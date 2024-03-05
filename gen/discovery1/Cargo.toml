@@ -4,12 +4,12 @@
 [package]
 
 name = "google-discovery1"
-version = "5.0.3+20200806"
+version = "5.0.4+20200806"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with discovery (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/discovery1"
 homepage = "https://developers.google.com/discovery/"
-documentation = "https://docs.rs/google-discovery1/5.0.3+20200806"
+documentation = "https://docs.rs/google-discovery1/5.0.4+20200806"
 license = "MIT"
 keywords = ["discovery", "google", "protocol", "web", "api"]
 autobins = false

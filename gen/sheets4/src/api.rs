@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, create, and delete all of your Google Drive files
     Drive,
@@ -146,7 +146,7 @@ impl<'a, S> Sheets<S> {
         Sheets {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://sheets.googleapis.com/".to_string(),
             _root_url: "https://sheets.googleapis.com/".to_string(),
         }
@@ -157,7 +157,7 @@ impl<'a, S> Sheets<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -606,7 +606,7 @@ impl client::Part for AutoResizeDimensionsRequest {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BandedRange {
-    /// The id of the banded range.
+    /// The ID of the banded range.
     #[serde(rename="bandedRangeId")]
     
     pub banded_range_id: Option<i32>,
@@ -902,7 +902,7 @@ pub struct BasicSeriesDataPointStyleOverride {
     #[serde(rename="colorStyle")]
     
     pub color_style: Option<ColorStyle>,
-    /// Zero based index of the series data point.
+    /// The zero-based index of the series data point.
     
     pub index: Option<i32>,
     /// Point style of the series data point. Valid only if the chartType is AREA, LINE, or SCATTER. COMBO charts are also supported if the series chart type is AREA, LINE, or SCATTER. If empty, the series default is used.
@@ -1294,7 +1294,7 @@ impl client::ResponseResult for BatchUpdateValuesResponse {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BigQueryDataSourceSpec {
-    /// The ID of a BigQuery enabled GCP project with a billing account attached. For any queries executed against the data source, the project is charged.
+    /// The ID of a BigQuery enabled Google Cloud project with a billing account attached. For any queries executed against the data source, the project is charged.
     #[serde(rename="projectId")]
     
     pub project_id: Option<String>,
@@ -1327,7 +1327,7 @@ pub struct BigQueryQuerySpec {
 impl client::Part for BigQueryQuerySpec {}
 
 
-/// Specifies a BigQuery table definition. Only [native tables](https://cloud.google.com/bigquery/docs/tables-intro) is allowed.
+/// Specifies a BigQuery table definition. Only [native tables](https://cloud.google.com/bigquery/docs/tables-intro) are allowed.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1380,7 +1380,7 @@ pub struct BooleanRule {
     /// The condition of the rule. If the condition evaluates to true, the format is applied.
     
     pub condition: Option<BooleanCondition>,
-    /// The format to apply. Conditional formatting can only apply a subset of formatting: bold, italic, strikethrough, foreground color & background color.
+    /// The format to apply. Conditional formatting can only apply a subset of formatting: bold, italic, strikethrough, foreground color and, background color.
     
     pub format: Option<CellFormat>,
 }
@@ -1623,7 +1623,7 @@ pub struct CellData {
     #[serde(rename="userEnteredFormat")]
     
     pub user_entered_format: Option<CellFormat>,
-    /// The value the user entered in the cell. e.g, `1234`, `'Hello'`, or `=NOW()` Note: Dates, Times and DateTimes are represented as doubles in serial number format.
+    /// The value the user entered in the cell. e.g., `1234`, `'Hello'`, or `=NOW()` Note: Dates, Times and DateTimes are represented as doubles in serial number format.
     #[serde(rename="userEnteredValue")]
     
     pub user_entered_value: Option<ExtendedValue>,
@@ -1995,7 +1995,7 @@ pub struct ClearValuesResponse {
 impl client::ResponseResult for ClearValuesResponse {}
 
 
-/// Represents a color in the RGBA color space. This representation is designed for simplicity of conversion to/from color representations in various languages over compactness. For example, the fields of this representation can be trivially provided to the constructor of `java.awt.Color` in Java; it can also be trivially provided to UIColor's `+colorWithRed:green:blue:alpha` method in iOS; and, with just a little work, it can be easily formatted into a CSS `rgba()` string in JavaScript. This reference page doesn't carry information about the absolute color space that should be used to interpret the RGB value (e.g. sRGB, Adobe RGB, DCI-P3, BT.2020, etc.). By default, applications should assume the sRGB color space. When color equality needs to be decided, implementations, unless documented otherwise, treat two colors as equal if all their red, green, blue, and alpha values each differ by at most 1e-5. Example (Java): import com.google.type.Color; // ... public static java.awt.Color fromProto(Color protocolor) { float alpha = protocolor.hasAlpha() ? protocolor.getAlpha().getValue() : 1.0; return new java.awt.Color( protocolor.getRed(), protocolor.getGreen(), protocolor.getBlue(), alpha); } public static Color toProto(java.awt.Color color) { float red = (float) color.getRed(); float green = (float) color.getGreen(); float blue = (float) color.getBlue(); float denominator = 255.0; Color.Builder resultBuilder = Color .newBuilder() .setRed(red / denominator) .setGreen(green / denominator) .setBlue(blue / denominator); int alpha = color.getAlpha(); if (alpha != 255) { result.setAlpha( FloatValue .newBuilder() .setValue(((float) alpha) / denominator) .build()); } return resultBuilder.build(); } // ... Example (iOS / Obj-C): // ... static UIColor* fromProto(Color* protocolor) { float red = [protocolor red]; float green = [protocolor green]; float blue = [protocolor blue]; FloatValue* alpha_wrapper = [protocolor alpha]; float alpha = 1.0; if (alpha_wrapper != nil) { alpha = [alpha_wrapper value]; } return [UIColor colorWithRed:red green:green blue:blue alpha:alpha]; } static Color* toProto(UIColor* color) { CGFloat red, green, blue, alpha; if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) { return nil; } Color* result = [[Color alloc] init]; [result setRed:red]; [result setGreen:green]; [result setBlue:blue]; if (alpha <= 0.9999) { [result setAlpha:floatWrapperWithValue(alpha)]; } [result autorelease]; return result; } // ... Example (JavaScript): // ... var protoToCssColor = function(rgb_color) { var redFrac = rgb_color.red || 0.0; var greenFrac = rgb_color.green || 0.0; var blueFrac = rgb_color.blue || 0.0; var red = Math.floor(redFrac * 255); var green = Math.floor(greenFrac * 255); var blue = Math.floor(blueFrac * 255); if (!('alpha' in rgb_color)) { return rgbToCssColor(red, green, blue); } var alphaFrac = rgb_color.alpha.value || 0.0; var rgbParams = [red, green, blue].join(','); return ['rgba(', rgbParams, ',', alphaFrac, ')'].join(''); }; var rgbToCssColor = function(red, green, blue) { var rgbNumber = new Number((red << 16) | (green << 8) | blue); var hexString = rgbNumber.toString(16); var missingZeros = 6 - hexString.length; var resultBuilder = ['#']; for (var i = 0; i < missingZeros; i++) { resultBuilder.push('0'); } resultBuilder.push(hexString); return resultBuilder.join(''); }; // ...
+/// Represents a color in the RGBA color space. This representation is designed for simplicity of conversion to and from color representations in various languages over compactness. For example, the fields of this representation can be trivially provided to the constructor of `java.awt.Color` in Java; it can also be trivially provided to UIColor's `+colorWithRed:green:blue:alpha` method in iOS; and, with just a little work, it can be easily formatted into a CSS `rgba()` string in JavaScript. This reference page doesn't have information about the absolute color space that should be used to interpret the RGB value—for example, sRGB, Adobe RGB, DCI-P3, and BT.2020. By default, applications should assume the sRGB color space. When color equality needs to be decided, implementations, unless documented otherwise, treat two colors as equal if all their red, green, blue, and alpha values each differ by at most `1e-5`. Example (Java): import com.google.type.Color; // ... public static java.awt.Color fromProto(Color protocolor) { float alpha = protocolor.hasAlpha() ? protocolor.getAlpha().getValue() : 1.0; return new java.awt.Color( protocolor.getRed(), protocolor.getGreen(), protocolor.getBlue(), alpha); } public static Color toProto(java.awt.Color color) { float red = (float) color.getRed(); float green = (float) color.getGreen(); float blue = (float) color.getBlue(); float denominator = 255.0; Color.Builder resultBuilder = Color .newBuilder() .setRed(red / denominator) .setGreen(green / denominator) .setBlue(blue / denominator); int alpha = color.getAlpha(); if (alpha != 255) { result.setAlpha( FloatValue .newBuilder() .setValue(((float) alpha) / denominator) .build()); } return resultBuilder.build(); } // ... Example (iOS / Obj-C): // ... static UIColor* fromProto(Color* protocolor) { float red = [protocolor red]; float green = [protocolor green]; float blue = [protocolor blue]; FloatValue* alpha_wrapper = [protocolor alpha]; float alpha = 1.0; if (alpha_wrapper != nil) { alpha = [alpha_wrapper value]; } return [UIColor colorWithRed:red green:green blue:blue alpha:alpha]; } static Color* toProto(UIColor* color) { CGFloat red, green, blue, alpha; if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) { return nil; } Color* result = [[Color alloc] init]; [result setRed:red]; [result setGreen:green]; [result setBlue:blue]; if (alpha <= 0.9999) { [result setAlpha:floatWrapperWithValue(alpha)]; } [result autorelease]; return result; } // ... Example (JavaScript): // ... var protoToCssColor = function(rgb_color) { var redFrac = rgb_color.red || 0.0; var greenFrac = rgb_color.green || 0.0; var blueFrac = rgb_color.blue || 0.0; var red = Math.floor(redFrac * 255); var green = Math.floor(greenFrac * 255); var blue = Math.floor(blueFrac * 255); if (!('alpha' in rgb_color)) { return rgbToCssColor(red, green, blue); } var alphaFrac = rgb_color.alpha.value || 0.0; var rgbParams = [red, green, blue].join(','); return ['rgba(', rgbParams, ',', alphaFrac, ')'].join(''); }; var rgbToCssColor = function(red, green, blue) { var rgbNumber = new Number((red << 16) | (green << 8) | blue); var hexString = rgbNumber.toString(16); var missingZeros = 6 - hexString.length; var resultBuilder = ['#']; for (var i = 0; i < missingZeros; i++) { resultBuilder.push('0'); } resultBuilder.push(hexString); return resultBuilder.join(''); }; // ...
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2475,7 +2475,7 @@ impl client::Part for DataSourceRefreshDailySchedule {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DataSourceRefreshMonthlySchedule {
-    /// Days of the month to refresh. Only 1-28 are supported, mapping to the 1st to the 28th day. At lesat one day must be specified.
+    /// Days of the month to refresh. Only 1-28 are supported, mapping to the 1st to the 28th day. At least one day must be specified.
     #[serde(rename="daysOfMonth")]
     
     pub days_of_month: Option<Vec<i32>>,
@@ -2488,7 +2488,7 @@ pub struct DataSourceRefreshMonthlySchedule {
 impl client::Part for DataSourceRefreshMonthlySchedule {}
 
 
-/// Schedule for refreshing the data source. Data sources in the spreadsheet are refreshed within a time interval. You can specify the start time by clicking the Scheduled Refresh button in the Sheets editor, but the interval is fixed at 4 hours. For example, if you specify a start time of 8am , the refresh will take place between 8am and 12pm every day.
+/// Schedule for refreshing the data source. Data sources in the spreadsheet are refreshed within a time interval. You can specify the start time by clicking the Scheduled Refresh button in the Sheets editor, but the interval is fixed at 4 hours. For example, if you specify a start time of 8 AM , the refresh will take place between 8 AM and 12 PM every day.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -3401,7 +3401,7 @@ impl client::Part for FilterCriteria {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct FilterSpec {
-    /// The column index.
+    /// The zero-based column index.
     #[serde(rename="columnIndex")]
     
     pub column_index: Option<i32>,
@@ -4276,7 +4276,7 @@ impl client::Part for PivotFilterCriteria {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PivotFilterSpec {
-    /// The column offset of the source range.
+    /// The zero-based column offset of the source range.
     #[serde(rename="columnOffsetIndex")]
     
     pub column_offset_index: Option<i32>,
@@ -4552,7 +4552,7 @@ pub struct ProtectedRange {
     #[serde(rename="unprotectedRanges")]
     
     pub unprotected_ranges: Option<Vec<GridRange>>,
-    /// True if this protected range will show a warning when editing. Warning-based protection means that every user can edit data in the protected range, except editing will prompt a warning asking the user to confirm the edit. When writing: if this field is true, then editors is ignored. Additionally, if this field is changed from true to false and the `editors` field is not set (nor included in the field mask), then the editors will be set to all the editors in the document.
+    /// True if this protected range will show a warning when editing. Warning-based protection means that every user can edit data in the protected range, except editing will prompt a warning asking the user to confirm the edit. When writing: if this field is true, then editors are ignored. Additionally, if this field is changed from true to false and the `editors` field is not set (nor included in the field mask), then the editors will be set to all the editors in the document.
     #[serde(rename="warningOnly")]
     
     pub warning_only: Option<bool>,
@@ -4824,7 +4824,7 @@ pub struct Request {
     #[serde(rename="randomizeRange")]
     
     pub randomize_range: Option<RandomizeRangeRequest>,
-    /// Refreshs one or multiple data sources and associated dbobjects.
+    /// Refreshes one or multiple data sources and associated dbobjects.
     #[serde(rename="refreshDataSource")]
     
     pub refresh_data_source: Option<RefreshDataSourceRequest>,
@@ -5246,7 +5246,7 @@ pub struct SheetProperties {
     /// True if the sheet is hidden in the UI, false if it's visible.
     
     pub hidden: Option<bool>,
-    /// The index of the sheet within the spreadsheet. When adding or updating sheet properties, if this field is excluded then the sheet is added or moved to the end of the sheet list. When updating sheet indices or inserting sheets, movement is considered in "before the move" indexes. For example, if there were 3 sheets (S1, S2, S3) in order to move S1 ahead of S2 the index would have to be set to 2. A sheet index update request is ignored if the requested index is identical to the sheets current index or if the requested new index is equal to the current sheet index + 1.
+    /// The index of the sheet within the spreadsheet. When adding or updating sheet properties, if this field is excluded then the sheet is added or moved to the end of the sheet list. When updating sheet indices or inserting sheets, movement is considered in "before the move" indexes. For example, if there were three sheets (S1, S2, S3) in order to move S1 ahead of S2 the index would have to be set to 2. A sheet index update request is ignored if the requested index is identical to the sheets current index or if the requested new index is equal to the current sheet index + 1.
     
     pub index: Option<i32>,
     /// True if the sheet is an RTL sheet instead of an LTR sheet.
@@ -5318,7 +5318,7 @@ pub struct SlicerSpec {
     #[serde(rename="backgroundColorStyle")]
     
     pub background_color_style: Option<ColorStyle>,
-    /// The column index in the data table on which the filter is applied to.
+    /// The zero-based column index in the data table on which the filter is applied to.
     #[serde(rename="columnIndex")]
     
     pub column_index: Option<i32>,
@@ -5602,7 +5602,7 @@ pub struct TextFormatRun {
     /// The format of this run. Absent values inherit the cell's format.
     
     pub format: Option<TextFormat>,
-    /// The character index where this run starts.
+    /// The zero-based character index where this run starts, in UTF-16 code units.
     #[serde(rename="startIndex")]
     
     pub start_index: Option<i32>,
@@ -6450,7 +6450,7 @@ pub struct WaterfallChartCustomSubtotal {
     /// A label for the subtotal column.
     
     pub label: Option<String>,
-    /// The 0-based index of a data point within the series. If data_is_subtotal is true, the data point at this index is the subtotal. Otherwise, the subtotal appears after the data point with this index. A series can have multiple subtotals at arbitrary indices, but subtotals do not affect the indices of the data points. For example, if a series has three data points, their indices will always be 0, 1, and 2, regardless of how many subtotals exist on the series or what data points they are associated with.
+    /// The zero-based index of a data point within the series. If data_is_subtotal is true, the data point at this index is the subtotal. Otherwise, the subtotal appears after the data point with this index. A series can have multiple subtotals at arbitrary indices, but subtotals do not affect the indices of the data points. For example, if a series has three data points, their indices will always be 0, 1, and 2, regardless of how many subtotals exist on the series or what data points they are associated with.
     #[serde(rename="subtotalIndex")]
     
     pub subtotal_index: Option<i32>,

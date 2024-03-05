@@ -187,14 +187,25 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "advanced-settings.audio-export-gcs-destination.uri" => Some(("advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.enabled" => Some(("advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.finish-digit" => Some(("advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.max-digits" => Some(("advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-interaction-logging" => Some(("advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "answer-feedback-settings.enable-answer-feedback" => Some(("answerFeedbackSettings.enableAnswerFeedback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "avatar-uri" => Some(("avatarUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-language-code" => Some(("defaultLanguageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enable-spell-correction" => Some(("enableSpellCorrection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "enable-stackdriver-logging" => Some(("enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gen-app-builder-settings.engine" => Some(("genAppBuilderSettings.engine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "git-integration-settings.github-settings.access-token" => Some(("gitIntegrationSettings.githubSettings.accessToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "git-integration-settings.github-settings.branches" => Some(("gitIntegrationSettings.githubSettings.branches", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "git-integration-settings.github-settings.display-name" => Some(("gitIntegrationSettings.githubSettings.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "git-integration-settings.github-settings.repository-uri" => Some(("gitIntegrationSettings.githubSettings.repositoryUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "git-integration-settings.github-settings.tracking-branch" => Some(("gitIntegrationSettings.githubSettings.trackingBranch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "locked" => Some(("locked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-settings" => Some(("securitySettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -203,7 +214,7 @@ where
                     "supported-language-codes" => Some(("supportedLanguageCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "avatar-uri", "default-language-code", "description", "display-name", "enable-interaction-logging", "enable-speech-adaptation", "enable-spell-correction", "enable-stackdriver-logging", "locked", "logging-settings", "name", "security-settings", "speech-to-text-settings", "start-flow", "supported-language-codes", "time-zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-token", "advanced-settings", "answer-feedback-settings", "audio-export-gcs-destination", "avatar-uri", "branches", "default-language-code", "description", "display-name", "dtmf-settings", "enable-answer-feedback", "enable-interaction-logging", "enable-speech-adaptation", "enable-spell-correction", "enable-stackdriver-logging", "enabled", "engine", "finish-digit", "gen-app-builder-settings", "git-integration-settings", "github-settings", "locked", "logging-settings", "max-digits", "name", "repository-uri", "security-settings", "speech-to-text-settings", "start-flow", "supported-language-codes", "time-zone", "tracking-branch", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -465,6 +476,95 @@ where
         }
     }
 
+    async fn _projects_locations_agents_entity_types_export(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "data-format" => Some(("dataFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity-types" => Some(("entityTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "entity-types-content-inline" => Some(("entityTypesContentInline", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "entity-types-uri" => Some(("entityTypesUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-format", "entity-types", "entity-types-content-inline", "entity-types-uri", "language-code"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowCxV3ExportEntityTypesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_agents_entity_types_export(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_agents_entity_types_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_agents_entity_types_get(opt.value_of("name").unwrap_or(""));
@@ -488,6 +588,94 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["language-code"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_agents_entity_types_import(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "entity-types-content.content" => Some(("entityTypesContent.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entity-types-uri" => Some(("entityTypesUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "merge-option" => Some(("mergeOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target-entity-type" => Some(("targetEntityType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "entity-types-content", "entity-types-uri", "merge-option", "target-entity-type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowCxV3ImportEntityTypesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_agents_entity_types_import(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1997,9 +2185,12 @@ where
                     "output-audio-config.synthesize-speech-config.volume-gain-db" => Some(("outputAudioConfig.synthesizeSpeechConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-input.audio.audio" => Some(("queryInput.audio.audio", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio.config.audio-encoding" => Some(("queryInput.audio.config.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.barge-in-config.no-barge-in-duration" => Some(("queryInput.audio.config.bargeInConfig.noBargeInDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.barge-in-config.total-duration" => Some(("queryInput.audio.config.bargeInConfig.totalDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio.config.enable-word-info" => Some(("queryInput.audio.config.enableWordInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio.config.model" => Some(("queryInput.audio.config.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio.config.model-variant" => Some(("queryInput.audio.config.modelVariant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.opt-out-conformer-model-migration" => Some(("queryInput.audio.config.optOutConformerModelMigration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio.config.phrase-hints" => Some(("queryInput.audio.config.phraseHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-input.audio.config.sample-rate-hertz" => Some(("queryInput.audio.config.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "query-input.audio.config.single-utterance" => Some(("queryInput.audio.config.singleUtterance", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2016,10 +2207,11 @@ where
                     "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-params.geo-location.latitude" => Some(("queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-params.geo-location.longitude" => Some(("queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-params.session-ttl" => Some(("queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "output-audio-config", "phrase-hints", "pitch", "query-input", "query-params", "sample-rate-hertz", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "phrase-hints", "pitch", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2451,11 +2643,15 @@ where
                     "match.intent.priority" => Some(("match.intent.priority", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "match.match-type" => Some(("match.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match.resolved-input" => Some(("match.resolvedInput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "match-intent-request.persist-parameter-changes" => Some(("matchIntentRequest.persistParameterChanges", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.audio.audio" => Some(("matchIntentRequest.queryInput.audio.audio", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.audio.config.audio-encoding" => Some(("matchIntentRequest.queryInput.audio.config.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "match-intent-request.query-input.audio.config.barge-in-config.no-barge-in-duration" => Some(("matchIntentRequest.queryInput.audio.config.bargeInConfig.noBargeInDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "match-intent-request.query-input.audio.config.barge-in-config.total-duration" => Some(("matchIntentRequest.queryInput.audio.config.bargeInConfig.totalDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.audio.config.enable-word-info" => Some(("matchIntentRequest.queryInput.audio.config.enableWordInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.audio.config.model" => Some(("matchIntentRequest.queryInput.audio.config.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.audio.config.model-variant" => Some(("matchIntentRequest.queryInput.audio.config.modelVariant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "match-intent-request.query-input.audio.config.opt-out-conformer-model-migration" => Some(("matchIntentRequest.queryInput.audio.config.optOutConformerModelMigration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.audio.config.phrase-hints" => Some(("matchIntentRequest.queryInput.audio.config.phraseHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "match-intent-request.query-input.audio.config.sample-rate-hertz" => Some(("matchIntentRequest.queryInput.audio.config.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.audio.config.single-utterance" => Some(("matchIntentRequest.queryInput.audio.config.singleUtterance", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2472,6 +2668,7 @@ where
                     "match-intent-request.query-params.flow-versions" => Some(("matchIntentRequest.queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "match-intent-request.query-params.geo-location.latitude" => Some(("matchIntentRequest.queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.geo-location.longitude" => Some(("matchIntentRequest.queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "match-intent-request.query-params.session-ttl" => Some(("matchIntentRequest.queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.time-zone" => Some(("matchIntentRequest.queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.webhook-headers" => Some(("matchIntentRequest.queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "output-audio-config.audio-encoding" => Some(("outputAudioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2483,7 +2680,7 @@ where
                     "output-audio-config.synthesize-speech-config.voice.ssml-gender" => Some(("outputAudioConfig.synthesizeSpeechConfig.voice.ssmlGender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-audio-config.synthesize-speech-config.volume-gain-db" => Some(("outputAudioConfig.synthesizeSpeechConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "channel", "confidence", "config", "current-page", "description", "digits", "disable-webhook", "display-name", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "is-fallback", "labels", "language-code", "latitude", "longitude", "match", "match-intent-request", "match-type", "model", "model-variant", "name", "output-audio-config", "phrase-hints", "pitch", "priority", "query-input", "query-params", "resolved-input", "sample-rate-hertz", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "confidence", "config", "current-page", "description", "digits", "disable-webhook", "display-name", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "is-fallback", "labels", "language-code", "latitude", "longitude", "match", "match-intent-request", "match-type", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "persist-parameter-changes", "phrase-hints", "pitch", "priority", "query-input", "query-params", "resolved-input", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2566,11 +2763,15 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "persist-parameter-changes" => Some(("persistParameterChanges", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio.audio" => Some(("queryInput.audio.audio", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio.config.audio-encoding" => Some(("queryInput.audio.config.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.barge-in-config.no-barge-in-duration" => Some(("queryInput.audio.config.bargeInConfig.noBargeInDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.barge-in-config.total-duration" => Some(("queryInput.audio.config.bargeInConfig.totalDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio.config.enable-word-info" => Some(("queryInput.audio.config.enableWordInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio.config.model" => Some(("queryInput.audio.config.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio.config.model-variant" => Some(("queryInput.audio.config.modelVariant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.opt-out-conformer-model-migration" => Some(("queryInput.audio.config.optOutConformerModelMigration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio.config.phrase-hints" => Some(("queryInput.audio.config.phraseHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-input.audio.config.sample-rate-hertz" => Some(("queryInput.audio.config.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "query-input.audio.config.single-utterance" => Some(("queryInput.audio.config.singleUtterance", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2587,10 +2788,11 @@ where
                     "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-params.geo-location.latitude" => Some(("queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-params.geo-location.longitude" => Some(("queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-params.session-ttl" => Some(("queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "phrase-hints", "query-input", "query-params", "sample-rate-hertz", "single-utterance", "text", "time-zone", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "no-barge-in-duration", "opt-out-conformer-model-migration", "persist-parameter-changes", "phrase-hints", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "text", "time-zone", "total-duration", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2601,6 +2803,125 @@ where
         }
         let mut request: api::GoogleCloudDialogflowCxV3MatchIntentRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().locations_agents_environments_sessions_match_intent(request, opt.value_of("session").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_agents_environments_sessions_server_streaming_detect_intent(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "output-audio-config.audio-encoding" => Some(("outputAudioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-audio-config.sample-rate-hertz" => Some(("outputAudioConfig.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "output-audio-config.synthesize-speech-config.effects-profile-id" => Some(("outputAudioConfig.synthesizeSpeechConfig.effectsProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "output-audio-config.synthesize-speech-config.pitch" => Some(("outputAudioConfig.synthesizeSpeechConfig.pitch", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "output-audio-config.synthesize-speech-config.speaking-rate" => Some(("outputAudioConfig.synthesizeSpeechConfig.speakingRate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "output-audio-config.synthesize-speech-config.voice.name" => Some(("outputAudioConfig.synthesizeSpeechConfig.voice.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-audio-config.synthesize-speech-config.voice.ssml-gender" => Some(("outputAudioConfig.synthesizeSpeechConfig.voice.ssmlGender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-audio-config.synthesize-speech-config.volume-gain-db" => Some(("outputAudioConfig.synthesizeSpeechConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-input.audio.audio" => Some(("queryInput.audio.audio", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.audio-encoding" => Some(("queryInput.audio.config.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.barge-in-config.no-barge-in-duration" => Some(("queryInput.audio.config.bargeInConfig.noBargeInDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.barge-in-config.total-duration" => Some(("queryInput.audio.config.bargeInConfig.totalDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.enable-word-info" => Some(("queryInput.audio.config.enableWordInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.model" => Some(("queryInput.audio.config.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.model-variant" => Some(("queryInput.audio.config.modelVariant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.opt-out-conformer-model-migration" => Some(("queryInput.audio.config.optOutConformerModelMigration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.phrase-hints" => Some(("queryInput.audio.config.phraseHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query-input.audio.config.sample-rate-hertz" => Some(("queryInput.audio.config.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.single-utterance" => Some(("queryInput.audio.config.singleUtterance", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query-input.dtmf.digits" => Some(("queryInput.dtmf.digits", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.dtmf.finish-digit" => Some(("queryInput.dtmf.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.event.event" => Some(("queryInput.event.event", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.intent.intent" => Some(("queryInput.intent.intent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.language-code" => Some(("queryInput.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.text.text" => Some(("queryInput.text.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-params.analyze-query-text-sentiment" => Some(("queryParams.analyzeQueryTextSentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query-params.channel" => Some(("queryParams.channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-params.current-page" => Some(("queryParams.currentPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-params.disable-webhook" => Some(("queryParams.disableWebhook", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query-params.geo-location.latitude" => Some(("queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-params.geo-location.longitude" => Some(("queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-params.session-ttl" => Some(("queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "phrase-hints", "pitch", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowCxV3DetectIntentRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_agents_environments_sessions_server_streaming_detect_intent(request, opt.value_of("session").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -2676,8 +2997,11 @@ where
                     "agent-uri" => Some(("agentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "data-format" => Some(("dataFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment" => Some(("environment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "git-destination.commit-message" => Some(("gitDestination.commitMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "git-destination.tracking-branch" => Some(("gitDestination.trackingBranch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "include-bigquery-export-settings" => Some(("includeBigqueryExportSettings", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-uri", "data-format", "environment"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-uri", "commit-message", "data-format", "environment", "git-destination", "include-bigquery-export-settings", "tracking-branch"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2760,15 +3084,34 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "advanced-settings.audio-export-gcs-destination.uri" => Some(("advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.enabled" => Some(("advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.finish-digit" => Some(("advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.max-digits" => Some(("advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-settings.logging-settings.enable-interaction-logging" => Some(("advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.enabled" => Some(("knowledgeConnectorSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.target-flow" => Some(("knowledgeConnectorSettings.targetFlow", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.target-page" => Some(("knowledgeConnectorSettings.targetPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.audio-export-gcs-destination.uri" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.enabled" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.finish-digit" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.max-digits" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-interaction-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.enable-generative-fallback" => Some(("knowledgeConnectorSettings.triggerFulfillment.enableGenerativeFallback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.return-partial-responses" => Some(("knowledgeConnectorSettings.triggerFulfillment.returnPartialResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.tag" => Some(("knowledgeConnectorSettings.triggerFulfillment.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.webhook" => Some(("knowledgeConnectorSettings.triggerFulfillment.webhook", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "nlu-settings.classification-threshold" => Some(("nluSettings.classificationThreshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "nlu-settings.model-training-mode" => Some(("nluSettings.modelTrainingMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "nlu-settings.model-type" => Some(("nluSettings.modelType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transition-route-groups" => Some(("transitionRouteGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification-threshold", "description", "display-name", "model-training-mode", "model-type", "name", "nlu-settings", "transition-route-groups"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "audio-export-gcs-destination", "classification-threshold", "description", "display-name", "dtmf-settings", "enable-generative-fallback", "enable-interaction-logging", "enable-stackdriver-logging", "enabled", "finish-digit", "knowledge-connector-settings", "logging-settings", "max-digits", "model-training-mode", "model-type", "name", "nlu-settings", "return-partial-responses", "tag", "target-flow", "target-page", "transition-route-groups", "trigger-fulfillment", "uri", "webhook"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3110,10 +3453,11 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "flow-content" => Some(("flowContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flow-import-strategy.global-import-strategy" => Some(("flowImportStrategy.globalImportStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flow-uri" => Some(("flowUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "import-option" => Some(("importOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["flow-content", "flow-uri", "import-option"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["flow-content", "flow-import-strategy", "flow-uri", "global-import-strategy", "import-option"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3258,14 +3602,41 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "advanced-settings.audio-export-gcs-destination.uri" => Some(("advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.enabled" => Some(("advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.finish-digit" => Some(("advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.max-digits" => Some(("advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-settings.logging-settings.enable-interaction-logging" => Some(("advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.audio-export-gcs-destination.uri" => Some(("entryFulfillment.advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.dtmf-settings.enabled" => Some(("entryFulfillment.advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.dtmf-settings.finish-digit" => Some(("entryFulfillment.advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.dtmf-settings.max-digits" => Some(("entryFulfillment.advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.logging-settings.enable-interaction-logging" => Some(("entryFulfillment.advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("entryFulfillment.advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.enable-generative-fallback" => Some(("entryFulfillment.enableGenerativeFallback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "entry-fulfillment.return-partial-responses" => Some(("entryFulfillment.returnPartialResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "entry-fulfillment.tag" => Some(("entryFulfillment.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-fulfillment.webhook" => Some(("entryFulfillment.webhook", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.enabled" => Some(("knowledgeConnectorSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.target-flow" => Some(("knowledgeConnectorSettings.targetFlow", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.target-page" => Some(("knowledgeConnectorSettings.targetPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.audio-export-gcs-destination.uri" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.enabled" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.finish-digit" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.max-digits" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-interaction-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.enable-generative-fallback" => Some(("knowledgeConnectorSettings.triggerFulfillment.enableGenerativeFallback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.return-partial-responses" => Some(("knowledgeConnectorSettings.triggerFulfillment.returnPartialResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.tag" => Some(("knowledgeConnectorSettings.triggerFulfillment.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.webhook" => Some(("knowledgeConnectorSettings.triggerFulfillment.webhook", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transition-route-groups" => Some(("transitionRouteGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "entry-fulfillment", "name", "return-partial-responses", "tag", "transition-route-groups", "webhook"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "audio-export-gcs-destination", "description", "display-name", "dtmf-settings", "enable-generative-fallback", "enable-interaction-logging", "enable-stackdriver-logging", "enabled", "entry-fulfillment", "finish-digit", "knowledge-connector-settings", "logging-settings", "max-digits", "name", "return-partial-responses", "tag", "target-flow", "target-page", "transition-route-groups", "trigger-fulfillment", "uri", "webhook"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3526,14 +3897,41 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "advanced-settings.audio-export-gcs-destination.uri" => Some(("advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.enabled" => Some(("advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.finish-digit" => Some(("advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.max-digits" => Some(("advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-settings.logging-settings.enable-interaction-logging" => Some(("advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.audio-export-gcs-destination.uri" => Some(("entryFulfillment.advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.dtmf-settings.enabled" => Some(("entryFulfillment.advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.dtmf-settings.finish-digit" => Some(("entryFulfillment.advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.dtmf-settings.max-digits" => Some(("entryFulfillment.advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.logging-settings.enable-interaction-logging" => Some(("entryFulfillment.advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("entryFulfillment.advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "entry-fulfillment.enable-generative-fallback" => Some(("entryFulfillment.enableGenerativeFallback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "entry-fulfillment.return-partial-responses" => Some(("entryFulfillment.returnPartialResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "entry-fulfillment.tag" => Some(("entryFulfillment.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "entry-fulfillment.webhook" => Some(("entryFulfillment.webhook", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.enabled" => Some(("knowledgeConnectorSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.target-flow" => Some(("knowledgeConnectorSettings.targetFlow", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.target-page" => Some(("knowledgeConnectorSettings.targetPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.audio-export-gcs-destination.uri" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.enabled" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.finish-digit" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.max-digits" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-interaction-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.enable-generative-fallback" => Some(("knowledgeConnectorSettings.triggerFulfillment.enableGenerativeFallback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.return-partial-responses" => Some(("knowledgeConnectorSettings.triggerFulfillment.returnPartialResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.tag" => Some(("knowledgeConnectorSettings.triggerFulfillment.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.webhook" => Some(("knowledgeConnectorSettings.triggerFulfillment.webhook", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transition-route-groups" => Some(("transitionRouteGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "entry-fulfillment", "name", "return-partial-responses", "tag", "transition-route-groups", "webhook"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "audio-export-gcs-destination", "description", "display-name", "dtmf-settings", "enable-generative-fallback", "enable-interaction-logging", "enable-stackdriver-logging", "enabled", "entry-fulfillment", "finish-digit", "knowledge-connector-settings", "logging-settings", "max-digits", "name", "return-partial-responses", "tag", "target-flow", "target-page", "transition-route-groups", "trigger-fulfillment", "uri", "webhook"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3623,15 +4021,34 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "advanced-settings.audio-export-gcs-destination.uri" => Some(("advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.enabled" => Some(("advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.finish-digit" => Some(("advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.max-digits" => Some(("advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "advanced-settings.logging-settings.enable-interaction-logging" => Some(("advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.enabled" => Some(("knowledgeConnectorSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.target-flow" => Some(("knowledgeConnectorSettings.targetFlow", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.target-page" => Some(("knowledgeConnectorSettings.targetPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.audio-export-gcs-destination.uri" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.enabled" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.finish-digit" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.dtmf-settings.max-digits" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-interaction-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("knowledgeConnectorSettings.triggerFulfillment.advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.enable-generative-fallback" => Some(("knowledgeConnectorSettings.triggerFulfillment.enableGenerativeFallback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.return-partial-responses" => Some(("knowledgeConnectorSettings.triggerFulfillment.returnPartialResponses", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.tag" => Some(("knowledgeConnectorSettings.triggerFulfillment.tag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.trigger-fulfillment.webhook" => Some(("knowledgeConnectorSettings.triggerFulfillment.webhook", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "nlu-settings.classification-threshold" => Some(("nluSettings.classificationThreshold", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "nlu-settings.model-training-mode" => Some(("nluSettings.modelTrainingMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "nlu-settings.model-type" => Some(("nluSettings.modelType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "transition-route-groups" => Some(("transitionRouteGroups", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification-threshold", "description", "display-name", "model-training-mode", "model-type", "name", "nlu-settings", "transition-route-groups"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "audio-export-gcs-destination", "classification-threshold", "description", "display-name", "dtmf-settings", "enable-generative-fallback", "enable-interaction-logging", "enable-stackdriver-logging", "enabled", "finish-digit", "knowledge-connector-settings", "logging-settings", "max-digits", "model-training-mode", "model-type", "name", "nlu-settings", "return-partial-responses", "tag", "target-flow", "target-page", "transition-route-groups", "trigger-fulfillment", "uri", "webhook"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4746,6 +5163,365 @@ where
         }
     }
 
+    async fn _projects_locations_agents_generators_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "prompt-text.text" => Some(("promptText.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "name", "prompt-text", "text"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowCxV3Generator = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_agents_generators_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "language-code" => {
+                    call = call.language_code(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["language-code"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_agents_generators_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_agents_generators_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "force" => {
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["force"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_agents_generators_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_agents_generators_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "language-code" => {
+                    call = call.language_code(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["language-code"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_agents_generators_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_agents_generators_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "language-code" => {
+                    call = call.language_code(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["language-code", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_agents_generators_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "prompt-text.text" => Some(("promptText.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "name", "prompt-text", "text"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowCxV3Generator = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_agents_generators_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                "language-code" => {
+                    call = call.language_code(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["language-code", "update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_agents_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_agents_get(opt.value_of("name").unwrap_or(""));
@@ -4765,6 +5541,62 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_agents_get_generative_settings(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_agents_get_generative_settings(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "language-code" => {
+                    call = call.language_code(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["language-code"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -5000,6 +5832,94 @@ where
         }
     }
 
+    async fn _projects_locations_agents_intents_export(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "data-format" => Some(("dataFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "intents" => Some(("intents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "intents-content-inline" => Some(("intentsContentInline", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "intents-uri" => Some(("intentsUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-format", "intents", "intents-content-inline", "intents-uri"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowCxV3ExportIntentsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_agents_intents_export(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_agents_intents_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_agents_intents_get(opt.value_of("name").unwrap_or(""));
@@ -5023,6 +5943,93 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["language-code"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_agents_intents_import(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "intents-content.content" => Some(("intentsContent.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "intents-uri" => Some(("intentsUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "merge-option" => Some(("mergeOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["content", "intents-content", "intents-uri", "merge-option"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowCxV3ImportIntentsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_agents_intents_import(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -5300,14 +6307,25 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "advanced-settings.audio-export-gcs-destination.uri" => Some(("advancedSettings.audioExportGcsDestination.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.enabled" => Some(("advancedSettings.dtmfSettings.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.finish-digit" => Some(("advancedSettings.dtmfSettings.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "advanced-settings.dtmf-settings.max-digits" => Some(("advancedSettings.dtmfSettings.maxDigits", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-interaction-logging" => Some(("advancedSettings.loggingSettings.enableInteractionLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "advanced-settings.logging-settings.enable-stackdriver-logging" => Some(("advancedSettings.loggingSettings.enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "answer-feedback-settings.enable-answer-feedback" => Some(("answerFeedbackSettings.enableAnswerFeedback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "avatar-uri" => Some(("avatarUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "default-language-code" => Some(("defaultLanguageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enable-spell-correction" => Some(("enableSpellCorrection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "enable-stackdriver-logging" => Some(("enableStackdriverLogging", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "gen-app-builder-settings.engine" => Some(("genAppBuilderSettings.engine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "git-integration-settings.github-settings.access-token" => Some(("gitIntegrationSettings.githubSettings.accessToken", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "git-integration-settings.github-settings.branches" => Some(("gitIntegrationSettings.githubSettings.branches", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "git-integration-settings.github-settings.display-name" => Some(("gitIntegrationSettings.githubSettings.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "git-integration-settings.github-settings.repository-uri" => Some(("gitIntegrationSettings.githubSettings.repositoryUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "git-integration-settings.github-settings.tracking-branch" => Some(("gitIntegrationSettings.githubSettings.trackingBranch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "locked" => Some(("locked", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-settings" => Some(("securitySettings", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5316,7 +6334,7 @@ where
                     "supported-language-codes" => Some(("supportedLanguageCodes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-settings", "avatar-uri", "default-language-code", "description", "display-name", "enable-interaction-logging", "enable-speech-adaptation", "enable-spell-correction", "enable-stackdriver-logging", "locked", "logging-settings", "name", "security-settings", "speech-to-text-settings", "start-flow", "supported-language-codes", "time-zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-token", "advanced-settings", "answer-feedback-settings", "audio-export-gcs-destination", "avatar-uri", "branches", "default-language-code", "description", "display-name", "dtmf-settings", "enable-answer-feedback", "enable-interaction-logging", "enable-speech-adaptation", "enable-spell-correction", "enable-stackdriver-logging", "enabled", "engine", "finish-digit", "gen-app-builder-settings", "git-integration-settings", "github-settings", "locked", "logging-settings", "max-digits", "name", "repository-uri", "security-settings", "speech-to-text-settings", "start-flow", "supported-language-codes", "time-zone", "tracking-branch", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5405,9 +6423,10 @@ where
                 match &temp_cursor.to_string()[..] {
                     "agent-content" => Some(("agentContent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "agent-uri" => Some(("agentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "git-source.tracking-branch" => Some(("gitSource.trackingBranch", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "restore-option" => Some(("restoreOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-content", "agent-uri", "restore-option"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent-content", "agent-uri", "git-source", "restore-option", "tracking-branch"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5500,9 +6519,12 @@ where
                     "output-audio-config.synthesize-speech-config.volume-gain-db" => Some(("outputAudioConfig.synthesizeSpeechConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-input.audio.audio" => Some(("queryInput.audio.audio", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio.config.audio-encoding" => Some(("queryInput.audio.config.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.barge-in-config.no-barge-in-duration" => Some(("queryInput.audio.config.bargeInConfig.noBargeInDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.barge-in-config.total-duration" => Some(("queryInput.audio.config.bargeInConfig.totalDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio.config.enable-word-info" => Some(("queryInput.audio.config.enableWordInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio.config.model" => Some(("queryInput.audio.config.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio.config.model-variant" => Some(("queryInput.audio.config.modelVariant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.opt-out-conformer-model-migration" => Some(("queryInput.audio.config.optOutConformerModelMigration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio.config.phrase-hints" => Some(("queryInput.audio.config.phraseHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-input.audio.config.sample-rate-hertz" => Some(("queryInput.audio.config.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "query-input.audio.config.single-utterance" => Some(("queryInput.audio.config.singleUtterance", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -5519,10 +6541,11 @@ where
                     "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-params.geo-location.latitude" => Some(("queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-params.geo-location.longitude" => Some(("queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-params.session-ttl" => Some(("queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "output-audio-config", "phrase-hints", "pitch", "query-input", "query-params", "sample-rate-hertz", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "phrase-hints", "pitch", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5954,11 +6977,15 @@ where
                     "match.intent.priority" => Some(("match.intent.priority", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "match.match-type" => Some(("match.matchType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match.resolved-input" => Some(("match.resolvedInput", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "match-intent-request.persist-parameter-changes" => Some(("matchIntentRequest.persistParameterChanges", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.audio.audio" => Some(("matchIntentRequest.queryInput.audio.audio", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.audio.config.audio-encoding" => Some(("matchIntentRequest.queryInput.audio.config.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "match-intent-request.query-input.audio.config.barge-in-config.no-barge-in-duration" => Some(("matchIntentRequest.queryInput.audio.config.bargeInConfig.noBargeInDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "match-intent-request.query-input.audio.config.barge-in-config.total-duration" => Some(("matchIntentRequest.queryInput.audio.config.bargeInConfig.totalDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.audio.config.enable-word-info" => Some(("matchIntentRequest.queryInput.audio.config.enableWordInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.audio.config.model" => Some(("matchIntentRequest.queryInput.audio.config.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.audio.config.model-variant" => Some(("matchIntentRequest.queryInput.audio.config.modelVariant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "match-intent-request.query-input.audio.config.opt-out-conformer-model-migration" => Some(("matchIntentRequest.queryInput.audio.config.optOutConformerModelMigration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.audio.config.phrase-hints" => Some(("matchIntentRequest.queryInput.audio.config.phraseHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "match-intent-request.query-input.audio.config.sample-rate-hertz" => Some(("matchIntentRequest.queryInput.audio.config.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "match-intent-request.query-input.audio.config.single-utterance" => Some(("matchIntentRequest.queryInput.audio.config.singleUtterance", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -5975,6 +7002,7 @@ where
                     "match-intent-request.query-params.flow-versions" => Some(("matchIntentRequest.queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "match-intent-request.query-params.geo-location.latitude" => Some(("matchIntentRequest.queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.geo-location.longitude" => Some(("matchIntentRequest.queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "match-intent-request.query-params.session-ttl" => Some(("matchIntentRequest.queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.time-zone" => Some(("matchIntentRequest.queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "match-intent-request.query-params.webhook-headers" => Some(("matchIntentRequest.queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "output-audio-config.audio-encoding" => Some(("outputAudioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5986,7 +7014,7 @@ where
                     "output-audio-config.synthesize-speech-config.voice.ssml-gender" => Some(("outputAudioConfig.synthesizeSpeechConfig.voice.ssmlGender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "output-audio-config.synthesize-speech-config.volume-gain-db" => Some(("outputAudioConfig.synthesizeSpeechConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "channel", "confidence", "config", "current-page", "description", "digits", "disable-webhook", "display-name", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "is-fallback", "labels", "language-code", "latitude", "longitude", "match", "match-intent-request", "match-type", "model", "model-variant", "name", "output-audio-config", "phrase-hints", "pitch", "priority", "query-input", "query-params", "resolved-input", "sample-rate-hertz", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "voice", "volume-gain-db", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "confidence", "config", "current-page", "description", "digits", "disable-webhook", "display-name", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "is-fallback", "labels", "language-code", "latitude", "longitude", "match", "match-intent-request", "match-type", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "persist-parameter-changes", "phrase-hints", "pitch", "priority", "query-input", "query-params", "resolved-input", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6069,11 +7097,15 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "persist-parameter-changes" => Some(("persistParameterChanges", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio.audio" => Some(("queryInput.audio.audio", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio.config.audio-encoding" => Some(("queryInput.audio.config.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.barge-in-config.no-barge-in-duration" => Some(("queryInput.audio.config.bargeInConfig.noBargeInDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.barge-in-config.total-duration" => Some(("queryInput.audio.config.bargeInConfig.totalDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio.config.enable-word-info" => Some(("queryInput.audio.config.enableWordInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio.config.model" => Some(("queryInput.audio.config.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-input.audio.config.model-variant" => Some(("queryInput.audio.config.modelVariant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.opt-out-conformer-model-migration" => Some(("queryInput.audio.config.optOutConformerModelMigration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "query-input.audio.config.phrase-hints" => Some(("queryInput.audio.config.phraseHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-input.audio.config.sample-rate-hertz" => Some(("queryInput.audio.config.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "query-input.audio.config.single-utterance" => Some(("queryInput.audio.config.singleUtterance", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -6090,10 +7122,11 @@ where
                     "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "query-params.geo-location.latitude" => Some(("queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "query-params.geo-location.longitude" => Some(("queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-params.session-ttl" => Some(("queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "phrase-hints", "query-input", "query-params", "sample-rate-hertz", "single-utterance", "text", "time-zone", "webhook-headers"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "no-barge-in-duration", "opt-out-conformer-model-migration", "persist-parameter-changes", "phrase-hints", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "text", "time-zone", "total-duration", "webhook-headers"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6104,6 +7137,215 @@ where
         }
         let mut request: api::GoogleCloudDialogflowCxV3MatchIntentRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().locations_agents_sessions_match_intent(request, opt.value_of("session").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_agents_sessions_server_streaming_detect_intent(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "output-audio-config.audio-encoding" => Some(("outputAudioConfig.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-audio-config.sample-rate-hertz" => Some(("outputAudioConfig.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "output-audio-config.synthesize-speech-config.effects-profile-id" => Some(("outputAudioConfig.synthesizeSpeechConfig.effectsProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "output-audio-config.synthesize-speech-config.pitch" => Some(("outputAudioConfig.synthesizeSpeechConfig.pitch", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "output-audio-config.synthesize-speech-config.speaking-rate" => Some(("outputAudioConfig.synthesizeSpeechConfig.speakingRate", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "output-audio-config.synthesize-speech-config.voice.name" => Some(("outputAudioConfig.synthesizeSpeechConfig.voice.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-audio-config.synthesize-speech-config.voice.ssml-gender" => Some(("outputAudioConfig.synthesizeSpeechConfig.voice.ssmlGender", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "output-audio-config.synthesize-speech-config.volume-gain-db" => Some(("outputAudioConfig.synthesizeSpeechConfig.volumeGainDb", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-input.audio.audio" => Some(("queryInput.audio.audio", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.audio-encoding" => Some(("queryInput.audio.config.audioEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.barge-in-config.no-barge-in-duration" => Some(("queryInput.audio.config.bargeInConfig.noBargeInDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.barge-in-config.total-duration" => Some(("queryInput.audio.config.bargeInConfig.totalDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.enable-word-info" => Some(("queryInput.audio.config.enableWordInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.model" => Some(("queryInput.audio.config.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.model-variant" => Some(("queryInput.audio.config.modelVariant", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.opt-out-conformer-model-migration" => Some(("queryInput.audio.config.optOutConformerModelMigration", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.phrase-hints" => Some(("queryInput.audio.config.phraseHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query-input.audio.config.sample-rate-hertz" => Some(("queryInput.audio.config.sampleRateHertz", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "query-input.audio.config.single-utterance" => Some(("queryInput.audio.config.singleUtterance", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query-input.dtmf.digits" => Some(("queryInput.dtmf.digits", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.dtmf.finish-digit" => Some(("queryInput.dtmf.finishDigit", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.event.event" => Some(("queryInput.event.event", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.intent.intent" => Some(("queryInput.intent.intent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.language-code" => Some(("queryInput.languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-input.text.text" => Some(("queryInput.text.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-params.analyze-query-text-sentiment" => Some(("queryParams.analyzeQueryTextSentiment", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query-params.channel" => Some(("queryParams.channel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-params.current-page" => Some(("queryParams.currentPage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-params.disable-webhook" => Some(("queryParams.disableWebhook", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "query-params.flow-versions" => Some(("queryParams.flowVersions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "query-params.geo-location.latitude" => Some(("queryParams.geoLocation.latitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-params.geo-location.longitude" => Some(("queryParams.geoLocation.longitude", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "query-params.session-ttl" => Some(("queryParams.sessionTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-params.time-zone" => Some(("queryParams.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "query-params.webhook-headers" => Some(("queryParams.webhookHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["analyze-query-text-sentiment", "audio", "audio-encoding", "barge-in-config", "channel", "config", "current-page", "digits", "disable-webhook", "dtmf", "effects-profile-id", "enable-word-info", "event", "finish-digit", "flow-versions", "geo-location", "intent", "language-code", "latitude", "longitude", "model", "model-variant", "name", "no-barge-in-duration", "opt-out-conformer-model-migration", "output-audio-config", "phrase-hints", "pitch", "query-input", "query-params", "sample-rate-hertz", "session-ttl", "single-utterance", "speaking-rate", "ssml-gender", "synthesize-speech-config", "text", "time-zone", "total-duration", "voice", "volume-gain-db", "webhook-headers"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowCxV3DetectIntentRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_agents_sessions_server_streaming_detect_intent(request, opt.value_of("session").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_agents_sessions_submit_answer_feedback(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "answer-feedback.custom-rating" => Some(("answerFeedback.customRating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer-feedback.rating" => Some(("answerFeedback.rating", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer-feedback.rating-reason.feedback" => Some(("answerFeedback.ratingReason.feedback", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "answer-feedback.rating-reason.reason-labels" => Some(("answerFeedback.ratingReason.reasonLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "response-id" => Some(("responseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["answer-feedback", "custom-rating", "feedback", "rating", "rating-reason", "reason-labels", "response-id", "update-mask"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowCxV3SubmitAnswerFeedbackRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_agents_sessions_submit_answer_feedback(request, opt.value_of("session").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -7062,6 +8304,460 @@ where
         }
     }
 
+    async fn _projects_locations_agents_transition_route_groups_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowCxV3TransitionRouteGroup = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_agents_transition_route_groups_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "language-code" => {
+                    call = call.language_code(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["language-code"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_agents_transition_route_groups_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_agents_transition_route_groups_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "force" => {
+                    call = call.force(        value.map(|v| arg_from_str(v, err, "force", "boolean")).unwrap_or(false));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["force"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_agents_transition_route_groups_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_agents_transition_route_groups_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "language-code" => {
+                    call = call.language_code(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["language-code"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_agents_transition_route_groups_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_agents_transition_route_groups_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "language-code" => {
+                    call = call.language_code(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["language-code", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_agents_transition_route_groups_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["display-name", "name"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowCxV3TransitionRouteGroup = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_agents_transition_route_groups_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                "language-code" => {
+                    call = call.language_code(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["language-code", "update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_agents_update_generative_settings(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "fallback-settings.selected-prompt" => Some(("fallbackSettings.selectedPrompt", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.agent" => Some(("knowledgeConnectorSettings.agent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.agent-identity" => Some(("knowledgeConnectorSettings.agentIdentity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.agent-scope" => Some(("knowledgeConnectorSettings.agentScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.business" => Some(("knowledgeConnectorSettings.business", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.business-description" => Some(("knowledgeConnectorSettings.businessDescription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "knowledge-connector-settings.disable-data-store-fallback" => Some(("knowledgeConnectorSettings.disableDataStoreFallback", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "language-code" => Some(("languageCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["agent", "agent-identity", "agent-scope", "business", "business-description", "disable-data-store-fallback", "fallback-settings", "knowledge-connector-settings", "language-code", "name", "selected-prompt"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudDialogflowCxV3GenerativeSettings = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_agents_update_generative_settings(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_agents_validate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -7173,20 +8869,28 @@ where
                     "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.allowed-ca-certs" => Some(("genericWebService.allowedCaCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "generic-web-service.http-method" => Some(("genericWebService.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generic-web-service.parameter-mapping" => Some(("genericWebService.parameterMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "generic-web-service.password" => Some(("genericWebService.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generic-web-service.request-body" => Some(("genericWebService.requestBody", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.request-headers" => Some(("genericWebService.requestHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "generic-web-service.uri" => Some(("genericWebService.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.username" => Some(("genericWebService.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generic-web-service.webhook-type" => Some(("genericWebService.webhookType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.allowed-ca-certs" => Some(("serviceDirectory.genericWebService.allowedCaCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-directory.generic-web-service.http-method" => Some(("serviceDirectory.genericWebService.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-directory.generic-web-service.parameter-mapping" => Some(("serviceDirectory.genericWebService.parameterMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "service-directory.generic-web-service.password" => Some(("serviceDirectory.genericWebService.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-directory.generic-web-service.request-body" => Some(("serviceDirectory.genericWebService.requestBody", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.request-headers" => Some(("serviceDirectory.genericWebService.requestHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "service-directory.generic-web-service.uri" => Some(("serviceDirectory.genericWebService.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.username" => Some(("serviceDirectory.genericWebService.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-directory.generic-web-service.webhook-type" => Some(("serviceDirectory.genericWebService.webhookType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.service" => Some(("serviceDirectory.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-ca-certs", "disabled", "display-name", "generic-web-service", "name", "password", "request-headers", "service", "service-directory", "timeout", "uri", "username"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-ca-certs", "disabled", "display-name", "generic-web-service", "http-method", "name", "parameter-mapping", "password", "request-body", "request-headers", "service", "service-directory", "timeout", "uri", "username", "webhook-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7439,20 +9143,28 @@ where
                     "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.allowed-ca-certs" => Some(("genericWebService.allowedCaCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "generic-web-service.http-method" => Some(("genericWebService.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generic-web-service.parameter-mapping" => Some(("genericWebService.parameterMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "generic-web-service.password" => Some(("genericWebService.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generic-web-service.request-body" => Some(("genericWebService.requestBody", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.request-headers" => Some(("genericWebService.requestHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "generic-web-service.uri" => Some(("genericWebService.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "generic-web-service.username" => Some(("genericWebService.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "generic-web-service.webhook-type" => Some(("genericWebService.webhookType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.allowed-ca-certs" => Some(("serviceDirectory.genericWebService.allowedCaCerts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "service-directory.generic-web-service.http-method" => Some(("serviceDirectory.genericWebService.httpMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-directory.generic-web-service.parameter-mapping" => Some(("serviceDirectory.genericWebService.parameterMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "service-directory.generic-web-service.password" => Some(("serviceDirectory.genericWebService.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-directory.generic-web-service.request-body" => Some(("serviceDirectory.genericWebService.requestBody", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.request-headers" => Some(("serviceDirectory.genericWebService.requestHeaders", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "service-directory.generic-web-service.uri" => Some(("serviceDirectory.genericWebService.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.generic-web-service.username" => Some(("serviceDirectory.genericWebService.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-directory.generic-web-service.webhook-type" => Some(("serviceDirectory.genericWebService.webhookType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-directory.service" => Some(("serviceDirectory.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-ca-certs", "disabled", "display-name", "generic-web-service", "name", "password", "request-headers", "service", "service-directory", "timeout", "uri", "username"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allowed-ca-certs", "disabled", "display-name", "generic-web-service", "http-method", "name", "parameter-mapping", "password", "request-body", "request-headers", "service", "service-directory", "timeout", "uri", "username", "webhook-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7831,9 +9543,10 @@ where
                     "purge-data-types" => Some(("purgeDataTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "redaction-scope" => Some(("redactionScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "redaction-strategy" => Some(("redactionStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "retention-strategy" => Some(("retentionStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention-window-days" => Some(("retentionWindowDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-export-pattern", "audio-export-settings", "audio-format", "deidentify-template", "display-name", "enable-audio-redaction", "enable-insights-export", "gcs-bucket", "insights-export-settings", "inspect-template", "name", "purge-data-types", "redaction-scope", "redaction-strategy", "retention-window-days"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-export-pattern", "audio-export-settings", "audio-format", "deidentify-template", "display-name", "enable-audio-redaction", "enable-insights-export", "gcs-bucket", "insights-export-settings", "inspect-template", "name", "purge-data-types", "redaction-scope", "redaction-strategy", "retention-strategy", "retention-window-days"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -8091,9 +9804,10 @@ where
                     "purge-data-types" => Some(("purgeDataTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "redaction-scope" => Some(("redactionScope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "redaction-strategy" => Some(("redactionStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "retention-strategy" => Some(("retentionStrategy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "retention-window-days" => Some(("retentionWindowDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-export-pattern", "audio-export-settings", "audio-format", "deidentify-template", "display-name", "enable-audio-redaction", "enable-insights-export", "gcs-bucket", "insights-export-settings", "inspect-template", "name", "purge-data-types", "redaction-scope", "redaction-strategy", "retention-window-days"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["audio-export-pattern", "audio-export-settings", "audio-format", "deidentify-template", "display-name", "enable-audio-redaction", "enable-insights-export", "gcs-bucket", "insights-export-settings", "inspect-template", "name", "purge-data-types", "redaction-scope", "redaction-strategy", "retention-strategy", "retention-window-days"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -8348,8 +10062,14 @@ where
                     ("locations-agents-entity-types-delete", Some(opt)) => {
                         call_result = self._projects_locations_agents_entity_types_delete(opt, dry_run, &mut err).await;
                     },
+                    ("locations-agents-entity-types-export", Some(opt)) => {
+                        call_result = self._projects_locations_agents_entity_types_export(opt, dry_run, &mut err).await;
+                    },
                     ("locations-agents-entity-types-get", Some(opt)) => {
                         call_result = self._projects_locations_agents_entity_types_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-agents-entity-types-import", Some(opt)) => {
+                        call_result = self._projects_locations_agents_entity_types_import(opt, dry_run, &mut err).await;
                     },
                     ("locations-agents-entity-types-list", Some(opt)) => {
                         call_result = self._projects_locations_agents_entity_types_list(opt, dry_run, &mut err).await;
@@ -8435,6 +10155,9 @@ where
                     ("locations-agents-environments-sessions-match-intent", Some(opt)) => {
                         call_result = self._projects_locations_agents_environments_sessions_match_intent(opt, dry_run, &mut err).await;
                     },
+                    ("locations-agents-environments-sessions-server-streaming-detect-intent", Some(opt)) => {
+                        call_result = self._projects_locations_agents_environments_sessions_server_streaming_detect_intent(opt, dry_run, &mut err).await;
+                    },
                     ("locations-agents-export", Some(opt)) => {
                         call_result = self._projects_locations_agents_export(opt, dry_run, &mut err).await;
                     },
@@ -8519,8 +10242,26 @@ where
                     ("locations-agents-flows-versions-patch", Some(opt)) => {
                         call_result = self._projects_locations_agents_flows_versions_patch(opt, dry_run, &mut err).await;
                     },
+                    ("locations-agents-generators-create", Some(opt)) => {
+                        call_result = self._projects_locations_agents_generators_create(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-agents-generators-delete", Some(opt)) => {
+                        call_result = self._projects_locations_agents_generators_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-agents-generators-get", Some(opt)) => {
+                        call_result = self._projects_locations_agents_generators_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-agents-generators-list", Some(opt)) => {
+                        call_result = self._projects_locations_agents_generators_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-agents-generators-patch", Some(opt)) => {
+                        call_result = self._projects_locations_agents_generators_patch(opt, dry_run, &mut err).await;
+                    },
                     ("locations-agents-get", Some(opt)) => {
                         call_result = self._projects_locations_agents_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-agents-get-generative-settings", Some(opt)) => {
+                        call_result = self._projects_locations_agents_get_generative_settings(opt, dry_run, &mut err).await;
                     },
                     ("locations-agents-get-validation-result", Some(opt)) => {
                         call_result = self._projects_locations_agents_get_validation_result(opt, dry_run, &mut err).await;
@@ -8531,8 +10272,14 @@ where
                     ("locations-agents-intents-delete", Some(opt)) => {
                         call_result = self._projects_locations_agents_intents_delete(opt, dry_run, &mut err).await;
                     },
+                    ("locations-agents-intents-export", Some(opt)) => {
+                        call_result = self._projects_locations_agents_intents_export(opt, dry_run, &mut err).await;
+                    },
                     ("locations-agents-intents-get", Some(opt)) => {
                         call_result = self._projects_locations_agents_intents_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-agents-intents-import", Some(opt)) => {
+                        call_result = self._projects_locations_agents_intents_import(opt, dry_run, &mut err).await;
                     },
                     ("locations-agents-intents-list", Some(opt)) => {
                         call_result = self._projects_locations_agents_intents_list(opt, dry_run, &mut err).await;
@@ -8573,6 +10320,12 @@ where
                     ("locations-agents-sessions-match-intent", Some(opt)) => {
                         call_result = self._projects_locations_agents_sessions_match_intent(opt, dry_run, &mut err).await;
                     },
+                    ("locations-agents-sessions-server-streaming-detect-intent", Some(opt)) => {
+                        call_result = self._projects_locations_agents_sessions_server_streaming_detect_intent(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-agents-sessions-submit-answer-feedback", Some(opt)) => {
+                        call_result = self._projects_locations_agents_sessions_submit_answer_feedback(opt, dry_run, &mut err).await;
+                    },
                     ("locations-agents-test-cases-batch-delete", Some(opt)) => {
                         call_result = self._projects_locations_agents_test_cases_batch_delete(opt, dry_run, &mut err).await;
                     },
@@ -8608,6 +10361,24 @@ where
                     },
                     ("locations-agents-test-cases-run", Some(opt)) => {
                         call_result = self._projects_locations_agents_test_cases_run(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-agents-transition-route-groups-create", Some(opt)) => {
+                        call_result = self._projects_locations_agents_transition_route_groups_create(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-agents-transition-route-groups-delete", Some(opt)) => {
+                        call_result = self._projects_locations_agents_transition_route_groups_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-agents-transition-route-groups-get", Some(opt)) => {
+                        call_result = self._projects_locations_agents_transition_route_groups_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-agents-transition-route-groups-list", Some(opt)) => {
+                        call_result = self._projects_locations_agents_transition_route_groups_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-agents-transition-route-groups-patch", Some(opt)) => {
+                        call_result = self._projects_locations_agents_transition_route_groups_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-agents-update-generative-settings", Some(opt)) => {
+                        call_result = self._projects_locations_agents_update_generative_settings(opt, dry_run, &mut err).await;
                     },
                     ("locations-agents-validate", Some(opt)) => {
                         call_result = self._projects_locations_agents_validate(opt, dry_run, &mut err).await;
@@ -8745,7 +10516,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-agents-changelogs-get', 'locations-agents-changelogs-list', 'locations-agents-create', 'locations-agents-delete', 'locations-agents-entity-types-create', 'locations-agents-entity-types-delete', 'locations-agents-entity-types-get', 'locations-agents-entity-types-list', 'locations-agents-entity-types-patch', 'locations-agents-environments-continuous-test-results-list', 'locations-agents-environments-create', 'locations-agents-environments-delete', 'locations-agents-environments-deploy-flow', 'locations-agents-environments-deployments-get', 'locations-agents-environments-deployments-list', 'locations-agents-environments-experiments-create', 'locations-agents-environments-experiments-delete', 'locations-agents-environments-experiments-get', 'locations-agents-environments-experiments-list', 'locations-agents-environments-experiments-patch', 'locations-agents-environments-experiments-start', 'locations-agents-environments-experiments-stop', 'locations-agents-environments-get', 'locations-agents-environments-list', 'locations-agents-environments-lookup-environment-history', 'locations-agents-environments-patch', 'locations-agents-environments-run-continuous-test', 'locations-agents-environments-sessions-detect-intent', 'locations-agents-environments-sessions-entity-types-create', 'locations-agents-environments-sessions-entity-types-delete', 'locations-agents-environments-sessions-entity-types-get', 'locations-agents-environments-sessions-entity-types-list', 'locations-agents-environments-sessions-entity-types-patch', 'locations-agents-environments-sessions-fulfill-intent', 'locations-agents-environments-sessions-match-intent', 'locations-agents-export', 'locations-agents-flows-create', 'locations-agents-flows-delete', 'locations-agents-flows-export', 'locations-agents-flows-get', 'locations-agents-flows-get-validation-result', 'locations-agents-flows-import', 'locations-agents-flows-list', 'locations-agents-flows-pages-create', 'locations-agents-flows-pages-delete', 'locations-agents-flows-pages-get', 'locations-agents-flows-pages-list', 'locations-agents-flows-pages-patch', 'locations-agents-flows-patch', 'locations-agents-flows-train', 'locations-agents-flows-transition-route-groups-create', 'locations-agents-flows-transition-route-groups-delete', 'locations-agents-flows-transition-route-groups-get', 'locations-agents-flows-transition-route-groups-list', 'locations-agents-flows-transition-route-groups-patch', 'locations-agents-flows-validate', 'locations-agents-flows-versions-compare-versions', 'locations-agents-flows-versions-create', 'locations-agents-flows-versions-delete', 'locations-agents-flows-versions-get', 'locations-agents-flows-versions-list', 'locations-agents-flows-versions-load', 'locations-agents-flows-versions-patch', 'locations-agents-get', 'locations-agents-get-validation-result', 'locations-agents-intents-create', 'locations-agents-intents-delete', 'locations-agents-intents-get', 'locations-agents-intents-list', 'locations-agents-intents-patch', 'locations-agents-list', 'locations-agents-patch', 'locations-agents-restore', 'locations-agents-sessions-detect-intent', 'locations-agents-sessions-entity-types-create', 'locations-agents-sessions-entity-types-delete', 'locations-agents-sessions-entity-types-get', 'locations-agents-sessions-entity-types-list', 'locations-agents-sessions-entity-types-patch', 'locations-agents-sessions-fulfill-intent', 'locations-agents-sessions-match-intent', 'locations-agents-test-cases-batch-delete', 'locations-agents-test-cases-batch-run', 'locations-agents-test-cases-calculate-coverage', 'locations-agents-test-cases-create', 'locations-agents-test-cases-export', 'locations-agents-test-cases-get', 'locations-agents-test-cases-import', 'locations-agents-test-cases-list', 'locations-agents-test-cases-patch', 'locations-agents-test-cases-results-get', 'locations-agents-test-cases-results-list', 'locations-agents-test-cases-run', 'locations-agents-validate', 'locations-agents-webhooks-create', 'locations-agents-webhooks-delete', 'locations-agents-webhooks-get', 'locations-agents-webhooks-list', 'locations-agents-webhooks-patch', 'locations-get', 'locations-list', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'locations-security-settings-create', 'locations-security-settings-delete', 'locations-security-settings-get', 'locations-security-settings-list', 'locations-security-settings-patch', 'operations-cancel', 'operations-get' and 'operations-list'", vec![
+        ("projects", "methods: 'locations-agents-changelogs-get', 'locations-agents-changelogs-list', 'locations-agents-create', 'locations-agents-delete', 'locations-agents-entity-types-create', 'locations-agents-entity-types-delete', 'locations-agents-entity-types-export', 'locations-agents-entity-types-get', 'locations-agents-entity-types-import', 'locations-agents-entity-types-list', 'locations-agents-entity-types-patch', 'locations-agents-environments-continuous-test-results-list', 'locations-agents-environments-create', 'locations-agents-environments-delete', 'locations-agents-environments-deploy-flow', 'locations-agents-environments-deployments-get', 'locations-agents-environments-deployments-list', 'locations-agents-environments-experiments-create', 'locations-agents-environments-experiments-delete', 'locations-agents-environments-experiments-get', 'locations-agents-environments-experiments-list', 'locations-agents-environments-experiments-patch', 'locations-agents-environments-experiments-start', 'locations-agents-environments-experiments-stop', 'locations-agents-environments-get', 'locations-agents-environments-list', 'locations-agents-environments-lookup-environment-history', 'locations-agents-environments-patch', 'locations-agents-environments-run-continuous-test', 'locations-agents-environments-sessions-detect-intent', 'locations-agents-environments-sessions-entity-types-create', 'locations-agents-environments-sessions-entity-types-delete', 'locations-agents-environments-sessions-entity-types-get', 'locations-agents-environments-sessions-entity-types-list', 'locations-agents-environments-sessions-entity-types-patch', 'locations-agents-environments-sessions-fulfill-intent', 'locations-agents-environments-sessions-match-intent', 'locations-agents-environments-sessions-server-streaming-detect-intent', 'locations-agents-export', 'locations-agents-flows-create', 'locations-agents-flows-delete', 'locations-agents-flows-export', 'locations-agents-flows-get', 'locations-agents-flows-get-validation-result', 'locations-agents-flows-import', 'locations-agents-flows-list', 'locations-agents-flows-pages-create', 'locations-agents-flows-pages-delete', 'locations-agents-flows-pages-get', 'locations-agents-flows-pages-list', 'locations-agents-flows-pages-patch', 'locations-agents-flows-patch', 'locations-agents-flows-train', 'locations-agents-flows-transition-route-groups-create', 'locations-agents-flows-transition-route-groups-delete', 'locations-agents-flows-transition-route-groups-get', 'locations-agents-flows-transition-route-groups-list', 'locations-agents-flows-transition-route-groups-patch', 'locations-agents-flows-validate', 'locations-agents-flows-versions-compare-versions', 'locations-agents-flows-versions-create', 'locations-agents-flows-versions-delete', 'locations-agents-flows-versions-get', 'locations-agents-flows-versions-list', 'locations-agents-flows-versions-load', 'locations-agents-flows-versions-patch', 'locations-agents-generators-create', 'locations-agents-generators-delete', 'locations-agents-generators-get', 'locations-agents-generators-list', 'locations-agents-generators-patch', 'locations-agents-get', 'locations-agents-get-generative-settings', 'locations-agents-get-validation-result', 'locations-agents-intents-create', 'locations-agents-intents-delete', 'locations-agents-intents-export', 'locations-agents-intents-get', 'locations-agents-intents-import', 'locations-agents-intents-list', 'locations-agents-intents-patch', 'locations-agents-list', 'locations-agents-patch', 'locations-agents-restore', 'locations-agents-sessions-detect-intent', 'locations-agents-sessions-entity-types-create', 'locations-agents-sessions-entity-types-delete', 'locations-agents-sessions-entity-types-get', 'locations-agents-sessions-entity-types-list', 'locations-agents-sessions-entity-types-patch', 'locations-agents-sessions-fulfill-intent', 'locations-agents-sessions-match-intent', 'locations-agents-sessions-server-streaming-detect-intent', 'locations-agents-sessions-submit-answer-feedback', 'locations-agents-test-cases-batch-delete', 'locations-agents-test-cases-batch-run', 'locations-agents-test-cases-calculate-coverage', 'locations-agents-test-cases-create', 'locations-agents-test-cases-export', 'locations-agents-test-cases-get', 'locations-agents-test-cases-import', 'locations-agents-test-cases-list', 'locations-agents-test-cases-patch', 'locations-agents-test-cases-results-get', 'locations-agents-test-cases-results-list', 'locations-agents-test-cases-run', 'locations-agents-transition-route-groups-create', 'locations-agents-transition-route-groups-delete', 'locations-agents-transition-route-groups-get', 'locations-agents-transition-route-groups-list', 'locations-agents-transition-route-groups-patch', 'locations-agents-update-generative-settings', 'locations-agents-validate', 'locations-agents-webhooks-create', 'locations-agents-webhooks-delete', 'locations-agents-webhooks-get', 'locations-agents-webhooks-list', 'locations-agents-webhooks-patch', 'locations-get', 'locations-list', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'locations-security-settings-create', 'locations-security-settings-delete', 'locations-security-settings-get', 'locations-security-settings-list', 'locations-security-settings-patch', 'operations-cancel', 'operations-get' and 'operations-list'", vec![
             ("locations-agents-changelogs-get",
                     Some(r##"Retrieves the specified Changelog."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-changelogs-get",
@@ -8890,6 +10661,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-agents-entity-types-export",
+                    Some(r##"Exports the selected entity types."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-entity-types-export",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the parent agent to export entity types. Format: `projects//locations//agents/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-agents-entity-types-get",
                     Some(r##"Retrieves the specified entity type."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-entity-types-get",
@@ -8899,6 +10698,34 @@ async fn main() {
                      Some(r##"Required. The name of the entity type. Format: `projects//locations//agents//entityTypes/`."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agents-entity-types-import",
+                    Some(r##"Imports the specified entitytypes into the agent."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-entity-types-import",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The agent to import the entity types into. Format: `projects//locations//agents/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -9612,6 +11439,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-agents-environments-sessions-server-streaming-detect-intent",
+                    Some(r##"Processes a natural language query and returns structured, actionable data as a result through server-side streaming. Server-side streaming allows Dialogflow to send [partial responses](https://cloud.google.com/dialogflow/cx/docs/concept/fulfillment#partial-response) earlier in a single request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-environments-sessions-server-streaming-detect-intent",
+                  vec![
+                    (Some(r##"session"##),
+                     None,
+                     Some(r##"Required. The name of the session this query is sent to. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment. It's up to the API caller to choose an appropriate `Session ID`. It can be a random number or some type of session identifiers (preferably hashed). The length of the `Session ID` must not exceed 36 characters. For more information, see the [sessions guide](https://cloud.google.com/dialogflow/cx/docs/concept/session). Note: Always use agent versions for production traffic. See [Versions and environments](https://cloud.google.com/dialogflow/cx/docs/concept/version)."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-agents-export",
                     Some(r##"Exports the specified agent to a binary file. This method is a [long-running operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation). The returned `Operation` type has the following method-specific fields: - `metadata`: An empty [Struct message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct) - `response`: ExportAgentResponse"##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-export",
@@ -9996,7 +11851,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The flow to create an TransitionRouteGroup for. Format: `projects//locations//agents//flows/`."##),
+                     Some(r##"Required. The flow to create an TransitionRouteGroup for. Format: `projects//locations//agents//flows/` or `projects//locations//agents/` for agent-level groups."##),
                      Some(true),
                      Some(false)),
         
@@ -10024,7 +11879,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the TransitionRouteGroup to delete. Format: `projects//locations//agents//flows//transitionRouteGroups/`."##),
+                     Some(r##"Required. The name of the TransitionRouteGroup to delete. Format: `projects//locations//agents//flows//transitionRouteGroups/` or `projects//locations//agents//transitionRouteGroups/`."##),
                      Some(true),
                      Some(false)),
         
@@ -10046,7 +11901,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the TransitionRouteGroup. Format: `projects//locations//agents//flows//transitionRouteGroups/`."##),
+                     Some(r##"Required. The name of the TransitionRouteGroup. Format: `projects//locations//agents//flows//transitionRouteGroups/` or `projects//locations//agents//transitionRouteGroups/`."##),
                      Some(true),
                      Some(false)),
         
@@ -10068,7 +11923,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The flow to list all transition route groups for. Format: `projects//locations//agents//flows/`."##),
+                     Some(r##"Required. The flow to list all transition route groups for. Format: `projects//locations//agents//flows/` or `projects//locations//agents/."##),
                      Some(true),
                      Some(false)),
         
@@ -10090,7 +11945,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The unique identifier of the transition route group. TransitionRouteGroups.CreateTransitionRouteGroup populates the name automatically. Format: `projects//locations//agents//flows//transitionRouteGroups/`."##),
+                     Some(r##"The unique identifier of the transition route group. TransitionRouteGroups.CreateTransitionRouteGroup populates the name automatically. Format: `projects//locations//agents//flows//transitionRouteGroups/` ."##),
                      Some(true),
                      Some(false)),
         
@@ -10318,6 +12173,128 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-agents-generators-create",
+                    Some(r##"Creates a generator in the specified agent."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-generators-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The agent to create a generator for. Format: `projects//locations//agents/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agents-generators-delete",
+                    Some(r##"Deletes the specified generators."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-generators-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the generator to delete. Format: `projects//locations//agents//generators/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agents-generators-get",
+                    Some(r##"Retrieves the specified generator."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-generators-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the generator. Format: `projects//locations//agents//generators/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agents-generators-list",
+                    Some(r##"Returns the list of all generators in the specified agent."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-generators-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The agent to list all generators for. Format: `projects//locations//agents/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agents-generators-patch",
+                    Some(r##"Update the specified generator."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-generators-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The unique identifier of the generator. Must be set for the Generators.UpdateGenerator method. Generators.CreateGenerate populates the name automatically. Format: `projects//locations//agents//generators/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-agents-get",
                     Some(r##"Retrieves the specified agent."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-get",
@@ -10325,6 +12302,28 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Required. The name of the agent. Format: `projects//locations//agents/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agents-get-generative-settings",
+                    Some(r##"Gets the generative settings for the agent."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-get-generative-settings",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Format: `projects//locations//agents//generativeSettings`."##),
                      Some(true),
                      Some(false)),
         
@@ -10412,6 +12411,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-agents-intents-export",
+                    Some(r##"Exports the selected intents. This method is a [long-running operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation). The returned `Operation` type has the following method-specific fields: - `metadata`: ExportIntentsMetadata - `response`: ExportIntentsResponse"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-intents-export",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the parent agent to export intents. Format: `projects//locations//agents/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-agents-intents-get",
                     Some(r##"Retrieves the specified intent."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-intents-get",
@@ -10421,6 +12448,34 @@ async fn main() {
                      Some(r##"Required. The name of the intent. Format: `projects//locations//agents//intents/`."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agents-intents-import",
+                    Some(r##"Imports the specified intents into the agent. This method is a [long-running operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation). The returned `Operation` type has the following method-specific fields: - `metadata`: ImportIntentsMetadata - `response`: ImportIntentsResponse"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-intents-import",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The agent to import the intents into. Format: `projects//locations//agents/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -10768,6 +12823,62 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-agents-sessions-server-streaming-detect-intent",
+                    Some(r##"Processes a natural language query and returns structured, actionable data as a result through server-side streaming. Server-side streaming allows Dialogflow to send [partial responses](https://cloud.google.com/dialogflow/cx/docs/concept/fulfillment#partial-response) earlier in a single request."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-sessions-server-streaming-detect-intent",
+                  vec![
+                    (Some(r##"session"##),
+                     None,
+                     Some(r##"Required. The name of the session this query is sent to. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment. It's up to the API caller to choose an appropriate `Session ID`. It can be a random number or some type of session identifiers (preferably hashed). The length of the `Session ID` must not exceed 36 characters. For more information, see the [sessions guide](https://cloud.google.com/dialogflow/cx/docs/concept/session). Note: Always use agent versions for production traffic. See [Versions and environments](https://cloud.google.com/dialogflow/cx/docs/concept/version)."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agents-sessions-submit-answer-feedback",
+                    Some(r##"Updates the feedback received from the user for a single turn of the bot response."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-sessions-submit-answer-feedback",
+                  vec![
+                    (Some(r##"session"##),
+                     None,
+                     Some(r##"Required. The name of the session the feedback was sent to."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-agents-test-cases-batch-delete",
                     Some(r##"Batch deletes test cases."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-test-cases-batch-delete",
@@ -11025,7 +13136,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-agents-test-cases-results-list",
-                    Some(r##"Fetches a list of results for a given test case."##),
+                    Some(r##"Fetches the list of run results for the given test case. A maximum of 100 results are kept for each test case."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-test-cases-results-list",
                   vec![
                     (Some(r##"parent"##),
@@ -11053,6 +13164,156 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Required. Format of test case name to run: `projects//locations/ /agents//testCases/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agents-transition-route-groups-create",
+                    Some(r##"Creates an TransitionRouteGroup in the specified flow. Note: You should always train a flow prior to sending it queries. See the [training documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-transition-route-groups-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The flow to create an TransitionRouteGroup for. Format: `projects//locations//agents//flows/` or `projects//locations//agents/` for agent-level groups."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agents-transition-route-groups-delete",
+                    Some(r##"Deletes the specified TransitionRouteGroup. Note: You should always train a flow prior to sending it queries. See the [training documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-transition-route-groups-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the TransitionRouteGroup to delete. Format: `projects//locations//agents//flows//transitionRouteGroups/` or `projects//locations//agents//transitionRouteGroups/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agents-transition-route-groups-get",
+                    Some(r##"Retrieves the specified TransitionRouteGroup."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-transition-route-groups-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the TransitionRouteGroup. Format: `projects//locations//agents//flows//transitionRouteGroups/` or `projects//locations//agents//transitionRouteGroups/`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agents-transition-route-groups-list",
+                    Some(r##"Returns the list of all transition route groups in the specified flow."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-transition-route-groups-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The flow to list all transition route groups for. Format: `projects//locations//agents//flows/` or `projects//locations//agents/."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agents-transition-route-groups-patch",
+                    Some(r##"Updates the specified TransitionRouteGroup. Note: You should always train a flow prior to sending it queries. See the [training documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training)."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-transition-route-groups-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The unique identifier of the transition route group. TransitionRouteGroups.CreateTransitionRouteGroup populates the name automatically. Format: `projects//locations//agents//flows//transitionRouteGroups/` ."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-agents-update-generative-settings",
+                    Some(r##"Updates the generative settings for the agent."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-agents-update-generative-settings",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Format: `projects//locations//agents//generativeSettings`."##),
                      Some(true),
                      Some(false)),
         
@@ -11313,7 +13574,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -11501,7 +13762,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dialogflow3_cli/projects_operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -11528,7 +13789,7 @@ async fn main() {
     
     let mut app = App::new("dialogflow3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230110")
+           .version("5.0.4+20240227")
            .about("Builds conversational interfaces (for example, chatbots, and voice-powered apps and devices).")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dialogflow3_cli")
            .arg(Arg::with_name("url")

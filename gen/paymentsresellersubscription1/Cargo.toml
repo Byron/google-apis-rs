@@ -4,12 +4,12 @@
 [package]
 
 name = "google-paymentsresellersubscription1"
-version = "5.0.3+20230123"
+version = "5.0.4+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Payments Reseller Subscription (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/paymentsresellersubscription1"
 homepage = "https://developers.google.com/payments/reseller/subscription/"
-documentation = "https://docs.rs/google-paymentsresellersubscription1/5.0.3+20230123"
+documentation = "https://docs.rs/google-paymentsresellersubscription1/5.0.4+20240303"
 license = "MIT"
 keywords = ["paymentsresellersubs", "google", "protocol", "web", "api"]
 autobins = false

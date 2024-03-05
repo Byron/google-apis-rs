@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebasestorage* crate version *5.0.3+20230106*, where *20230106* is the exact revision of the *firebasestorage:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Firebasestorage* crate version *5.0.4+20240301*, where *20240301* is the exact revision of the *firebasestorage:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Firebasestorage* *v1_beta* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/storage).

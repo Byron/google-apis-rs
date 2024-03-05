@@ -155,7 +155,7 @@
             }
         }
     },
-    "revision": "20221104",
+    "revision": "20240123",
     "rootUrl": "https://analyticsreporting.googleapis.com/",
     "schemas": {
         "Activity": {

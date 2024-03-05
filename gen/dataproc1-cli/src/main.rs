@@ -75,6 +75,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "basic-algorithm.cooldown-period" => Some(("basicAlgorithm.cooldownPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.graceful-decommission-timeout" => Some(("basicAlgorithm.sparkStandaloneConfig.gracefulDecommissionTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "basic-algorithm.spark-standalone-config.remove-only-idle-workers" => Some(("basicAlgorithm.sparkStandaloneConfig.removeOnlyIdleWorkers", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.scale-down-factor" => Some(("basicAlgorithm.sparkStandaloneConfig.scaleDownFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.scale-down-min-worker-fraction" => Some(("basicAlgorithm.sparkStandaloneConfig.scaleDownMinWorkerFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.scale-up-factor" => Some(("basicAlgorithm.sparkStandaloneConfig.scaleUpFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -94,7 +95,7 @@ where
                     "worker-config.min-instances" => Some(("workerConfig.minInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "worker-config.weight" => Some(("workerConfig.weight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic-algorithm", "cooldown-period", "graceful-decommission-timeout", "id", "labels", "max-instances", "min-instances", "name", "scale-down-factor", "scale-down-min-worker-fraction", "scale-up-factor", "scale-up-min-worker-fraction", "secondary-worker-config", "spark-standalone-config", "weight", "worker-config", "yarn-config"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic-algorithm", "cooldown-period", "graceful-decommission-timeout", "id", "labels", "max-instances", "min-instances", "name", "remove-only-idle-workers", "scale-down-factor", "scale-down-min-worker-fraction", "scale-up-factor", "scale-up-min-worker-fraction", "secondary-worker-config", "spark-standalone-config", "weight", "worker-config", "yarn-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -598,6 +599,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "basic-algorithm.cooldown-period" => Some(("basicAlgorithm.cooldownPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.graceful-decommission-timeout" => Some(("basicAlgorithm.sparkStandaloneConfig.gracefulDecommissionTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "basic-algorithm.spark-standalone-config.remove-only-idle-workers" => Some(("basicAlgorithm.sparkStandaloneConfig.removeOnlyIdleWorkers", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.scale-down-factor" => Some(("basicAlgorithm.sparkStandaloneConfig.scaleDownFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.scale-down-min-worker-fraction" => Some(("basicAlgorithm.sparkStandaloneConfig.scaleDownMinWorkerFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.scale-up-factor" => Some(("basicAlgorithm.sparkStandaloneConfig.scaleUpFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -617,7 +619,7 @@ where
                     "worker-config.min-instances" => Some(("workerConfig.minInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "worker-config.weight" => Some(("workerConfig.weight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic-algorithm", "cooldown-period", "graceful-decommission-timeout", "id", "labels", "max-instances", "min-instances", "name", "scale-down-factor", "scale-down-min-worker-fraction", "scale-up-factor", "scale-up-min-worker-fraction", "secondary-worker-config", "spark-standalone-config", "weight", "worker-config", "yarn-config"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic-algorithm", "cooldown-period", "graceful-decommission-timeout", "id", "labels", "max-instances", "min-instances", "name", "remove-only-idle-workers", "scale-down-factor", "scale-down-min-worker-fraction", "scale-up-factor", "scale-up-min-worker-fraction", "secondary-worker-config", "spark-standalone-config", "weight", "worker-config", "yarn-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -707,7 +709,9 @@ where
                     "environment-config.execution-config.network-tags" => Some(("environmentConfig.executionConfig.networkTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "environment-config.execution-config.network-uri" => Some(("environmentConfig.executionConfig.networkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.execution-config.service-account" => Some(("environmentConfig.executionConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.staging-bucket" => Some(("environmentConfig.executionConfig.stagingBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.execution-config.subnetwork-uri" => Some(("environmentConfig.executionConfig.subnetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.ttl" => Some(("environmentConfig.executionConfig.ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.peripherals-config.metastore-service" => Some(("environmentConfig.peripheralsConfig.metastoreService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "environment-config.peripherals-config.spark-history-server-config.dataproc-cluster" => Some(("environmentConfig.peripheralsConfig.sparkHistoryServerConfig.dataprocCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -721,11 +725,18 @@ where
                     "pyspark-batch.python-file-uris" => Some(("pysparkBatch.pythonFileUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "runtime-config.container-image" => Some(("runtimeConfig.containerImage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-config.properties" => Some(("runtimeConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "runtime-config.repository-config.pypi-repository-config.pypi-repository" => Some(("runtimeConfig.repositoryConfig.pypiRepositoryConfig.pypiRepository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-config.version" => Some(("runtimeConfig.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.approximate-usage.accelerator-type" => Some(("runtimeInfo.approximateUsage.acceleratorType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.approximate-usage.milli-accelerator-seconds" => Some(("runtimeInfo.approximateUsage.milliAcceleratorSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.approximate-usage.milli-dcu-seconds" => Some(("runtimeInfo.approximateUsage.milliDcuSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.approximate-usage.shuffle-storage-gb-seconds" => Some(("runtimeInfo.approximateUsage.shuffleStorageGbSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.current-usage.accelerator-type" => Some(("runtimeInfo.currentUsage.acceleratorType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.current-usage.milli-accelerator" => Some(("runtimeInfo.currentUsage.milliAccelerator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.current-usage.milli-dcu" => Some(("runtimeInfo.currentUsage.milliDcu", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.current-usage.milli-dcu-premium" => Some(("runtimeInfo.currentUsage.milliDcuPremium", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.current-usage.shuffle-storage-gb" => Some(("runtimeInfo.currentUsage.shuffleStorageGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.current-usage.shuffle-storage-gb-premium" => Some(("runtimeInfo.currentUsage.shuffleStorageGbPremium", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.current-usage.snapshot-time" => Some(("runtimeInfo.currentUsage.snapshotTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.diagnostic-output-uri" => Some(("runtimeInfo.diagnosticOutputUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "runtime-info.endpoints" => Some(("runtimeInfo.endpoints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -748,7 +759,7 @@ where
                     "state-time" => Some(("stateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["approximate-usage", "archive-uris", "args", "container-image", "create-time", "creator", "current-usage", "dataproc-cluster", "diagnostic-output-uri", "endpoints", "environment-config", "execution-config", "file-uris", "idle-ttl", "jar-file-uris", "kms-key", "labels", "main-class", "main-jar-file-uri", "main-python-file-uri", "main-r-file-uri", "metastore-service", "milli-dcu", "milli-dcu-seconds", "name", "network-tags", "network-uri", "operation", "output-uri", "peripherals-config", "properties", "pyspark-batch", "python-file-uris", "query-file-uri", "query-variables", "runtime-config", "runtime-info", "service-account", "shuffle-storage-gb", "shuffle-storage-gb-seconds", "snapshot-time", "spark-batch", "spark-history-server-config", "spark-r-batch", "spark-sql-batch", "state", "state-message", "state-time", "subnetwork-uri", "uuid", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-type", "approximate-usage", "archive-uris", "args", "container-image", "create-time", "creator", "current-usage", "dataproc-cluster", "diagnostic-output-uri", "endpoints", "environment-config", "execution-config", "file-uris", "idle-ttl", "jar-file-uris", "kms-key", "labels", "main-class", "main-jar-file-uri", "main-python-file-uri", "main-r-file-uri", "metastore-service", "milli-accelerator", "milli-accelerator-seconds", "milli-dcu", "milli-dcu-premium", "milli-dcu-seconds", "name", "network-tags", "network-uri", "operation", "output-uri", "peripherals-config", "properties", "pypi-repository", "pypi-repository-config", "pyspark-batch", "python-file-uris", "query-file-uri", "query-variables", "repository-config", "runtime-config", "runtime-info", "service-account", "shuffle-storage-gb", "shuffle-storage-gb-premium", "shuffle-storage-gb-seconds", "snapshot-time", "spark-batch", "spark-history-server-config", "spark-r-batch", "spark-sql-batch", "staging-bucket", "state", "state-message", "state-time", "subnetwork-uri", "ttl", "uuid", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -931,6 +942,12 @@ where
                 "page-size" => {
                     call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -944,7 +961,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1196,6 +1213,772 @@ where
         }
     }
 
+    async fn _projects_locations_session_templates_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creator" => Some(("creator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.idle-ttl" => Some(("environmentConfig.executionConfig.idleTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.kms-key" => Some(("environmentConfig.executionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.network-tags" => Some(("environmentConfig.executionConfig.networkTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "environment-config.execution-config.network-uri" => Some(("environmentConfig.executionConfig.networkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.service-account" => Some(("environmentConfig.executionConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.staging-bucket" => Some(("environmentConfig.executionConfig.stagingBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.subnetwork-uri" => Some(("environmentConfig.executionConfig.subnetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.ttl" => Some(("environmentConfig.executionConfig.ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.peripherals-config.metastore-service" => Some(("environmentConfig.peripheralsConfig.metastoreService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.peripherals-config.spark-history-server-config.dataproc-cluster" => Some(("environmentConfig.peripheralsConfig.sparkHistoryServerConfig.dataprocCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "jupyter-session.display-name" => Some(("jupyterSession.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "jupyter-session.kernel" => Some(("jupyterSession.kernel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-config.container-image" => Some(("runtimeConfig.containerImage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-config.properties" => Some(("runtimeConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "runtime-config.repository-config.pypi-repository-config.pypi-repository" => Some(("runtimeConfig.repositoryConfig.pypiRepositoryConfig.pypiRepository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-config.version" => Some(("runtimeConfig.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["container-image", "create-time", "creator", "dataproc-cluster", "description", "display-name", "environment-config", "execution-config", "idle-ttl", "jupyter-session", "kernel", "kms-key", "labels", "metastore-service", "name", "network-tags", "network-uri", "peripherals-config", "properties", "pypi-repository", "pypi-repository-config", "repository-config", "runtime-config", "service-account", "spark-history-server-config", "staging-bucket", "subnetwork-uri", "ttl", "update-time", "uuid", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SessionTemplate = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_session_templates_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_session_templates_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_session_templates_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_session_templates_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_session_templates_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_session_templates_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_session_templates_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_session_templates_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creator" => Some(("creator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.idle-ttl" => Some(("environmentConfig.executionConfig.idleTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.kms-key" => Some(("environmentConfig.executionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.network-tags" => Some(("environmentConfig.executionConfig.networkTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "environment-config.execution-config.network-uri" => Some(("environmentConfig.executionConfig.networkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.service-account" => Some(("environmentConfig.executionConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.staging-bucket" => Some(("environmentConfig.executionConfig.stagingBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.subnetwork-uri" => Some(("environmentConfig.executionConfig.subnetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.ttl" => Some(("environmentConfig.executionConfig.ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.peripherals-config.metastore-service" => Some(("environmentConfig.peripheralsConfig.metastoreService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.peripherals-config.spark-history-server-config.dataproc-cluster" => Some(("environmentConfig.peripheralsConfig.sparkHistoryServerConfig.dataprocCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "jupyter-session.display-name" => Some(("jupyterSession.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "jupyter-session.kernel" => Some(("jupyterSession.kernel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-config.container-image" => Some(("runtimeConfig.containerImage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-config.properties" => Some(("runtimeConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "runtime-config.repository-config.pypi-repository-config.pypi-repository" => Some(("runtimeConfig.repositoryConfig.pypiRepositoryConfig.pypiRepository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-config.version" => Some(("runtimeConfig.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["container-image", "create-time", "creator", "dataproc-cluster", "description", "display-name", "environment-config", "execution-config", "idle-ttl", "jupyter-session", "kernel", "kms-key", "labels", "metastore-service", "name", "network-tags", "network-uri", "peripherals-config", "properties", "pypi-repository", "pypi-repository-config", "repository-config", "runtime-config", "service-account", "spark-history-server-config", "staging-bucket", "subnetwork-uri", "ttl", "update-time", "uuid", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SessionTemplate = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_session_templates_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "creator" => Some(("creator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.idle-ttl" => Some(("environmentConfig.executionConfig.idleTtl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.kms-key" => Some(("environmentConfig.executionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.network-tags" => Some(("environmentConfig.executionConfig.networkTags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "environment-config.execution-config.network-uri" => Some(("environmentConfig.executionConfig.networkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.service-account" => Some(("environmentConfig.executionConfig.serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.staging-bucket" => Some(("environmentConfig.executionConfig.stagingBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.subnetwork-uri" => Some(("environmentConfig.executionConfig.subnetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.execution-config.ttl" => Some(("environmentConfig.executionConfig.ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.peripherals-config.metastore-service" => Some(("environmentConfig.peripheralsConfig.metastoreService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "environment-config.peripherals-config.spark-history-server-config.dataproc-cluster" => Some(("environmentConfig.peripheralsConfig.sparkHistoryServerConfig.dataprocCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "jupyter-session.display-name" => Some(("jupyterSession.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "jupyter-session.kernel" => Some(("jupyterSession.kernel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-config.container-image" => Some(("runtimeConfig.containerImage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-config.properties" => Some(("runtimeConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "runtime-config.repository-config.pypi-repository-config.pypi-repository" => Some(("runtimeConfig.repositoryConfig.pypiRepositoryConfig.pypiRepository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-config.version" => Some(("runtimeConfig.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.approximate-usage.accelerator-type" => Some(("runtimeInfo.approximateUsage.acceleratorType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.approximate-usage.milli-accelerator-seconds" => Some(("runtimeInfo.approximateUsage.milliAcceleratorSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.approximate-usage.milli-dcu-seconds" => Some(("runtimeInfo.approximateUsage.milliDcuSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.approximate-usage.shuffle-storage-gb-seconds" => Some(("runtimeInfo.approximateUsage.shuffleStorageGbSeconds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.current-usage.accelerator-type" => Some(("runtimeInfo.currentUsage.acceleratorType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.current-usage.milli-accelerator" => Some(("runtimeInfo.currentUsage.milliAccelerator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.current-usage.milli-dcu" => Some(("runtimeInfo.currentUsage.milliDcu", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.current-usage.milli-dcu-premium" => Some(("runtimeInfo.currentUsage.milliDcuPremium", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.current-usage.shuffle-storage-gb" => Some(("runtimeInfo.currentUsage.shuffleStorageGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.current-usage.shuffle-storage-gb-premium" => Some(("runtimeInfo.currentUsage.shuffleStorageGbPremium", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.current-usage.snapshot-time" => Some(("runtimeInfo.currentUsage.snapshotTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.diagnostic-output-uri" => Some(("runtimeInfo.diagnosticOutputUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "runtime-info.endpoints" => Some(("runtimeInfo.endpoints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "runtime-info.output-uri" => Some(("runtimeInfo.outputUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "session-template" => Some(("sessionTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-message" => Some(("stateMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-time" => Some(("stateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user" => Some(("user", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uuid" => Some(("uuid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["accelerator-type", "approximate-usage", "container-image", "create-time", "creator", "current-usage", "dataproc-cluster", "diagnostic-output-uri", "display-name", "endpoints", "environment-config", "execution-config", "idle-ttl", "jupyter-session", "kernel", "kms-key", "labels", "metastore-service", "milli-accelerator", "milli-accelerator-seconds", "milli-dcu", "milli-dcu-premium", "milli-dcu-seconds", "name", "network-tags", "network-uri", "output-uri", "peripherals-config", "properties", "pypi-repository", "pypi-repository-config", "repository-config", "runtime-config", "runtime-info", "service-account", "session-template", "shuffle-storage-gb", "shuffle-storage-gb-premium", "shuffle-storage-gb-seconds", "snapshot-time", "spark-history-server-config", "staging-bucket", "state", "state-message", "state-time", "subnetwork-uri", "ttl", "user", "uuid", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Session = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_sessions_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "session-id" => {
+                    call = call.session_id(value.unwrap_or(""));
+                },
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["request-id", "session-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_sessions_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["request-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_sessions_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_sessions_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_sessions_terminate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["request-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TerminateSessionRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_sessions_terminate(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_workflow_templates_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1221,6 +2004,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dag-timeout" => Some(("dagTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "encryption-config.kms-key" => Some(("encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1230,6 +2014,7 @@ where
                     "placement.managed-cluster.config.autoscaling-config.policy-uri" => Some(("placement.managedCluster.config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.encryption-config.kms-key" => Some(("placement.managedCluster.config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.enable-http-port-access" => Some(("placement.managedCluster.config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.http-ports" => Some(("placement.managedCluster.config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("placement.managedCluster.config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1265,10 +2050,13 @@ where
                     "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.min-cpu-platform" => Some(("placement.managedCluster.config.masterConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.min-num-instances" => Some(("placement.managedCluster.config.masterConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.num-instances" => Some(("placement.managedCluster.config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.preemptibility" => Some(("placement.managedCluster.config.masterConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.masterConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.metastore-config.dataproc-metastore-service" => Some(("placement.managedCluster.config.metastoreConfig.dataprocMetastoreService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1279,10 +2067,13 @@ where
                     "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.min-cpu-platform" => Some(("placement.managedCluster.config.secondaryWorkerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.min-num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.preemptibility" => Some(("placement.managedCluster.config.secondaryWorkerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.secondaryWorkerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.security-config.identity-config.user-service-account-mapping" => Some(("placement.managedCluster.config.securityConfig.identityConfig.userServiceAccountMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.security-config.kerberos-config.cross-realm-trust-admin-server" => Some(("placement.managedCluster.config.securityConfig.kerberosConfig.crossRealmTrustAdminServer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.security-config.kerberos-config.cross-realm-trust-kdc" => Some(("placement.managedCluster.config.securityConfig.kerberosConfig.crossRealmTrustKdc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1312,15 +2103,18 @@ where
                     "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.min-cpu-platform" => Some(("placement.managedCluster.config.workerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.min-num-instances" => Some(("placement.managedCluster.config.workerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.num-instances" => Some(("placement.managedCluster.config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.preemptibility" => Some(("placement.managedCluster.config.workerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.workerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.labels" => Some(("placement.managedCluster.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1689,6 +2483,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dag-timeout" => Some(("dagTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "encryption-config.kms-key" => Some(("encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1698,6 +2493,7 @@ where
                     "placement.managed-cluster.config.autoscaling-config.policy-uri" => Some(("placement.managedCluster.config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.encryption-config.kms-key" => Some(("placement.managedCluster.config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.enable-http-port-access" => Some(("placement.managedCluster.config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.http-ports" => Some(("placement.managedCluster.config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("placement.managedCluster.config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1733,10 +2529,13 @@ where
                     "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.min-cpu-platform" => Some(("placement.managedCluster.config.masterConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.min-num-instances" => Some(("placement.managedCluster.config.masterConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.num-instances" => Some(("placement.managedCluster.config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.preemptibility" => Some(("placement.managedCluster.config.masterConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.masterConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.metastore-config.dataproc-metastore-service" => Some(("placement.managedCluster.config.metastoreConfig.dataprocMetastoreService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1747,10 +2546,13 @@ where
                     "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.min-cpu-platform" => Some(("placement.managedCluster.config.secondaryWorkerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.min-num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.preemptibility" => Some(("placement.managedCluster.config.secondaryWorkerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.secondaryWorkerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.security-config.identity-config.user-service-account-mapping" => Some(("placement.managedCluster.config.securityConfig.identityConfig.userServiceAccountMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.security-config.kerberos-config.cross-realm-trust-admin-server" => Some(("placement.managedCluster.config.securityConfig.kerberosConfig.crossRealmTrustAdminServer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.security-config.kerberos-config.cross-realm-trust-kdc" => Some(("placement.managedCluster.config.securityConfig.kerberosConfig.crossRealmTrustKdc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1780,15 +2582,18 @@ where
                     "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.min-cpu-platform" => Some(("placement.managedCluster.config.workerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.min-num-instances" => Some(("placement.managedCluster.config.workerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.num-instances" => Some(("placement.managedCluster.config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.preemptibility" => Some(("placement.managedCluster.config.workerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.workerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.labels" => Some(("placement.managedCluster.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2107,6 +2912,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dag-timeout" => Some(("dagTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "encryption-config.kms-key" => Some(("encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2116,6 +2922,7 @@ where
                     "placement.managed-cluster.config.autoscaling-config.policy-uri" => Some(("placement.managedCluster.config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.encryption-config.kms-key" => Some(("placement.managedCluster.config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.enable-http-port-access" => Some(("placement.managedCluster.config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.http-ports" => Some(("placement.managedCluster.config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("placement.managedCluster.config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2151,10 +2958,13 @@ where
                     "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.min-cpu-platform" => Some(("placement.managedCluster.config.masterConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.min-num-instances" => Some(("placement.managedCluster.config.masterConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.num-instances" => Some(("placement.managedCluster.config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.preemptibility" => Some(("placement.managedCluster.config.masterConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.masterConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.metastore-config.dataproc-metastore-service" => Some(("placement.managedCluster.config.metastoreConfig.dataprocMetastoreService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2165,10 +2975,13 @@ where
                     "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.min-cpu-platform" => Some(("placement.managedCluster.config.secondaryWorkerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.min-num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.preemptibility" => Some(("placement.managedCluster.config.secondaryWorkerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.secondaryWorkerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.security-config.identity-config.user-service-account-mapping" => Some(("placement.managedCluster.config.securityConfig.identityConfig.userServiceAccountMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.security-config.kerberos-config.cross-realm-trust-admin-server" => Some(("placement.managedCluster.config.securityConfig.kerberosConfig.crossRealmTrustAdminServer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.security-config.kerberos-config.cross-realm-trust-kdc" => Some(("placement.managedCluster.config.securityConfig.kerberosConfig.crossRealmTrustKdc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2198,15 +3011,18 @@ where
                     "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.min-cpu-platform" => Some(("placement.managedCluster.config.workerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.min-num-instances" => Some(("placement.managedCluster.config.workerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.num-instances" => Some(("placement.managedCluster.config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.preemptibility" => Some(("placement.managedCluster.config.workerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.workerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.labels" => Some(("placement.managedCluster.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2291,6 +3107,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "basic-algorithm.cooldown-period" => Some(("basicAlgorithm.cooldownPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.graceful-decommission-timeout" => Some(("basicAlgorithm.sparkStandaloneConfig.gracefulDecommissionTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "basic-algorithm.spark-standalone-config.remove-only-idle-workers" => Some(("basicAlgorithm.sparkStandaloneConfig.removeOnlyIdleWorkers", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.scale-down-factor" => Some(("basicAlgorithm.sparkStandaloneConfig.scaleDownFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.scale-down-min-worker-fraction" => Some(("basicAlgorithm.sparkStandaloneConfig.scaleDownMinWorkerFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.scale-up-factor" => Some(("basicAlgorithm.sparkStandaloneConfig.scaleUpFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -2310,7 +3127,7 @@ where
                     "worker-config.min-instances" => Some(("workerConfig.minInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "worker-config.weight" => Some(("workerConfig.weight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic-algorithm", "cooldown-period", "graceful-decommission-timeout", "id", "labels", "max-instances", "min-instances", "name", "scale-down-factor", "scale-down-min-worker-fraction", "scale-up-factor", "scale-up-min-worker-fraction", "secondary-worker-config", "spark-standalone-config", "weight", "worker-config", "yarn-config"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic-algorithm", "cooldown-period", "graceful-decommission-timeout", "id", "labels", "max-instances", "min-instances", "name", "remove-only-idle-workers", "scale-down-factor", "scale-down-min-worker-fraction", "scale-up-factor", "scale-up-min-worker-fraction", "secondary-worker-config", "spark-standalone-config", "weight", "worker-config", "yarn-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2814,6 +3631,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "basic-algorithm.cooldown-period" => Some(("basicAlgorithm.cooldownPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.graceful-decommission-timeout" => Some(("basicAlgorithm.sparkStandaloneConfig.gracefulDecommissionTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "basic-algorithm.spark-standalone-config.remove-only-idle-workers" => Some(("basicAlgorithm.sparkStandaloneConfig.removeOnlyIdleWorkers", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.scale-down-factor" => Some(("basicAlgorithm.sparkStandaloneConfig.scaleDownFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.scale-down-min-worker-fraction" => Some(("basicAlgorithm.sparkStandaloneConfig.scaleDownMinWorkerFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "basic-algorithm.spark-standalone-config.scale-up-factor" => Some(("basicAlgorithm.sparkStandaloneConfig.scaleUpFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
@@ -2833,7 +3651,7 @@ where
                     "worker-config.min-instances" => Some(("workerConfig.minInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "worker-config.weight" => Some(("workerConfig.weight", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic-algorithm", "cooldown-period", "graceful-decommission-timeout", "id", "labels", "max-instances", "min-instances", "name", "scale-down-factor", "scale-down-min-worker-fraction", "scale-up-factor", "scale-up-min-worker-fraction", "secondary-worker-config", "spark-standalone-config", "weight", "worker-config", "yarn-config"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["basic-algorithm", "cooldown-period", "graceful-decommission-timeout", "id", "labels", "max-instances", "min-instances", "name", "remove-only-idle-workers", "scale-down-factor", "scale-down-min-worker-fraction", "scale-up-factor", "scale-up-min-worker-fraction", "secondary-worker-config", "spark-standalone-config", "weight", "worker-config", "yarn-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2921,6 +3739,7 @@ where
                     "config.autoscaling-config.policy-uri" => Some(("config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.config-bucket" => Some(("config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.encryption-config.gce-pd-kms-key-name" => Some(("config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.encryption-config.kms-key" => Some(("config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.endpoint-config.enable-http-port-access" => Some(("config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.endpoint-config.http-ports" => Some(("config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2956,10 +3775,13 @@ where
                     "config.master-config.is-preemptible" => Some(("config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.master-config.machine-type-uri" => Some(("config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.managed-group-config.instance-group-manager-name" => Some(("config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.master-config.managed-group-config.instance-group-manager-uri" => Some(("config.masterConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.managed-group-config.instance-template-name" => Some(("config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.min-cpu-platform" => Some(("config.masterConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.master-config.min-num-instances" => Some(("config.masterConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.master-config.num-instances" => Some(("config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.master-config.preemptibility" => Some(("config.masterConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.master-config.startup-config.required-registration-fraction" => Some(("config.masterConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "config.metastore-config.dataproc-metastore-service" => Some(("config.metastoreConfig.dataprocMetastoreService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.disk-config.boot-disk-type" => Some(("config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2970,10 +3792,13 @@ where
                     "config.secondary-worker-config.is-preemptible" => Some(("config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.machine-type-uri" => Some(("config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.managed-group-config.instance-group-manager-uri" => Some(("config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.min-cpu-platform" => Some(("config.secondaryWorkerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.min-num-instances" => Some(("config.secondaryWorkerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.num-instances" => Some(("config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.preemptibility" => Some(("config.secondaryWorkerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.startup-config.required-registration-fraction" => Some(("config.secondaryWorkerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "config.security-config.identity-config.user-service-account-mapping" => Some(("config.securityConfig.identityConfig.userServiceAccountMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.security-config.kerberos-config.cross-realm-trust-admin-server" => Some(("config.securityConfig.kerberosConfig.crossRealmTrustAdminServer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.security-config.kerberos-config.cross-realm-trust-kdc" => Some(("config.securityConfig.kerberosConfig.crossRealmTrustKdc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3003,10 +3828,13 @@ where
                     "config.worker-config.is-preemptible" => Some(("config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.worker-config.machine-type-uri" => Some(("config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.worker-config.managed-group-config.instance-group-manager-name" => Some(("config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.worker-config.managed-group-config.instance-group-manager-uri" => Some(("config.workerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.worker-config.managed-group-config.instance-template-name" => Some(("config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.worker-config.min-cpu-platform" => Some(("config.workerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.worker-config.min-num-instances" => Some(("config.workerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.worker-config.num-instances" => Some(("config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.worker-config.preemptibility" => Some(("config.workerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.worker-config.startup-config.required-registration-fraction" => Some(("config.workerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "metrics.hdfs-metrics" => Some(("metrics.hdfsMetrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "metrics.yarn-metrics" => Some(("metrics.yarnMetrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -3025,7 +3853,7 @@ where
                     "virtual-cluster-config.kubernetes-cluster-config.kubernetes-software-config.properties" => Some(("virtualClusterConfig.kubernetesClusterConfig.kubernetesSoftwareConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "virtual-cluster-config.staging-bucket" => Some(("virtualClusterConfig.stagingBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "auxiliary-services-config", "boot-disk-size-gb", "boot-disk-type", "cluster-name", "cluster-namespace", "cluster-uuid", "component-version", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dataproc-cluster", "dataproc-metastore-service", "detail", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "hdfs-metrics", "http-ports", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key-uri", "kubernetes-cluster-config", "kubernetes-namespace", "kubernetes-software-config", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-group-config", "master-config", "metadata", "metastore-config", "metrics", "min-cpu-platform", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "policy-uri", "preemptibility", "private-ipv6-google-access", "project-id", "properties", "realm", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "spark-history-server-config", "staging-bucket", "state", "state-start-time", "status", "subnetwork-uri", "substate", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "user-service-account-mapping", "values", "virtual-cluster-config", "worker-config", "yarn-metrics", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "auxiliary-services-config", "boot-disk-size-gb", "boot-disk-type", "cluster-name", "cluster-namespace", "cluster-uuid", "component-version", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dataproc-cluster", "dataproc-metastore-service", "detail", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "hdfs-metrics", "http-ports", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "kubernetes-cluster-config", "kubernetes-namespace", "kubernetes-software-config", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-group-config", "master-config", "metadata", "metastore-config", "metrics", "min-cpu-platform", "min-num-instances", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "policy-uri", "preemptibility", "private-ipv6-google-access", "project-id", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "spark-history-server-config", "staging-bucket", "startup-config", "state", "state-start-time", "status", "subnetwork-uri", "substate", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "user-service-account-mapping", "values", "virtual-cluster-config", "worker-config", "yarn-metrics", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3101,6 +3929,9 @@ where
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
                 },
+                "graceful-termination-timeout" => {
+                    call = call.graceful_termination_timeout(        value.map(|v| arg_from_str(v, err, "graceful-termination-timeout", "google-duration")).unwrap_or(chrono::Duration::seconds(0)));
+                },
                 "cluster-uuid" => {
                     call = call.cluster_uuid(value.unwrap_or(""));
                 },
@@ -3117,7 +3948,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["cluster-uuid", "request-id"].iter().map(|v|*v));
+                                                                           v.extend(["cluster-uuid", "graceful-termination-timeout", "request-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3174,8 +4005,16 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "diagnosis-interval.end-time" => Some(("diagnosisInterval.endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "diagnosis-interval.start-time" => Some(("diagnosisInterval.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "job" => Some(("job", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "jobs" => Some(("jobs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "tarball-access" => Some(("tarballAccess", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tarball-gcs-dir" => Some(("tarballGcsDir", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "yarn-application-id" => Some(("yarnApplicationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "yarn-application-ids" => Some(("yarnApplicationIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["diagnosis-interval", "end-time", "job", "jobs", "start-time", "tarball-access", "tarball-gcs-dir", "yarn-application-id", "yarn-application-ids"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3554,13 +4393,16 @@ where
                     "node-group-config.is-preemptible" => Some(("nodeGroupConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "node-group-config.machine-type-uri" => Some(("nodeGroupConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-group-config.managed-group-config.instance-group-manager-name" => Some(("nodeGroupConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-group-config.managed-group-config.instance-group-manager-uri" => Some(("nodeGroupConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-group-config.managed-group-config.instance-template-name" => Some(("nodeGroupConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "node-group-config.min-cpu-platform" => Some(("nodeGroupConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-group-config.min-num-instances" => Some(("nodeGroupConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-group-config.num-instances" => Some(("nodeGroupConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "node-group-config.preemptibility" => Some(("nodeGroupConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "node-group-config.startup-config.required-registration-fraction" => Some(("nodeGroupConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "roles" => Some(("roles", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "boot-disk-type", "disk-config", "image-uri", "instance-group-manager-name", "instance-names", "instance-template-name", "is-preemptible", "labels", "local-ssd-interface", "machine-type-uri", "managed-group-config", "min-cpu-platform", "name", "node-group-config", "num-instances", "num-local-ssds", "preemptibility", "roles"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boot-disk-size-gb", "boot-disk-type", "disk-config", "image-uri", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "is-preemptible", "labels", "local-ssd-interface", "machine-type-uri", "managed-group-config", "min-cpu-platform", "min-num-instances", "name", "node-group-config", "num-instances", "num-local-ssds", "preemptibility", "required-registration-fraction", "roles", "startup-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3576,6 +4418,9 @@ where
             match key {
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
+                },
+                "parent-operation-id" => {
+                    call = call.parent_operation_id(value.unwrap_or(""));
                 },
                 "node-group-id" => {
                     call = call.node_group_id(value.unwrap_or(""));
@@ -3593,7 +4438,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["node-group-id", "request-id"].iter().map(|v|*v));
+                                                                           v.extend(["node-group-id", "parent-operation-id", "request-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3679,6 +4524,93 @@ where
         }
     }
 
+    async fn _projects_regions_clusters_node_groups_repair(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "instance-names" => Some(("instanceNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "repair-action" => Some(("repairAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["instance-names", "repair-action", "request-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::RepairNodeGroupRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().regions_clusters_node_groups_repair(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_regions_clusters_node_groups_resize(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -3703,10 +4635,11 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "graceful-decommission-timeout" => Some(("gracefulDecommissionTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-operation-id" => Some(("parentOperationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "size" => Some(("size", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["graceful-decommission-timeout", "request-id", "size"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["graceful-decommission-timeout", "parent-operation-id", "request-id", "size"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3794,6 +4727,7 @@ where
                     "config.autoscaling-config.policy-uri" => Some(("config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.config-bucket" => Some(("config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.encryption-config.gce-pd-kms-key-name" => Some(("config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.encryption-config.kms-key" => Some(("config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.endpoint-config.enable-http-port-access" => Some(("config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.endpoint-config.http-ports" => Some(("config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -3829,10 +4763,13 @@ where
                     "config.master-config.is-preemptible" => Some(("config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.master-config.machine-type-uri" => Some(("config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.managed-group-config.instance-group-manager-name" => Some(("config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.master-config.managed-group-config.instance-group-manager-uri" => Some(("config.masterConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.managed-group-config.instance-template-name" => Some(("config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.master-config.min-cpu-platform" => Some(("config.masterConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.master-config.min-num-instances" => Some(("config.masterConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.master-config.num-instances" => Some(("config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.master-config.preemptibility" => Some(("config.masterConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.master-config.startup-config.required-registration-fraction" => Some(("config.masterConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "config.metastore-config.dataproc-metastore-service" => Some(("config.metastoreConfig.dataprocMetastoreService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.disk-config.boot-disk-type" => Some(("config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3843,10 +4780,13 @@ where
                     "config.secondary-worker-config.is-preemptible" => Some(("config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.machine-type-uri" => Some(("config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.managed-group-config.instance-group-manager-uri" => Some(("config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.min-cpu-platform" => Some(("config.secondaryWorkerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.min-num-instances" => Some(("config.secondaryWorkerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.num-instances" => Some(("config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.secondary-worker-config.preemptibility" => Some(("config.secondaryWorkerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.secondary-worker-config.startup-config.required-registration-fraction" => Some(("config.secondaryWorkerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "config.security-config.identity-config.user-service-account-mapping" => Some(("config.securityConfig.identityConfig.userServiceAccountMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "config.security-config.kerberos-config.cross-realm-trust-admin-server" => Some(("config.securityConfig.kerberosConfig.crossRealmTrustAdminServer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.security-config.kerberos-config.cross-realm-trust-kdc" => Some(("config.securityConfig.kerberosConfig.crossRealmTrustKdc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3876,10 +4816,13 @@ where
                     "config.worker-config.is-preemptible" => Some(("config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.worker-config.machine-type-uri" => Some(("config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.worker-config.managed-group-config.instance-group-manager-name" => Some(("config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.worker-config.managed-group-config.instance-group-manager-uri" => Some(("config.workerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.worker-config.managed-group-config.instance-template-name" => Some(("config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.worker-config.min-cpu-platform" => Some(("config.workerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.worker-config.min-num-instances" => Some(("config.workerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.worker-config.num-instances" => Some(("config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "config.worker-config.preemptibility" => Some(("config.workerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "config.worker-config.startup-config.required-registration-fraction" => Some(("config.workerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "metrics.hdfs-metrics" => Some(("metrics.hdfsMetrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "metrics.yarn-metrics" => Some(("metrics.yarnMetrics", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -3898,7 +4841,7 @@ where
                     "virtual-cluster-config.kubernetes-cluster-config.kubernetes-software-config.properties" => Some(("virtualClusterConfig.kubernetesClusterConfig.kubernetesSoftwareConfig.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "virtual-cluster-config.staging-bucket" => Some(("virtualClusterConfig.stagingBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "auxiliary-services-config", "boot-disk-size-gb", "boot-disk-type", "cluster-name", "cluster-namespace", "cluster-uuid", "component-version", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dataproc-cluster", "dataproc-metastore-service", "detail", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "hdfs-metrics", "http-ports", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key-uri", "kubernetes-cluster-config", "kubernetes-namespace", "kubernetes-software-config", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-group-config", "master-config", "metadata", "metastore-config", "metrics", "min-cpu-platform", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "policy-uri", "preemptibility", "private-ipv6-google-access", "project-id", "properties", "realm", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "spark-history-server-config", "staging-bucket", "state", "state-start-time", "status", "subnetwork-uri", "substate", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "user-service-account-mapping", "values", "virtual-cluster-config", "worker-config", "yarn-metrics", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "auxiliary-services-config", "boot-disk-size-gb", "boot-disk-type", "cluster-name", "cluster-namespace", "cluster-uuid", "component-version", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dataproc-cluster", "dataproc-metastore-service", "detail", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "hdfs-metrics", "http-ports", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "kubernetes-cluster-config", "kubernetes-namespace", "kubernetes-software-config", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-group-config", "master-config", "metadata", "metastore-config", "metrics", "min-cpu-platform", "min-num-instances", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "policy-uri", "preemptibility", "private-ipv6-google-access", "project-id", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "spark-history-server-config", "staging-bucket", "startup-config", "state", "state-start-time", "status", "subnetwork-uri", "substate", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "user-service-account-mapping", "values", "virtual-cluster-config", "worker-config", "yarn-metrics", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4768,6 +5711,13 @@ where
                     "driver-output-resource-uri" => Some(("driverOutputResourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "driver-scheduling-config.memory-mb" => Some(("driverSchedulingConfig.memoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "driver-scheduling-config.vcores" => Some(("driverSchedulingConfig.vcores", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "flink-job.args" => Some(("flinkJob.args", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "flink-job.jar-file-uris" => Some(("flinkJob.jarFileUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "flink-job.logging-config.driver-log-levels" => Some(("flinkJob.loggingConfig.driverLogLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "flink-job.main-class" => Some(("flinkJob.mainClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flink-job.main-jar-file-uri" => Some(("flinkJob.mainJarFileUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flink-job.properties" => Some(("flinkJob.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "flink-job.savepoint-uri" => Some(("flinkJob.savepointUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hadoop-job.archive-uris" => Some(("hadoopJob.archiveUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "hadoop-job.args" => Some(("hadoopJob.args", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "hadoop-job.file-uris" => Some(("hadoopJob.fileUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -4845,7 +5795,7 @@ where
                     "trino-job.query-file-uri" => Some(("trinoJob.queryFileUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trino-job.query-list.queries" => Some(("trinoJob.queryList.queries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archive-uris", "args", "client-tags", "cluster-labels", "cluster-name", "cluster-uuid", "continue-on-failure", "details", "done", "driver-control-files-uri", "driver-log-levels", "driver-output-resource-uri", "driver-scheduling-config", "file-uris", "hadoop-job", "hive-job", "jar-file-uris", "job-id", "job-uuid", "labels", "logging-config", "main-class", "main-jar-file-uri", "main-python-file-uri", "main-r-file-uri", "max-failures-per-hour", "max-failures-total", "memory-mb", "output-format", "pig-job", "placement", "presto-job", "project-id", "properties", "pyspark-job", "python-file-uris", "queries", "query-file-uri", "query-list", "reference", "scheduling", "script-variables", "spark-job", "spark-r-job", "spark-sql-job", "state", "state-start-time", "status", "substate", "trino-job", "vcores"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archive-uris", "args", "client-tags", "cluster-labels", "cluster-name", "cluster-uuid", "continue-on-failure", "details", "done", "driver-control-files-uri", "driver-log-levels", "driver-output-resource-uri", "driver-scheduling-config", "file-uris", "flink-job", "hadoop-job", "hive-job", "jar-file-uris", "job-id", "job-uuid", "labels", "logging-config", "main-class", "main-jar-file-uri", "main-python-file-uri", "main-r-file-uri", "max-failures-per-hour", "max-failures-total", "memory-mb", "output-format", "pig-job", "placement", "presto-job", "project-id", "properties", "pyspark-job", "python-file-uris", "queries", "query-file-uri", "query-list", "reference", "savepoint-uri", "scheduling", "script-variables", "spark-job", "spark-r-job", "spark-sql-job", "state", "state-start-time", "status", "substate", "trino-job", "vcores"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5023,6 +5973,13 @@ where
                     "job.driver-output-resource-uri" => Some(("job.driverOutputResourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.driver-scheduling-config.memory-mb" => Some(("job.driverSchedulingConfig.memoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "job.driver-scheduling-config.vcores" => Some(("job.driverSchedulingConfig.vcores", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job.flink-job.args" => Some(("job.flinkJob.args", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "job.flink-job.jar-file-uris" => Some(("job.flinkJob.jarFileUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "job.flink-job.logging-config.driver-log-levels" => Some(("job.flinkJob.loggingConfig.driverLogLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "job.flink-job.main-class" => Some(("job.flinkJob.mainClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "job.flink-job.main-jar-file-uri" => Some(("job.flinkJob.mainJarFileUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "job.flink-job.properties" => Some(("job.flinkJob.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "job.flink-job.savepoint-uri" => Some(("job.flinkJob.savepointUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.hadoop-job.archive-uris" => Some(("job.hadoopJob.archiveUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.hadoop-job.args" => Some(("job.hadoopJob.args", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.hadoop-job.file-uris" => Some(("job.hadoopJob.fileUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -5101,7 +6058,7 @@ where
                     "job.trino-job.query-list.queries" => Some(("job.trinoJob.queryList.queries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archive-uris", "args", "client-tags", "cluster-labels", "cluster-name", "cluster-uuid", "continue-on-failure", "details", "done", "driver-control-files-uri", "driver-log-levels", "driver-output-resource-uri", "driver-scheduling-config", "file-uris", "hadoop-job", "hive-job", "jar-file-uris", "job", "job-id", "job-uuid", "labels", "logging-config", "main-class", "main-jar-file-uri", "main-python-file-uri", "main-r-file-uri", "max-failures-per-hour", "max-failures-total", "memory-mb", "output-format", "pig-job", "placement", "presto-job", "project-id", "properties", "pyspark-job", "python-file-uris", "queries", "query-file-uri", "query-list", "reference", "request-id", "scheduling", "script-variables", "spark-job", "spark-r-job", "spark-sql-job", "state", "state-start-time", "status", "substate", "trino-job", "vcores"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archive-uris", "args", "client-tags", "cluster-labels", "cluster-name", "cluster-uuid", "continue-on-failure", "details", "done", "driver-control-files-uri", "driver-log-levels", "driver-output-resource-uri", "driver-scheduling-config", "file-uris", "flink-job", "hadoop-job", "hive-job", "jar-file-uris", "job", "job-id", "job-uuid", "labels", "logging-config", "main-class", "main-jar-file-uri", "main-python-file-uri", "main-r-file-uri", "max-failures-per-hour", "max-failures-total", "memory-mb", "output-format", "pig-job", "placement", "presto-job", "project-id", "properties", "pyspark-job", "python-file-uris", "queries", "query-file-uri", "query-list", "reference", "request-id", "savepoint-uri", "scheduling", "script-variables", "spark-job", "spark-r-job", "spark-sql-job", "state", "state-start-time", "status", "substate", "trino-job", "vcores"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5189,6 +6146,13 @@ where
                     "job.driver-output-resource-uri" => Some(("job.driverOutputResourceUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.driver-scheduling-config.memory-mb" => Some(("job.driverSchedulingConfig.memoryMb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "job.driver-scheduling-config.vcores" => Some(("job.driverSchedulingConfig.vcores", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "job.flink-job.args" => Some(("job.flinkJob.args", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "job.flink-job.jar-file-uris" => Some(("job.flinkJob.jarFileUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "job.flink-job.logging-config.driver-log-levels" => Some(("job.flinkJob.loggingConfig.driverLogLevels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "job.flink-job.main-class" => Some(("job.flinkJob.mainClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "job.flink-job.main-jar-file-uri" => Some(("job.flinkJob.mainJarFileUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "job.flink-job.properties" => Some(("job.flinkJob.properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "job.flink-job.savepoint-uri" => Some(("job.flinkJob.savepointUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "job.hadoop-job.archive-uris" => Some(("job.hadoopJob.archiveUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.hadoop-job.args" => Some(("job.hadoopJob.args", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "job.hadoop-job.file-uris" => Some(("job.hadoopJob.fileUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -5267,7 +6231,7 @@ where
                     "job.trino-job.query-list.queries" => Some(("job.trinoJob.queryList.queries", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archive-uris", "args", "client-tags", "cluster-labels", "cluster-name", "cluster-uuid", "continue-on-failure", "details", "done", "driver-control-files-uri", "driver-log-levels", "driver-output-resource-uri", "driver-scheduling-config", "file-uris", "hadoop-job", "hive-job", "jar-file-uris", "job", "job-id", "job-uuid", "labels", "logging-config", "main-class", "main-jar-file-uri", "main-python-file-uri", "main-r-file-uri", "max-failures-per-hour", "max-failures-total", "memory-mb", "output-format", "pig-job", "placement", "presto-job", "project-id", "properties", "pyspark-job", "python-file-uris", "queries", "query-file-uri", "query-list", "reference", "request-id", "scheduling", "script-variables", "spark-job", "spark-r-job", "spark-sql-job", "state", "state-start-time", "status", "substate", "trino-job", "vcores"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["archive-uris", "args", "client-tags", "cluster-labels", "cluster-name", "cluster-uuid", "continue-on-failure", "details", "done", "driver-control-files-uri", "driver-log-levels", "driver-output-resource-uri", "driver-scheduling-config", "file-uris", "flink-job", "hadoop-job", "hive-job", "jar-file-uris", "job", "job-id", "job-uuid", "labels", "logging-config", "main-class", "main-jar-file-uri", "main-python-file-uri", "main-r-file-uri", "max-failures-per-hour", "max-failures-total", "memory-mb", "output-format", "pig-job", "placement", "presto-job", "project-id", "properties", "pyspark-job", "python-file-uris", "queries", "query-file-uri", "query-list", "reference", "request-id", "savepoint-uri", "scheduling", "script-variables", "spark-job", "spark-r-job", "spark-sql-job", "state", "state-start-time", "status", "substate", "trino-job", "vcores"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5911,6 +6875,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dag-timeout" => Some(("dagTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "encryption-config.kms-key" => Some(("encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5920,6 +6885,7 @@ where
                     "placement.managed-cluster.config.autoscaling-config.policy-uri" => Some(("placement.managedCluster.config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.encryption-config.kms-key" => Some(("placement.managedCluster.config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.enable-http-port-access" => Some(("placement.managedCluster.config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.http-ports" => Some(("placement.managedCluster.config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("placement.managedCluster.config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -5955,10 +6921,13 @@ where
                     "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.min-cpu-platform" => Some(("placement.managedCluster.config.masterConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.min-num-instances" => Some(("placement.managedCluster.config.masterConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.num-instances" => Some(("placement.managedCluster.config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.preemptibility" => Some(("placement.managedCluster.config.masterConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.masterConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.metastore-config.dataproc-metastore-service" => Some(("placement.managedCluster.config.metastoreConfig.dataprocMetastoreService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5969,10 +6938,13 @@ where
                     "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.min-cpu-platform" => Some(("placement.managedCluster.config.secondaryWorkerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.min-num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.preemptibility" => Some(("placement.managedCluster.config.secondaryWorkerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.secondaryWorkerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.security-config.identity-config.user-service-account-mapping" => Some(("placement.managedCluster.config.securityConfig.identityConfig.userServiceAccountMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.security-config.kerberos-config.cross-realm-trust-admin-server" => Some(("placement.managedCluster.config.securityConfig.kerberosConfig.crossRealmTrustAdminServer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.security-config.kerberos-config.cross-realm-trust-kdc" => Some(("placement.managedCluster.config.securityConfig.kerberosConfig.crossRealmTrustKdc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6002,15 +6974,18 @@ where
                     "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.min-cpu-platform" => Some(("placement.managedCluster.config.workerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.min-num-instances" => Some(("placement.managedCluster.config.workerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.num-instances" => Some(("placement.managedCluster.config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.preemptibility" => Some(("placement.managedCluster.config.workerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.workerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.labels" => Some(("placement.managedCluster.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6379,6 +7354,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dag-timeout" => Some(("dagTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "encryption-config.kms-key" => Some(("encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6388,6 +7364,7 @@ where
                     "placement.managed-cluster.config.autoscaling-config.policy-uri" => Some(("placement.managedCluster.config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.encryption-config.kms-key" => Some(("placement.managedCluster.config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.enable-http-port-access" => Some(("placement.managedCluster.config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.http-ports" => Some(("placement.managedCluster.config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("placement.managedCluster.config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -6423,10 +7400,13 @@ where
                     "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.min-cpu-platform" => Some(("placement.managedCluster.config.masterConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.min-num-instances" => Some(("placement.managedCluster.config.masterConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.num-instances" => Some(("placement.managedCluster.config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.preemptibility" => Some(("placement.managedCluster.config.masterConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.masterConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.metastore-config.dataproc-metastore-service" => Some(("placement.managedCluster.config.metastoreConfig.dataprocMetastoreService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6437,10 +7417,13 @@ where
                     "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.min-cpu-platform" => Some(("placement.managedCluster.config.secondaryWorkerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.min-num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.preemptibility" => Some(("placement.managedCluster.config.secondaryWorkerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.secondaryWorkerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.security-config.identity-config.user-service-account-mapping" => Some(("placement.managedCluster.config.securityConfig.identityConfig.userServiceAccountMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.security-config.kerberos-config.cross-realm-trust-admin-server" => Some(("placement.managedCluster.config.securityConfig.kerberosConfig.crossRealmTrustAdminServer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.security-config.kerberos-config.cross-realm-trust-kdc" => Some(("placement.managedCluster.config.securityConfig.kerberosConfig.crossRealmTrustKdc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6470,15 +7453,18 @@ where
                     "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.min-cpu-platform" => Some(("placement.managedCluster.config.workerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.min-num-instances" => Some(("placement.managedCluster.config.workerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.num-instances" => Some(("placement.managedCluster.config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.preemptibility" => Some(("placement.managedCluster.config.workerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.workerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.labels" => Some(("placement.managedCluster.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6797,6 +7783,7 @@ where
                 match &temp_cursor.to_string()[..] {
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dag-timeout" => Some(("dagTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "encryption-config.kms-key" => Some(("encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6806,6 +7793,7 @@ where
                     "placement.managed-cluster.config.autoscaling-config.policy-uri" => Some(("placement.managedCluster.config.autoscalingConfig.policyUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.config-bucket" => Some(("placement.managedCluster.config.configBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.encryption-config.gce-pd-kms-key-name" => Some(("placement.managedCluster.config.encryptionConfig.gcePdKmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.encryption-config.kms-key" => Some(("placement.managedCluster.config.encryptionConfig.kmsKey", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.enable-http-port-access" => Some(("placement.managedCluster.config.endpointConfig.enableHttpPortAccess", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.endpoint-config.http-ports" => Some(("placement.managedCluster.config.endpointConfig.httpPorts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.gce-cluster-config.confidential-instance-config.enable-confidential-compute" => Some(("placement.managedCluster.config.gceClusterConfig.confidentialInstanceConfig.enableConfidentialCompute", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -6841,10 +7829,13 @@ where
                     "placement.managed-cluster.config.master-config.is-preemptible" => Some(("placement.managedCluster.config.masterConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.machine-type-uri" => Some(("placement.managedCluster.config.masterConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.masterConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.min-cpu-platform" => Some(("placement.managedCluster.config.masterConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.min-num-instances" => Some(("placement.managedCluster.config.masterConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.num-instances" => Some(("placement.managedCluster.config.masterConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.master-config.preemptibility" => Some(("placement.managedCluster.config.masterConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.master-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.masterConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.metastore-config.dataproc-metastore-service" => Some(("placement.managedCluster.config.metastoreConfig.dataprocMetastoreService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-size-gb" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskSizeGb", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.disk-config.boot-disk-type" => Some(("placement.managedCluster.config.secondaryWorkerConfig.diskConfig.bootDiskType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6855,10 +7846,13 @@ where
                     "placement.managed-cluster.config.secondary-worker-config.is-preemptible" => Some(("placement.managedCluster.config.secondaryWorkerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.machine-type-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.secondaryWorkerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.min-cpu-platform" => Some(("placement.managedCluster.config.secondaryWorkerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.min-num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.num-instances" => Some(("placement.managedCluster.config.secondaryWorkerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.secondary-worker-config.preemptibility" => Some(("placement.managedCluster.config.secondaryWorkerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.secondary-worker-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.secondaryWorkerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.security-config.identity-config.user-service-account-mapping" => Some(("placement.managedCluster.config.securityConfig.identityConfig.userServiceAccountMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "placement.managed-cluster.config.security-config.kerberos-config.cross-realm-trust-admin-server" => Some(("placement.managedCluster.config.securityConfig.kerberosConfig.crossRealmTrustAdminServer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.security-config.kerberos-config.cross-realm-trust-kdc" => Some(("placement.managedCluster.config.securityConfig.kerberosConfig.crossRealmTrustKdc", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6888,15 +7882,18 @@ where
                     "placement.managed-cluster.config.worker-config.is-preemptible" => Some(("placement.managedCluster.config.workerConfig.isPreemptible", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.machine-type-uri" => Some(("placement.managedCluster.config.workerConfig.machineTypeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.managed-group-config.instance-group-manager-uri" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceGroupManagerUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.managed-group-config.instance-template-name" => Some(("placement.managedCluster.config.workerConfig.managedGroupConfig.instanceTemplateName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.min-cpu-platform" => Some(("placement.managedCluster.config.workerConfig.minCpuPlatform", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.min-num-instances" => Some(("placement.managedCluster.config.workerConfig.minNumInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.num-instances" => Some(("placement.managedCluster.config.workerConfig.numInstances", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.config.worker-config.preemptibility" => Some(("placement.managedCluster.config.workerConfig.preemptibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "placement.managed-cluster.config.worker-config.startup-config.required-registration-fraction" => Some(("placement.managedCluster.config.workerConfig.startupConfig.requiredRegistrationFraction", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "placement.managed-cluster.labels" => Some(("placement.managedCluster.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auto-delete-time", "auto-delete-ttl", "autoscaling-config", "boot-disk-size-gb", "boot-disk-type", "cluster-labels", "cluster-name", "cluster-namespace", "cluster-selector", "confidential-instance-config", "config", "config-bucket", "consume-reservation-type", "create-time", "cross-realm-trust-admin-server", "cross-realm-trust-kdc", "cross-realm-trust-realm", "cross-realm-trust-shared-password-uri", "dag-timeout", "dataproc-metastore-service", "disk-config", "enable-confidential-compute", "enable-http-port-access", "enable-integrity-monitoring", "enable-kerberos", "enable-secure-boot", "enable-vtpm", "encryption-config", "endpoint-config", "gce-cluster-config", "gce-pd-kms-key-name", "gke-cluster-config", "gke-cluster-target", "http-ports", "id", "identity-config", "idle-delete-ttl", "idle-start-time", "image-uri", "image-version", "instance-group-manager-name", "instance-group-manager-uri", "instance-names", "instance-template-name", "internal-ip-only", "is-preemptible", "kdc-db-key-uri", "kerberos-config", "key", "key-password-uri", "keystore-password-uri", "keystore-uri", "kms-key", "kms-key-uri", "labels", "lifecycle-config", "local-ssd-interface", "machine-type-uri", "managed-cluster", "managed-group-config", "master-config", "metadata", "metastore-config", "min-cpu-platform", "min-num-instances", "name", "namespaced-gke-deployment-target", "network-uri", "node-group-affinity", "node-group-uri", "num-instances", "num-local-ssds", "optional-components", "placement", "policy-uri", "preemptibility", "private-ipv6-google-access", "properties", "realm", "required-registration-fraction", "reservation-affinity", "root-principal-password-uri", "secondary-worker-config", "security-config", "service-account", "service-account-scopes", "shielded-instance-config", "software-config", "startup-config", "subnetwork-uri", "tags", "target-gke-cluster", "temp-bucket", "tgt-lifetime-hours", "truststore-password-uri", "truststore-uri", "update-time", "user-service-account-mapping", "values", "version", "worker-config", "zone", "zone-uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7011,6 +8008,36 @@ where
                     ("locations-operations-list", Some(opt)) => {
                         call_result = self._projects_locations_operations_list(opt, dry_run, &mut err).await;
                     },
+                    ("locations-session-templates-create", Some(opt)) => {
+                        call_result = self._projects_locations_session_templates_create(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-session-templates-delete", Some(opt)) => {
+                        call_result = self._projects_locations_session_templates_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-session-templates-get", Some(opt)) => {
+                        call_result = self._projects_locations_session_templates_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-session-templates-list", Some(opt)) => {
+                        call_result = self._projects_locations_session_templates_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-session-templates-patch", Some(opt)) => {
+                        call_result = self._projects_locations_session_templates_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-sessions-create", Some(opt)) => {
+                        call_result = self._projects_locations_sessions_create(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-sessions-delete", Some(opt)) => {
+                        call_result = self._projects_locations_sessions_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-sessions-get", Some(opt)) => {
+                        call_result = self._projects_locations_sessions_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-sessions-list", Some(opt)) => {
+                        call_result = self._projects_locations_sessions_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-sessions-terminate", Some(opt)) => {
+                        call_result = self._projects_locations_sessions_terminate(opt, dry_run, &mut err).await;
+                    },
                     ("locations-workflow-templates-create", Some(opt)) => {
                         call_result = self._projects_locations_workflow_templates_create(opt, dry_run, &mut err).await;
                     },
@@ -7091,6 +8118,9 @@ where
                     },
                     ("regions-clusters-node-groups-get", Some(opt)) => {
                         call_result = self._projects_regions_clusters_node_groups_get(opt, dry_run, &mut err).await;
+                    },
+                    ("regions-clusters-node-groups-repair", Some(opt)) => {
+                        call_result = self._projects_regions_clusters_node_groups_repair(opt, dry_run, &mut err).await;
                     },
                     ("regions-clusters-node-groups-resize", Some(opt)) => {
                         call_result = self._projects_regions_clusters_node_groups_resize(opt, dry_run, &mut err).await;
@@ -7273,7 +8303,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-autoscaling-policies-create', 'locations-autoscaling-policies-delete', 'locations-autoscaling-policies-get', 'locations-autoscaling-policies-get-iam-policy', 'locations-autoscaling-policies-list', 'locations-autoscaling-policies-set-iam-policy', 'locations-autoscaling-policies-test-iam-permissions', 'locations-autoscaling-policies-update', 'locations-batches-create', 'locations-batches-delete', 'locations-batches-get', 'locations-batches-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-workflow-templates-create', 'locations-workflow-templates-delete', 'locations-workflow-templates-get', 'locations-workflow-templates-get-iam-policy', 'locations-workflow-templates-instantiate', 'locations-workflow-templates-instantiate-inline', 'locations-workflow-templates-list', 'locations-workflow-templates-set-iam-policy', 'locations-workflow-templates-test-iam-permissions', 'locations-workflow-templates-update', 'regions-autoscaling-policies-create', 'regions-autoscaling-policies-delete', 'regions-autoscaling-policies-get', 'regions-autoscaling-policies-get-iam-policy', 'regions-autoscaling-policies-list', 'regions-autoscaling-policies-set-iam-policy', 'regions-autoscaling-policies-test-iam-permissions', 'regions-autoscaling-policies-update', 'regions-clusters-create', 'regions-clusters-delete', 'regions-clusters-diagnose', 'regions-clusters-get', 'regions-clusters-get-iam-policy', 'regions-clusters-inject-credentials', 'regions-clusters-list', 'regions-clusters-node-groups-create', 'regions-clusters-node-groups-get', 'regions-clusters-node-groups-resize', 'regions-clusters-patch', 'regions-clusters-repair', 'regions-clusters-set-iam-policy', 'regions-clusters-start', 'regions-clusters-stop', 'regions-clusters-test-iam-permissions', 'regions-jobs-cancel', 'regions-jobs-delete', 'regions-jobs-get', 'regions-jobs-get-iam-policy', 'regions-jobs-list', 'regions-jobs-patch', 'regions-jobs-set-iam-policy', 'regions-jobs-submit', 'regions-jobs-submit-as-operation', 'regions-jobs-test-iam-permissions', 'regions-operations-cancel', 'regions-operations-delete', 'regions-operations-get', 'regions-operations-get-iam-policy', 'regions-operations-list', 'regions-operations-set-iam-policy', 'regions-operations-test-iam-permissions', 'regions-workflow-templates-create', 'regions-workflow-templates-delete', 'regions-workflow-templates-get', 'regions-workflow-templates-get-iam-policy', 'regions-workflow-templates-instantiate', 'regions-workflow-templates-instantiate-inline', 'regions-workflow-templates-list', 'regions-workflow-templates-set-iam-policy', 'regions-workflow-templates-test-iam-permissions' and 'regions-workflow-templates-update'", vec![
+        ("projects", "methods: 'locations-autoscaling-policies-create', 'locations-autoscaling-policies-delete', 'locations-autoscaling-policies-get', 'locations-autoscaling-policies-get-iam-policy', 'locations-autoscaling-policies-list', 'locations-autoscaling-policies-set-iam-policy', 'locations-autoscaling-policies-test-iam-permissions', 'locations-autoscaling-policies-update', 'locations-batches-create', 'locations-batches-delete', 'locations-batches-get', 'locations-batches-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-session-templates-create', 'locations-session-templates-delete', 'locations-session-templates-get', 'locations-session-templates-list', 'locations-session-templates-patch', 'locations-sessions-create', 'locations-sessions-delete', 'locations-sessions-get', 'locations-sessions-list', 'locations-sessions-terminate', 'locations-workflow-templates-create', 'locations-workflow-templates-delete', 'locations-workflow-templates-get', 'locations-workflow-templates-get-iam-policy', 'locations-workflow-templates-instantiate', 'locations-workflow-templates-instantiate-inline', 'locations-workflow-templates-list', 'locations-workflow-templates-set-iam-policy', 'locations-workflow-templates-test-iam-permissions', 'locations-workflow-templates-update', 'regions-autoscaling-policies-create', 'regions-autoscaling-policies-delete', 'regions-autoscaling-policies-get', 'regions-autoscaling-policies-get-iam-policy', 'regions-autoscaling-policies-list', 'regions-autoscaling-policies-set-iam-policy', 'regions-autoscaling-policies-test-iam-permissions', 'regions-autoscaling-policies-update', 'regions-clusters-create', 'regions-clusters-delete', 'regions-clusters-diagnose', 'regions-clusters-get', 'regions-clusters-get-iam-policy', 'regions-clusters-inject-credentials', 'regions-clusters-list', 'regions-clusters-node-groups-create', 'regions-clusters-node-groups-get', 'regions-clusters-node-groups-repair', 'regions-clusters-node-groups-resize', 'regions-clusters-patch', 'regions-clusters-repair', 'regions-clusters-set-iam-policy', 'regions-clusters-start', 'regions-clusters-stop', 'regions-clusters-test-iam-permissions', 'regions-jobs-cancel', 'regions-jobs-delete', 'regions-jobs-get', 'regions-jobs-get-iam-policy', 'regions-jobs-list', 'regions-jobs-patch', 'regions-jobs-set-iam-policy', 'regions-jobs-submit', 'regions-jobs-submit-as-operation', 'regions-jobs-test-iam-permissions', 'regions-operations-cancel', 'regions-operations-delete', 'regions-operations-get', 'regions-operations-get-iam-policy', 'regions-operations-list', 'regions-operations-set-iam-policy', 'regions-operations-test-iam-permissions', 'regions-workflow-templates-create', 'regions-workflow-templates-delete', 'regions-workflow-templates-get', 'regions-workflow-templates-get-iam-policy', 'regions-workflow-templates-instantiate', 'regions-workflow-templates-instantiate-inline', 'regions-workflow-templates-list', 'regions-workflow-templates-set-iam-policy', 'regions-workflow-templates-test-iam-permissions' and 'regions-workflow-templates-update'", vec![
             ("locations-autoscaling-policies-create",
                     Some(r##"Creates new autoscaling policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-autoscaling-policies-create",
@@ -7509,7 +8539,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-batches-delete",
-                    Some(r##"Deletes the batch workload resource. If the batch is not in terminal state, the delete fails and the response returns FAILED_PRECONDITION."##),
+                    Some(r##"Deletes the batch workload resource. If the batch is not in a CANCELLED, SUCCEEDED or FAILED State, the delete operation fails and the response returns FAILED_PRECONDITION."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-batches-delete",
                   vec![
                     (Some(r##"name"##),
@@ -7641,7 +8671,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED.NOTE: the name binding allows API services to override the binding to use different resource name schemes, such as users/*/operations. To override the binding, API services can add a binding such as "/v1/{name=users/*}/operations" to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -7649,6 +8679,250 @@ async fn main() {
                      Some(r##"The name of the operation's parent resource."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-session-templates-create",
+                    Some(r##"Create a session template synchronously."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-session-templates-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent resource where this session template will be created."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-session-templates-delete",
+                    Some(r##"Deletes a session template."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-session-templates-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the session template resource to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-session-templates-get",
+                    Some(r##"Gets the resource representation for a session template."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-session-templates-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the session template to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-session-templates-list",
+                    Some(r##"Lists session templates."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-session-templates-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent that owns this collection of session templates."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-session-templates-patch",
+                    Some(r##"Updates the session template synchronously."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-session-templates-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name of the session template."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-create",
+                    Some(r##"Create an interactive session asynchronously."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent resource where this session will be created."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-delete",
+                    Some(r##"Deletes the interactive session resource. If the session is not in terminal state, it is terminated, and then deleted."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the session resource to delete."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-get",
+                    Some(r##"Gets the resource representation for an interactive session."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the session to retrieve."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-list",
+                    Some(r##"Lists interactive sessions."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent, which owns this collection of sessions."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-sessions-terminate",
+                    Some(r##"Terminates the interactive session."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_locations-sessions-terminate",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the session resource to terminate."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -8418,6 +9692,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("regions-clusters-node-groups-repair",
+                    Some(r##"Repair nodes in a node group."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-clusters-node-groups-repair",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the node group to resize. Format: projects/{project}/regions/{region}/clusters/{cluster}/nodeGroups/{nodeGroup}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("regions-clusters-node-groups-resize",
                     Some(r##"Resizes a node group in a cluster. The returned Operation.metadata is NodeGroupOperationMetadata (https://cloud.google.com/dataproc/docs/reference/rpc/google.cloud.dataproc.v1#nodegroupoperationmetadata)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-clusters-node-groups-resize",
@@ -9085,7 +10387,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("regions-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED.NOTE: the name binding allows API services to override the binding to use different resource name schemes, such as users/*/operations. To override the binding, API services can add a binding such as "/v1/{name=users/*}/operations" to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED."##),
                     "Details at http://byron.github.io/google-apis-rs/google_dataproc1_cli/projects_regions-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -9430,7 +10732,7 @@ async fn main() {
     
     let mut app = App::new("dataproc1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230103")
+           .version("5.0.4+20240222")
            .about("Manages Hadoop-based clusters and jobs on Google Cloud Platform.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dataproc1_cli")
            .arg(Arg::with_name("url")

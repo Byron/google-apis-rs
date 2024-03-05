@@ -1,4 +1,4 @@
-site_name: Container v5.0.3+20230104
+site_name: Container v5.0.4+20240214
 site_url: http://byron.github.io/google-apis-rs/google-container1-cli
 site_description: A complete library to interact with Container (protocol v1)
 
@@ -11,6 +11,7 @@ nav:
 - Home: 'index.md'
 - 'Projects':
     - 'Aggregated Usable Subnetworks List': 'projects_aggregated-usable-subnetworks-list.md'
+    - 'Locations Clusters Check Autopilot Compatibility': 'projects_locations-clusters-check-autopilot-compatibility.md'
     - 'Locations Clusters Complete Ip Rotation': 'projects_locations-clusters-complete-ip-rotation.md'
     - 'Locations Clusters Create': 'projects_locations-clusters-create.md'
     - 'Locations Clusters Delete': 'projects_locations-clusters-delete.md'

@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// Manage your eDiscovery data
     Ediscovery,
@@ -126,7 +126,7 @@ impl<'a, S> Vault<S> {
         Vault {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://vault.googleapis.com/".to_string(),
             _root_url: "https://vault.googleapis.com/".to_string(),
         }
@@ -140,7 +140,7 @@ impl<'a, S> Vault<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -271,6 +271,54 @@ pub struct AddMatterPermissionsRequest {
 impl client::RequestValue for AddMatterPermissionsRequest {}
 
 
+/// The options for Calendar exports.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CalendarExportOptions {
+    /// The file format for exported text messages.
+    #[serde(rename="exportFormat")]
+    
+    pub export_format: Option<String>,
+}
+
+impl client::Part for CalendarExportOptions {}
+
+
+/// Additional options for Calendar search
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CalendarOptions {
+    /// Matches only those events whose location contains all of the words in the given set. If the string contains quoted phrases, this method only matches those events whose location contain the exact phrase. Entries in the set are considered in "and". Word splitting example: ["New Zealand"] vs ["New","Zealand"] "New Zealand": matched by both "New and better Zealand": only matched by the later
+    #[serde(rename="locationQuery")]
+    
+    pub location_query: Option<Vec<String>>,
+    /// Matches only those events that do not contain any of the words in the given set in title, description, location, or attendees. Entries in the set are considered in "or".
+    #[serde(rename="minusWords")]
+    
+    pub minus_words: Option<Vec<String>>,
+    /// Matches only those events whose attendees contain all of the words in the given set. Entries in the set are considered in "and".
+    #[serde(rename="peopleQuery")]
+    
+    pub people_query: Option<Vec<String>>,
+    /// Matches only events for which the custodian gave one of these responses. If the set is empty or contains ATTENDEE_RESPONSE_UNSPECIFIED there will be no filtering on responses.
+    #[serde(rename="responseStatuses")]
+    
+    pub response_statuses: Option<Vec<String>>,
+    /// Search the current version of the Calendar event, but export the contents of the last version saved before 12:00 AM UTC on the specified date. Enter the date in UTC.
+    #[serde(rename="versionDate")]
+    
+    pub version_date: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+}
+
+impl client::Part for CalendarOptions {}
+
+
 /// The request message for Operations.CancelOperation.
 /// 
 /// # Activities
@@ -327,7 +375,7 @@ impl client::ResponseResult for CloseMatterResponse {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CloudStorageFile {
-    /// The name of the Cloud Storage bucket for the export file. You can use this value in the [Cloud Storage JSON or XML APIs](https://cloud.google.com/storage/docs/apis), but not to list the bucket contents. Instead, you can [get individual export files](https://cloud.google.com/storage/docs/json_api/v1/objects/get) by object name.
+    /// The name of the Cloud Storage bucket for the export file. You can use this value in the Cloud Storage [JSON API](https://cloud.google.com/storage/docs/json_api) or [XML API](https://cloud.google.com/storage/docs/xml-api), but not to list the bucket contents. Instead, you can [get individual export files](https://cloud.google.com/storage/docs/json_api/v1/objects/get) by object name.
     #[serde(rename="bucketName")]
     
     pub bucket_name: Option<String>,
@@ -335,7 +383,7 @@ pub struct CloudStorageFile {
     #[serde(rename="md5Hash")]
     
     pub md5_hash: Option<String>,
-    /// The name of the Cloud Storage object for the export file. You can use this value in the [Cloud Storage JSON or XML APIs](https://cloud.google.com/storage/docs/apis).
+    /// The name of the Cloud Storage object for the export file. You can use this value in the Cloud Storage [JSON API](https://cloud.google.com/storage/docs/json_api) or [XML API](https://cloud.google.com/storage/docs/xml-api).
     #[serde(rename="objectName")]
     
     pub object_name: Option<String>,
@@ -516,6 +564,10 @@ pub struct Export {
     /// The export name. Don't use special characters (~!$'(),;@:/?) in the name, they can prevent you from downloading exports.
     
     pub name: Option<String>,
+    /// Output only. Identifies the parent export that spawned this child export. This is only set on child exports.
+    #[serde(rename="parentExportId")]
+    
+    pub parent_export_id: Option<String>,
     /// The query parameters used to create the export.
     
     pub query: Option<Query>,
@@ -541,6 +593,10 @@ impl client::ResponseResult for Export {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ExportOptions {
+    /// Option available for Calendar export.
+    #[serde(rename="calendarOptions")]
+    
+    pub calendar_options: Option<CalendarExportOptions>,
     /// Options for Drive exports.
     #[serde(rename="driveOptions")]
     
@@ -635,7 +691,7 @@ impl client::Part for HangoutsChatExportOptions {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct HangoutsChatInfo {
-    /// A list of Chat spaces IDs, as provided by the [Chat API](https://developers.google.com/hangouts/chat).
+    /// A list of Chat spaces IDs, as provided by the [Chat API](https://developers.google.com/chat). There is a limit of exporting from 500 Chat spaces per request.
     #[serde(rename="roomId")]
     
     pub room_id: Option<Vec<String>>,
@@ -1003,6 +1059,10 @@ pub struct MailExportOptions {
     #[serde(rename="exportFormat")]
     
     pub export_format: Option<String>,
+    /// Optional. To enable exporting linked Drive files, set to **true**.
+    #[serde(rename="exportLinkedDriveFiles")]
+    
+    pub export_linked_drive_files: Option<bool>,
     /// To export confidential mode content, set to **true**.
     #[serde(rename="showConfidentialModeContent")]
     
@@ -1023,6 +1083,10 @@ impl client::Part for MailExportOptions {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MailOptions {
+    /// Specifies whether the results should include encrypted content, unencrypted content, or both. Defaults to including both.
+    #[serde(rename="clientSideEncryptedOption")]
+    
+    pub client_side_encrypted_option: Option<String>,
     /// Set to **true** to exclude drafts.
     #[serde(rename="excludeDrafts")]
     
@@ -1145,7 +1209,7 @@ pub struct Operation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -1181,6 +1245,10 @@ pub struct Query {
     #[serde(rename="accountInfo")]
     
     pub account_info: Option<AccountInfo>,
+    /// Set Calendar search-specific options.
+    #[serde(rename="calendarOptions")]
+    
+    pub calendar_options: Option<CalendarOptions>,
     /// The Google Workspace service to search.
     
     pub corpus: Option<String>,
@@ -2207,7 +2275,7 @@ impl<'a, S> OperationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
     /// 
     /// # Arguments
     ///
@@ -11281,7 +11349,7 @@ where
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *list* method supported by a *operation* resource.
 /// It is not used directly, but through a [`OperationMethods`] instance.

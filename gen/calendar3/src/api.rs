@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, share, and permanently delete all the calendars you can access using Google Calendar
     Full,
@@ -104,22 +104,23 @@ impl Default for Scope {
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().watch(req, "calendarId")
 ///              .updated_min(chrono::Utc::now())
-///              .time_zone("duo")
+///              .time_zone("sed")
 ///              .time_min(chrono::Utc::now())
 ///              .time_max(chrono::Utc::now())
-///              .sync_token("sed")
+///              .sync_token("no")
 ///              .single_events(true)
 ///              .show_hidden_invitations(true)
-///              .show_deleted(true)
-///              .add_shared_extended_property("vero")
-///              .q("erat")
-///              .add_private_extended_property("sed")
-///              .page_token("duo")
-///              .order_by("dolore")
-///              .max_results(-22)
-///              .max_attendees(-28)
-///              .i_cal_uid("amet.")
-///              .always_include_email(false)
+///              .show_deleted(false)
+///              .add_shared_extended_property("erat")
+///              .q("sed")
+///              .add_private_extended_property("duo")
+///              .page_token("dolore")
+///              .order_by("et")
+///              .max_results(-28)
+///              .max_attendees(-2)
+///              .i_cal_uid("consetetur")
+///              .add_event_types("diam")
+///              .always_include_email(true)
 ///              .doit().await;
 /// 
 /// match result {
@@ -158,7 +159,7 @@ impl<'a, S> CalendarHub<S> {
         CalendarHub {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://www.googleapis.com/calendar/v3/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -190,7 +191,7 @@ impl<'a, S> CalendarHub<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -941,10 +942,11 @@ pub struct Event {
     /// ETag of the resource.
     
     pub etag: Option<String>,
-    /// Specific type of the event. Read-only. Possible values are:  
+    /// Specific type of the event. This cannot be modified after the event is created. Possible values are:  
     /// - "default" - A regular event or not further specified. 
     /// - "outOfOffice" - An out-of-office event. 
-    /// - "focusTime" - A focus-time event.
+    /// - "focusTime" - A focus-time event. 
+    /// - "workingLocation" - A working location event.  Currently, only "default " and "workingLocation" events can be created using the API. Extended support for other event types will be made available in later releases.
     #[serde(rename="eventType")]
     
     pub event_type: Option<String>,
@@ -952,6 +954,10 @@ pub struct Event {
     #[serde(rename="extendedProperties")]
     
     pub extended_properties: Option<EventExtendedProperties>,
+    /// Focus Time event data. Used if eventType is focusTime.
+    #[serde(rename="focusTimeProperties")]
+    
+    pub focus_time_properties: Option<EventFocusTimeProperties>,
     /// A gadget that extends this event. Gadgets are deprecated; this structure is instead only used for returning birthday calendar metadata.
     
     pub gadget: Option<EventGadget>,
@@ -1004,6 +1010,10 @@ pub struct Event {
     #[serde(rename="originalStartTime")]
     
     pub original_start_time: Option<EventDateTime>,
+    /// Out of office event data. Used if eventType is outOfOffice.
+    #[serde(rename="outOfOfficeProperties")]
+    
+    pub out_of_office_properties: Option<EventOutOfOfficeProperties>,
     /// If set to True, Event propagation is disabled. Note that it is not the same thing as Private event properties. Optional. Immutable. The default is False.
     #[serde(rename="privateCopy")]
     
@@ -1057,6 +1067,10 @@ pub struct Event {
     /// - "confidential" - The event is private. This value is provided for compatibility reasons.
     
     pub visibility: Option<String>,
+    /// Working location event data.
+    #[serde(rename="workingLocationProperties")]
+    
+    pub working_location_properties: Option<EventWorkingLocationProperties>,
 }
 
 impl client::RequestValue for Event {}
@@ -1178,6 +1192,50 @@ impl client::Part for EventDateTime {}
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EventFocusTimeProperties {
+    /// Whether to decline meeting invitations which overlap Focus Time events. Valid values are declineNone, meaning that no meeting invitations are declined; declineAllConflictingInvitations, meaning that all conflicting meeting invitations that conflict with the event are declined; and declineOnlyNewConflictingInvitations, meaning that only new conflicting meeting invitations which arrive while the Focus Time event is present are to be declined.
+    #[serde(rename="autoDeclineMode")]
+    
+    pub auto_decline_mode: Option<String>,
+    /// The status to mark the user in Chat and related products. This can be available or doNotDisturb.
+    #[serde(rename="chatStatus")]
+    
+    pub chat_status: Option<String>,
+    /// Response message to set if an existing event or new invitation is automatically declined by Calendar.
+    #[serde(rename="declineMessage")]
+    
+    pub decline_message: Option<String>,
+}
+
+impl client::Part for EventFocusTimeProperties {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EventOutOfOfficeProperties {
+    /// Whether to decline meeting invitations which overlap Out of office events. Valid values are declineNone, meaning that no meeting invitations are declined; declineAllConflictingInvitations, meaning that all conflicting meeting invitations that conflict with the event are declined; and declineOnlyNewConflictingInvitations, meaning that only new conflicting meeting invitations which arrive while the Out of office event is present are to be declined.
+    #[serde(rename="autoDeclineMode")]
+    
+    pub auto_decline_mode: Option<String>,
+    /// Response message to set if an existing event or new invitation is automatically declined by Calendar.
+    #[serde(rename="declineMessage")]
+    
+    pub decline_message: Option<String>,
+}
+
+impl client::Part for EventOutOfOfficeProperties {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EventReminder {
     /// The method used by this reminder. Possible values are:  
     /// - "email" - Reminders are sent via email. 
@@ -1192,6 +1250,38 @@ pub struct EventReminder {
 }
 
 impl client::Part for EventReminder {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EventWorkingLocationProperties {
+    /// If present, specifies that the user is working from a custom location.
+    #[serde(rename="customLocation")]
+    
+    pub custom_location: Option<EventWorkingLocationPropertiesCustomLocation>,
+    /// If present, specifies that the user is working at home.
+    #[serde(rename="homeOffice")]
+    
+    pub home_office: Option<json::Value>,
+    /// If present, specifies that the user is working from an office.
+    #[serde(rename="officeLocation")]
+    
+    pub office_location: Option<EventWorkingLocationPropertiesOfficeLocation>,
+    /// Type of the working location. Possible values are:  
+    /// - "homeOffice" - The user is working at home. 
+    /// - "officeLocation" - The user is working from an office. 
+    /// - "customLocation" - The user is working from a custom location.  Any details are specified in a sub-field of the specified name, but this field may be missing if empty. Any other fields are ignored.
+    /// Required when adding working location properties.
+    #[serde(rename="type")]
+    
+    pub type_: Option<String>,
+}
+
+impl client::Part for EventWorkingLocationProperties {}
 
 
 /// There is no detailed description.
@@ -1650,6 +1740,54 @@ pub struct EventSource {
 
 impl client::NestedType for EventSource {}
 impl client::Part for EventSource {}
+
+
+/// If present, specifies that the user is working from a custom location.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EventWorkingLocationPropertiesCustomLocation {
+    /// An optional extra label for additional information.
+    
+    pub label: Option<String>,
+}
+
+impl client::NestedType for EventWorkingLocationPropertiesCustomLocation {}
+impl client::Part for EventWorkingLocationPropertiesCustomLocation {}
+
+
+/// If present, specifies that the user is working from an office.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EventWorkingLocationPropertiesOfficeLocation {
+    /// An optional building identifier. This should reference a building ID in the organization's Resources database.
+    #[serde(rename="buildingId")]
+    
+    pub building_id: Option<String>,
+    /// An optional desk identifier.
+    #[serde(rename="deskId")]
+    
+    pub desk_id: Option<String>,
+    /// An optional floor identifier.
+    #[serde(rename="floorId")]
+    
+    pub floor_id: Option<String>,
+    /// An optional floor section identifier.
+    #[serde(rename="floorSectionId")]
+    
+    pub floor_section_id: Option<String>,
+    /// The office name that's displayed in Calendar Web and Mobile clients. We recommend you reference a building name in the organization's Resources database.
+    
+    pub label: Option<String>,
+}
+
+impl client::NestedType for EventWorkingLocationPropertiesOfficeLocation {}
+impl client::Part for EventWorkingLocationPropertiesOfficeLocation {}
 
 
 
@@ -2457,6 +2595,7 @@ impl<'a, S> EventMethods<'a, S> {
             _max_results: Default::default(),
             _max_attendees: Default::default(),
             _i_cal_uid: Default::default(),
+            _event_types: Default::default(),
             _always_include_email: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -2466,7 +2605,7 @@ impl<'a, S> EventMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Moves an event to another calendar, i.e. changes an event's organizer.
+    /// Moves an event to another calendar, i.e. changes an event's organizer. Note that only default events can be moved; outOfOffice, focusTime and workingLocation events cannot be moved.
     /// 
     /// # Arguments
     ///
@@ -2591,6 +2730,7 @@ impl<'a, S> EventMethods<'a, S> {
             _max_results: Default::default(),
             _max_attendees: Default::default(),
             _i_cal_uid: Default::default(),
+            _event_types: Default::default(),
             _always_include_email: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
@@ -3614,10 +3754,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.acl().list("calendarId")
-///              .sync_token("vero")
-///              .show_deleted(false)
-///              .page_token("invidunt")
-///              .max_results(-65)
+///              .sync_token("invidunt")
+///              .show_deleted(true)
+///              .page_token("vero")
+///              .max_results(-44)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10673,7 +10813,8 @@ where
 ///              .max_results(-73)
 ///              .max_attendees(-10)
 ///              .i_cal_uid("takimata")
-///              .always_include_email(true)
+///              .add_event_types("Lorem")
+///              .always_include_email(false)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10698,6 +10839,7 @@ pub struct EventListCall<'a, S>
     _max_results: Option<i32>,
     _max_attendees: Option<i32>,
     _i_cal_uid: Option<String>,
+    _event_types: Vec<String>,
     _always_include_email: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
@@ -10727,14 +10869,14 @@ where
         dlg.begin(client::MethodInfo { id: "calendar.events.list",
                                http_method: hyper::Method::GET });
 
-        for &field in ["alt", "calendarId", "updatedMin", "timeZone", "timeMin", "timeMax", "syncToken", "singleEvents", "showHiddenInvitations", "showDeleted", "sharedExtendedProperty", "q", "privateExtendedProperty", "pageToken", "orderBy", "maxResults", "maxAttendees", "iCalUID", "alwaysIncludeEmail"].iter() {
+        for &field in ["alt", "calendarId", "updatedMin", "timeZone", "timeMin", "timeMax", "syncToken", "singleEvents", "showHiddenInvitations", "showDeleted", "sharedExtendedProperty", "q", "privateExtendedProperty", "pageToken", "orderBy", "maxResults", "maxAttendees", "iCalUID", "eventTypes", "alwaysIncludeEmail"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(20 + self._additional_params.len());
+        let mut params = Params::with_capacity(21 + self._additional_params.len());
         params.push("calendarId", self._calendar_id);
         if let Some(value) = self._updated_min.as_ref() {
             params.push("updatedMin", ::client::serde::datetime_to_string(&value));
@@ -10787,6 +10929,11 @@ where
         }
         if let Some(value) = self._i_cal_uid.as_ref() {
             params.push("iCalUID", value);
+        }
+        if self._event_types.len() > 0 {
+            for f in self._event_types.iter() {
+                params.push("eventTypes", f);
+            }
         }
         if let Some(value) = self._always_include_email.as_ref() {
             params.push("alwaysIncludeEmail", value.to_string());
@@ -10944,7 +11091,7 @@ where
     /// - sharedExtendedProperty 
     /// - timeMin 
     /// - timeMax 
-    /// - updatedMin If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
+    /// - updatedMin All other query parameters should be the same as for the initial synchronization to avoid undefined behavior. If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
     ///
@@ -10982,7 +11129,20 @@ where
         self._shared_extended_property.push(new_value.to_string());
         self
     }
-    /// Free text search terms to find events that match these terms in the following fields: summary, description, location, attendee's displayName, attendee's email. Optional.
+    /// Free text search terms to find events that match these terms in the following fields:
+    /// 
+    /// - summary 
+    /// - description 
+    /// - location 
+    /// - attendee's displayName 
+    /// - attendee's email 
+    /// - organizer's displayName 
+    /// - organizer's email 
+    /// - workingLocationProperties.officeLocation.buildingId 
+    /// - workingLocationProperties.officeLocation.deskId 
+    /// - workingLocationProperties.officeLocation.label 
+    /// - workingLocationProperties.customLocation.label 
+    /// These search terms also match predefined keywords against all display title translations of working location, out-of-office, and focus-time events. For example, searching for "Office" or "Bureau" returns working location events of type officeLocation, whereas searching for "Out of office" or "Abwesend" returns out-of-office events. Optional.
     ///
     /// Sets the *q* query property to the given value.
     pub fn q(mut self, new_value: &str) -> EventListCall<'a, S> {
@@ -11032,7 +11192,15 @@ where
         self._i_cal_uid = Some(new_value.to_string());
         self
     }
-    /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
+    /// Event types to return. Optional. This parameter can be repeated multiple times to return events of different types. The default is ["default", "focusTime", "outOfOffice"].
+    ///
+    /// Append the given value to the *event types* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_event_types(mut self, new_value: &str) -> EventListCall<'a, S> {
+        self._event_types.push(new_value.to_string());
+        self
+    }
+    /// Deprecated and ignored.
     ///
     /// Sets the *always include email* query property to the given value.
     pub fn always_include_email(mut self, new_value: bool) -> EventListCall<'a, S> {
@@ -11111,7 +11279,7 @@ where
 }
 
 
-/// Moves an event to another calendar, i.e. changes an event's organizer.
+/// Moves an event to another calendar, i.e. changes an event's organizer. Note that only default events can be moved; outOfOffice, focusTime and workingLocation events cannot be moved.
 ///
 /// A builder for the *move* method supported by a *event* resource.
 /// It is not used directly, but through a [`EventMethods`] instance.
@@ -11138,7 +11306,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().move_("calendarId", "eventId", "destination")
-///              .send_updates("et")
+///              .send_updates("erat")
 ///              .send_notifications(true)
 ///              .doit().await;
 /// # }
@@ -11453,10 +11621,10 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.events().patch(req, "calendarId", "eventId")
 ///              .supports_attachments(true)
-///              .send_updates("et")
-///              .send_notifications(true)
-///              .max_attendees(-96)
-///              .conference_data_version(-98)
+///              .send_updates("consetetur")
+///              .send_notifications(false)
+///              .max_attendees(-32)
+///              .conference_data_version(-25)
 ///              .always_include_email(false)
 ///              .doit().await;
 /// # }
@@ -12512,6 +12680,7 @@ where
 ///              .max_results(-58)
 ///              .max_attendees(-91)
 ///              .i_cal_uid("rebum.")
+///              .add_event_types("tempor")
 ///              .always_include_email(true)
 ///              .doit().await;
 /// # }
@@ -12538,6 +12707,7 @@ pub struct EventWatchCall<'a, S>
     _max_results: Option<i32>,
     _max_attendees: Option<i32>,
     _i_cal_uid: Option<String>,
+    _event_types: Vec<String>,
     _always_include_email: Option<bool>,
     _delegate: Option<&'a mut dyn client::Delegate>,
     _additional_params: HashMap<String, String>,
@@ -12567,14 +12737,14 @@ where
         dlg.begin(client::MethodInfo { id: "calendar.events.watch",
                                http_method: hyper::Method::POST });
 
-        for &field in ["alt", "calendarId", "updatedMin", "timeZone", "timeMin", "timeMax", "syncToken", "singleEvents", "showHiddenInvitations", "showDeleted", "sharedExtendedProperty", "q", "privateExtendedProperty", "pageToken", "orderBy", "maxResults", "maxAttendees", "iCalUID", "alwaysIncludeEmail"].iter() {
+        for &field in ["alt", "calendarId", "updatedMin", "timeZone", "timeMin", "timeMax", "syncToken", "singleEvents", "showHiddenInvitations", "showDeleted", "sharedExtendedProperty", "q", "privateExtendedProperty", "pageToken", "orderBy", "maxResults", "maxAttendees", "iCalUID", "eventTypes", "alwaysIncludeEmail"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(21 + self._additional_params.len());
+        let mut params = Params::with_capacity(22 + self._additional_params.len());
         params.push("calendarId", self._calendar_id);
         if let Some(value) = self._updated_min.as_ref() {
             params.push("updatedMin", ::client::serde::datetime_to_string(&value));
@@ -12627,6 +12797,11 @@ where
         }
         if let Some(value) = self._i_cal_uid.as_ref() {
             params.push("iCalUID", value);
+        }
+        if self._event_types.len() > 0 {
+            for f in self._event_types.iter() {
+                params.push("eventTypes", f);
+            }
         }
         if let Some(value) = self._always_include_email.as_ref() {
             params.push("alwaysIncludeEmail", value.to_string());
@@ -12807,7 +12982,7 @@ where
     /// - sharedExtendedProperty 
     /// - timeMin 
     /// - timeMax 
-    /// - updatedMin If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
+    /// - updatedMin All other query parameters should be the same as for the initial synchronization to avoid undefined behavior. If the syncToken expires, the server will respond with a 410 GONE response code and the client should clear its storage and perform a full synchronization without any syncToken.
     /// Learn more about incremental synchronization.
     /// Optional. The default is to return all entries.
     ///
@@ -12845,7 +13020,20 @@ where
         self._shared_extended_property.push(new_value.to_string());
         self
     }
-    /// Free text search terms to find events that match these terms in the following fields: summary, description, location, attendee's displayName, attendee's email. Optional.
+    /// Free text search terms to find events that match these terms in the following fields:
+    /// 
+    /// - summary 
+    /// - description 
+    /// - location 
+    /// - attendee's displayName 
+    /// - attendee's email 
+    /// - organizer's displayName 
+    /// - organizer's email 
+    /// - workingLocationProperties.officeLocation.buildingId 
+    /// - workingLocationProperties.officeLocation.deskId 
+    /// - workingLocationProperties.officeLocation.label 
+    /// - workingLocationProperties.customLocation.label 
+    /// These search terms also match predefined keywords against all display title translations of working location, out-of-office, and focus-time events. For example, searching for "Office" or "Bureau" returns working location events of type officeLocation, whereas searching for "Out of office" or "Abwesend" returns out-of-office events. Optional.
     ///
     /// Sets the *q* query property to the given value.
     pub fn q(mut self, new_value: &str) -> EventWatchCall<'a, S> {
@@ -12895,7 +13083,15 @@ where
         self._i_cal_uid = Some(new_value.to_string());
         self
     }
-    /// Deprecated and ignored. A value will always be returned in the email field for the organizer, creator and attendees, even if no real email address is available (i.e. a generated, non-working value will be provided).
+    /// Event types to return. Optional. This parameter can be repeated multiple times to return events of different types. The default is ["default", "focusTime", "outOfOffice"].
+    ///
+    /// Append the given value to the *event types* query property.
+    /// Each appended value will retain its original ordering and be '/'-separated in the URL's parameters.
+    pub fn add_event_types(mut self, new_value: &str) -> EventWatchCall<'a, S> {
+        self._event_types.push(new_value.to_string());
+        self
+    }
+    /// Deprecated and ignored.
     ///
     /// Sets the *always include email* query property to the given value.
     pub fn always_include_email(mut self, new_value: bool) -> EventWatchCall<'a, S> {
@@ -13528,9 +13724,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.settings().list()
-///              .sync_token("eos")
-///              .page_token("amet.")
-///              .max_results(-84)
+///              .sync_token("amet")
+///              .page_token("ut")
+///              .max_results(-27)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13812,9 +14008,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.settings().watch(req)
-///              .sync_token("amet")
-///              .page_token("ut")
-///              .max_results(-27)
+///              .sync_token("sit")
+///              .page_token("vero")
+///              .max_results(-20)
 ///              .doit().await;
 /// # }
 /// ```

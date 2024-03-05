@@ -2,7 +2,11 @@ api:
   credentials: '{"installed":{"auth_uri":"https://accounts.google.com/o/oauth2/auth","client_secret":"hCsslbCUyfehWMmbkG8vTYxG","token_uri":"https://accounts.google.com/o/oauth2/token","client_email":"","redirect_uris":["urn:ietf:wg:oauth:2.0:oob","oob"],"client_x509_cert_url":"","client_id":"620010449518-9ngf7o4dhs0dka470npqvor6dc5lqb9b.apps.googleusercontent.com","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs"}}'
   blacklist:
     # recursive type
-    - analyticsadmin1_alpha
+    - analyticsadmin
+    # resursive type
+    - bigquery
+    # redefinition of `Scope`
+    - binaryauthorization
     # ampersand & in type name
     - mybusinessqanda
     # recursive type
@@ -22,6 +26,7 @@ api:
     - kgsearch
     # Has a struct field called 'async', which is now reserved
     - homegraph
+    - gkehub
     - spanner
     - firebaserules
     - servicemanagement
@@ -90,7 +95,7 @@ directories:
   # The subdirectory to contain documentation from all APIs and related programs
   doc_subdir: doc
 cargo:
-  build_version: "5.0.3"
+  build_version: "5.0.4"
   repo_base_url: https://github.com/Byron/google-apis-rs
   authors:
     # don't forget to possibly add them to copyright authors

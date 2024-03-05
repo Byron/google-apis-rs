@@ -25,12 +25,13 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Tasks* API at revision *20230105*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud Tasks* API at revision *20240223*. The CLI is at version *5.0.4*.
 
 ```bash
 cloudtasks2-beta3 [options]
         projects
                 locations-get <name> [-p <v>]... [-o <out>]
+                locations-get-cmek-config <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
                 locations-queues-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-queues-delete <name> [-p <v>]... [-o <out>]
@@ -49,6 +50,7 @@ cloudtasks2-beta3 [options]
                 locations-queues-tasks-list <parent> [-p <v>]... [-o <out>]
                 locations-queues-tasks-run <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-queues-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-update-cmek-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
   cloudtasks2-beta3 --help
 
 Configuration:

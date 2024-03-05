@@ -25,18 +25,34 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Composer* API at revision *20230107*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud Composer* API at revision *20240227*. The CLI is at version *5.0.4*.
 
 ```bash
 composer1 [options]
         projects
                 locations-environments-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-environments-database-failover <environment> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-environments-delete <name> [-p <v>]... [-o <out>]
+                locations-environments-execute-airflow-command <environment> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-environments-fetch-database-properties <environment> [-p <v>]... [-o <out>]
                 locations-environments-get <name> [-p <v>]... [-o <out>]
                 locations-environments-list <parent> [-p <v>]... [-o <out>]
                 locations-environments-load-snapshot <environment> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-environments-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-environments-poll-airflow-command <environment> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-environments-save-snapshot <environment> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-environments-stop-airflow-command <environment> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-environments-user-workloads-config-maps-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-environments-user-workloads-config-maps-delete <name> [-p <v>]... [-o <out>]
+                locations-environments-user-workloads-config-maps-get <name> [-p <v>]... [-o <out>]
+                locations-environments-user-workloads-config-maps-list <parent> [-p <v>]... [-o <out>]
+                locations-environments-user-workloads-config-maps-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-environments-user-workloads-secrets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-environments-user-workloads-secrets-delete <name> [-p <v>]... [-o <out>]
+                locations-environments-user-workloads-secrets-get <name> [-p <v>]... [-o <out>]
+                locations-environments-user-workloads-secrets-list <parent> [-p <v>]... [-o <out>]
+                locations-environments-user-workloads-secrets-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-environments-workloads-list <parent> [-p <v>]... [-o <out>]
                 locations-image-versions-list <parent> [-p <v>]... [-o <out>]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]

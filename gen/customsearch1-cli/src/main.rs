@@ -467,7 +467,7 @@ async fn main() {
     
     let mut app = App::new("customsearch1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
+           .version("5.0.4+20240303")
            .about("Searches over a website or collection of websites")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_customsearch1_cli")
            .arg(Arg::with_name("folder")

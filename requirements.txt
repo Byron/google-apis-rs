@@ -7,3 +7,4 @@ ghp-import
 pyright
 types-PyYAML
 inflect
+urllib3

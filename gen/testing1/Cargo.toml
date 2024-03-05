@@ -4,12 +4,12 @@
 [package]
 
 name = "google-testing1"
-version = "5.0.3+20230119"
+version = "5.0.4+20240227"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with testing (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/testing1"
 homepage = "https://developers.google.com/cloud-test-lab/"
-documentation = "https://docs.rs/google-testing1/5.0.3+20230119"
+documentation = "https://docs.rs/google-testing1/5.0.4+20240227"
 license = "MIT"
 keywords = ["testing", "google", "protocol", "web", "api"]
 autobins = false

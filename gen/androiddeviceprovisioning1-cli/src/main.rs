@@ -81,10 +81,11 @@ where
                     "custom-message" => Some(("customMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dpc-extras" => Some(("dpcExtras", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dpc-resource-path" => Some(("dpcResourcePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "forced-reset-time" => Some(("forcedResetTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "is-default" => Some(("isDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["company-name", "configuration-id", "configuration-name", "contact-email", "contact-phone", "custom-message", "dpc-extras", "dpc-resource-path", "is-default", "name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["company-name", "configuration-id", "configuration-name", "contact-email", "contact-phone", "custom-message", "dpc-extras", "dpc-resource-path", "forced-reset-time", "is-default", "name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -319,10 +320,11 @@ where
                     "custom-message" => Some(("customMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dpc-extras" => Some(("dpcExtras", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "dpc-resource-path" => Some(("dpcResourcePath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "forced-reset-time" => Some(("forcedResetTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "is-default" => Some(("isDefault", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["company-name", "configuration-id", "configuration-name", "contact-email", "contact-phone", "custom-message", "dpc-extras", "dpc-resource-path", "is-default", "name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["company-name", "configuration-id", "configuration-name", "contact-email", "contact-phone", "custom-message", "dpc-extras", "dpc-resource-path", "forced-reset-time", "is-default", "name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1080,6 +1082,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "configuration-id" => Some(("configurationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "customer-id" => Some(("customerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.chrome-os-attested-device-id" => Some(("deviceIdentifier.chromeOsAttestedDeviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "device-identifier.device-type" => Some(("deviceIdentifier.deviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1094,7 +1097,7 @@ where
                     "section-type" => Some(("sectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "simlock-profile-id" => Some(("simlockProfileId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["chrome-os-attested-device-id", "customer-id", "device-identifier", "device-metadata", "device-type", "entries", "google-workspace-customer-id", "imei", "manufacturer", "meid", "model", "pre-provisioning-token", "section-type", "serial-number", "simlock-profile-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["chrome-os-attested-device-id", "configuration-id", "customer-id", "device-identifier", "device-metadata", "device-type", "entries", "google-workspace-customer-id", "imei", "manufacturer", "meid", "model", "pre-provisioning-token", "section-type", "serial-number", "simlock-profile-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1411,6 +1414,94 @@ where
     async fn _partners_devices_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.partners().devices_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _partners_devices_get_sim_lock_state(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "device-identifier.chrome-os-attested-device-id" => Some(("deviceIdentifier.chromeOsAttestedDeviceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.device-type" => Some(("deviceIdentifier.deviceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.imei" => Some(("deviceIdentifier.imei", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.manufacturer" => Some(("deviceIdentifier.manufacturer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.meid" => Some(("deviceIdentifier.meid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.model" => Some(("deviceIdentifier.model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device-identifier.serial-number" => Some(("deviceIdentifier.serialNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["chrome-os-attested-device-id", "device-identifier", "device-type", "imei", "manufacturer", "meid", "model", "serial-number"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GetDeviceSimLockStateRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.partners().devices_get_sim_lock_state(request, opt.value_of("partner-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1988,6 +2079,9 @@ where
                     ("devices-get", Some(opt)) => {
                         call_result = self._partners_devices_get(opt, dry_run, &mut err).await;
                     },
+                    ("devices-get-sim-lock-state", Some(opt)) => {
+                        call_result = self._partners_devices_get_sim_lock_state(opt, dry_run, &mut err).await;
+                    },
                     ("devices-metadata", Some(opt)) => {
                         call_result = self._partners_devices_metadata(opt, dry_run, &mut err).await;
                     },
@@ -2401,7 +2495,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("partners", "methods: 'customers-create', 'customers-list', 'devices-claim', 'devices-claim-async', 'devices-find-by-identifier', 'devices-find-by-owner', 'devices-get', 'devices-metadata', 'devices-unclaim', 'devices-unclaim-async', 'devices-update-metadata-async', 'vendors-customers-list' and 'vendors-list'", vec![
+        ("partners", "methods: 'customers-create', 'customers-list', 'devices-claim', 'devices-claim-async', 'devices-find-by-identifier', 'devices-find-by-owner', 'devices-get', 'devices-get-sim-lock-state', 'devices-metadata', 'devices-unclaim', 'devices-unclaim-async', 'devices-update-metadata-async', 'vendors-customers-list' and 'vendors-list'", vec![
             ("customers-create",
                     Some(r##"Creates a customer for zero-touch enrollment. After the method returns successfully, admin and owner roles can manage devices and EMM configs by calling API methods or using their zero-touch enrollment portal. The customer receives an email that welcomes them to zero-touch enrollment and explains how to sign into the portal."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/partners_customers-create",
@@ -2586,6 +2680,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("devices-get-sim-lock-state",
+                    Some(r##"Gets a device's SIM lock state."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/partners_devices-get-sim-lock-state",
+                  vec![
+                    (Some(r##"partner-id"##),
+                     None,
+                     Some(r##"Required. The ID of the partner."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("devices-metadata",
                     Some(r##"Updates reseller metadata associated with the device. Android devices only."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli/partners_devices-metadata",
@@ -2754,7 +2876,7 @@ async fn main() {
     
     let mut app = App::new("androiddeviceprovisioning1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230115")
+           .version("5.0.4+20240304")
            .about("Automates Android zero-touch enrollment for device resellers, customers, and EMMs.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androiddeviceprovisioning1_cli")
            .arg(Arg::with_name("folder")

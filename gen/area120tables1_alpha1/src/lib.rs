@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Area120 Tables* crate version *5.0.3+20230123*, where *20230123* is the exact revision of the *area120tables:v1alpha1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Area120 Tables* crate version *5.0.4+20240304*, where *20240304* is the exact revision of the *area120tables:v1alpha1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Area120 Tables* *v1_alpha1* API can be found at the
 //! [official documentation site](https://support.google.com/area120-tables/answer/10011390).

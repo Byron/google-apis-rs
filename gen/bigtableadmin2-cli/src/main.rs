@@ -50,110 +50,6 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
-    async fn _operations_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.operations().cancel(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _operations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.operations().delete(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     async fn _operations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.operations().get(opt.value_of("name").unwrap_or(""));
@@ -295,10 +191,12 @@ where
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "multi-cluster-routing-use-any.cluster-ids" => Some(("multiClusterRoutingUseAny.clusterIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "priority" => Some(("priority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "single-cluster-routing.allow-transactional-writes" => Some(("singleClusterRouting.allowTransactionalWrites", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "single-cluster-routing.cluster-id" => Some(("singleClusterRouting.clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "standard-isolation.priority" => Some(("standardIsolation.priority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-transactional-writes", "cluster-id", "cluster-ids", "description", "etag", "multi-cluster-routing-use-any", "name", "single-cluster-routing"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-transactional-writes", "cluster-id", "cluster-ids", "description", "etag", "multi-cluster-routing-use-any", "name", "priority", "single-cluster-routing", "standard-isolation"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -559,10 +457,12 @@ where
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "multi-cluster-routing-use-any.cluster-ids" => Some(("multiClusterRoutingUseAny.clusterIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "priority" => Some(("priority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "single-cluster-routing.allow-transactional-writes" => Some(("singleClusterRouting.allowTransactionalWrites", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "single-cluster-routing.cluster-id" => Some(("singleClusterRouting.clusterId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "standard-isolation.priority" => Some(("standardIsolation.priority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-transactional-writes", "cluster-id", "cluster-ids", "description", "etag", "multi-cluster-routing-use-any", "name", "single-cluster-routing"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-transactional-writes", "cluster-id", "cluster-ids", "description", "etag", "multi-cluster-routing-use-any", "name", "priority", "single-cluster-routing", "standard-isolation"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2485,6 +2385,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "table.change-stream-config.retention-period" => Some(("table.changeStreamConfig.retentionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "table.deletion-protection" => Some(("table.deletionProtection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "table.granularity" => Some(("table.granularity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "table.name" => Some(("table.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2500,7 +2401,7 @@ where
                     "table.stats.row-count" => Some(("table.stats.rowCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "table-id" => Some(("tableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["average-cells-per-column", "average-columns-per-row", "backup", "backup-info", "deletion-protection", "end-time", "granularity", "logical-data-bytes", "name", "restore-info", "row-count", "source-backup", "source-table", "source-type", "start-time", "stats", "table", "table-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["average-cells-per-column", "average-columns-per-row", "backup", "backup-info", "change-stream-config", "deletion-protection", "end-time", "granularity", "logical-data-bytes", "name", "restore-info", "retention-period", "row-count", "source-backup", "source-table", "source-type", "start-time", "stats", "table", "table-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3008,8 +2909,9 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "ignore-warnings" => Some(("ignoreWarnings", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ignore-warnings"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3092,6 +2994,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "change-stream-config.retention-period" => Some(("changeStreamConfig.retentionPeriod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deletion-protection" => Some(("deletionProtection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "granularity" => Some(("granularity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3106,7 +3009,7 @@ where
                     "stats.logical-data-bytes" => Some(("stats.logicalDataBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "stats.row-count" => Some(("stats.rowCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["average-cells-per-column", "average-columns-per-row", "backup", "backup-info", "deletion-protection", "end-time", "granularity", "logical-data-bytes", "name", "restore-info", "row-count", "source-backup", "source-table", "source-type", "start-time", "stats"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["average-cells-per-column", "average-columns-per-row", "backup", "backup-info", "change-stream-config", "deletion-protection", "end-time", "granularity", "logical-data-bytes", "name", "restore-info", "retention-period", "row-count", "source-backup", "source-table", "source-type", "start-time", "stats"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3688,58 +3591,6 @@ where
         }
     }
 
-    async fn _projects_locations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_get(opt.value_of("name").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     async fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_list(opt.value_of("name").unwrap_or(""));
@@ -3809,12 +3660,6 @@ where
         match self.opt.subcommand() {
             ("operations", Some(opt)) => {
                 match opt.subcommand() {
-                    ("cancel", Some(opt)) => {
-                        call_result = self._operations_cancel(opt, dry_run, &mut err).await;
-                    },
-                    ("delete", Some(opt)) => {
-                        call_result = self._operations_delete(opt, dry_run, &mut err).await;
-                    },
                     ("get", Some(opt)) => {
                         call_result = self._operations_get(opt, dry_run, &mut err).await;
                     },
@@ -3961,9 +3806,6 @@ where
                     ("instances-update", Some(opt)) => {
                         call_result = self._projects_instances_update(opt, dry_run, &mut err).await;
                     },
-                    ("locations-get", Some(opt)) => {
-                        call_result = self._projects_locations_get(opt, dry_run, &mut err).await;
-                    },
                     ("locations-list", Some(opt)) => {
                         call_result = self._projects_locations_list(opt, dry_run, &mut err).await;
                     },
@@ -4046,51 +3888,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("operations", "methods: 'cancel', 'delete', 'get' and 'projects-operations-list'", vec![
-            ("cancel",
-                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/operations_cancel",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"The name of the operation resource to be cancelled."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ("delete",
-                    Some(r##"Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/operations_delete",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"The name of the operation resource to be deleted."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
+        ("operations", "methods: 'get' and 'projects-operations-list'", vec![
             ("get",
                     Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/operations_get",
@@ -4114,7 +3912,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("projects-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/operations_projects-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -4137,7 +3935,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'instances-app-profiles-create', 'instances-app-profiles-delete', 'instances-app-profiles-get', 'instances-app-profiles-list', 'instances-app-profiles-patch', 'instances-clusters-backups-copy', 'instances-clusters-backups-create', 'instances-clusters-backups-delete', 'instances-clusters-backups-get', 'instances-clusters-backups-get-iam-policy', 'instances-clusters-backups-list', 'instances-clusters-backups-patch', 'instances-clusters-backups-set-iam-policy', 'instances-clusters-backups-test-iam-permissions', 'instances-clusters-create', 'instances-clusters-delete', 'instances-clusters-get', 'instances-clusters-hot-tablets-list', 'instances-clusters-list', 'instances-clusters-partial-update-cluster', 'instances-clusters-update', 'instances-create', 'instances-delete', 'instances-get', 'instances-get-iam-policy', 'instances-list', 'instances-partial-update-instance', 'instances-set-iam-policy', 'instances-tables-check-consistency', 'instances-tables-create', 'instances-tables-delete', 'instances-tables-drop-row-range', 'instances-tables-generate-consistency-token', 'instances-tables-get', 'instances-tables-get-iam-policy', 'instances-tables-list', 'instances-tables-modify-column-families', 'instances-tables-patch', 'instances-tables-restore', 'instances-tables-set-iam-policy', 'instances-tables-test-iam-permissions', 'instances-tables-undelete', 'instances-test-iam-permissions', 'instances-update', 'locations-get' and 'locations-list'", vec![
+        ("projects", "methods: 'instances-app-profiles-create', 'instances-app-profiles-delete', 'instances-app-profiles-get', 'instances-app-profiles-list', 'instances-app-profiles-patch', 'instances-clusters-backups-copy', 'instances-clusters-backups-create', 'instances-clusters-backups-delete', 'instances-clusters-backups-get', 'instances-clusters-backups-get-iam-policy', 'instances-clusters-backups-list', 'instances-clusters-backups-patch', 'instances-clusters-backups-set-iam-policy', 'instances-clusters-backups-test-iam-permissions', 'instances-clusters-create', 'instances-clusters-delete', 'instances-clusters-get', 'instances-clusters-hot-tablets-list', 'instances-clusters-list', 'instances-clusters-partial-update-cluster', 'instances-clusters-update', 'instances-create', 'instances-delete', 'instances-get', 'instances-get-iam-policy', 'instances-list', 'instances-partial-update-instance', 'instances-set-iam-policy', 'instances-tables-check-consistency', 'instances-tables-create', 'instances-tables-delete', 'instances-tables-drop-row-range', 'instances-tables-generate-consistency-token', 'instances-tables-get', 'instances-tables-get-iam-policy', 'instances-tables-list', 'instances-tables-modify-column-families', 'instances-tables-patch', 'instances-tables-restore', 'instances-tables-set-iam-policy', 'instances-tables-test-iam-permissions', 'instances-tables-undelete', 'instances-test-iam-permissions', 'instances-update' and 'locations-list'", vec![
             ("instances-app-profiles-create",
                     Some(r##"Creates an app profile within an instance."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-app-profiles-create",
@@ -4361,7 +4159,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-clusters-backups-get-iam-policy",
-                    Some(r##"Gets the access control policy for a Table resource. Returns an empty policy if the resource exists but does not have a policy set."##),
+                    Some(r##"Gets the access control policy for a Table or Backup resource. Returns an empty policy if the resource exists but does not have a policy set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-clusters-backups-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -4439,7 +4237,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-clusters-backups-set-iam-policy",
-                    Some(r##"Sets the access control policy on a Table resource. Replaces any existing policy."##),
+                    Some(r##"Sets the access control policy on a Table or Backup resource. Replaces any existing policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-clusters-backups-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -4467,7 +4265,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-clusters-backups-test-iam-permissions",
-                    Some(r##"Returns permissions that the caller has on the specified table resource."##),
+                    Some(r##"Returns permissions that the caller has on the specified Table or Backup resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-clusters-backups-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
@@ -4923,7 +4721,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-tables-drop-row-range",
-                    Some(r##"Permanently drop/delete a row range from a specified table. The request can specify whether to delete all rows in a table, or only those that match a particular prefix."##),
+                    Some(r##"Permanently drop/delete a row range from a specified table. The request can specify whether to delete all rows in a table, or only those that match a particular prefix. Note that row key prefixes used here are treated as service data. For more information about how service data is handled, see the [Google Cloud Privacy Notice](https://cloud.google.com/terms/cloud-privacy-notice)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-tables-drop-row-range",
                   vec![
                     (Some(r##"name"##),
@@ -5001,7 +4799,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-tables-get-iam-policy",
-                    Some(r##"Gets the access control policy for a Table resource. Returns an empty policy if the resource exists but does not have a policy set."##),
+                    Some(r##"Gets the access control policy for a Table or Backup resource. Returns an empty policy if the resource exists but does not have a policy set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-tables-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -5135,7 +4933,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-tables-set-iam-policy",
-                    Some(r##"Sets the access control policy on a Table resource. Replaces any existing policy."##),
+                    Some(r##"Sets the access control policy on a Table or Backup resource. Replaces any existing policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-tables-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -5163,7 +4961,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("instances-tables-test-iam-permissions",
-                    Some(r##"Returns permissions that the caller has on the specified table resource."##),
+                    Some(r##"Returns permissions that the caller has on the specified Table or Backup resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_instances-tables-test-iam-permissions",
                   vec![
                     (Some(r##"resource"##),
@@ -5274,28 +5072,6 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
-            ("locations-get",
-                    Some(r##"Gets information about a location."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_locations-get",
-                  vec![
-                    (Some(r##"name"##),
-                     None,
-                     Some(r##"Resource name for the location."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
             ("locations-list",
                     Some(r##"Lists information about the supported locations for this service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli/projects_locations-list",
@@ -5324,7 +5100,7 @@ async fn main() {
     
     let mut app = App::new("bigtableadmin2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230110")
+           .version("5.0.4+20240221")
            .about("Administer your Cloud Bigtable tables and instances.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigtableadmin2_cli")
            .arg(Arg::with_name("url")

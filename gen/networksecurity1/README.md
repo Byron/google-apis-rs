@@ -5,16 +5,18 @@ DO NOT EDIT !
 -->
 The `google-networksecurity1` library allows access to all features of the *Google NetworkSecurity* service.
 
-This documentation was generated from *NetworkSecurity* crate version *5.0.3+20230106*, where *20230106* is the exact revision of the *networksecurity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+This documentation was generated from *NetworkSecurity* crate version *5.0.4+20240221*, where *20240221* is the exact revision of the *networksecurity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 
 Everything else about the *NetworkSecurity* *v1* API can be found at the
 [official documentation site](https://cloud.google.com/networking).
 # Features
 
-Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/NetworkSecurity) ... 
+Handle the following *Resources* with ease from the central [hub](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/NetworkSecurity) ... 
 
+* organizations
+ * [*locations address groups add items*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::OrganizationLocationAddressGroupAddItemCall), [*locations address groups clone items*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::OrganizationLocationAddressGroupCloneItemCall), [*locations address groups create*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::OrganizationLocationAddressGroupCreateCall), [*locations address groups delete*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::OrganizationLocationAddressGroupDeleteCall), [*locations address groups get*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::OrganizationLocationAddressGroupGetCall), [*locations address groups list*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::OrganizationLocationAddressGroupListCall), [*locations address groups list references*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::OrganizationLocationAddressGroupListReferenceCall), [*locations address groups patch*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::OrganizationLocationAddressGroupPatchCall), [*locations address groups remove items*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::OrganizationLocationAddressGroupRemoveItemCall), [*locations operations cancel*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::OrganizationLocationOperationCancelCall), [*locations operations delete*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::OrganizationLocationOperationDeleteCall), [*locations operations get*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::OrganizationLocationOperationGetCall) and [*locations operations list*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::OrganizationLocationOperationListCall)
 * projects
- * [*locations authorization policies create*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationAuthorizationPolicyCreateCall), [*locations authorization policies delete*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationAuthorizationPolicyDeleteCall), [*locations authorization policies get*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationAuthorizationPolicyGetCall), [*locations authorization policies get iam policy*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationAuthorizationPolicyGetIamPolicyCall), [*locations authorization policies list*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationAuthorizationPolicyListCall), [*locations authorization policies patch*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationAuthorizationPolicyPatchCall), [*locations authorization policies set iam policy*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationAuthorizationPolicySetIamPolicyCall), [*locations authorization policies test iam permissions*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationAuthorizationPolicyTestIamPermissionCall), [*locations client tls policies create*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationClientTlsPolicyCreateCall), [*locations client tls policies delete*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationClientTlsPolicyDeleteCall), [*locations client tls policies get*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationClientTlsPolicyGetCall), [*locations client tls policies get iam policy*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationClientTlsPolicyGetIamPolicyCall), [*locations client tls policies list*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationClientTlsPolicyListCall), [*locations client tls policies patch*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationClientTlsPolicyPatchCall), [*locations client tls policies set iam policy*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationClientTlsPolicySetIamPolicyCall), [*locations client tls policies test iam permissions*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationClientTlsPolicyTestIamPermissionCall), [*locations get*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationGetCall), [*locations list*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationListCall), [*locations operations cancel*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationOperationCancelCall), [*locations operations delete*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationOperationDeleteCall), [*locations operations get*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationOperationGetCall), [*locations operations list*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationOperationListCall), [*locations server tls policies create*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationServerTlsPolicyCreateCall), [*locations server tls policies delete*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationServerTlsPolicyDeleteCall), [*locations server tls policies get*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationServerTlsPolicyGetCall), [*locations server tls policies get iam policy*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationServerTlsPolicyGetIamPolicyCall), [*locations server tls policies list*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationServerTlsPolicyListCall), [*locations server tls policies patch*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationServerTlsPolicyPatchCall), [*locations server tls policies set iam policy*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationServerTlsPolicySetIamPolicyCall) and [*locations server tls policies test iam permissions*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/api::ProjectLocationServerTlsPolicyTestIamPermissionCall)
+ * [*locations address groups add items*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAddressGroupAddItemCall), [*locations address groups clone items*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAddressGroupCloneItemCall), [*locations address groups create*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAddressGroupCreateCall), [*locations address groups delete*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAddressGroupDeleteCall), [*locations address groups get*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAddressGroupGetCall), [*locations address groups get iam policy*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAddressGroupGetIamPolicyCall), [*locations address groups list*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAddressGroupListCall), [*locations address groups list references*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAddressGroupListReferenceCall), [*locations address groups patch*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAddressGroupPatchCall), [*locations address groups remove items*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAddressGroupRemoveItemCall), [*locations address groups set iam policy*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAddressGroupSetIamPolicyCall), [*locations address groups test iam permissions*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAddressGroupTestIamPermissionCall), [*locations authorization policies create*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAuthorizationPolicyCreateCall), [*locations authorization policies delete*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAuthorizationPolicyDeleteCall), [*locations authorization policies get*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAuthorizationPolicyGetCall), [*locations authorization policies get iam policy*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAuthorizationPolicyGetIamPolicyCall), [*locations authorization policies list*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAuthorizationPolicyListCall), [*locations authorization policies patch*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAuthorizationPolicyPatchCall), [*locations authorization policies set iam policy*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAuthorizationPolicySetIamPolicyCall), [*locations authorization policies test iam permissions*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationAuthorizationPolicyTestIamPermissionCall), [*locations client tls policies create*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationClientTlsPolicyCreateCall), [*locations client tls policies delete*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationClientTlsPolicyDeleteCall), [*locations client tls policies get*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationClientTlsPolicyGetCall), [*locations client tls policies get iam policy*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationClientTlsPolicyGetIamPolicyCall), [*locations client tls policies list*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationClientTlsPolicyListCall), [*locations client tls policies patch*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationClientTlsPolicyPatchCall), [*locations client tls policies set iam policy*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationClientTlsPolicySetIamPolicyCall), [*locations client tls policies test iam permissions*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationClientTlsPolicyTestIamPermissionCall), [*locations gateway security policies create*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationGatewaySecurityPolicyCreateCall), [*locations gateway security policies delete*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationGatewaySecurityPolicyDeleteCall), [*locations gateway security policies get*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationGatewaySecurityPolicyGetCall), [*locations gateway security policies list*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationGatewaySecurityPolicyListCall), [*locations gateway security policies patch*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationGatewaySecurityPolicyPatchCall), [*locations gateway security policies rules create*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationGatewaySecurityPolicyRuleCreateCall), [*locations gateway security policies rules delete*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationGatewaySecurityPolicyRuleDeleteCall), [*locations gateway security policies rules get*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationGatewaySecurityPolicyRuleGetCall), [*locations gateway security policies rules list*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationGatewaySecurityPolicyRuleListCall), [*locations gateway security policies rules patch*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationGatewaySecurityPolicyRulePatchCall), [*locations get*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationGetCall), [*locations list*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationListCall), [*locations operations cancel*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationOperationCancelCall), [*locations operations delete*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationOperationDeleteCall), [*locations operations get*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationOperationGetCall), [*locations operations list*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationOperationListCall), [*locations server tls policies create*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationServerTlsPolicyCreateCall), [*locations server tls policies delete*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationServerTlsPolicyDeleteCall), [*locations server tls policies get*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationServerTlsPolicyGetCall), [*locations server tls policies get iam policy*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationServerTlsPolicyGetIamPolicyCall), [*locations server tls policies list*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationServerTlsPolicyListCall), [*locations server tls policies patch*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationServerTlsPolicyPatchCall), [*locations server tls policies set iam policy*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationServerTlsPolicySetIamPolicyCall), [*locations server tls policies test iam permissions*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationServerTlsPolicyTestIamPermissionCall), [*locations tls inspection policies create*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationTlsInspectionPolicyCreateCall), [*locations tls inspection policies delete*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationTlsInspectionPolicyDeleteCall), [*locations tls inspection policies get*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationTlsInspectionPolicyGetCall), [*locations tls inspection policies list*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationTlsInspectionPolicyListCall), [*locations tls inspection policies patch*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationTlsInspectionPolicyPatchCall), [*locations url lists create*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationUrlListCreateCall), [*locations url lists delete*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationUrlListDeleteCall), [*locations url lists get*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationUrlListGetCall), [*locations url lists list*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationUrlListListCall) and [*locations url lists patch*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/api::ProjectLocationUrlListPatchCall)
 
 
 
@@ -23,17 +25,17 @@ Handle the following *Resources* with ease from the central [hub](https://docs.r
 
 The API is structured into the following primary items:
 
-* **[Hub](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/NetworkSecurity)**
+* **[Hub](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/NetworkSecurity)**
     * a central object to maintain state and allow accessing all *Activities*
-    * creates [*Method Builders*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::MethodsBuilder) which in turn
-      allow access to individual [*Call Builders*](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::CallBuilder)
-* **[Resources](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::Resource)**
+    * creates [*Method Builders*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::MethodsBuilder) which in turn
+      allow access to individual [*Call Builders*](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::CallBuilder)
+* **[Resources](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::Resource)**
     * primary types that you can apply *Activities* to
     * a collection of properties and *Parts*
-    * **[Parts](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::Part)**
+    * **[Parts](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::Part)**
         * a collection of properties
         * never directly used in *Activities*
-* **[Activities](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::CallBuilder)**
+* **[Activities](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::CallBuilder)**
     * operations to apply to *Resources*
 
 All *structures* are marked with applicable traits to further categorize them and ease browsing.
@@ -47,16 +49,41 @@ let r = hub.resource().activity(...).doit().await
 Or specifically ...
 
 ```ignore
+let r = hub.organizations().locations_address_groups_add_items(...).doit().await
+let r = hub.organizations().locations_address_groups_clone_items(...).doit().await
+let r = hub.organizations().locations_address_groups_create(...).doit().await
+let r = hub.organizations().locations_address_groups_delete(...).doit().await
+let r = hub.organizations().locations_address_groups_patch(...).doit().await
+let r = hub.organizations().locations_address_groups_remove_items(...).doit().await
+let r = hub.organizations().locations_operations_get(...).doit().await
+let r = hub.projects().locations_address_groups_add_items(...).doit().await
+let r = hub.projects().locations_address_groups_clone_items(...).doit().await
+let r = hub.projects().locations_address_groups_create(...).doit().await
+let r = hub.projects().locations_address_groups_delete(...).doit().await
+let r = hub.projects().locations_address_groups_patch(...).doit().await
+let r = hub.projects().locations_address_groups_remove_items(...).doit().await
 let r = hub.projects().locations_authorization_policies_create(...).doit().await
 let r = hub.projects().locations_authorization_policies_delete(...).doit().await
 let r = hub.projects().locations_authorization_policies_patch(...).doit().await
 let r = hub.projects().locations_client_tls_policies_create(...).doit().await
 let r = hub.projects().locations_client_tls_policies_delete(...).doit().await
 let r = hub.projects().locations_client_tls_policies_patch(...).doit().await
+let r = hub.projects().locations_gateway_security_policies_rules_create(...).doit().await
+let r = hub.projects().locations_gateway_security_policies_rules_delete(...).doit().await
+let r = hub.projects().locations_gateway_security_policies_rules_patch(...).doit().await
+let r = hub.projects().locations_gateway_security_policies_create(...).doit().await
+let r = hub.projects().locations_gateway_security_policies_delete(...).doit().await
+let r = hub.projects().locations_gateway_security_policies_patch(...).doit().await
 let r = hub.projects().locations_operations_get(...).doit().await
 let r = hub.projects().locations_server_tls_policies_create(...).doit().await
 let r = hub.projects().locations_server_tls_policies_delete(...).doit().await
 let r = hub.projects().locations_server_tls_policies_patch(...).doit().await
+let r = hub.projects().locations_tls_inspection_policies_create(...).doit().await
+let r = hub.projects().locations_tls_inspection_policies_delete(...).doit().await
+let r = hub.projects().locations_tls_inspection_policies_patch(...).doit().await
+let r = hub.projects().locations_url_lists_create(...).doit().await
+let r = hub.projects().locations_url_lists_delete(...).doit().await
+let r = hub.projects().locations_url_lists_patch(...).doit().await
 ```
 
 The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -83,7 +110,7 @@ serde_json = "^1.0"
 extern crate hyper;
 extern crate hyper_rustls;
 extern crate google_networksecurity1 as networksecurity1;
-use networksecurity1::api::AuthorizationPolicy;
+use networksecurity1::api::AddressGroup;
 use networksecurity1::{Result, Error};
 use std::default::Default;
 use networksecurity1::{NetworkSecurity, oauth2, hyper, hyper_rustls, chrono, FieldMask};
@@ -104,13 +131,14 @@ let mut hub = NetworkSecurity::new(hyper::Client::builder().build(hyper_rustls::
 // As the method needs a request, you would usually fill it with the desired information
 // into the respective structure. Some of the parts shown here might not be applicable !
 // Values shown here are possibly random and not representative !
-let mut req = AuthorizationPolicy::default();
+let mut req = AddressGroup::default();
 
 // You can configure optional parameters by calling the respective setters at will, and
 // execute the final call using `doit()`.
 // Values shown here are possibly random and not representative !
-let result = hub.projects().locations_authorization_policies_create(req, "parent")
-             .authorization_policy_id("magna")
+let result = hub.organizations().locations_address_groups_create(req, "parent")
+             .request_id("magna")
+             .address_group_id("no")
              .doit().await;
 
 match result {
@@ -134,17 +162,17 @@ match result {
 ```
 ## Handling Errors
 
-All errors produced by the system are provided either as [Result](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::Result) enumeration as return value of
+All errors produced by the system are provided either as [Result](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::Result) enumeration as return value of
 the doit() methods, or handed as possibly intermediate results to either the 
-[Hub Delegate](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
+[Hub Delegate](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::Delegate), or the [Authenticator Delegate](https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html).
 
 When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
 makes the system potentially resilient to all kinds of errors.
 
 ## Uploads and Downloads
-If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::Result), should be
+If a method supports downloads, the response body, which is part of the [Result](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::Result), should be
 read by you to obtain the media.
-If such a method also supports a [Response Result](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::ResponseResult), it will return that by default.
+If such a method also supports a [Response Result](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::ResponseResult), it will return that by default.
 You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
 this call: `.param("alt", "media")`.
 
@@ -154,29 +182,29 @@ Methods supporting uploads can do so using up to 2 different protocols:
 
 ## Customization and Callbacks
 
-You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::Delegate) to the 
-[Method Builder](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::CallBuilder) before making the final `doit()` call. 
+You may alter the way an `doit()` method is called by providing a [delegate](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::Delegate) to the 
+[Method Builder](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::CallBuilder) before making the final `doit()` call. 
 Respective methods will be called to provide progress information, as well as determine whether the system should 
 retry on failure.
 
-The [delegate trait](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
+The [delegate trait](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::Delegate) is default-implemented, allowing you to customize it with minimal effort.
 
 ## Optional Parts in Server-Requests
 
-All structures provided by this library are made to be [encodable](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::RequestValue) and 
-[decodable](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
+All structures provided by this library are made to be [encodable](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::RequestValue) and 
+[decodable](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::ResponseResult) via *json*. Optionals are used to indicate that partial requests are responses 
 are valid.
-Most optionals are are considered [Parts](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::Part) which are identifiable by name, which will be sent to 
+Most optionals are are considered [Parts](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::Part) which are identifiable by name, which will be sent to 
 the server to indicate either the set parts of the request or the desired parts in the response.
 
 ## Builder Arguments
 
-Using [method builders](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
+Using [method builders](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::CallBuilder), you are able to prepare an action call by repeatedly calling it's methods.
 These will always take a single argument, for which the following statements are true.
 
 * [PODs][wiki-pod] are handed by copy
 * strings are passed as `&str`
-* [request values](https://docs.rs/google-networksecurity1/5.0.3+20230106/google_networksecurity1/client::RequestValue) are moved
+* [request values](https://docs.rs/google-networksecurity1/5.0.4+20240221/google_networksecurity1/client::RequestValue) are moved
 
 Arguments will always be copied or cloned into the builder, to make them independent of their original life times.
 

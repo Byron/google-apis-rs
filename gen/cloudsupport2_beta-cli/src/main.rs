@@ -50,98 +50,6 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
-    async fn _attachments_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "attachment.create-time" => Some(("attachment.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "attachment.creator.display-name" => Some(("attachment.creator.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "attachment.creator.email" => Some(("attachment.creator.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "attachment.creator.google-support" => Some(("attachment.creator.googleSupport", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "attachment.filename" => Some(("attachment.filename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "attachment.mime-type" => Some(("attachment.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "attachment.name" => Some(("attachment.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "attachment.size-bytes" => Some(("attachment.sizeBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attachment", "create-time", "creator", "display-name", "email", "filename", "google-support", "mime-type", "name", "size-bytes"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::CreateAttachmentRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.attachments().create(request, opt.value_of("parent").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
     async fn _case_classifications_search(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.case_classifications().search();
@@ -150,6 +58,12 @@ where
             match key {
                 "query" => {
                     call = call.query(value.unwrap_or(""));
+                },
+                "product-product-subline" => {
+                    call = call.product_product_subline(value.unwrap_or(""));
+                },
+                "product-product-line" => {
+                    call = call.product_product_line(value.unwrap_or(""));
                 },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
@@ -170,7 +84,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token", "query"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "product-product-line", "product-product-subline", "query"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -375,10 +289,11 @@ where
                     "creator.display-name" => Some(("creator.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator.email" => Some(("creator.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator.google-support" => Some(("creator.googleSupport", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "creator.username" => Some(("creator.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "plain-text-body" => Some(("plainTextBody", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["body", "create-time", "creator", "display-name", "email", "google-support", "name", "plain-text-body"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["body", "create-time", "creator", "display-name", "email", "google-support", "name", "plain-text-body", "username"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -522,10 +437,14 @@ where
                 match &temp_cursor.to_string()[..] {
                     "classification.display-name" => Some(("classification.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "classification.id" => Some(("classification.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "classification.product.product-line" => Some(("classification.product.productLine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "classification.product.product-subline" => Some(("classification.product.productSubline", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-email" => Some(("contactEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator.display-name" => Some(("creator.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator.email" => Some(("creator.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator.google-support" => Some(("creator.googleSupport", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "creator.username" => Some(("creator.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "escalated" => Some(("escalated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -539,7 +458,7 @@ where
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification", "create-time", "creator", "description", "display-name", "email", "escalated", "google-support", "id", "language-code", "name", "priority", "severity", "state", "subscriber-email-addresses", "test-case", "time-zone", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification", "contact-email", "create-time", "creator", "description", "display-name", "email", "escalated", "google-support", "id", "language-code", "name", "priority", "product", "product-line", "product-subline", "severity", "state", "subscriber-email-addresses", "test-case", "time-zone", "update-time", "username"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -743,6 +662,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "product-line" => {
+                    call = call.product_line(value.unwrap_or(""));
+                },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
@@ -765,7 +687,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token", "product-line"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -824,10 +746,14 @@ where
                 match &temp_cursor.to_string()[..] {
                     "classification.display-name" => Some(("classification.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "classification.id" => Some(("classification.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "classification.product.product-line" => Some(("classification.product.productLine", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "classification.product.product-subline" => Some(("classification.product.productSubline", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "contact-email" => Some(("contactEmail", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator.display-name" => Some(("creator.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator.email" => Some(("creator.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "creator.google-support" => Some(("creator.googleSupport", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "creator.username" => Some(("creator.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "escalated" => Some(("escalated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -841,7 +767,7 @@ where
                     "time-zone" => Some(("timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification", "create-time", "creator", "description", "display-name", "email", "escalated", "google-support", "id", "language-code", "name", "priority", "severity", "state", "subscriber-email-addresses", "test-case", "time-zone", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["classification", "contact-email", "create-time", "creator", "description", "display-name", "email", "escalated", "google-support", "id", "language-code", "name", "priority", "product", "product-line", "product-subline", "severity", "state", "subscriber-email-addresses", "test-case", "time-zone", "update-time", "username"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -914,6 +840,9 @@ where
                 "query" => {
                     call = call.query(value.unwrap_or(""));
                 },
+                "parent" => {
+                    call = call.parent(value.unwrap_or(""));
+                },
                 "page-token" => {
                     call = call.page_token(value.unwrap_or(""));
                 },
@@ -933,7 +862,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token", "query"].iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token", "parent", "query"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1056,12 +985,13 @@ where
                     "attachment.creator.display-name" => Some(("attachment.creator.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attachment.creator.email" => Some(("attachment.creator.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attachment.creator.google-support" => Some(("attachment.creator.googleSupport", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "attachment.creator.username" => Some(("attachment.creator.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attachment.filename" => Some(("attachment.filename", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attachment.mime-type" => Some(("attachment.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attachment.name" => Some(("attachment.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "attachment.size-bytes" => Some(("attachment.sizeBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attachment", "create-time", "creator", "display-name", "email", "filename", "google-support", "mime-type", "name", "size-bytes"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["attachment", "create-time", "creator", "display-name", "email", "filename", "google-support", "mime-type", "name", "size-bytes", "username"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1129,17 +1059,6 @@ where
         let mut call_result: Result<(), DoitError> = Ok(());
         let mut err_opt: Option<InvalidOptionsError> = None;
         match self.opt.subcommand() {
-            ("attachments", Some(opt)) => {
-                match opt.subcommand() {
-                    ("create", Some(opt)) => {
-                        call_result = self._attachments_create(opt, dry_run, &mut err).await;
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("attachments".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
             ("case-classifications", Some(opt)) => {
                 match opt.subcommand() {
                     ("search", Some(opt)) => {
@@ -1277,40 +1196,9 @@ async fn main() {
     let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
-        ("attachments", "methods: 'create'", vec![
-            ("create",
-                    Some(r##"Create a file attachment on a case or Cloud resource. The attachment object must have the following fields set: filename."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/attachments_create",
-                  vec![
-                    (Some(r##"parent"##),
-                     None,
-                     Some(r##"Required. The resource name of the case (or case parent) to which the attachment should be attached."##),
-                     Some(true),
-                     Some(false)),
-        
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ]),
-        
         ("case-classifications", "methods: 'search'", vec![
             ("search",
-                    Some(r##"Retrieve valid classifications to be used when creating a support case. The classications are hierarchical, with each classification containing all levels of the hierarchy, separated by " > ". For example "Technical Issue > Compute > Compute Engine"."##),
+                    Some(r##"Retrieve valid classifications to use when creating a support case. Classifications are hierarchical. Each classification is a string containing all levels of the hierarchy separated by `" > "`. For example, `"Technical Issue > Compute > Compute Engine"`. Classification IDs returned by this endpoint are valid for at least six months. When a classification is deactivated, this endpoint immediately stops returning it. After six months, `case.create` requests using the classification will fail. EXAMPLES: cURL: ```shell curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ 'https://cloudsupport.googleapis.com/v2/caseClassifications:search?query=display_name:"*Compute%20Engine*"' ``` Python: ```python import googleapiclient.discovery supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version="v2", discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version=v2", ) request = supportApiService.caseClassifications().search( query='display_name:"*Compute Engine*"' ) print(request.execute()) ```"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/case-classifications_search",
                   vec![
                     (Some(r##"v"##),
@@ -1329,12 +1217,12 @@ async fn main() {
         
         ("cases", "methods: 'attachments-list', 'close', 'comments-create', 'comments-list', 'create', 'escalate', 'get', 'list', 'patch' and 'search'", vec![
             ("attachments-list",
-                    Some(r##"Retrieve all attachments associated with a support case."##),
+                    Some(r##"List all the attachments associated with a support case. EXAMPLES: cURL: ```shell case="projects/some-project/cases/23598314" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$case/attachments" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = ( supportApiService.cases() .attachments() .list(parent="projects/some-project/cases/43595344") ) print(request.execute()) ```"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_attachments-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of Case object for which attachments should be listed."##),
+                     Some(r##"Required. The name of the case for which attachments should be listed."##),
                      Some(true),
                      Some(false)),
         
@@ -1351,12 +1239,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("close",
-                    Some(r##"Close the specified case."##),
+                    Some(r##"Close a case. EXAMPLES: cURL: ```shell case="projects/some-project/cases/43595344" curl \ --request POST \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$case:close" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().close( name="projects/some-project/cases/43595344" ) print(request.execute()) ```"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_close",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The fully qualified name of the case resource to be closed."##),
+                     Some(r##"Required. The name of the case to close."##),
                      Some(true),
                      Some(false)),
         
@@ -1379,12 +1267,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("comments-create",
-                    Some(r##"Add a new comment to the specified Case. The comment object must have the following fields set: body."##),
+                    Some(r##"Add a new comment to a case. The comment must have the following fields set: `body`. EXAMPLES: cURL: ```shell case="projects/some-project/cases/43591344" curl \ --request POST \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ --header 'Content-Type: application/json' \ --data '{ "body": "This is a test comment." }' \ "https://cloudsupport.googleapis.com/v2/$case/comments" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = ( supportApiService.cases() .comments() .create( parent="projects/some-project/cases/43595344", body={"body": "This is a test comment."}, ) ) print(request.execute()) ```"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_comments-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of Case to which this comment should be added."##),
+                     Some(r##"Required. The name of the case to which the comment should be added."##),
                      Some(true),
                      Some(false)),
         
@@ -1407,12 +1295,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("comments-list",
-                    Some(r##"Retrieve all Comments associated with the Case object."##),
+                    Some(r##"List all the comments associated with a case. EXAMPLES: cURL: ```shell case="projects/some-project/cases/43595344" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$case/comments" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = ( supportApiService.cases() .comments() .list(parent="projects/some-project/cases/43595344") ) print(request.execute()) ```"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_comments-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of Case object for which comments should be listed."##),
+                     Some(r##"Required. The name of the case for which to list comments."##),
                      Some(true),
                      Some(false)),
         
@@ -1429,12 +1317,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("create",
-                    Some(r##"Create a new case and associate it with the given Cloud resource. The case object must have the following fields set: display_name, description, classification, and severity."##),
+                    Some(r##"Create a new case and associate it with a parent. It must have the following fields set: `display_name`, `description`, `classification`, and `priority`. If you're just testing the API and don't want to route your case to an agent, set `testCase=true`. EXAMPLES: cURL: ```shell parent="projects/some-project" curl \ --request POST \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ --header 'Content-Type: application/json' \ --data '{ "display_name": "Test case created by me.", "description": "a random test case, feel free to close", "classification": { "id": "100IK2AKCLHMGRJ9CDGMOCGP8DM6UTB4BT262T31BT1M2T31DHNMENPO6KS36CPJ786L2TBFEHGN6NPI64R3CDHN8880G08I1H3MURR7DHII0GRCDTQM8" }, "time_zone": "-07:00", "subscriber_email_addresses": [ "foo@domain.com", "bar@domain.com" ], "testCase": true, "priority": "P3" }' \ "https://cloudsupport.googleapis.com/v2/$parent/cases" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().create( parent="projects/some-project", body={ "displayName": "A Test Case", "description": "This is a test case.", "testCase": True, "priority": "P2", "classification": { "id": "100IK2AKCLHMGRJ9CDGMOCGP8DM6UTB4BT262T31BT1M2T31DHNMENPO6KS36CPJ786L2TBFEHGN6NPI64R3CDHN8880G08I1H3MURR7DHII0GRCDTQM8" }, }, ) print(request.execute()) ```"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The name of the Cloud resource under which the case should be created."##),
+                     Some(r##"Required. The name of the parent under which the case should be created."##),
                      Some(true),
                      Some(false)),
         
@@ -1457,12 +1345,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("escalate",
-                    Some(r##"Escalate a case. Escalating a case will initiate the Cloud Support escalation management process. This operation is only available to certain Customer Care tiers. Go to https://cloud.google.com/support and look for 'Technical support escalations' in the feature list to find out which tiers are able to perform escalations."##),
+                    Some(r##"Escalate a case, starting the Google Cloud Support escalation management process. This operation is only available for some support services. Go to https://cloud.google.com/support and look for 'Technical support escalations' in the feature list to find out which ones let you do that. EXAMPLES: cURL: ```shell case="projects/some-project/cases/43595344" curl \ --request POST \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ --header "Content-Type: application/json" \ --data '{ "escalation": { "reason": "BUSINESS_IMPACT", "justification": "This is a test escalation." } }' \ "https://cloudsupport.googleapis.com/v2/$case:escalate" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().escalate( name="projects/some-project/cases/43595344", body={ "escalation": { "reason": "BUSINESS_IMPACT", "justification": "This is a test escalation.", }, }, ) print(request.execute()) ```"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_escalate",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The fully qualified name of the Case resource to be escalated."##),
+                     Some(r##"Required. The name of the case to be escalated."##),
                      Some(true),
                      Some(false)),
         
@@ -1485,12 +1373,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("get",
-                    Some(r##"Retrieve the specified case."##),
+                    Some(r##"Retrieve a case. EXAMPLES: cURL: ```shell case="projects/some-project/cases/16033687" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$case" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().get( name="projects/some-project/cases/43595344", ) print(request.execute()) ```"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The fully qualified name of a case to be retrieved."##),
+                     Some(r##"Required. The full name of a case to be retrieved."##),
                      Some(true),
                      Some(false)),
         
@@ -1507,12 +1395,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Retrieve all cases under the specified parent. Note: Listing cases under an Organization returns only the cases directly parented by that organization. To retrieve all cases under an organization, including cases parented by projects under that organization, use `cases.search`."##),
+                    Some(r##"Retrieve all cases under a parent, but not its children. For example, listing cases under an organization only returns the cases that are directly parented by that organization. To retrieve cases under an organization and its projects, use `cases.search`. EXAMPLES: cURL: ```shell parent="projects/some-project" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$parent/cases" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().list(parent="projects/some-project") print(request.execute()) ```"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The fully qualified name of parent resource to list cases under."##),
+                     Some(r##"Required. The name of a parent to list cases under."##),
                      Some(true),
                      Some(false)),
         
@@ -1529,7 +1417,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("patch",
-                    Some(r##"Update the specified case. Only a subset of fields can be updated."##),
+                    Some(r##"Update a case. Only some fields can be updated. EXAMPLES: cURL: ```shell case="projects/some-project/cases/43595344" curl \ --request PATCH \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ --header "Content-Type: application/json" \ --data '{ "priority": "P1" }' \ "https://cloudsupport.googleapis.com/v2/$case?updateMask=priority" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().patch( name="projects/some-project/cases/43112854", body={ "displayName": "This is Now a New Title", "priority": "P2", }, ) print(request.execute()) ```"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_patch",
                   vec![
                     (Some(r##"name"##),
@@ -1557,7 +1445,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Search cases using the specified query."##),
+                    Some(r##"Search for cases using a query. EXAMPLES: cURL: ```shell parent="projects/some-project" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$parent/cases:search" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().search( parent="projects/some-project", query="state=OPEN" ) print(request.execute()) ```"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/cases_search",
                   vec![
                     (Some(r##"v"##),
@@ -1576,12 +1464,12 @@ async fn main() {
         
         ("media", "methods: 'download' and 'upload'", vec![
             ("download",
-                    Some(r##"Download a file attachment on a case. Note: HTTP requests must append "?alt=media" to the URL."##),
+                    Some(r##"Download a file attached to a case. Note: HTTP requests must append "?alt=media" to the URL. EXAMPLES: cURL: ```shell name="projects/some-project/cases/43594844/attachments/0674M00000WijAnZAJ" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$name:download?alt=media" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.media().download( name="projects/some-project/cases/43595344/attachments/0684M00000Pw6pHQAR" ) request.uri = request.uri.split("?")[0] + "?alt=media" print(request.execute()) ```"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/media_download",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the attachment to be downloaded."##),
+                     Some(r##"The name of the file attachment to download."##),
                      Some(true),
                      Some(false)),
         
@@ -1598,12 +1486,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("upload",
-                    Some(r##"Create a file attachment on a case or Cloud resource. The attachment object must have the following fields set: filename."##),
+                    Some(r##"Create a file attachment on a case or Cloud resource. The attachment must have the following fields set: `filename`. EXAMPLES: cURL: ```shell echo "This text is in a file I'm uploading using CSAPI." \ > "./example_file.txt" case="projects/some-project/cases/43594844" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ --data-binary @"./example_file.txt" \ "https://cloudsupport.googleapis.com/upload/v2beta/$case/attachments?attachment.filename=uploaded_via_curl.txt" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) file_path = "./example_file.txt" with open(file_path, "w") as file: file.write( "This text is inside a file I'm going to upload using the Cloud Support API.", ) request = supportApiService.media().upload( parent="projects/some-project/cases/43595344", media_body=file_path ) request.uri = request.uri.split("?")[0] + "?attachment.filename=uploaded_via_python.txt" print(request.execute()) ```"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli/media_upload",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The resource name of the case (or case parent) to which the attachment should be attached."##),
+                     Some(r##"Required. The name of the case or Cloud resource to which the attachment should be attached."##),
                      Some(true),
                      Some(false)),
         
@@ -1637,7 +1525,7 @@ async fn main() {
     
     let mut app = App::new("cloudsupport2-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230121")
+           .version("5.0.4+20240304")
            .about("Manages Google Cloud technical support cases for Customer Care support offerings. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudsupport2_beta_cli")
            .arg(Arg::with_name("url")

@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *Cloudbilling* API can be found at the
-[official documentation site](https://cloud.google.com/billing/).
+[official documentation site](https://cloud.google.com/billing/docs/apis).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloudbilling* API at revision *20221206*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloudbilling* API at revision *20240214*. The CLI is at version *5.0.4*.
 
 ```bash
 cloudbilling1 [options]
@@ -34,10 +34,17 @@ cloudbilling1 [options]
                 get <name> [-p <v>]... [-o <out>]
                 get-iam-policy <resource> [-p <v>]... [-o <out>]
                 list [-p <v>]... [-o <out>]
+                move <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 projects-list <name> [-p <v>]... [-o <out>]
                 set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                sub-accounts-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                sub-accounts-list <parent> [-p <v>]... [-o <out>]
                 test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+        organizations
+                billing-accounts-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                billing-accounts-list <parent> [-p <v>]... [-o <out>]
+                billing-accounts-move <destination-parent> <name> [-p <v>]... [-o <out>]
         projects
                 get-billing-info <name> [-p <v>]... [-o <out>]
                 update-billing-info <name> (-r <kv>)... [-p <v>]... [-o <out>]

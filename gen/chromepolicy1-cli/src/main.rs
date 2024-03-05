@@ -242,10 +242,11 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "policy-namespace" => Some(("policyNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy-schema" => Some(("policySchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy-target-key.additional-target-keys" => Some(("policyTargetKey.additionalTargetKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "policy-target-key.target-resource" => Some(("policyTargetKey.targetResource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-target-keys", "policy-namespace", "policy-target-key", "target-resource"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-target-keys", "policy-namespace", "policy-schema", "policy-target-key", "target-resource"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -330,10 +331,11 @@ where
                 match &temp_cursor.to_string()[..] {
                     "group-ids" => Some(("groupIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "policy-namespace" => Some(("policyNamespace", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy-schema" => Some(("policySchema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy-target-key.additional-target-keys" => Some(("policyTargetKey.additionalTargetKeys", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "policy-target-key.target-resource" => Some(("policyTargetKey.targetResource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-target-keys", "group-ids", "policy-namespace", "policy-target-key", "target-resource"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["additional-target-keys", "group-ids", "policy-namespace", "policy-schema", "policy-target-key", "target-resource"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1730,7 +1732,7 @@ async fn main() {
     
     let mut app = App::new("chromepolicy1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
+           .version("5.0.4+20240303")
            .about("The Chrome Policy API is a suite of services that allows Chrome administrators to control the policies applied to their managed Chrome OS devices and Chrome browsers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_chromepolicy1_cli")
            .arg(Arg::with_name("url")

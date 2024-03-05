@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloud Redis* crate version *5.0.3+20230111*, where *20230111* is the exact revision of the *redis:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Cloud Redis* crate version *5.0.4+20240226*, where *20240226* is the exact revision of the *redis:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Cloud Redis* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/memorystore/docs/redis/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](CloudRedis) ... 
 //! 
 //! * projects
-//!  * [*locations get*](api::ProjectLocationGetCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances export*](api::ProjectLocationInstanceExportCall), [*locations instances failover*](api::ProjectLocationInstanceFailoverCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances get auth string*](api::ProjectLocationInstanceGetAuthStringCall), [*locations instances import*](api::ProjectLocationInstanceImportCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances patch*](api::ProjectLocationInstancePatchCall), [*locations instances reschedule maintenance*](api::ProjectLocationInstanceRescheduleMaintenanceCall), [*locations instances upgrade*](api::ProjectLocationInstanceUpgradeCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
+//!  * [*locations clusters create*](api::ProjectLocationClusterCreateCall), [*locations clusters delete*](api::ProjectLocationClusterDeleteCall), [*locations clusters get*](api::ProjectLocationClusterGetCall), [*locations clusters get certificate authority*](api::ProjectLocationClusterGetCertificateAuthorityCall), [*locations clusters list*](api::ProjectLocationClusterListCall), [*locations clusters patch*](api::ProjectLocationClusterPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations instances create*](api::ProjectLocationInstanceCreateCall), [*locations instances delete*](api::ProjectLocationInstanceDeleteCall), [*locations instances export*](api::ProjectLocationInstanceExportCall), [*locations instances failover*](api::ProjectLocationInstanceFailoverCall), [*locations instances get*](api::ProjectLocationInstanceGetCall), [*locations instances get auth string*](api::ProjectLocationInstanceGetAuthStringCall), [*locations instances import*](api::ProjectLocationInstanceImportCall), [*locations instances list*](api::ProjectLocationInstanceListCall), [*locations instances patch*](api::ProjectLocationInstancePatchCall), [*locations instances reschedule maintenance*](api::ProjectLocationInstanceRescheduleMaintenanceCall), [*locations instances upgrade*](api::ProjectLocationInstanceUpgradeCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall) and [*locations operations list*](api::ProjectLocationOperationListCall)
 //! 
 //! 
 //! 
@@ -47,6 +47,9 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.projects().locations_clusters_create(...).doit().await
+//! let r = hub.projects().locations_clusters_delete(...).doit().await
+//! let r = hub.projects().locations_clusters_patch(...).doit().await
 //! let r = hub.projects().locations_instances_create(...).doit().await
 //! let r = hub.projects().locations_instances_delete(...).doit().await
 //! let r = hub.projects().locations_instances_export(...).doit().await
@@ -82,7 +85,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_redis1 as redis1;
-//! use redis1::api::Instance;
+//! use redis1::api::Cluster;
 //! use redis1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -104,13 +107,14 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = Instance::default();
+//! let mut req = Cluster::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_instances_create(req, "parent")
-//!              .instance_id("ipsum")
+//! let result = hub.projects().locations_clusters_create(req, "parent")
+//!              .request_id("voluptua.")
+//!              .cluster_id("At")
 //!              .doit().await;
 //! 
 //! match result {

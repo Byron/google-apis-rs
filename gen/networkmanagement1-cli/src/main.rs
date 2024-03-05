@@ -131,9 +131,13 @@ where
                     "destination.cloud-function.uri" => Some(("destination.cloudFunction.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.cloud-run-revision.uri" => Some(("destination.cloudRunRevision.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.cloud-sql-instance" => Some(("destination.cloudSqlInstance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination.forwarding-rule" => Some(("destination.forwardingRule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination.forwarding-rule-target" => Some(("destination.forwardingRuleTarget", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.gke-master-cluster" => Some(("destination.gkeMasterCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.instance" => Some(("destination.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.ip-address" => Some(("destination.ipAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination.load-balancer-id" => Some(("destination.loadBalancerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination.load-balancer-type" => Some(("destination.loadBalancerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.network" => Some(("destination.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.network-type" => Some(("destination.networkType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.port" => Some(("destination.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -141,6 +145,22 @@ where
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.abort-cause" => Some(("probingDetails.abortCause", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.destination-egress-location.metropolitan-area" => Some(("probingDetails.destinationEgressLocation.metropolitanArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.destination-ip" => Some(("probingDetails.endpointInfo.destinationIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.destination-network-uri" => Some(("probingDetails.endpointInfo.destinationNetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.destination-port" => Some(("probingDetails.endpointInfo.destinationPort", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.protocol" => Some(("probingDetails.endpointInfo.protocol", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.source-agent-uri" => Some(("probingDetails.endpointInfo.sourceAgentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.source-ip" => Some(("probingDetails.endpointInfo.sourceIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.source-network-uri" => Some(("probingDetails.endpointInfo.sourceNetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.source-port" => Some(("probingDetails.endpointInfo.sourcePort", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "probing-details.error.code" => Some(("probingDetails.error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "probing-details.error.message" => Some(("probingDetails.error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.result" => Some(("probingDetails.result", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.sent-probe-count" => Some(("probingDetails.sentProbeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "probing-details.successful-probe-count" => Some(("probingDetails.successfulProbeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "probing-details.verify-time" => Some(("probingDetails.verifyTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "protocol" => Some(("protocol", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reachability-details.error.code" => Some(("reachabilityDetails.error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "reachability-details.error.message" => Some(("reachabilityDetails.error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -151,16 +171,20 @@ where
                     "source.cloud-function.uri" => Some(("source.cloudFunction.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.cloud-run-revision.uri" => Some(("source.cloudRunRevision.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.cloud-sql-instance" => Some(("source.cloudSqlInstance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source.forwarding-rule" => Some(("source.forwardingRule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source.forwarding-rule-target" => Some(("source.forwardingRuleTarget", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.gke-master-cluster" => Some(("source.gkeMasterCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.instance" => Some(("source.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.ip-address" => Some(("source.ipAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source.load-balancer-id" => Some(("source.loadBalancerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source.load-balancer-type" => Some(("source.loadBalancerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.network" => Some(("source.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.network-type" => Some(("source.networkType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.port" => Some(("source.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source.project-id" => Some(("source.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-version", "cloud-function", "cloud-run-revision", "cloud-sql-instance", "code", "create-time", "description", "destination", "display-name", "error", "gke-master-cluster", "instance", "ip-address", "labels", "message", "name", "network", "network-type", "port", "project-id", "protocol", "reachability-details", "related-projects", "result", "source", "update-time", "uri", "verify-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["abort-cause", "app-engine-version", "cloud-function", "cloud-run-revision", "cloud-sql-instance", "code", "create-time", "description", "destination", "destination-egress-location", "destination-ip", "destination-network-uri", "destination-port", "display-name", "endpoint-info", "error", "forwarding-rule", "forwarding-rule-target", "gke-master-cluster", "instance", "ip-address", "labels", "load-balancer-id", "load-balancer-type", "message", "metropolitan-area", "name", "network", "network-type", "port", "probing-details", "project-id", "protocol", "reachability-details", "related-projects", "result", "sent-probe-count", "source", "source-agent-uri", "source-ip", "source-network-uri", "source-port", "successful-probe-count", "update-time", "uri", "verify-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -478,9 +502,13 @@ where
                     "destination.cloud-function.uri" => Some(("destination.cloudFunction.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.cloud-run-revision.uri" => Some(("destination.cloudRunRevision.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.cloud-sql-instance" => Some(("destination.cloudSqlInstance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination.forwarding-rule" => Some(("destination.forwardingRule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination.forwarding-rule-target" => Some(("destination.forwardingRuleTarget", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.gke-master-cluster" => Some(("destination.gkeMasterCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.instance" => Some(("destination.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.ip-address" => Some(("destination.ipAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination.load-balancer-id" => Some(("destination.loadBalancerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "destination.load-balancer-type" => Some(("destination.loadBalancerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.network" => Some(("destination.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.network-type" => Some(("destination.networkType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "destination.port" => Some(("destination.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -488,6 +516,22 @@ where
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.abort-cause" => Some(("probingDetails.abortCause", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.destination-egress-location.metropolitan-area" => Some(("probingDetails.destinationEgressLocation.metropolitanArea", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.destination-ip" => Some(("probingDetails.endpointInfo.destinationIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.destination-network-uri" => Some(("probingDetails.endpointInfo.destinationNetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.destination-port" => Some(("probingDetails.endpointInfo.destinationPort", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.protocol" => Some(("probingDetails.endpointInfo.protocol", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.source-agent-uri" => Some(("probingDetails.endpointInfo.sourceAgentUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.source-ip" => Some(("probingDetails.endpointInfo.sourceIp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.source-network-uri" => Some(("probingDetails.endpointInfo.sourceNetworkUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.endpoint-info.source-port" => Some(("probingDetails.endpointInfo.sourcePort", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "probing-details.error.code" => Some(("probingDetails.error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "probing-details.error.message" => Some(("probingDetails.error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.result" => Some(("probingDetails.result", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "probing-details.sent-probe-count" => Some(("probingDetails.sentProbeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "probing-details.successful-probe-count" => Some(("probingDetails.successfulProbeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "probing-details.verify-time" => Some(("probingDetails.verifyTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "protocol" => Some(("protocol", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reachability-details.error.code" => Some(("reachabilityDetails.error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "reachability-details.error.message" => Some(("reachabilityDetails.error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -498,16 +542,20 @@ where
                     "source.cloud-function.uri" => Some(("source.cloudFunction.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.cloud-run-revision.uri" => Some(("source.cloudRunRevision.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.cloud-sql-instance" => Some(("source.cloudSqlInstance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source.forwarding-rule" => Some(("source.forwardingRule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source.forwarding-rule-target" => Some(("source.forwardingRuleTarget", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.gke-master-cluster" => Some(("source.gkeMasterCluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.instance" => Some(("source.instance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.ip-address" => Some(("source.ipAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source.load-balancer-id" => Some(("source.loadBalancerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source.load-balancer-type" => Some(("source.loadBalancerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.network" => Some(("source.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.network-type" => Some(("source.networkType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source.port" => Some(("source.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source.project-id" => Some(("source.projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["app-engine-version", "cloud-function", "cloud-run-revision", "cloud-sql-instance", "code", "create-time", "description", "destination", "display-name", "error", "gke-master-cluster", "instance", "ip-address", "labels", "message", "name", "network", "network-type", "port", "project-id", "protocol", "reachability-details", "related-projects", "result", "source", "update-time", "uri", "verify-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["abort-cause", "app-engine-version", "cloud-function", "cloud-run-revision", "cloud-sql-instance", "code", "create-time", "description", "destination", "destination-egress-location", "destination-ip", "destination-network-uri", "destination-port", "display-name", "endpoint-info", "error", "forwarding-rule", "forwarding-rule-target", "gke-master-cluster", "instance", "ip-address", "labels", "load-balancer-id", "load-balancer-type", "message", "metropolitan-area", "name", "network", "network-type", "port", "probing-details", "project-id", "protocol", "reachability-details", "related-projects", "result", "sent-probe-count", "source", "source-agent-uri", "source-ip", "source-network-uri", "source-port", "successful-probe-count", "update-time", "uri", "verify-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1594,7 +1642,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-global-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_networkmanagement1_cli/projects_locations-global-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -1643,7 +1691,7 @@ async fn main() {
     
     let mut app = App::new("networkmanagement1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230105")
+           .version("5.0.4+20240221")
            .about("The Network Management API provides a collection of network performance monitoring and diagnostic capabilities.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_networkmanagement1_cli")
            .arg(Arg::with_name("url")

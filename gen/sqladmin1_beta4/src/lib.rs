@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *SQL Admin* crate version *5.0.3+20221209*, where *20221209* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *SQL Admin* crate version *5.0.4+20240219*, where *20240219* is the exact revision of the *sqladmin:v1beta4* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *SQL Admin* *v1_beta4* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-sql/).
@@ -20,11 +20,11 @@
 //! * [flags](api::Flag)
 //!  * [*list*](api::FlagListCall)
 //! * instances
-//!  * [*add server ca*](api::InstanceAddServerCaCall), [*clone*](api::InstanceCloneCall), [*delete*](api::InstanceDeleteCall), [*demote master*](api::InstanceDemoteMasterCall), [*export*](api::InstanceExportCall), [*failover*](api::InstanceFailoverCall), [*get*](api::InstanceGetCall), [*import*](api::InstanceImportCall), [*insert*](api::InstanceInsertCall), [*list*](api::InstanceListCall), [*list server cas*](api::InstanceListServerCaCall), [*patch*](api::InstancePatchCall), [*promote replica*](api::InstancePromoteReplicaCall), [*reset ssl config*](api::InstanceResetSslConfigCall), [*restart*](api::InstanceRestartCall), [*restore backup*](api::InstanceRestoreBackupCall), [*rotate server ca*](api::InstanceRotateServerCaCall), [*start replica*](api::InstanceStartReplicaCall), [*stop replica*](api::InstanceStopReplicaCall), [*truncate log*](api::InstanceTruncateLogCall) and [*update*](api::InstanceUpdateCall)
+//!  * [*add server ca*](api::InstanceAddServerCaCall), [*clone*](api::InstanceCloneCall), [*delete*](api::InstanceDeleteCall), [*demote*](api::InstanceDemoteCall), [*demote master*](api::InstanceDemoteMasterCall), [*export*](api::InstanceExportCall), [*failover*](api::InstanceFailoverCall), [*get*](api::InstanceGetCall), [*import*](api::InstanceImportCall), [*insert*](api::InstanceInsertCall), [*list*](api::InstanceListCall), [*list server cas*](api::InstanceListServerCaCall), [*patch*](api::InstancePatchCall), [*promote replica*](api::InstancePromoteReplicaCall), [*reencrypt*](api::InstanceReencryptCall), [*reset ssl config*](api::InstanceResetSslConfigCall), [*restart*](api::InstanceRestartCall), [*restore backup*](api::InstanceRestoreBackupCall), [*rotate server ca*](api::InstanceRotateServerCaCall), [*start replica*](api::InstanceStartReplicaCall), [*stop replica*](api::InstanceStopReplicaCall), [*switchover*](api::InstanceSwitchoverCall), [*truncate log*](api::InstanceTruncateLogCall) and [*update*](api::InstanceUpdateCall)
 //! * [operations](api::Operation)
-//!  * [*get*](api::OperationGetCall) and [*list*](api::OperationListCall)
+//!  * [*cancel*](api::OperationCancelCall), [*get*](api::OperationGetCall) and [*list*](api::OperationListCall)
 //! * projects
-//!  * [*instances reschedule maintenance*](api::ProjectInstanceRescheduleMaintenanceCall), [*instances start external sync*](api::ProjectInstanceStartExternalSyncCall) and [*instances verify external sync settings*](api::ProjectInstanceVerifyExternalSyncSettingCall)
+//!  * [*instances get disk shrink config*](api::ProjectInstanceGetDiskShrinkConfigCall), [*instances get latest recovery time*](api::ProjectInstanceGetLatestRecoveryTimeCall), [*instances perform disk shrink*](api::ProjectInstancePerformDiskShrinkCall), [*instances reschedule maintenance*](api::ProjectInstanceRescheduleMaintenanceCall), [*instances reset replica size*](api::ProjectInstanceResetReplicaSizeCall), [*instances start external sync*](api::ProjectInstanceStartExternalSyncCall) and [*instances verify external sync settings*](api::ProjectInstanceVerifyExternalSyncSettingCall)
 //! * [ssl certs](api::SslCert)
 //!  * [*create ephemeral*](api::SslCertCreateEphemeralCall), [*delete*](api::SslCertDeleteCall), [*get*](api::SslCertGetCall), [*insert*](api::SslCertInsertCall) and [*list*](api::SslCertListCall)
 //! * [tiers](api::Tier)
@@ -74,6 +74,7 @@
 //! let r = hub.instances().add_server_ca(...).doit().await
 //! let r = hub.instances().clone(...).doit().await
 //! let r = hub.instances().delete(...).doit().await
+//! let r = hub.instances().demote(...).doit().await
 //! let r = hub.instances().demote_master(...).doit().await
 //! let r = hub.instances().export(...).doit().await
 //! let r = hub.instances().failover(...).doit().await
@@ -81,17 +82,22 @@
 //! let r = hub.instances().insert(...).doit().await
 //! let r = hub.instances().patch(...).doit().await
 //! let r = hub.instances().promote_replica(...).doit().await
+//! let r = hub.instances().reencrypt(...).doit().await
 //! let r = hub.instances().reset_ssl_config(...).doit().await
 //! let r = hub.instances().restart(...).doit().await
 //! let r = hub.instances().restore_backup(...).doit().await
 //! let r = hub.instances().rotate_server_ca(...).doit().await
 //! let r = hub.instances().start_replica(...).doit().await
 //! let r = hub.instances().stop_replica(...).doit().await
+//! let r = hub.instances().switchover(...).doit().await
 //! let r = hub.instances().truncate_log(...).doit().await
 //! let r = hub.instances().update(...).doit().await
+//! let r = hub.operations().cancel(...).doit().await
 //! let r = hub.operations().get(...).doit().await
 //! let r = hub.operations().list(...).doit().await
+//! let r = hub.projects().instances_perform_disk_shrink(...).doit().await
 //! let r = hub.projects().instances_reschedule_maintenance(...).doit().await
+//! let r = hub.projects().instances_reset_replica_size(...).doit().await
 //! let r = hub.projects().instances_start_external_sync(...).doit().await
 //! let r = hub.ssl_certs().delete(...).doit().await
 //! let r = hub.users().delete(...).doit().await

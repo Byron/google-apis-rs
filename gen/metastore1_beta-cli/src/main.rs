@@ -765,6 +765,90 @@ where
         }
     }
 
+    async fn _projects_locations_operations_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CancelOperationRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_operations_cancel(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_operations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_operations_delete(opt.value_of("name").unwrap_or(""));
@@ -1017,6 +1101,93 @@ where
         }
     }
 
+    async fn _projects_locations_services_alter_table_properties(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "properties" => Some(("properties", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "table-name" => Some(("tableName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["properties", "table-name", "update-mask"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AlterTablePropertiesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_services_alter_table_properties(request, opt.value_of("service").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_services_backups_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1062,8 +1233,20 @@ where
                     "service-revision.metadata-integration.data-catalog-config.enabled" => Some(("serviceRevision.metadataIntegration.dataCatalogConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "service-revision.name" => Some(("serviceRevision.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.network" => Some(("serviceRevision.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-revision.network-config.custom-routes-enabled" => Some(("serviceRevision.networkConfig.customRoutesEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "service-revision.port" => Some(("serviceRevision.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "service-revision.release-channel" => Some(("serviceRevision.releaseChannel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-revision.scaling-config.instance-size" => Some(("serviceRevision.scalingConfig.instanceSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-revision.scaling-config.scaling-factor" => Some(("serviceRevision.scalingConfig.scalingFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "service-revision.scheduled-backup.backup-location" => Some(("serviceRevision.scheduledBackup.backupLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-revision.scheduled-backup.cron-schedule" => Some(("serviceRevision.scheduledBackup.cronSchedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-revision.scheduled-backup.enabled" => Some(("serviceRevision.scheduledBackup.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "service-revision.scheduled-backup.latest-backup.backup-id" => Some(("serviceRevision.scheduledBackup.latestBackup.backupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-revision.scheduled-backup.latest-backup.duration" => Some(("serviceRevision.scheduledBackup.latestBackup.duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-revision.scheduled-backup.latest-backup.start-time" => Some(("serviceRevision.scheduledBackup.latestBackup.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-revision.scheduled-backup.latest-backup.state" => Some(("serviceRevision.scheduledBackup.latestBackup.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-revision.scheduled-backup.next-scheduled-time" => Some(("serviceRevision.scheduledBackup.nextScheduledTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-revision.scheduled-backup.time-zone" => Some(("serviceRevision.scheduledBackup.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.state" => Some(("serviceRevision.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.state-message" => Some(("serviceRevision.stateMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-revision.telemetry-config.log-format" => Some(("serviceRevision.telemetryConfig.logFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1072,7 +1255,7 @@ where
                     "service-revision.update-time" => Some(("serviceRevision.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-gcs-uri", "cloud-secret", "config-overrides", "create-time", "data-catalog-config", "database-type", "day-of-week", "description", "enabled", "encryption-config", "end-time", "endpoint-protocol", "endpoint-uri", "hive-metastore-config", "hour-of-day", "kerberos-config", "keytab", "kms-key", "krb5-config-gcs-uri", "labels", "log-format", "maintenance-window", "metadata-integration", "name", "network", "port", "principal", "release-channel", "restoring-services", "service-revision", "state", "state-message", "telemetry-config", "tier", "uid", "update-time", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-gcs-uri", "backup-id", "backup-location", "cloud-secret", "config-overrides", "create-time", "cron-schedule", "custom-routes-enabled", "data-catalog-config", "database-type", "day-of-week", "description", "duration", "enabled", "encryption-config", "end-time", "endpoint-protocol", "endpoint-uri", "hive-metastore-config", "hour-of-day", "instance-size", "kerberos-config", "keytab", "kms-key", "krb5-config-gcs-uri", "labels", "latest-backup", "log-format", "maintenance-window", "metadata-integration", "name", "network", "network-config", "next-scheduled-time", "port", "principal", "release-channel", "restoring-services", "scaling-config", "scaling-factor", "scheduled-backup", "service-revision", "start-time", "state", "state-message", "telemetry-config", "tier", "time-zone", "uid", "update-time", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1580,8 +1763,20 @@ where
                     "metadata-integration.data-catalog-config.enabled" => Some(("metadataIntegration.dataCatalogConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-config.custom-routes-enabled" => Some(("networkConfig.customRoutesEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "port" => Some(("port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "release-channel" => Some(("releaseChannel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scaling-config.instance-size" => Some(("scalingConfig.instanceSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scaling-config.scaling-factor" => Some(("scalingConfig.scalingFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "scheduled-backup.backup-location" => Some(("scheduledBackup.backupLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scheduled-backup.cron-schedule" => Some(("scheduledBackup.cronSchedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scheduled-backup.enabled" => Some(("scheduledBackup.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "scheduled-backup.latest-backup.backup-id" => Some(("scheduledBackup.latestBackup.backupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scheduled-backup.latest-backup.duration" => Some(("scheduledBackup.latestBackup.duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scheduled-backup.latest-backup.start-time" => Some(("scheduledBackup.latestBackup.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scheduled-backup.latest-backup.state" => Some(("scheduledBackup.latestBackup.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scheduled-backup.next-scheduled-time" => Some(("scheduledBackup.nextScheduledTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scheduled-backup.time-zone" => Some(("scheduledBackup.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state-message" => Some(("stateMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "telemetry-config.log-format" => Some(("telemetryConfig.logFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1589,7 +1784,7 @@ where
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-gcs-uri", "cloud-secret", "config-overrides", "create-time", "data-catalog-config", "database-type", "day-of-week", "enabled", "encryption-config", "endpoint-protocol", "endpoint-uri", "hive-metastore-config", "hour-of-day", "kerberos-config", "keytab", "kms-key", "krb5-config-gcs-uri", "labels", "log-format", "maintenance-window", "metadata-integration", "name", "network", "port", "principal", "release-channel", "state", "state-message", "telemetry-config", "tier", "uid", "update-time", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-gcs-uri", "backup-id", "backup-location", "cloud-secret", "config-overrides", "create-time", "cron-schedule", "custom-routes-enabled", "data-catalog-config", "database-type", "day-of-week", "duration", "enabled", "encryption-config", "endpoint-protocol", "endpoint-uri", "hive-metastore-config", "hour-of-day", "instance-size", "kerberos-config", "keytab", "kms-key", "krb5-config-gcs-uri", "labels", "latest-backup", "log-format", "maintenance-window", "metadata-integration", "name", "network", "network-config", "next-scheduled-time", "port", "principal", "release-channel", "scaling-config", "scaling-factor", "scheduled-backup", "start-time", "state", "state-message", "telemetry-config", "tier", "time-zone", "uid", "update-time", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2747,6 +2942,62 @@ where
         }
     }
 
+    async fn _projects_locations_services_migration_executions_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_services_migration_executions_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["request-id"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_services_move_table_to_database(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2874,8 +3125,20 @@ where
                     "metadata-integration.data-catalog-config.enabled" => Some(("metadataIntegration.dataCatalogConfig.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network" => Some(("network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-config.custom-routes-enabled" => Some(("networkConfig.customRoutesEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "port" => Some(("port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "release-channel" => Some(("releaseChannel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scaling-config.instance-size" => Some(("scalingConfig.instanceSize", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scaling-config.scaling-factor" => Some(("scalingConfig.scalingFactor", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "scheduled-backup.backup-location" => Some(("scheduledBackup.backupLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scheduled-backup.cron-schedule" => Some(("scheduledBackup.cronSchedule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scheduled-backup.enabled" => Some(("scheduledBackup.enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "scheduled-backup.latest-backup.backup-id" => Some(("scheduledBackup.latestBackup.backupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scheduled-backup.latest-backup.duration" => Some(("scheduledBackup.latestBackup.duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scheduled-backup.latest-backup.start-time" => Some(("scheduledBackup.latestBackup.startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scheduled-backup.latest-backup.state" => Some(("scheduledBackup.latestBackup.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scheduled-backup.next-scheduled-time" => Some(("scheduledBackup.nextScheduledTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scheduled-backup.time-zone" => Some(("scheduledBackup.timeZone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state-message" => Some(("stateMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "telemetry-config.log-format" => Some(("telemetryConfig.logFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2883,7 +3146,7 @@ where
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-gcs-uri", "cloud-secret", "config-overrides", "create-time", "data-catalog-config", "database-type", "day-of-week", "enabled", "encryption-config", "endpoint-protocol", "endpoint-uri", "hive-metastore-config", "hour-of-day", "kerberos-config", "keytab", "kms-key", "krb5-config-gcs-uri", "labels", "log-format", "maintenance-window", "metadata-integration", "name", "network", "port", "principal", "release-channel", "state", "state-message", "telemetry-config", "tier", "uid", "update-time", "version"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["artifact-gcs-uri", "backup-id", "backup-location", "cloud-secret", "config-overrides", "create-time", "cron-schedule", "custom-routes-enabled", "data-catalog-config", "database-type", "day-of-week", "duration", "enabled", "encryption-config", "endpoint-protocol", "endpoint-uri", "hive-metastore-config", "hour-of-day", "instance-size", "kerberos-config", "keytab", "kms-key", "krb5-config-gcs-uri", "labels", "latest-backup", "log-format", "maintenance-window", "metadata-integration", "name", "network", "network-config", "next-scheduled-time", "port", "principal", "release-channel", "scaling-config", "scaling-factor", "scheduled-backup", "start-time", "state", "state-message", "telemetry-config", "tier", "time-zone", "uid", "update-time", "version"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3144,10 +3407,11 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "backup" => Some(("backup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-location" => Some(("backupLocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "restore-type" => Some(("restoreType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup", "request-id", "restore-type"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup", "backup-location", "request-id", "restore-type"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3416,6 +3680,9 @@ where
                     ("locations-list", Some(opt)) => {
                         call_result = self._projects_locations_list(opt, dry_run, &mut err).await;
                     },
+                    ("locations-operations-cancel", Some(opt)) => {
+                        call_result = self._projects_locations_operations_cancel(opt, dry_run, &mut err).await;
+                    },
                     ("locations-operations-delete", Some(opt)) => {
                         call_result = self._projects_locations_operations_delete(opt, dry_run, &mut err).await;
                     },
@@ -3427,6 +3694,9 @@ where
                     },
                     ("locations-services-alter-location", Some(opt)) => {
                         call_result = self._projects_locations_services_alter_location(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-services-alter-table-properties", Some(opt)) => {
+                        call_result = self._projects_locations_services_alter_table_properties(opt, dry_run, &mut err).await;
                     },
                     ("locations-services-backups-create", Some(opt)) => {
                         call_result = self._projects_locations_services_backups_create(opt, dry_run, &mut err).await;
@@ -3496,6 +3766,9 @@ where
                     },
                     ("locations-services-metadata-imports-patch", Some(opt)) => {
                         call_result = self._projects_locations_services_metadata_imports_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-services-migration-executions-delete", Some(opt)) => {
+                        call_result = self._projects_locations_services_migration_executions_delete(opt, dry_run, &mut err).await;
                     },
                     ("locations-services-move-table-to-database", Some(opt)) => {
                         call_result = self._projects_locations_services_move_table_to_database(opt, dry_run, &mut err).await;
@@ -3597,7 +3870,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-federations-create', 'locations-federations-delete', 'locations-federations-get', 'locations-federations-get-iam-policy', 'locations-federations-list', 'locations-federations-patch', 'locations-federations-set-iam-policy', 'locations-federations-test-iam-permissions', 'locations-get', 'locations-list', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-services-alter-location', 'locations-services-backups-create', 'locations-services-backups-delete', 'locations-services-backups-get', 'locations-services-backups-get-iam-policy', 'locations-services-backups-list', 'locations-services-backups-set-iam-policy', 'locations-services-backups-test-iam-permissions', 'locations-services-create', 'locations-services-databases-get-iam-policy', 'locations-services-databases-set-iam-policy', 'locations-services-databases-tables-get-iam-policy', 'locations-services-databases-tables-set-iam-policy', 'locations-services-databases-tables-test-iam-permissions', 'locations-services-databases-test-iam-permissions', 'locations-services-delete', 'locations-services-export-metadata', 'locations-services-get', 'locations-services-get-iam-policy', 'locations-services-list', 'locations-services-metadata-imports-create', 'locations-services-metadata-imports-get', 'locations-services-metadata-imports-list', 'locations-services-metadata-imports-patch', 'locations-services-move-table-to-database', 'locations-services-patch', 'locations-services-query-metadata', 'locations-services-remove-iam-policy', 'locations-services-restore', 'locations-services-set-iam-policy' and 'locations-services-test-iam-permissions'", vec![
+        ("projects", "methods: 'locations-federations-create', 'locations-federations-delete', 'locations-federations-get', 'locations-federations-get-iam-policy', 'locations-federations-list', 'locations-federations-patch', 'locations-federations-set-iam-policy', 'locations-federations-test-iam-permissions', 'locations-get', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-services-alter-location', 'locations-services-alter-table-properties', 'locations-services-backups-create', 'locations-services-backups-delete', 'locations-services-backups-get', 'locations-services-backups-get-iam-policy', 'locations-services-backups-list', 'locations-services-backups-set-iam-policy', 'locations-services-backups-test-iam-permissions', 'locations-services-create', 'locations-services-databases-get-iam-policy', 'locations-services-databases-set-iam-policy', 'locations-services-databases-tables-get-iam-policy', 'locations-services-databases-tables-set-iam-policy', 'locations-services-databases-tables-test-iam-permissions', 'locations-services-databases-test-iam-permissions', 'locations-services-delete', 'locations-services-export-metadata', 'locations-services-get', 'locations-services-get-iam-policy', 'locations-services-list', 'locations-services-metadata-imports-create', 'locations-services-metadata-imports-get', 'locations-services-metadata-imports-list', 'locations-services-metadata-imports-patch', 'locations-services-migration-executions-delete', 'locations-services-move-table-to-database', 'locations-services-patch', 'locations-services-query-metadata', 'locations-services-remove-iam-policy', 'locations-services-restore', 'locations-services-set-iam-policy' and 'locations-services-test-iam-permissions'", vec![
             ("locations-federations-create",
                     Some(r##"Creates a metastore federation in a project and location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-federations-create",
@@ -3842,6 +4115,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-operations-cancel",
+                    Some(r##"Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns google.rpc.Code.UNIMPLEMENTED. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to Code.CANCELLED."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-operations-cancel",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the operation resource to be cancelled."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-operations-delete",
                     Some(r##"Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns google.rpc.Code.UNIMPLEMENTED."##),
                     "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-operations-delete",
@@ -3887,7 +4188,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED.NOTE: the name binding allows API services to override the binding to use different resource name schemes, such as users/*/operations. To override the binding, API services can add a binding such as "/v1/{name=users/*}/operations" to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED."##),
                     "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -3915,6 +4216,34 @@ async fn main() {
                     (Some(r##"service"##),
                      None,
                      Some(r##"Required. The relative resource name of the metastore service to mutate metadata, in the following format:projects/{project_id}/locations/{location_id}/services/{service_id}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-services-alter-table-properties",
+                    Some(r##"Alter metadata table properties."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-services-alter-table-properties",
+                  vec![
+                    (Some(r##"service"##),
+                     None,
+                     Some(r##"Required. The relative resource name of the Dataproc Metastore service that's being used to mutate metadata table properties, in the following format:projects/{project_id}/locations/{location_id}/services/{service_id}."##),
                      Some(true),
                      Some(false)),
         
@@ -4508,6 +4837,28 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-services-migration-executions-delete",
+                    Some(r##"Deletes a single migration execution."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-services-migration-executions-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The relative resource name of the migrationExecution to delete, in the following form:projects/{project_number}/locations/{location_id}/services/{service_id}/migrationExecutions/{migration_execution_id}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-services-move-table-to-database",
                     Some(r##"Move a table to another database."##),
                     "Details at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli/projects_locations-services-move-table-to-database",
@@ -4710,7 +5061,7 @@ async fn main() {
     
     let mut app = App::new("metastore1-beta")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230111")
+           .version("5.0.4+20240228")
            .about("The Dataproc Metastore API is used to manage the lifecycle and configuration of metastore services.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_metastore1_beta_cli")
            .arg(Arg::with_name("url")

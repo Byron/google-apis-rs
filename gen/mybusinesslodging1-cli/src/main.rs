@@ -1195,7 +1195,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Google identifier for this location in the form: `accounts/{account_id}/locations/{location_id}/lodging`"##),
+                     Some(r##"Required. Google identifier for this location in the form: `locations/{location_id}/lodging`"##),
                      Some(true),
                      Some(false)),
         
@@ -1245,7 +1245,7 @@ async fn main() {
     
     let mut app = App::new("mybusinesslodging1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230124")
+           .version("5.0.4+20240304")
            .about("The My Business Lodging API enables managing lodging business information on Google. Note - If you have a quota of 0 after enabling the API, please request for GBP API access.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_mybusinesslodging1_cli")
            .arg(Arg::with_name("folder")

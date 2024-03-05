@@ -4,7 +4,7 @@
 [package]
 
 name = "google-adexchangebuyer1d4-cli"
-version = "5.0.3+20210330"
+version = "5.0.4+20210330"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Ad Exchange Buyer (protocol v1.4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/adexchangebuyer1d4-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-adexchangebuyer1d4]
 path = "../adexchangebuyer1d4"
-version = "5.0.3+20210330"
+version = "5.0.4+20210330"
 

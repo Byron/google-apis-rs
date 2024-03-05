@@ -1,4 +1,4 @@
-site_name: Cloud Build v5.0.3+20230120
+site_name: Cloud Build v5.0.4+20240223
 site_url: http://byron.github.io/google-apis-rs/google-cloudbuild1-cli
 site_description: A complete library to interact with Cloud Build (protocol v1)
 
@@ -44,6 +44,7 @@ nav:
     - 'Locations Builds Get': 'projects_locations-builds-get.md'
     - 'Locations Builds List': 'projects_locations-builds-list.md'
     - 'Locations Builds Retry': 'projects_locations-builds-retry.md'
+    - 'Locations Get Default Service Account': 'projects_locations-get-default-service-account.md'
     - 'Locations Git Lab Configs Connected Repositories Batch Create': 'projects_locations-git-lab-configs-connected-repositories-batch-create.md'
     - 'Locations Git Lab Configs Create': 'projects_locations-git-lab-configs-create.md'
     - 'Locations Git Lab Configs Delete': 'projects_locations-git-lab-configs-delete.md'

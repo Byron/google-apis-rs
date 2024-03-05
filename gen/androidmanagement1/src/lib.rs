@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Android Management* crate version *5.0.3+20230119*, where *20230119* is the exact revision of the *androidmanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Android Management* crate version *5.0.4+20240221*, where *20240221* is the exact revision of the *androidmanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Android Management* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/android/management).
@@ -12,7 +12,9 @@
 //! Handle the following *Resources* with ease from the central [hub](AndroidManagement) ... 
 //! 
 //! * [enterprises](api::Enterprise)
-//!  * [*applications get*](api::EnterpriseApplicationGetCall), [*create*](api::EnterpriseCreateCall), [*delete*](api::EnterpriseDeleteCall), [*devices delete*](api::EnterpriseDeviceDeleteCall), [*devices get*](api::EnterpriseDeviceGetCall), [*devices issue command*](api::EnterpriseDeviceIssueCommandCall), [*devices list*](api::EnterpriseDeviceListCall), [*devices operations cancel*](api::EnterpriseDeviceOperationCancelCall), [*devices operations delete*](api::EnterpriseDeviceOperationDeleteCall), [*devices operations get*](api::EnterpriseDeviceOperationGetCall), [*devices operations list*](api::EnterpriseDeviceOperationListCall), [*devices patch*](api::EnterpriseDevicePatchCall), [*enrollment tokens create*](api::EnterpriseEnrollmentTokenCreateCall), [*enrollment tokens delete*](api::EnterpriseEnrollmentTokenDeleteCall), [*enrollment tokens get*](api::EnterpriseEnrollmentTokenGetCall), [*enrollment tokens list*](api::EnterpriseEnrollmentTokenListCall), [*get*](api::EnterpriseGetCall), [*list*](api::EnterpriseListCall), [*patch*](api::EnterprisePatchCall), [*policies delete*](api::EnterprisePolicyDeleteCall), [*policies get*](api::EnterprisePolicyGetCall), [*policies list*](api::EnterprisePolicyListCall), [*policies patch*](api::EnterprisePolicyPatchCall), [*web apps create*](api::EnterpriseWebAppCreateCall), [*web apps delete*](api::EnterpriseWebAppDeleteCall), [*web apps get*](api::EnterpriseWebAppGetCall), [*web apps list*](api::EnterpriseWebAppListCall), [*web apps patch*](api::EnterpriseWebAppPatchCall) and [*web tokens create*](api::EnterpriseWebTokenCreateCall)
+//!  * [*applications get*](api::EnterpriseApplicationGetCall), [*create*](api::EnterpriseCreateCall), [*delete*](api::EnterpriseDeleteCall), [*devices delete*](api::EnterpriseDeviceDeleteCall), [*devices get*](api::EnterpriseDeviceGetCall), [*devices issue command*](api::EnterpriseDeviceIssueCommandCall), [*devices list*](api::EnterpriseDeviceListCall), [*devices operations cancel*](api::EnterpriseDeviceOperationCancelCall), [*devices operations get*](api::EnterpriseDeviceOperationGetCall), [*devices operations list*](api::EnterpriseDeviceOperationListCall), [*devices patch*](api::EnterpriseDevicePatchCall), [*enrollment tokens create*](api::EnterpriseEnrollmentTokenCreateCall), [*enrollment tokens delete*](api::EnterpriseEnrollmentTokenDeleteCall), [*enrollment tokens get*](api::EnterpriseEnrollmentTokenGetCall), [*enrollment tokens list*](api::EnterpriseEnrollmentTokenListCall), [*get*](api::EnterpriseGetCall), [*list*](api::EnterpriseListCall), [*migration tokens create*](api::EnterpriseMigrationTokenCreateCall), [*migration tokens get*](api::EnterpriseMigrationTokenGetCall), [*migration tokens list*](api::EnterpriseMigrationTokenListCall), [*patch*](api::EnterprisePatchCall), [*policies delete*](api::EnterprisePolicyDeleteCall), [*policies get*](api::EnterprisePolicyGetCall), [*policies list*](api::EnterprisePolicyListCall), [*policies patch*](api::EnterprisePolicyPatchCall), [*web apps create*](api::EnterpriseWebAppCreateCall), [*web apps delete*](api::EnterpriseWebAppDeleteCall), [*web apps get*](api::EnterpriseWebAppGetCall), [*web apps list*](api::EnterpriseWebAppListCall), [*web apps patch*](api::EnterpriseWebAppPatchCall) and [*web tokens create*](api::EnterpriseWebTokenCreateCall)
+//! * [provisioning info](api::ProvisioningInfo)
+//!  * [*get*](api::ProvisioningInfoGetCall)
 //! * [signup urls](api::SignupUrl)
 //!  * [*create*](api::SignupUrlCreateCall)
 //! 
@@ -51,7 +53,6 @@
 //! ```ignore
 //! let r = hub.enterprises().applications_get(...).doit().await
 //! let r = hub.enterprises().devices_operations_cancel(...).doit().await
-//! let r = hub.enterprises().devices_operations_delete(...).doit().await
 //! let r = hub.enterprises().devices_operations_get(...).doit().await
 //! let r = hub.enterprises().devices_operations_list(...).doit().await
 //! let r = hub.enterprises().devices_delete(...).doit().await
@@ -63,6 +64,9 @@
 //! let r = hub.enterprises().enrollment_tokens_delete(...).doit().await
 //! let r = hub.enterprises().enrollment_tokens_get(...).doit().await
 //! let r = hub.enterprises().enrollment_tokens_list(...).doit().await
+//! let r = hub.enterprises().migration_tokens_create(...).doit().await
+//! let r = hub.enterprises().migration_tokens_get(...).doit().await
+//! let r = hub.enterprises().migration_tokens_list(...).doit().await
 //! let r = hub.enterprises().policies_delete(...).doit().await
 //! let r = hub.enterprises().policies_get(...).doit().await
 //! let r = hub.enterprises().policies_list(...).doit().await

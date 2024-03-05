@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Assuredworkloads* crate version *5.0.3+20230116*, where *20230116* is the exact revision of the *assuredworkloads:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Assuredworkloads* crate version *5.0.4+20240222*, where *20240222* is the exact revision of the *assuredworkloads:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Assuredworkloads* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/learnmoreurl).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Assuredworkloads) ... 
 //! 
 //! * organizations
-//!  * [*locations operations get*](api::OrganizationLocationOperationGetCall), [*locations operations list*](api::OrganizationLocationOperationListCall), [*locations workloads create*](api::OrganizationLocationWorkloadCreateCall), [*locations workloads delete*](api::OrganizationLocationWorkloadDeleteCall), [*locations workloads get*](api::OrganizationLocationWorkloadGetCall), [*locations workloads list*](api::OrganizationLocationWorkloadListCall), [*locations workloads mutate partner permissions*](api::OrganizationLocationWorkloadMutatePartnerPermissionCall), [*locations workloads patch*](api::OrganizationLocationWorkloadPatchCall), [*locations workloads restrict allowed resources*](api::OrganizationLocationWorkloadRestrictAllowedResourceCall), [*locations workloads violations acknowledge*](api::OrganizationLocationWorkloadViolationAcknowledgeCall), [*locations workloads violations get*](api::OrganizationLocationWorkloadViolationGetCall) and [*locations workloads violations list*](api::OrganizationLocationWorkloadViolationListCall)
+//!  * [*locations operations get*](api::OrganizationLocationOperationGetCall), [*locations operations list*](api::OrganizationLocationOperationListCall), [*locations workloads analyze workload move*](api::OrganizationLocationWorkloadAnalyzeWorkloadMoveCall), [*locations workloads create*](api::OrganizationLocationWorkloadCreateCall), [*locations workloads delete*](api::OrganizationLocationWorkloadDeleteCall), [*locations workloads enable resource monitoring*](api::OrganizationLocationWorkloadEnableResourceMonitoringCall), [*locations workloads get*](api::OrganizationLocationWorkloadGetCall), [*locations workloads list*](api::OrganizationLocationWorkloadListCall), [*locations workloads mutate partner permissions*](api::OrganizationLocationWorkloadMutatePartnerPermissionCall), [*locations workloads patch*](api::OrganizationLocationWorkloadPatchCall), [*locations workloads restrict allowed resources*](api::OrganizationLocationWorkloadRestrictAllowedResourceCall), [*locations workloads violations acknowledge*](api::OrganizationLocationWorkloadViolationAcknowledgeCall), [*locations workloads violations get*](api::OrganizationLocationWorkloadViolationGetCall) and [*locations workloads violations list*](api::OrganizationLocationWorkloadViolationListCall)
 //! 
 //! 
 //! 

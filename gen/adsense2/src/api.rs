@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// View and manage your AdSense data
     Full,
@@ -138,7 +138,7 @@ impl<'a, S> Adsense<S> {
         Adsense {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://adsense.googleapis.com/".to_string(),
             _root_url: "https://adsense.googleapis.com/".to_string(),
         }
@@ -149,7 +149,7 @@ impl<'a, S> Adsense<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -358,7 +358,7 @@ pub struct AdUnit {
     #[serde(rename="reportingDimensionId")]
     
     pub reporting_dimension_id: Option<String>,
-    /// State of the ad unit.
+    /// Required. State of the ad unit.
     
     pub state: Option<String>,
 }
@@ -556,7 +556,7 @@ pub struct HttpBody {
     pub content_type: Option<String>,
     /// The HTTP request/response body as raw binary.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub data: Option<Vec<u8>>,
     /// Application specific response metadata. Must be set in the first response for streaming APIs.
     
@@ -7915,7 +7915,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// A page token, received from a previous `ListPayments` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListPayments` must match the call that provided the page token.
+    /// A page token, received from a previous `ListSavedReports` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListSavedReports` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AccountReportSavedListCall<'a, S> {
@@ -10710,7 +10710,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// A page token, received from a previous `ListAccounts` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListAccounts` must match the call that provided the page token.
+    /// A page token, received from a previous `ListChildAccounts` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListChildAccounts` must match the call that provided the page token.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> AccountListChildAccountCall<'a, S> {

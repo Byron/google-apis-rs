@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *networkconnectivity* crate version *5.0.3+20230105*, where *20230105* is the exact revision of the *networkconnectivity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *networkconnectivity* crate version *5.0.4+20240221*, where *20240221* is the exact revision of the *networkconnectivity:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *networkconnectivity* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/network-connectivity/docs/reference/networkconnectivity/rest).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Networkconnectivity) ... 
 //! 
 //! * projects
-//!  * [*locations get*](api::ProjectLocationGetCall), [*locations global hubs create*](api::ProjectLocationGlobalHubCreateCall), [*locations global hubs delete*](api::ProjectLocationGlobalHubDeleteCall), [*locations global hubs get*](api::ProjectLocationGlobalHubGetCall), [*locations global hubs get iam policy*](api::ProjectLocationGlobalHubGetIamPolicyCall), [*locations global hubs list*](api::ProjectLocationGlobalHubListCall), [*locations global hubs patch*](api::ProjectLocationGlobalHubPatchCall), [*locations global hubs set iam policy*](api::ProjectLocationGlobalHubSetIamPolicyCall), [*locations global hubs test iam permissions*](api::ProjectLocationGlobalHubTestIamPermissionCall), [*locations global policy based routes get iam policy*](api::ProjectLocationGlobalPolicyBasedRouteGetIamPolicyCall), [*locations global policy based routes set iam policy*](api::ProjectLocationGlobalPolicyBasedRouteSetIamPolicyCall), [*locations global policy based routes test iam permissions*](api::ProjectLocationGlobalPolicyBasedRouteTestIamPermissionCall), [*locations internal ranges create*](api::ProjectLocationInternalRangeCreateCall), [*locations internal ranges delete*](api::ProjectLocationInternalRangeDeleteCall), [*locations internal ranges get*](api::ProjectLocationInternalRangeGetCall), [*locations internal ranges list*](api::ProjectLocationInternalRangeListCall), [*locations internal ranges patch*](api::ProjectLocationInternalRangePatchCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations service classes get iam policy*](api::ProjectLocationServiceClassGetIamPolicyCall), [*locations service classes set iam policy*](api::ProjectLocationServiceClassSetIamPolicyCall), [*locations service classes test iam permissions*](api::ProjectLocationServiceClassTestIamPermissionCall), [*locations service connection maps get iam policy*](api::ProjectLocationServiceConnectionMapGetIamPolicyCall), [*locations service connection maps set iam policy*](api::ProjectLocationServiceConnectionMapSetIamPolicyCall), [*locations service connection maps test iam permissions*](api::ProjectLocationServiceConnectionMapTestIamPermissionCall), [*locations service connection policies get iam policy*](api::ProjectLocationServiceConnectionPolicyGetIamPolicyCall), [*locations service connection policies set iam policy*](api::ProjectLocationServiceConnectionPolicySetIamPolicyCall), [*locations service connection policies test iam permissions*](api::ProjectLocationServiceConnectionPolicyTestIamPermissionCall), [*locations spokes create*](api::ProjectLocationSpokeCreateCall), [*locations spokes delete*](api::ProjectLocationSpokeDeleteCall), [*locations spokes get*](api::ProjectLocationSpokeGetCall), [*locations spokes get iam policy*](api::ProjectLocationSpokeGetIamPolicyCall), [*locations spokes list*](api::ProjectLocationSpokeListCall), [*locations spokes patch*](api::ProjectLocationSpokePatchCall), [*locations spokes set iam policy*](api::ProjectLocationSpokeSetIamPolicyCall) and [*locations spokes test iam permissions*](api::ProjectLocationSpokeTestIamPermissionCall)
+//!  * [*locations get*](api::ProjectLocationGetCall), [*locations global hubs accept spoke*](api::ProjectLocationGlobalHubAcceptSpokeCall), [*locations global hubs create*](api::ProjectLocationGlobalHubCreateCall), [*locations global hubs delete*](api::ProjectLocationGlobalHubDeleteCall), [*locations global hubs get*](api::ProjectLocationGlobalHubGetCall), [*locations global hubs get iam policy*](api::ProjectLocationGlobalHubGetIamPolicyCall), [*locations global hubs groups get*](api::ProjectLocationGlobalHubGroupGetCall), [*locations global hubs groups get iam policy*](api::ProjectLocationGlobalHubGroupGetIamPolicyCall), [*locations global hubs groups list*](api::ProjectLocationGlobalHubGroupListCall), [*locations global hubs groups set iam policy*](api::ProjectLocationGlobalHubGroupSetIamPolicyCall), [*locations global hubs groups test iam permissions*](api::ProjectLocationGlobalHubGroupTestIamPermissionCall), [*locations global hubs list*](api::ProjectLocationGlobalHubListCall), [*locations global hubs list spokes*](api::ProjectLocationGlobalHubListSpokeCall), [*locations global hubs patch*](api::ProjectLocationGlobalHubPatchCall), [*locations global hubs reject spoke*](api::ProjectLocationGlobalHubRejectSpokeCall), [*locations global hubs route tables get*](api::ProjectLocationGlobalHubRouteTableGetCall), [*locations global hubs route tables list*](api::ProjectLocationGlobalHubRouteTableListCall), [*locations global hubs route tables routes get*](api::ProjectLocationGlobalHubRouteTableRouteGetCall), [*locations global hubs route tables routes list*](api::ProjectLocationGlobalHubRouteTableRouteListCall), [*locations global hubs set iam policy*](api::ProjectLocationGlobalHubSetIamPolicyCall), [*locations global hubs test iam permissions*](api::ProjectLocationGlobalHubTestIamPermissionCall), [*locations global policy based routes create*](api::ProjectLocationGlobalPolicyBasedRouteCreateCall), [*locations global policy based routes delete*](api::ProjectLocationGlobalPolicyBasedRouteDeleteCall), [*locations global policy based routes get*](api::ProjectLocationGlobalPolicyBasedRouteGetCall), [*locations global policy based routes get iam policy*](api::ProjectLocationGlobalPolicyBasedRouteGetIamPolicyCall), [*locations global policy based routes list*](api::ProjectLocationGlobalPolicyBasedRouteListCall), [*locations global policy based routes set iam policy*](api::ProjectLocationGlobalPolicyBasedRouteSetIamPolicyCall), [*locations global policy based routes test iam permissions*](api::ProjectLocationGlobalPolicyBasedRouteTestIamPermissionCall), [*locations internal ranges create*](api::ProjectLocationInternalRangeCreateCall), [*locations internal ranges delete*](api::ProjectLocationInternalRangeDeleteCall), [*locations internal ranges get*](api::ProjectLocationInternalRangeGetCall), [*locations internal ranges list*](api::ProjectLocationInternalRangeListCall), [*locations internal ranges patch*](api::ProjectLocationInternalRangePatchCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations service classes delete*](api::ProjectLocationServiceClassDeleteCall), [*locations service classes get*](api::ProjectLocationServiceClassGetCall), [*locations service classes get iam policy*](api::ProjectLocationServiceClassGetIamPolicyCall), [*locations service classes list*](api::ProjectLocationServiceClassListCall), [*locations service classes patch*](api::ProjectLocationServiceClassPatchCall), [*locations service classes set iam policy*](api::ProjectLocationServiceClassSetIamPolicyCall), [*locations service classes test iam permissions*](api::ProjectLocationServiceClassTestIamPermissionCall), [*locations service connection maps create*](api::ProjectLocationServiceConnectionMapCreateCall), [*locations service connection maps delete*](api::ProjectLocationServiceConnectionMapDeleteCall), [*locations service connection maps get*](api::ProjectLocationServiceConnectionMapGetCall), [*locations service connection maps get iam policy*](api::ProjectLocationServiceConnectionMapGetIamPolicyCall), [*locations service connection maps list*](api::ProjectLocationServiceConnectionMapListCall), [*locations service connection maps patch*](api::ProjectLocationServiceConnectionMapPatchCall), [*locations service connection maps set iam policy*](api::ProjectLocationServiceConnectionMapSetIamPolicyCall), [*locations service connection maps test iam permissions*](api::ProjectLocationServiceConnectionMapTestIamPermissionCall), [*locations service connection policies create*](api::ProjectLocationServiceConnectionPolicyCreateCall), [*locations service connection policies delete*](api::ProjectLocationServiceConnectionPolicyDeleteCall), [*locations service connection policies get*](api::ProjectLocationServiceConnectionPolicyGetCall), [*locations service connection policies get iam policy*](api::ProjectLocationServiceConnectionPolicyGetIamPolicyCall), [*locations service connection policies list*](api::ProjectLocationServiceConnectionPolicyListCall), [*locations service connection policies patch*](api::ProjectLocationServiceConnectionPolicyPatchCall), [*locations service connection policies set iam policy*](api::ProjectLocationServiceConnectionPolicySetIamPolicyCall), [*locations service connection policies test iam permissions*](api::ProjectLocationServiceConnectionPolicyTestIamPermissionCall), [*locations service connection tokens create*](api::ProjectLocationServiceConnectionTokenCreateCall), [*locations service connection tokens delete*](api::ProjectLocationServiceConnectionTokenDeleteCall), [*locations service connection tokens get*](api::ProjectLocationServiceConnectionTokenGetCall), [*locations service connection tokens list*](api::ProjectLocationServiceConnectionTokenListCall), [*locations spokes create*](api::ProjectLocationSpokeCreateCall), [*locations spokes delete*](api::ProjectLocationSpokeDeleteCall), [*locations spokes get*](api::ProjectLocationSpokeGetCall), [*locations spokes get iam policy*](api::ProjectLocationSpokeGetIamPolicyCall), [*locations spokes list*](api::ProjectLocationSpokeListCall), [*locations spokes patch*](api::ProjectLocationSpokePatchCall), [*locations spokes set iam policy*](api::ProjectLocationSpokeSetIamPolicyCall) and [*locations spokes test iam permissions*](api::ProjectLocationSpokeTestIamPermissionCall)
 //! 
 //! 
 //! 
@@ -47,18 +47,30 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().locations_global_hubs_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_global_hubs_set_iam_policy(...).doit().await
-//! let r = hub.projects().locations_global_policy_based_routes_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_global_policy_based_routes_set_iam_policy(...).doit().await
-//! let r = hub.projects().locations_service_classes_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_service_classes_set_iam_policy(...).doit().await
-//! let r = hub.projects().locations_service_connection_maps_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_service_connection_maps_set_iam_policy(...).doit().await
-//! let r = hub.projects().locations_service_connection_policies_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_service_connection_policies_set_iam_policy(...).doit().await
-//! let r = hub.projects().locations_spokes_get_iam_policy(...).doit().await
-//! let r = hub.projects().locations_spokes_set_iam_policy(...).doit().await
+//! let r = hub.projects().locations_global_hubs_accept_spoke(...).doit().await
+//! let r = hub.projects().locations_global_hubs_create(...).doit().await
+//! let r = hub.projects().locations_global_hubs_delete(...).doit().await
+//! let r = hub.projects().locations_global_hubs_patch(...).doit().await
+//! let r = hub.projects().locations_global_hubs_reject_spoke(...).doit().await
+//! let r = hub.projects().locations_global_policy_based_routes_create(...).doit().await
+//! let r = hub.projects().locations_global_policy_based_routes_delete(...).doit().await
+//! let r = hub.projects().locations_internal_ranges_create(...).doit().await
+//! let r = hub.projects().locations_internal_ranges_delete(...).doit().await
+//! let r = hub.projects().locations_internal_ranges_patch(...).doit().await
+//! let r = hub.projects().locations_operations_get(...).doit().await
+//! let r = hub.projects().locations_service_classes_delete(...).doit().await
+//! let r = hub.projects().locations_service_classes_patch(...).doit().await
+//! let r = hub.projects().locations_service_connection_maps_create(...).doit().await
+//! let r = hub.projects().locations_service_connection_maps_delete(...).doit().await
+//! let r = hub.projects().locations_service_connection_maps_patch(...).doit().await
+//! let r = hub.projects().locations_service_connection_policies_create(...).doit().await
+//! let r = hub.projects().locations_service_connection_policies_delete(...).doit().await
+//! let r = hub.projects().locations_service_connection_policies_patch(...).doit().await
+//! let r = hub.projects().locations_service_connection_tokens_create(...).doit().await
+//! let r = hub.projects().locations_service_connection_tokens_delete(...).doit().await
+//! let r = hub.projects().locations_spokes_create(...).doit().await
+//! let r = hub.projects().locations_spokes_delete(...).doit().await
+//! let r = hub.projects().locations_spokes_patch(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -85,6 +97,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_networkconnectivity1 as networkconnectivity1;
+//! use networkconnectivity1::api::Hub;
 //! use networkconnectivity1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -103,11 +116,17 @@
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = Networkconnectivity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
+//! // Values shown here are possibly random and not representative !
+//! let mut req = Hub::default();
+//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_global_hubs_get_iam_policy("resource")
-//!              .options_requested_policy_version(-55)
+//! let result = hub.projects().locations_global_hubs_create(req, "parent")
+//!              .request_id("voluptua.")
+//!              .hub_id("At")
 //!              .doit().await;
 //! 
 //! match result {

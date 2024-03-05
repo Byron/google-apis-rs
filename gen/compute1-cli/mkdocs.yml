@@ -1,4 +1,4 @@
-site_name: compute v5.0.3+20230103
+site_name: compute v5.0.4+20240218
 site_url: http://byron.github.io/google-apis-rs/google-compute1-cli
 site_description: A complete library to interact with compute (protocol v1)
 
@@ -19,6 +19,7 @@ nav:
     - 'Get': 'addresses_get.md'
     - 'Insert': 'addresses_insert.md'
     - 'List': 'addresses_list.md'
+    - 'Move': 'addresses_move.md'
     - 'Set Labels': 'addresses_set-labels.md'
 - 'Autoscalers':
     - 'Aggregated List': 'autoscalers_aggregated-list.md'
@@ -33,10 +34,13 @@ nav:
     - 'Delete': 'backend-buckets_delete.md'
     - 'Delete Signed Url Key': 'backend-buckets_delete-signed-url-key.md'
     - 'Get': 'backend-buckets_get.md'
+    - 'Get Iam Policy': 'backend-buckets_get-iam-policy.md'
     - 'Insert': 'backend-buckets_insert.md'
     - 'List': 'backend-buckets_list.md'
     - 'Patch': 'backend-buckets_patch.md'
     - 'Set Edge Security Policy': 'backend-buckets_set-edge-security-policy.md'
+    - 'Set Iam Policy': 'backend-buckets_set-iam-policy.md'
+    - 'Test Iam Permissions': 'backend-buckets_test-iam-permissions.md'
     - 'Update': 'backend-buckets_update.md'
 - 'Backend Services':
     - 'Add Signed Url Key': 'backend-services_add-signed-url-key.md'
@@ -48,10 +52,12 @@ nav:
     - 'Get Iam Policy': 'backend-services_get-iam-policy.md'
     - 'Insert': 'backend-services_insert.md'
     - 'List': 'backend-services_list.md'
+    - 'List Usable': 'backend-services_list-usable.md'
     - 'Patch': 'backend-services_patch.md'
     - 'Set Edge Security Policy': 'backend-services_set-edge-security-policy.md'
     - 'Set Iam Policy': 'backend-services_set-iam-policy.md'
     - 'Set Security Policy': 'backend-services_set-security-policy.md'
+    - 'Test Iam Permissions': 'backend-services_test-iam-permissions.md'
     - 'Update': 'backend-services_update.md'
 - 'Disk Types':
     - 'Aggregated List': 'disk-types_aggregated-list.md'
@@ -60,6 +66,7 @@ nav:
 - 'Disks':
     - 'Add Resource Policies': 'disks_add-resource-policies.md'
     - 'Aggregated List': 'disks_aggregated-list.md'
+    - 'Bulk Insert': 'disks_bulk-insert.md'
     - 'Create Snapshot': 'disks_create-snapshot.md'
     - 'Delete': 'disks_delete.md'
     - 'Get': 'disks_get.md'
@@ -70,7 +77,11 @@ nav:
     - 'Resize': 'disks_resize.md'
     - 'Set Iam Policy': 'disks_set-iam-policy.md'
     - 'Set Labels': 'disks_set-labels.md'
+    - 'Start Async Replication': 'disks_start-async-replication.md'
+    - 'Stop Async Replication': 'disks_stop-async-replication.md'
+    - 'Stop Group Async Replication': 'disks_stop-group-async-replication.md'
     - 'Test Iam Permissions': 'disks_test-iam-permissions.md'
+    - 'Update': 'disks_update.md'
 - 'External Vpn Gateways':
     - 'Delete': 'external-vpn-gateways_delete.md'
     - 'Get': 'external-vpn-gateways_get.md'
@@ -118,6 +129,7 @@ nav:
     - 'Get': 'global-addresses_get.md'
     - 'Insert': 'global-addresses_insert.md'
     - 'List': 'global-addresses_list.md'
+    - 'Move': 'global-addresses_move.md'
     - 'Set Labels': 'global-addresses_set-labels.md'
 - 'Global Forwarding Rules':
     - 'Delete': 'global-forwarding-rules_delete.md'
@@ -219,6 +231,7 @@ nav:
     - 'Remove Instances': 'instance-groups_remove-instances.md'
     - 'Set Named Ports': 'instance-groups_set-named-ports.md'
 - 'Instance Templates':
+    - 'Aggregated List': 'instance-templates_aggregated-list.md'
     - 'Delete': 'instance-templates_delete.md'
     - 'Get': 'instance-templates_get.md'
     - 'Get Iam Policy': 'instance-templates_get-iam-policy.md'
@@ -245,6 +258,7 @@ nav:
     - 'Insert': 'instances_insert.md'
     - 'List': 'instances_list.md'
     - 'List Referrers': 'instances_list-referrers.md'
+    - 'Perform Maintenance': 'instances_perform-maintenance.md'
     - 'Remove Resource Policies': 'instances_remove-resource-policies.md'
     - 'Reset': 'instances_reset.md'
     - 'Resume': 'instances_resume.md'
@@ -257,7 +271,9 @@ nav:
     - 'Set Machine Type': 'instances_set-machine-type.md'
     - 'Set Metadata': 'instances_set-metadata.md'
     - 'Set Min Cpu Platform': 'instances_set-min-cpu-platform.md'
+    - 'Set Name': 'instances_set-name.md'
     - 'Set Scheduling': 'instances_set-scheduling.md'
+    - 'Set Security Policy': 'instances_set-security-policy.md'
     - 'Set Service Account': 'instances_set-service-account.md'
     - 'Set Shielded Instance Integrity Policy': 'instances_set-shielded-instance-integrity-policy.md'
     - 'Set Tags': 'instances_set-tags.md'
@@ -272,6 +288,16 @@ nav:
     - 'Update Display Device': 'instances_update-display-device.md'
     - 'Update Network Interface': 'instances_update-network-interface.md'
     - 'Update Shielded Instance Config': 'instances_update-shielded-instance-config.md'
+- 'Instant Snapshots':
+    - 'Aggregated List': 'instant-snapshots_aggregated-list.md'
+    - 'Delete': 'instant-snapshots_delete.md'
+    - 'Get': 'instant-snapshots_get.md'
+    - 'Get Iam Policy': 'instant-snapshots_get-iam-policy.md'
+    - 'Insert': 'instant-snapshots_insert.md'
+    - 'List': 'instant-snapshots_list.md'
+    - 'Set Iam Policy': 'instant-snapshots_set-iam-policy.md'
+    - 'Set Labels': 'instant-snapshots_set-labels.md'
+    - 'Test Iam Permissions': 'instant-snapshots_test-iam-permissions.md'
 - 'Interconnect Attachments':
     - 'Aggregated List': 'interconnect-attachments_aggregated-list.md'
     - 'Delete': 'interconnect-attachments_delete.md'
@@ -283,10 +309,14 @@ nav:
 - 'Interconnect Locations':
     - 'Get': 'interconnect-locations_get.md'
     - 'List': 'interconnect-locations_list.md'
+- 'Interconnect Remote Locations':
+    - 'Get': 'interconnect-remote-locations_get.md'
+    - 'List': 'interconnect-remote-locations_list.md'
 - 'Interconnects':
     - 'Delete': 'interconnects_delete.md'
     - 'Get': 'interconnects_get.md'
     - 'Get Diagnostics': 'interconnects_get-diagnostics.md'
+    - 'Get Macsec Config': 'interconnects_get-macsec-config.md'
     - 'Insert': 'interconnects_insert.md'
     - 'List': 'interconnects_list.md'
     - 'Patch': 'interconnects_patch.md'
@@ -321,6 +351,7 @@ nav:
     - 'Get Iam Policy': 'network-attachments_get-iam-policy.md'
     - 'Insert': 'network-attachments_insert.md'
     - 'List': 'network-attachments_list.md'
+    - 'Patch': 'network-attachments_patch.md'
     - 'Set Iam Policy': 'network-attachments_set-iam-policy.md'
     - 'Test Iam Permissions': 'network-attachments_test-iam-permissions.md'
 - 'Network Edge Security Services':
@@ -381,6 +412,7 @@ nav:
     - 'Patch': 'node-groups_patch.md'
     - 'Set Iam Policy': 'node-groups_set-iam-policy.md'
     - 'Set Node Template': 'node-groups_set-node-template.md'
+    - 'Simulate Maintenance Event': 'node-groups_simulate-maintenance-event.md'
     - 'Test Iam Permissions': 'node-groups_test-iam-permissions.md'
 - 'Node Templates':
     - 'Aggregated List': 'node-templates_aggregated-list.md'
@@ -414,22 +446,27 @@ nav:
     - 'List Xpn Hosts': 'projects_list-xpn-hosts.md'
     - 'Move Disk': 'projects_move-disk.md'
     - 'Move Instance': 'projects_move-instance.md'
+    - 'Set Cloud Armor Tier': 'projects_set-cloud-armor-tier.md'
     - 'Set Common Instance Metadata': 'projects_set-common-instance-metadata.md'
     - 'Set Default Network Tier': 'projects_set-default-network-tier.md'
     - 'Set Usage Export Bucket': 'projects_set-usage-export-bucket.md'
 - 'Public Advertised Prefixes':
+    - 'Announce': 'public-advertised-prefixes_announce.md'
     - 'Delete': 'public-advertised-prefixes_delete.md'
     - 'Get': 'public-advertised-prefixes_get.md'
     - 'Insert': 'public-advertised-prefixes_insert.md'
     - 'List': 'public-advertised-prefixes_list.md'
     - 'Patch': 'public-advertised-prefixes_patch.md'
+    - 'Withdraw': 'public-advertised-prefixes_withdraw.md'
 - 'Public Delegated Prefixes':
     - 'Aggregated List': 'public-delegated-prefixes_aggregated-list.md'
+    - 'Announce': 'public-delegated-prefixes_announce.md'
     - 'Delete': 'public-delegated-prefixes_delete.md'
     - 'Get': 'public-delegated-prefixes_get.md'
     - 'Insert': 'public-delegated-prefixes_insert.md'
     - 'List': 'public-delegated-prefixes_list.md'
     - 'Patch': 'public-delegated-prefixes_patch.md'
+    - 'Withdraw': 'public-delegated-prefixes_withdraw.md'
 - 'Region Autoscalers':
     - 'Delete': 'region-autoscalers_delete.md'
     - 'Get': 'region-autoscalers_get.md'
@@ -444,8 +481,11 @@ nav:
     - 'Get Iam Policy': 'region-backend-services_get-iam-policy.md'
     - 'Insert': 'region-backend-services_insert.md'
     - 'List': 'region-backend-services_list.md'
+    - 'List Usable': 'region-backend-services_list-usable.md'
     - 'Patch': 'region-backend-services_patch.md'
     - 'Set Iam Policy': 'region-backend-services_set-iam-policy.md'
+    - 'Set Security Policy': 'region-backend-services_set-security-policy.md'
+    - 'Test Iam Permissions': 'region-backend-services_test-iam-permissions.md'
     - 'Update': 'region-backend-services_update.md'
 - 'Region Commitments':
     - 'Aggregated List': 'region-commitments_aggregated-list.md'
@@ -458,6 +498,7 @@ nav:
     - 'List': 'region-disk-types_list.md'
 - 'Region Disks':
     - 'Add Resource Policies': 'region-disks_add-resource-policies.md'
+    - 'Bulk Insert': 'region-disks_bulk-insert.md'
     - 'Create Snapshot': 'region-disks_create-snapshot.md'
     - 'Delete': 'region-disks_delete.md'
     - 'Get': 'region-disks_get.md'
@@ -468,7 +509,11 @@ nav:
     - 'Resize': 'region-disks_resize.md'
     - 'Set Iam Policy': 'region-disks_set-iam-policy.md'
     - 'Set Labels': 'region-disks_set-labels.md'
+    - 'Start Async Replication': 'region-disks_start-async-replication.md'
+    - 'Stop Async Replication': 'region-disks_stop-async-replication.md'
+    - 'Stop Group Async Replication': 'region-disks_stop-group-async-replication.md'
     - 'Test Iam Permissions': 'region-disks_test-iam-permissions.md'
+    - 'Update': 'region-disks_update.md'
 - 'Region Health Check Services':
     - 'Delete': 'region-health-check-services_delete.md'
     - 'Get': 'region-health-check-services_get.md'
@@ -507,13 +552,30 @@ nav:
     - 'List': 'region-instance-groups_list.md'
     - 'List Instances': 'region-instance-groups_list-instances.md'
     - 'Set Named Ports': 'region-instance-groups_set-named-ports.md'
+- 'Region Instance Templates':
+    - 'Delete': 'region-instance-templates_delete.md'
+    - 'Get': 'region-instance-templates_get.md'
+    - 'Insert': 'region-instance-templates_insert.md'
+    - 'List': 'region-instance-templates_list.md'
 - 'Region Instances':
     - 'Bulk Insert': 'region-instances_bulk-insert.md'
+- 'Region Instant Snapshots':
+    - 'Delete': 'region-instant-snapshots_delete.md'
+    - 'Get': 'region-instant-snapshots_get.md'
+    - 'Get Iam Policy': 'region-instant-snapshots_get-iam-policy.md'
+    - 'Insert': 'region-instant-snapshots_insert.md'
+    - 'List': 'region-instant-snapshots_list.md'
+    - 'Set Iam Policy': 'region-instant-snapshots_set-iam-policy.md'
+    - 'Set Labels': 'region-instant-snapshots_set-labels.md'
+    - 'Test Iam Permissions': 'region-instant-snapshots_test-iam-permissions.md'
 - 'Region Network Endpoint Groups':
+    - 'Attach Network Endpoints': 'region-network-endpoint-groups_attach-network-endpoints.md'
     - 'Delete': 'region-network-endpoint-groups_delete.md'
+    - 'Detach Network Endpoints': 'region-network-endpoint-groups_detach-network-endpoints.md'
     - 'Get': 'region-network-endpoint-groups_get.md'
     - 'Insert': 'region-network-endpoint-groups_insert.md'
     - 'List': 'region-network-endpoint-groups_list.md'
+    - 'List Network Endpoints': 'region-network-endpoint-groups_list-network-endpoints.md'
 - 'Region Network Firewall Policies':
     - 'Add Association': 'region-network-firewall-policies_add-association.md'
     - 'Add Rule': 'region-network-firewall-policies_add-rule.md'
@@ -543,11 +605,15 @@ nav:
     - 'List': 'region-operations_list.md'
     - 'Wait': 'region-operations_wait.md'
 - 'Region Security Policies':
+    - 'Add Rule': 'region-security-policies_add-rule.md'
     - 'Delete': 'region-security-policies_delete.md'
     - 'Get': 'region-security-policies_get.md'
+    - 'Get Rule': 'region-security-policies_get-rule.md'
     - 'Insert': 'region-security-policies_insert.md'
     - 'List': 'region-security-policies_list.md'
     - 'Patch': 'region-security-policies_patch.md'
+    - 'Patch Rule': 'region-security-policies_patch-rule.md'
+    - 'Remove Rule': 'region-security-policies_remove-rule.md'
 - 'Region Ssl Certificates':
     - 'Delete': 'region-ssl-certificates_delete.md'
     - 'Get': 'region-ssl-certificates_get.md'
@@ -587,6 +653,8 @@ nav:
     - 'Patch': 'region-url-maps_patch.md'
     - 'Update': 'region-url-maps_update.md'
     - 'Validate': 'region-url-maps_validate.md'
+- 'Region Zones':
+    - 'List': 'region-zones_list.md'
 - 'Regions':
     - 'Get': 'regions_get.md'
     - 'List': 'regions_list.md'
@@ -608,12 +676,14 @@ nav:
     - 'Get Iam Policy': 'resource-policies_get-iam-policy.md'
     - 'Insert': 'resource-policies_insert.md'
     - 'List': 'resource-policies_list.md'
+    - 'Patch': 'resource-policies_patch.md'
     - 'Set Iam Policy': 'resource-policies_set-iam-policy.md'
     - 'Test Iam Permissions': 'resource-policies_test-iam-permissions.md'
 - 'Routers':
     - 'Aggregated List': 'routers_aggregated-list.md'
     - 'Delete': 'routers_delete.md'
     - 'Get': 'routers_get.md'
+    - 'Get Nat Ip Info': 'routers_get-nat-ip-info.md'
     - 'Get Nat Mapping Info': 'routers_get-nat-mapping-info.md'
     - 'Get Router Status': 'routers_get-router-status.md'
     - 'Insert': 'routers_insert.md'
@@ -649,6 +719,9 @@ nav:
     - 'Patch': 'service-attachments_patch.md'
     - 'Set Iam Policy': 'service-attachments_set-iam-policy.md'
     - 'Test Iam Permissions': 'service-attachments_test-iam-permissions.md'
+- 'Snapshot Settings':
+    - 'Get': 'snapshot-settings_get.md'
+    - 'Patch': 'snapshot-settings_patch.md'
 - 'Snapshots':
     - 'Delete': 'snapshots_delete.md'
     - 'Get': 'snapshots_get.md'
@@ -717,6 +790,7 @@ nav:
     - 'Get': 'target-instances_get.md'
     - 'Insert': 'target-instances_insert.md'
     - 'List': 'target-instances_list.md'
+    - 'Set Security Policy': 'target-instances_set-security-policy.md'
 - 'Target Pools':
     - 'Add Health Check': 'target-pools_add-health-check.md'
     - 'Add Instance': 'target-pools_add-instance.md'
@@ -729,6 +803,7 @@ nav:
     - 'Remove Health Check': 'target-pools_remove-health-check.md'
     - 'Remove Instance': 'target-pools_remove-instance.md'
     - 'Set Backup': 'target-pools_set-backup.md'
+    - 'Set Security Policy': 'target-pools_set-security-policy.md'
 - 'Target Ssl Proxies':
     - 'Delete': 'target-ssl-proxies_delete.md'
     - 'Get': 'target-ssl-proxies_get.md'

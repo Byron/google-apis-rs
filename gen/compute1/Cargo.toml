@@ -4,12 +4,12 @@
 [package]
 
 name = "google-compute1"
-version = "5.0.3+20230103"
+version = "5.0.4+20240218"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with compute (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/compute1"
 homepage = "https://cloud.google.com/compute/"
-documentation = "https://docs.rs/google-compute1/5.0.3+20230103"
+documentation = "https://docs.rs/google-compute1/5.0.4+20240218"
 license = "MIT"
 keywords = ["compute", "google", "protocol", "web", "api"]
 autobins = false

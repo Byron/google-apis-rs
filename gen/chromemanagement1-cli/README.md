@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Chrome Management* API at revision *20230123*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Chrome Management* API at revision *20240303*. The CLI is at version *5.0.4*.
 
 ```bash
 chromemanagement1 [options]
@@ -34,15 +34,24 @@ chromemanagement1 [options]
                 apps-chrome-get <name> [-p <v>]... [-o <out>]
                 apps-count-chrome-app-requests <customer> [-p <v>]... [-o <out>]
                 apps-web-get <name> [-p <v>]... [-o <out>]
+                reports-count-chrome-browsers-needing-attention <customer> [-p <v>]... [-o <out>]
                 reports-count-chrome-devices-reaching-auto-expiration-date <customer> [-p <v>]... [-o <out>]
                 reports-count-chrome-devices-that-need-attention <customer> [-p <v>]... [-o <out>]
                 reports-count-chrome-hardware-fleet-devices <customer> [-p <v>]... [-o <out>]
                 reports-count-chrome-versions <customer> [-p <v>]... [-o <out>]
                 reports-count-installed-apps <customer> [-p <v>]... [-o <out>]
+                reports-count-print-jobs-by-printer <customer> [-p <v>]... [-o <out>]
+                reports-count-print-jobs-by-user <customer> [-p <v>]... [-o <out>]
+                reports-enumerate-print-jobs <customer> [-p <v>]... [-o <out>]
                 reports-find-installed-app-devices <customer> [-p <v>]... [-o <out>]
                 telemetry-devices-get <name> [-p <v>]... [-o <out>]
                 telemetry-devices-list <parent> [-p <v>]... [-o <out>]
                 telemetry-events-list <parent> [-p <v>]... [-o <out>]
+                telemetry-notification-configs-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                telemetry-notification-configs-delete <name> [-p <v>]... [-o <out>]
+                telemetry-notification-configs-list <parent> [-p <v>]... [-o <out>]
+                telemetry-users-get <name> [-p <v>]... [-o <out>]
+                telemetry-users-list <parent> [-p <v>]... [-o <out>]
   chromemanagement1 --help
 
 Configuration:

@@ -4,11 +4,11 @@
 [package]
 
 name = "google-cloudlatencytest2"
-version = "5.0.3+20160309"
+version = "5.0.4+20160309"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with cloudlatencytest (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudlatencytest2"
-documentation = "https://docs.rs/google-cloudlatencytest2/5.0.3+20160309"
+documentation = "https://docs.rs/google-cloudlatencytest2/5.0.4+20160309"
 license = "MIT"
 keywords = ["cloudlatencytest", "google", "protocol", "web", "api"]
 autobins = false

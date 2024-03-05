@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -126,7 +126,7 @@ impl<'a, S> ContainerAnalysis<S> {
         ContainerAnalysis {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://containeranalysis.googleapis.com/".to_string(),
             _root_url: "https://containeranalysis.googleapis.com/".to_string(),
         }
@@ -137,7 +137,7 @@ impl<'a, S> ContainerAnalysis<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -249,6 +249,49 @@ pub struct ArtifactRule {
 }
 
 impl client::Part for ArtifactRule {}
+
+
+/// Assessment provides all information that is related to a single vulnerability for this product.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Assessment {
+    /// Holds the MITRE standard Common Vulnerabilities and Exposures (CVE) tracking number for the vulnerability. Deprecated: Use vulnerability_id instead to denote CVEs.
+    
+    pub cve: Option<String>,
+    /// Contains information about the impact of this vulnerability, this will change with time.
+    
+    pub impacts: Option<Vec<String>>,
+    /// Justification provides the justification when the state of the assessment if NOT_AFFECTED.
+    
+    pub justification: Option<Justification>,
+    /// A detailed description of this Vex.
+    #[serde(rename="longDescription")]
+    
+    pub long_description: Option<String>,
+    /// Holds a list of references associated with this vulnerability item and assessment. These uris have additional information about the vulnerability and the assessment itself. E.g. Link to a document which details how this assessment concluded the state of this vulnerability.
+    #[serde(rename="relatedUris")]
+    
+    pub related_uris: Option<Vec<RelatedUrl>>,
+    /// Specifies details on how to handle (and presumably, fix) a vulnerability.
+    
+    pub remediations: Option<Vec<Remediation>>,
+    /// A one sentence description of this Vex.
+    #[serde(rename="shortDescription")]
+    
+    pub short_description: Option<String>,
+    /// Provides the state of this Vulnerability assessment.
+    
+    pub state: Option<String>,
+    /// The vulnerability identifier for this Assessment. Will hold one of common identifiers e.g. CVE, GHSA etc.
+    #[serde(rename="vulnerabilityId")]
+    
+    pub vulnerability_id: Option<String>,
+}
+
+impl client::Part for Assessment {}
 
 
 /// Occurrence that represents a single "attestation". The authenticity of an attestation can be verified using the attached signature. If the verifier trusts the public key of the signer, then verifying the signature is sufficient to establish trust. In this circumstance, the authority to which this attestation is attached is primarily useful for look-up (how to find this attestation if you already know the authority and artifact to be verified) and intent (which authority was this attestation intended to sign for).
@@ -391,10 +434,10 @@ pub struct Binding {
     /// The condition that is associated with this binding. If the condition evaluates to `true`, then this binding applies to the current request. If the condition evaluates to `false`, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the principals in this binding. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     
     pub condition: Option<Expr>,
-    /// Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. 
+    /// Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workforce identity pool. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/group/{group_id}`: All workforce identities in a group. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All workforce identities with a specific attribute value. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/*`: All identities in a workforce identity pool. * `principal://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workload identity pool. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/group/{group_id}`: A workload identity pool group. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All identities in a workload identity pool with a certain attribute. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/*`: All identities in a workload identity pool. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `deleted:principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: Deleted single identity in a workforce identity pool. For example, `deleted:principal://iam.googleapis.com/locations/global/workforcePools/my-pool-id/subject/my-subject-attribute-value`.
     
     pub members: Option<Vec<String>>,
-    /// Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+    /// Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`. For an overview of the IAM roles and permissions, see the [IAM documentation](https://cloud.google.com/iam/docs/roles-overview). For a list of the available pre-defined roles, see [here](https://cloud.google.com/iam/docs/understanding-roles).
     
     pub role: Option<String>,
 }
@@ -419,6 +462,58 @@ pub struct Build {
 }
 
 impl client::Part for Build {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuildDefinition {
+    /// no description provided
+    #[serde(rename="buildType")]
+    
+    pub build_type: Option<String>,
+    /// no description provided
+    #[serde(rename="externalParameters")]
+    
+    pub external_parameters: Option<HashMap<String, json::Value>>,
+    /// no description provided
+    #[serde(rename="internalParameters")]
+    
+    pub internal_parameters: Option<HashMap<String, json::Value>>,
+    /// no description provided
+    #[serde(rename="resolvedDependencies")]
+    
+    pub resolved_dependencies: Option<Vec<ResourceDescriptor>>,
+}
+
+impl client::Part for BuildDefinition {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuildMetadata {
+    /// no description provided
+    #[serde(rename="finishedOn")]
+    
+    pub finished_on: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// no description provided
+    #[serde(rename="invocationId")]
+    
+    pub invocation_id: Option<String>,
+    /// no description provided
+    #[serde(rename="startedOn")]
+    
+    pub started_on: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+}
+
+impl client::Part for BuildMetadata {}
 
 
 /// Provenance of a build. Contains all information needed to verify the full details about the build from source to completion.
@@ -503,7 +598,7 @@ pub struct BuildSignature {
     pub public_key: Option<String>,
     /// Required. Signature of the related `BuildProvenance`. In JSON, this is base-64 encoded.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub signature: Option<Vec<u8>>,
 }
 
@@ -857,7 +952,7 @@ pub struct Digest {
     /// Value of the digest.
     #[serde(rename="digestBytes")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub digest_bytes: Option<Vec<u8>>,
 }
 
@@ -895,6 +990,14 @@ pub struct Discovered {
     #[serde(rename="lastAnalysisTime")]
     
     pub last_analysis_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// The last time this resource was scanned.
+    #[serde(rename="lastScanTime")]
+    
+    pub last_scan_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// The status of an SBOM generation.
+    #[serde(rename="sbomStatus")]
+    
+    pub sbom_status: Option<SBOMStatus>,
 }
 
 impl client::Part for Discovered {}
@@ -948,7 +1051,7 @@ pub struct Distribution {
 impl client::Part for Distribution {}
 
 
-/// DocumentNote represents an SPDX Document Creation Information section: https://spdx.github.io/spdx-spec/v2.3/document-creation-information/
+/// DocumentNote represents an SPDX Document Creation Information section: https://spdx.github.io/spdx-spec/2-document-creation-information/
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -968,7 +1071,7 @@ pub struct DocumentNote {
 impl client::Part for DocumentNote {}
 
 
-/// DocumentOccurrence represents an SPDX Document Creation Information section: https://spdx.github.io/spdx-spec/v2.3/document-creation-information/
+/// DocumentOccurrence represents an SPDX Document Creation Information section: https://spdx.github.io/spdx-spec/2-document-creation-information/
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1037,7 +1140,7 @@ impl client::ResponseResult for Empty {}
 pub struct Envelope {
     /// no description provided
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub payload: Option<Vec<u8>>,
     /// no description provided
     #[serde(rename="payloadType")]
@@ -1063,7 +1166,7 @@ pub struct EnvelopeSignature {
     pub keyid: Option<String>,
     /// no description provided
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub sig: Option<Vec<u8>>,
 }
 
@@ -1084,6 +1187,41 @@ pub struct Environment {
 }
 
 impl client::Part for Environment {}
+
+
+/// The request to a call of ExportSBOM
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [resources export sbom projects](ProjectResourceExportSBOMCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExportSBOMRequest { _never_set: Option<bool> }
+
+impl client::RequestValue for ExportSBOMRequest {}
+
+
+/// The response from a call to ExportSBOM
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [resources export sbom projects](ProjectResourceExportSBOMCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ExportSBOMResponse {
+    /// The name of the discovery occurrence in the form "projects/{project_id}/occurrences/{OCCURRENCE_ID} It can be used to track the progression of the SBOM export.
+    #[serde(rename="discoveryOccurrenceId")]
+    
+    pub discovery_occurrence_id: Option<String>,
+}
+
+impl client::ResponseResult for ExportSBOMResponse {}
 
 
 /// Represents a textual expression in the Common Expression Language (CEL) syntax. CEL is a C-like expression language. The syntax and semantics of CEL are documented at https://github.com/google/cel-spec. Example (Comparison): title: "Summary size limit" description: "Determines if a summary is less than 100 chars" expression: "document.summary.size() < 100" Example (Equality): title: "Requestor is owner" description: "Determines if requestor is the document owner" expression: "document.owner == request.auth.claims.email" Example (Logic): title: "Public documents" description: "Determine whether the document should be publicly visible" expression: "document.type != 'private' && document.type != 'internal'" Example (Data Manipulation): title: "Notification string" description: "Create a notification string with a timestamp." expression: "'New message received at ' + string(document.create_time)" The exact variables and functions that may be referenced within an expression are determined by the service that evaluates it. See the service documentation for additional information.
@@ -1263,6 +1401,21 @@ pub struct FixableTotalByDigest {
 impl client::Part for FixableTotalByDigest {}
 
 
+/// GeneratePackagesSummaryRequest is the request body for the GeneratePackagesSummary API method. It just takes a single name argument, referring to the resource.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [resources generate packages summary projects](ProjectResourceGeneratePackagesSummaryCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GeneratePackagesSummaryRequest { _never_set: Option<bool> }
+
+impl client::RequestValue for GeneratePackagesSummaryRequest {}
+
+
 /// An attestation wrapper that uses the Grafeas `Signature` message. This attestation must define the `serialized_payload` that the `signatures` verify and any metadata necessary to interpret that plaintext. The signatures should always be over the `serialized_payload` bytestring.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1277,7 +1430,7 @@ pub struct GenericSignedAttestation {
     /// The serialized payload that is verified by one or more `signatures`. The encoding and semantic meaning of this payload must match what is set in `content_type`.
     #[serde(rename="serializedPayload")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub serialized_payload: Option<Vec<u8>>,
     /// One or more signatures over `serialized_payload`. Verifier implementations should consider this attestation message verified if at least one `signature` verifies `serialized_payload`. See `Signature` in common.proto for more details on signature structure and verification.
     
@@ -1377,6 +1530,10 @@ impl client::Part for GitSourceContext {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GrafeasV1beta1BuildDetails {
+    /// no description provided
+    #[serde(rename="inTotoSlsaProvenanceV1")]
+    
+    pub in_toto_slsa_provenance_v1: Option<InTotoSlsaProvenanceV1>,
     /// Required. The actual provenance for the build.
     
     pub provenance: Option<BuildProvenance>,
@@ -1516,6 +1673,14 @@ pub struct GrafeasV1beta1VulnerabilityDetails {
     #[serde(rename="cvssScore")]
     
     pub cvss_score: Option<f32>,
+    /// The cvss v2 score for the vulnerability.
+    #[serde(rename="cvssV2")]
+    
+    pub cvss_v2: Option<CVSS>,
+    /// The cvss v3 score for the vulnerability.
+    #[serde(rename="cvssV3")]
+    
+    pub cvss_v3: Option<CVSS>,
     /// Output only. CVSS version used to populate cvss_score and severity.
     #[serde(rename="cvssVersion")]
     
@@ -1524,6 +1689,10 @@ pub struct GrafeasV1beta1VulnerabilityDetails {
     #[serde(rename="effectiveSeverity")]
     
     pub effective_severity: Option<String>,
+    /// Occurrence-specific extra details about the vulnerability.
+    #[serde(rename="extraDetails")]
+    
+    pub extra_details: Option<String>,
     /// Output only. A detailed description of this vulnerability.
     #[serde(rename="longDescription")]
     
@@ -1547,6 +1716,10 @@ pub struct GrafeasV1beta1VulnerabilityDetails {
     #[serde(rename="type")]
     
     pub type_: Option<String>,
+    /// no description provided
+    #[serde(rename="vexAssessment")]
+    
+    pub vex_assessment: Option<VexAssessment>,
 }
 
 impl client::Part for GrafeasV1beta1VulnerabilityDetails {}
@@ -1565,7 +1738,7 @@ pub struct Hash {
     pub type_: Option<String>,
     /// Required. The hash value.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub value: Option<Vec<u8>>,
 }
 
@@ -1624,6 +1797,31 @@ pub struct InToto {
 impl client::Part for InToto {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InTotoSlsaProvenanceV1 {
+    /// InToto spec defined at https://github.com/in-toto/attestation/tree/main/spec#statement
+    
+    pub _type: Option<String>,
+    /// no description provided
+    
+    pub predicate: Option<SlsaProvenanceV1>,
+    /// no description provided
+    #[serde(rename="predicateType")]
+    
+    pub predicate_type: Option<String>,
+    /// no description provided
+    
+    pub subject: Option<Vec<Subject>>,
+}
+
+impl client::Part for InTotoSlsaProvenanceV1 {}
+
+
 /// This represents how a particular software package may be installed on a system.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1657,6 +1855,25 @@ pub struct Installation {
 }
 
 impl client::Part for Installation {}
+
+
+/// Justification provides the justification when the state of the assessment if NOT_AFFECTED.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Justification {
+    /// Additional details on why this justification was chosen.
+    
+    pub details: Option<String>,
+    /// The justification type for this vulnerability.
+    #[serde(rename="justificationType")]
+    
+    pub justification_type: Option<String>,
+}
+
+impl client::Part for Justification {}
 
 
 /// There is no detailed description.
@@ -1711,6 +1928,25 @@ pub struct License {
 }
 
 impl client::Part for License {}
+
+
+/// Per license count
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct LicensesSummary {
+    /// The number of fixable vulnerabilities associated with this resource.
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub count: Option<i64>,
+    /// The license of the package. Note that the format of this value is not guaranteed. It may be nil, an empty string, a boolean value (A | B), a differently formed boolean value (A OR B), etc...
+    
+    pub license: Option<String>,
+}
+
+impl client::Part for LicensesSummary {}
 
 
 /// This corresponds to an in-toto link.
@@ -1897,6 +2133,10 @@ pub struct Note {
     /// A note describing a software bill of materials.
     
     pub sbom: Option<DocumentNote>,
+    /// A note describing an SBOM reference.
+    #[serde(rename="sbomReference")]
+    
+    pub sbom_reference: Option<SBOMReferenceNote>,
     /// A one sentence description of this note.
     #[serde(rename="shortDescription")]
     
@@ -1920,6 +2160,10 @@ pub struct Note {
     /// A note describing a package vulnerability.
     
     pub vulnerability: Option<Vulnerability>,
+    /// A note describing a vulnerability assessment.
+    #[serde(rename="vulnerabilityAssessment")]
+    
+    pub vulnerability_assessment: Option<VulnerabilityAssessmentNote>,
 }
 
 impl client::RequestValue for Note {}
@@ -1987,6 +2231,10 @@ pub struct Occurrence {
     /// Describes a specific software bill of materials document.
     
     pub sbom: Option<DocumentOccurrence>,
+    /// Describes a specific SBOM reference occurrences.
+    #[serde(rename="sbomReference")]
+    
+    pub sbom_reference: Option<SBOMReferenceOccurrence>,
     /// Describes a specific SPDX File.
     #[serde(rename="spdxFile")]
     
@@ -2210,6 +2458,30 @@ pub struct PackageIssue {
 impl client::Part for PackageIssue {}
 
 
+/// A summary of the packages found within the given resource.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [resources generate packages summary projects](ProjectResourceGeneratePackagesSummaryCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PackagesSummaryResponse {
+    /// A listing by license name of each of the licenses and their counts.
+    #[serde(rename="licensesSummary")]
+    
+    pub licenses_summary: Option<Vec<LicensesSummary>>,
+    /// The unique URL of the image or the container for which this summary applies.
+    #[serde(rename="resourceUrl")]
+    
+    pub resource_url: Option<String>,
+}
+
+impl client::ResponseResult for PackagesSummaryResponse {}
+
+
 /// An attestation wrapper with a PGP-compatible signature. This message only supports `ATTACHED` signatures, where the payload that is signed is included alongside the signature itself in the same file.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2233,7 +2505,7 @@ pub struct PgpSignedAttestation {
 impl client::Part for PgpSignedAttestation {}
 
 
-/// An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** { “bindings”: \[ { “role”: “roles/resourcemanager.organizationAdmin”, “members”: \[ “user:mike@example.com”, “group:admins@example.com”, “domain:google.com”, “serviceAccount:my-project-id@appspot.gserviceaccount.com” \] }, { “role”: “roles/resourcemanager.organizationViewer”, “members”: \[ “user:eve@example.com” \], “condition”: { “title”: “expirable access”, “description”: “Does not grant access after Sep 2020”, “expression”: “request.time \< timestamp(‘2020-10-01T00:00:00.000Z’)”, } } \], “etag”: “BwWWja0YfJA=”, “version”: 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time \< timestamp(‘2020-10-01T00:00:00.000Z’) etag: BwWWja0YfJA= version: 3 For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).
+/// An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** `{ "bindings": [ { "role": "roles/resourcemanager.organizationAdmin", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-project-id@appspot.gserviceaccount.com" ] }, { "role": "roles/resourcemanager.organizationViewer", "members": [ "user:eve@example.com" ], "condition": { "title": "expirable access", "description": "Does not grant access after Sep 2020", "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')", } } ], "etag": "BwWWja0YfJA=", "version": 3 }` **YAML example:** `bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3` For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).
 /// 
 /// # Activities
 /// 
@@ -2252,7 +2524,7 @@ pub struct Policy {
     pub bindings: Option<Vec<Binding>>,
     /// `etag` is used for optimistic concurrency control as a way to help prevent simultaneous updates of a policy from overwriting each other. It is strongly suggested that systems make use of the `etag` in the read-modify-write cycle to perform policy updates in order to avoid race conditions: An `etag` is returned in the response to `getIamPolicy`, and systems are expected to put that etag in the request to `setIamPolicy` to ensure that their change will be applied to the same version of the policy. **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub etag: Option<Vec<u8>>,
     /// Specifies the format of the policy. Valid values are `0`, `1`, and `3`. Requests that specify an invalid value are rejected. Any operation that affects conditional role bindings must specify version `3`. This requirement applies to the following operations: * Getting a policy that includes a conditional role binding * Adding a conditional role binding to a policy * Changing a conditional role binding in a policy * Removing any role binding, with or without a condition, from a policy that includes conditions **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost. If a policy does not include any conditions, operations on that policy may specify any valid version or leave the field unset. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     
@@ -2260,6 +2532,28 @@ pub struct Policy {
 }
 
 impl client::ResponseResult for Policy {}
+
+
+/// Product contains information about a product and how to uniquely identify it.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Product {
+    /// Contains a URI which is vendor-specific. Example: The artifact repository URL of an image.
+    #[serde(rename="genericUri")]
+    
+    pub generic_uri: Option<String>,
+    /// Token that identifies a product so that it can be referred to from other parts in the document. There is no predefined format as long as it uniquely identifies a group in the context of the current document.
+    
+    pub id: Option<String>,
+    /// Name of the product.
+    
+    pub name: Option<String>,
+}
+
+impl client::Part for Product {}
 
 
 /// Selects a repo using a Google Cloud Platform project ID (e.g., winged-cargo-31) and a repo name within that project.
@@ -2280,6 +2574,51 @@ pub struct ProjectRepoId {
 }
 
 impl client::Part for ProjectRepoId {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProvenanceBuilder {
+    /// no description provided
+    #[serde(rename="builderDependencies")]
+    
+    pub builder_dependencies: Option<Vec<ResourceDescriptor>>,
+    /// no description provided
+    
+    pub id: Option<String>,
+    /// no description provided
+    
+    pub version: Option<HashMap<String, String>>,
+}
+
+impl client::Part for ProvenanceBuilder {}
+
+
+/// Publisher contains information about the publisher of this Note.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Publisher {
+    /// Provides information about the authority of the issuing party to release the document, in particular, the party's constituency and responsibilities or other obligations.
+    #[serde(rename="issuingAuthority")]
+    
+    pub issuing_authority: Option<String>,
+    /// Name of the publisher. Examples: 'Google', 'Google Cloud Platform'.
+    
+    pub name: Option<String>,
+    /// The context or namespace. Contains a URL which is under control of the issuing party and can be used as a globally unique identifier for that issuing party. Example: https://csaf.io
+    #[serde(rename="publisherNamespace")]
+    
+    pub publisher_namespace: Option<String>,
+}
+
+impl client::Part for Publisher {}
 
 
 /// Metadata for any related URL information.
@@ -2341,6 +2680,29 @@ pub struct RelationshipOccurrence {
 impl client::Part for RelationshipOccurrence {}
 
 
+/// Specifies details on how to handle (and presumably, fix) a vulnerability.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Remediation {
+    /// Contains a comprehensive human-readable discussion of the remediation.
+    
+    pub details: Option<String>,
+    /// The type of remediation that can be applied.
+    #[serde(rename="remediationType")]
+    
+    pub remediation_type: Option<String>,
+    /// Contains the URL where to obtain the remediation.
+    #[serde(rename="remediationUri")]
+    
+    pub remediation_uri: Option<RelatedUrl>,
+}
+
+impl client::Part for Remediation {}
+
+
 /// A unique identifier for a Cloud Repo.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2382,6 +2744,173 @@ pub struct Resource {
 impl client::Part for Resource {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceDescriptor {
+    /// no description provided
+    
+    pub annotations: Option<HashMap<String, json::Value>>,
+    /// no description provided
+    
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    pub content: Option<Vec<u8>>,
+    /// no description provided
+    
+    pub digest: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename="downloadLocation")]
+    
+    pub download_location: Option<String>,
+    /// no description provided
+    #[serde(rename="mediaType")]
+    
+    pub media_type: Option<String>,
+    /// no description provided
+    
+    pub name: Option<String>,
+    /// no description provided
+    
+    pub uri: Option<String>,
+}
+
+impl client::Part for ResourceDescriptor {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RunDetails {
+    /// no description provided
+    
+    pub builder: Option<ProvenanceBuilder>,
+    /// no description provided
+    
+    pub byproducts: Option<Vec<ResourceDescriptor>>,
+    /// no description provided
+    
+    pub metadata: Option<BuildMetadata>,
+}
+
+impl client::Part for RunDetails {}
+
+
+/// The note representing an SBOM reference.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SBOMReferenceNote {
+    /// The format that SBOM takes. E.g. may be spdx, cyclonedx, etc...
+    
+    pub format: Option<String>,
+    /// The version of the format that the SBOM takes. E.g. if the format is spdx, the version may be 2.3.
+    
+    pub version: Option<String>,
+}
+
+impl client::Part for SBOMReferenceNote {}
+
+
+/// The occurrence representing an SBOM reference as applied to a specific resource. The occurrence follows the DSSE specification. See https://github.com/secure-systems-lab/dsse/blob/master/envelope.md for more details.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SBOMReferenceOccurrence {
+    /// The actual payload that contains the SBOM reference data.
+    
+    pub payload: Option<SbomReferenceIntotoPayload>,
+    /// The kind of payload that SbomReferenceIntotoPayload takes. Since it's in the intoto format, this value is expected to be 'application/vnd.in-toto+json'.
+    #[serde(rename="payloadType")]
+    
+    pub payload_type: Option<String>,
+    /// The signatures over the payload.
+    
+    pub signatures: Option<Vec<EnvelopeSignature>>,
+}
+
+impl client::Part for SBOMReferenceOccurrence {}
+
+
+/// The status of an SBOM generation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SBOMStatus {
+    /// If there was an error generating an SBOM, this will indicate what that error was.
+    
+    pub error: Option<String>,
+    /// The progress of the SBOM generation.
+    #[serde(rename="sbomState")]
+    
+    pub sbom_state: Option<String>,
+}
+
+impl client::Part for SBOMStatus {}
+
+
+/// The actual payload that contains the SBOM Reference data. The payload follows the intoto statement specification. See https://github.com/in-toto/attestation/blob/main/spec/v1.0/statement.md for more details.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SbomReferenceIntotoPayload {
+    /// Identifier for the schema of the Statement.
+    
+    pub _type: Option<String>,
+    /// Additional parameters of the Predicate. Includes the actual data about the SBOM.
+    
+    pub predicate: Option<SbomReferenceIntotoPredicate>,
+    /// URI identifying the type of the Predicate.
+    #[serde(rename="predicateType")]
+    
+    pub predicate_type: Option<String>,
+    /// Set of software artifacts that the attestation applies to. Each element represents a single software artifact.
+    
+    pub subject: Option<Vec<Subject>>,
+}
+
+impl client::Part for SbomReferenceIntotoPayload {}
+
+
+/// A predicate which describes the SBOM being referenced.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SbomReferenceIntotoPredicate {
+    /// A map of algorithm to digest of the contents of the SBOM.
+    
+    pub digest: Option<HashMap<String, String>>,
+    /// The location of the SBOM.
+    
+    pub location: Option<String>,
+    /// The mime type of the SBOM.
+    #[serde(rename="mimeType")]
+    
+    pub mime_type: Option<String>,
+    /// The person or system referring this predicate to the consumer.
+    #[serde(rename="referrerId")]
+    
+    pub referrer_id: Option<String>,
+}
+
+impl client::Part for SbomReferenceIntotoPredicate {}
+
+
 /// Request message for `SetIamPolicy` method.
 /// 
 /// # Activities
@@ -2415,7 +2944,7 @@ pub struct Signature {
     pub public_key_id: Option<String>,
     /// The content of the signature, an opaque bytestring. The payload that this signature verifies MUST be unambiguously provided with the Signature during verification. A wrapper message might provide the payload explicitly. Alternatively, a message might have a canonical serialization that can always be unambiguously computed to derive the payload.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub signature: Option<Vec<u8>>,
 }
 
@@ -2448,6 +2977,26 @@ pub struct SigningKey {
 }
 
 impl client::Part for SigningKey {}
+
+
+/// Keep in sync with schema at https://github.com/slsa-framework/slsa/blob/main/docs/provenance/schema/v1/provenance.proto Builder renamed to ProvenanceBuilder because of Java conflicts.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SlsaProvenanceV1 {
+    /// no description provided
+    #[serde(rename="buildDefinition")]
+    
+    pub build_definition: Option<BuildDefinition>,
+    /// no description provided
+    #[serde(rename="runDetails")]
+    
+    pub run_details: Option<RunDetails>,
+}
+
+impl client::Part for SlsaProvenanceV1 {}
 
 
 /// Source describes the location of the source used for the build.
@@ -2523,6 +3072,24 @@ pub struct Status {
 impl client::Part for Status {}
 
 
+/// Set of software artifacts that the attestation applies to. Each element represents a single software artifact.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Subject {
+    /// `"": ""` Algorithms can be e.g. sha256, sha512 See https://github.com/in-toto/attestation/blob/main/spec/field_types.md#DigestSet
+    
+    pub digest: Option<HashMap<String, String>>,
+    /// Identifier to distinguish this artifact from others within the subject.
+    
+    pub name: Option<String>,
+}
+
+impl client::Part for Subject {}
+
+
 /// Request message for `TestIamPermissions` method.
 /// 
 /// # Activities
@@ -2590,6 +3157,45 @@ pub struct Version {
 impl client::Part for Version {}
 
 
+/// VexAssessment provides all publisher provided Vex information that is related to this vulnerability.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VexAssessment {
+    /// Holds the MITRE standard Common Vulnerabilities and Exposures (CVE) tracking number for the vulnerability. Deprecated: Use vulnerability_id instead to denote CVEs.
+    
+    pub cve: Option<String>,
+    /// Contains information about the impact of this vulnerability, this will change with time.
+    
+    pub impacts: Option<Vec<String>>,
+    /// Justification provides the justification when the state of the assessment if NOT_AFFECTED.
+    
+    pub justification: Option<Justification>,
+    /// The VulnerabilityAssessment note from which this VexAssessment was generated. This will be of the form: `projects/[PROJECT_ID]/notes/[NOTE_ID]`.
+    #[serde(rename="noteName")]
+    
+    pub note_name: Option<String>,
+    /// Holds a list of references associated with this vulnerability item and assessment.
+    #[serde(rename="relatedUris")]
+    
+    pub related_uris: Option<Vec<RelatedUrl>>,
+    /// Specifies details on how to handle (and presumably, fix) a vulnerability.
+    
+    pub remediations: Option<Vec<Remediation>>,
+    /// Provides the state of this Vulnerability assessment.
+    
+    pub state: Option<String>,
+    /// The vulnerability identifier for this Assessment. Will hold one of common identifiers e.g. CVE, GHSA etc.
+    #[serde(rename="vulnerabilityId")]
+    
+    pub vulnerability_id: Option<String>,
+}
+
+impl client::Part for VexAssessment {}
+
+
 /// Vulnerability provides metadata about a security vulnerability in a Note.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2633,6 +3239,42 @@ pub struct Vulnerability {
 }
 
 impl client::Part for Vulnerability {}
+
+
+/// A single VulnerabilityAssessmentNote represents one particular product's vulnerability assessment for one CVE.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VulnerabilityAssessmentNote {
+    /// Represents a vulnerability assessment for the product.
+    
+    pub assessment: Option<Assessment>,
+    /// Identifies the language used by this document, corresponding to IETF BCP 47 / RFC 5646.
+    #[serde(rename="languageCode")]
+    
+    pub language_code: Option<String>,
+    /// A detailed description of this Vex.
+    #[serde(rename="longDescription")]
+    
+    pub long_description: Option<String>,
+    /// The product affected by this vex.
+    
+    pub product: Option<Product>,
+    /// Publisher details of this Note.
+    
+    pub publisher: Option<Publisher>,
+    /// A one sentence description of this Vex.
+    #[serde(rename="shortDescription")]
+    
+    pub short_description: Option<String>,
+    /// The title of the note. E.g. `Vex-Debian-11.4`
+    
+    pub title: Option<String>,
+}
+
+impl client::Part for VulnerabilityAssessmentNote {}
 
 
 /// The location of the vulnerability.
@@ -2730,7 +3372,7 @@ impl client::Part for WindowsDetail {}
 ///     ).build().await.unwrap();
 /// let mut hub = ContainerAnalysis::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `notes_batch_create(...)`, `notes_create(...)`, `notes_delete(...)`, `notes_get(...)`, `notes_get_iam_policy(...)`, `notes_list(...)`, `notes_occurrences_list(...)`, `notes_patch(...)`, `notes_set_iam_policy(...)`, `notes_test_iam_permissions(...)`, `occurrences_batch_create(...)`, `occurrences_create(...)`, `occurrences_delete(...)`, `occurrences_get(...)`, `occurrences_get_iam_policy(...)`, `occurrences_get_notes(...)`, `occurrences_get_vulnerability_summary(...)`, `occurrences_list(...)`, `occurrences_patch(...)`, `occurrences_set_iam_policy(...)` and `occurrences_test_iam_permissions(...)`
+/// // like `notes_batch_create(...)`, `notes_create(...)`, `notes_delete(...)`, `notes_get(...)`, `notes_get_iam_policy(...)`, `notes_list(...)`, `notes_occurrences_list(...)`, `notes_patch(...)`, `notes_set_iam_policy(...)`, `notes_test_iam_permissions(...)`, `occurrences_batch_create(...)`, `occurrences_create(...)`, `occurrences_delete(...)`, `occurrences_get(...)`, `occurrences_get_iam_policy(...)`, `occurrences_get_notes(...)`, `occurrences_get_vulnerability_summary(...)`, `occurrences_list(...)`, `occurrences_patch(...)`, `occurrences_set_iam_policy(...)`, `occurrences_test_iam_permissions(...)`, `resources_export_sbom(...)` and `resources_generate_packages_summary(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -3133,6 +3775,44 @@ impl<'a, S> ProjectMethods<'a, S> {
             hub: self.hub,
             _request: request,
             _resource: resource.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Generates an SBOM and other dependency information for the given resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The name of the resource in the form of `projects/[PROJECT_ID]/resources/[RESOURCE_URL]`.
+    pub fn resources_export_sbom(&self, request: ExportSBOMRequest, name: &str) -> ProjectResourceExportSBOMCall<'a, S> {
+        ProjectResourceExportSBOMCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets a summary of the packages within a given resource.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Required. The name of the resource to get a packages summary for in the form of `projects/[PROJECT_ID]/resources/[RESOURCE_URL]`.
+    pub fn resources_generate_packages_summary(&self, request: GeneratePackagesSummaryRequest, name: &str) -> ProjectResourceGeneratePackagesSummaryCall<'a, S> {
+        ProjectResourceGeneratePackagesSummaryCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -9160,6 +9840,590 @@ where
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
     pub fn clear_scopes(mut self) -> ProjectOccurrenceTestIamPermissionCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Generates an SBOM and other dependency information for the given resource.
+///
+/// A builder for the *resources.exportSBOM* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_containeranalysis1_beta1 as containeranalysis1_beta1;
+/// use containeranalysis1_beta1::api::ExportSBOMRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use containeranalysis1_beta1::{ContainerAnalysis, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ContainerAnalysis::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ExportSBOMRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().resources_export_sbom(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectResourceExportSBOMCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ContainerAnalysis<S>,
+    _request: ExportSBOMRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectResourceExportSBOMCall<'a, S> {}
+
+impl<'a, S> ProjectResourceExportSBOMCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ExportSBOMResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "containeranalysis.projects.resources.exportSBOM",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}:exportSBOM";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ExportSBOMRequest) -> ProjectResourceExportSBOMCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the resource in the form of `projects/[PROJECT_ID]/resources/[RESOURCE_URL]`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectResourceExportSBOMCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectResourceExportSBOMCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectResourceExportSBOMCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectResourceExportSBOMCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectResourceExportSBOMCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectResourceExportSBOMCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Gets a summary of the packages within a given resource.
+///
+/// A builder for the *resources.generatePackagesSummary* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_containeranalysis1_beta1 as containeranalysis1_beta1;
+/// use containeranalysis1_beta1::api::GeneratePackagesSummaryRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use containeranalysis1_beta1::{ContainerAnalysis, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ContainerAnalysis::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GeneratePackagesSummaryRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().resources_generate_packages_summary(req, "name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectResourceGeneratePackagesSummaryCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ContainerAnalysis<S>,
+    _request: GeneratePackagesSummaryRequest,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectResourceGeneratePackagesSummaryCall<'a, S> {}
+
+impl<'a, S> ProjectResourceGeneratePackagesSummaryCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, PackagesSummaryResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "containeranalysis.projects.resources.generatePackagesSummary",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1beta1/{+name}:generatePackagesSummary";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GeneratePackagesSummaryRequest) -> ProjectResourceGeneratePackagesSummaryCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the resource to get a packages summary for in the form of `projects/[PROJECT_ID]/resources/[RESOURCE_URL]`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectResourceGeneratePackagesSummaryCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectResourceGeneratePackagesSummaryCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectResourceGeneratePackagesSummaryCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectResourceGeneratePackagesSummaryCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectResourceGeneratePackagesSummaryCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectResourceGeneratePackagesSummaryCall<'a, S> {
         self._scopes.clear();
         self
     }

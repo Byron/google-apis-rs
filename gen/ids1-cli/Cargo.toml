@@ -4,7 +4,7 @@
 [package]
 
 name = "google-ids1-cli"
-version = "5.0.3+20221113"
+version = "5.0.4+20231203"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with IDS (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/ids1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-ids1]
 path = "../ids1"
-version = "5.0.3+20221113"
+version = "5.0.4+20231203"
 

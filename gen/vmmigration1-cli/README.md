@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *VM Migration Service* API at revision *20230119*. The CLI is at version *5.0.3*.
+This documentation was generated from the *VM Migration Service* API at revision *20240222*. The CLI is at version *5.0.4*.
 
 ```bash
 vmmigration1 [options]
@@ -38,6 +38,13 @@ vmmigration1 [options]
                 locations-groups-list <parent> [-p <v>]... [-o <out>]
                 locations-groups-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-groups-remove-group-migration <group> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-image-imports-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-image-imports-delete <name> [-p <v>]... [-o <out>]
+                locations-image-imports-get <name> [-p <v>]... [-o <out>]
+                locations-image-imports-image-import-jobs-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-image-imports-image-import-jobs-get <name> [-p <v>]... [-o <out>]
+                locations-image-imports-image-import-jobs-list <parent> [-p <v>]... [-o <out>]
+                locations-image-imports-list <parent> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
                 locations-operations-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]

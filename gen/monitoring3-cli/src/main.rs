@@ -277,16 +277,18 @@ where
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "documentation.content" => Some(("documentation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "documentation.mime-type" => Some(("documentation.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "documentation.subject" => Some(("documentation.subject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enabled" => Some(("enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "mutation-record.mutate-time" => Some(("mutationRecord.mutateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mutation-record.mutated-by" => Some(("mutationRecord.mutatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-channels" => Some(("notificationChannels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "severity" => Some(("severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "validity.code" => Some(("validity.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "validity.message" => Some(("validity.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alert-strategy", "auto-close", "code", "combiner", "content", "creation-record", "display-name", "documentation", "enabled", "message", "mime-type", "mutate-time", "mutated-by", "mutation-record", "name", "notification-channels", "notification-rate-limit", "period", "user-labels", "validity"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alert-strategy", "auto-close", "code", "combiner", "content", "creation-record", "display-name", "documentation", "enabled", "message", "mime-type", "mutate-time", "mutated-by", "mutation-record", "name", "notification-channels", "notification-rate-limit", "period", "severity", "subject", "user-labels", "validity"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -546,16 +548,18 @@ where
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "documentation.content" => Some(("documentation.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "documentation.mime-type" => Some(("documentation.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "documentation.subject" => Some(("documentation.subject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enabled" => Some(("enabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "mutation-record.mutate-time" => Some(("mutationRecord.mutateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mutation-record.mutated-by" => Some(("mutationRecord.mutatedBy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-channels" => Some(("notificationChannels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "severity" => Some(("severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "validity.code" => Some(("validity.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "validity.message" => Some(("validity.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alert-strategy", "auto-close", "code", "combiner", "content", "creation-record", "display-name", "documentation", "enabled", "message", "mime-type", "mutate-time", "mutated-by", "mutation-record", "name", "notification-channels", "notification-rate-limit", "period", "user-labels", "validity"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alert-strategy", "auto-close", "code", "combiner", "content", "creation-record", "display-name", "documentation", "enabled", "message", "mime-type", "mutate-time", "mutated-by", "mutation-record", "name", "notification-channels", "notification-rate-limit", "period", "severity", "subject", "user-labels", "validity"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2920,6 +2924,7 @@ where
                     "http-check.auth-info.username" => Some(("httpCheck.authInfo.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.body" => Some(("httpCheck.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.content-type" => Some(("httpCheck.contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.custom-content-type" => Some(("httpCheck.customContentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.headers" => Some(("httpCheck.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "http-check.mask-headers" => Some(("httpCheck.maskHeaders", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "http-check.path" => Some(("httpCheck.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2936,12 +2941,15 @@ where
                     "resource-group.group-id" => Some(("resourceGroup.groupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-group.resource-type" => Some(("resourceGroup.resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "selected-regions" => Some(("selectedRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "synthetic-monitor.cloud-function-v2.cloud-run-revision.labels" => Some(("syntheticMonitor.cloudFunctionV2.cloudRunRevision.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "synthetic-monitor.cloud-function-v2.cloud-run-revision.type" => Some(("syntheticMonitor.cloudFunctionV2.cloudRunRevision.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "synthetic-monitor.cloud-function-v2.name" => Some(("syntheticMonitor.cloudFunctionV2.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tcp-check.ping-config.pings-count" => Some(("tcpCheck.pingConfig.pingsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "tcp-check.port" => Some(("tcpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "body", "checker-type", "content-type", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "ping-config", "pings-count", "port", "request-method", "resource-group", "resource-type", "selected-regions", "tcp-check", "timeout", "type", "use-ssl", "user-labels", "username", "validate-ssl"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "body", "checker-type", "cloud-function-v2", "cloud-run-revision", "content-type", "custom-content-type", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "ping-config", "pings-count", "port", "request-method", "resource-group", "resource-type", "selected-regions", "synthetic-monitor", "tcp-check", "timeout", "type", "use-ssl", "user-labels", "username", "validate-ssl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3196,6 +3204,7 @@ where
                     "http-check.auth-info.username" => Some(("httpCheck.authInfo.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.body" => Some(("httpCheck.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.content-type" => Some(("httpCheck.contentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "http-check.custom-content-type" => Some(("httpCheck.customContentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "http-check.headers" => Some(("httpCheck.headers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "http-check.mask-headers" => Some(("httpCheck.maskHeaders", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "http-check.path" => Some(("httpCheck.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3212,12 +3221,15 @@ where
                     "resource-group.group-id" => Some(("resourceGroup.groupId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "resource-group.resource-type" => Some(("resourceGroup.resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "selected-regions" => Some(("selectedRegions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "synthetic-monitor.cloud-function-v2.cloud-run-revision.labels" => Some(("syntheticMonitor.cloudFunctionV2.cloudRunRevision.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "synthetic-monitor.cloud-function-v2.cloud-run-revision.type" => Some(("syntheticMonitor.cloudFunctionV2.cloudRunRevision.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "synthetic-monitor.cloud-function-v2.name" => Some(("syntheticMonitor.cloudFunctionV2.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tcp-check.ping-config.pings-count" => Some(("tcpCheck.pingConfig.pingsCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "tcp-check.port" => Some(("tcpCheck.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "timeout" => Some(("timeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-labels" => Some(("userLabels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "body", "checker-type", "content-type", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "ping-config", "pings-count", "port", "request-method", "resource-group", "resource-type", "selected-regions", "tcp-check", "timeout", "type", "use-ssl", "user-labels", "username", "validate-ssl"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["auth-info", "body", "checker-type", "cloud-function-v2", "cloud-run-revision", "content-type", "custom-content-type", "display-name", "group-id", "headers", "http-check", "is-internal", "labels", "mask-headers", "monitored-resource", "name", "password", "path", "period", "ping-config", "pings-count", "port", "request-method", "resource-group", "resource-type", "selected-regions", "synthetic-monitor", "tcp-check", "timeout", "type", "use-ssl", "user-labels", "username", "validate-ssl"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5079,7 +5091,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("notification-channels-list",
-                    Some(r##"Lists the notification channels that have been created for the project."##),
+                    Some(r##"Lists the notification channels that have been created for the project. To list the types of notification channels that are supported, use the ListNotificationChannelDescriptors method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_notification-channels-list",
                   vec![
                     (Some(r##"name"##),
@@ -5285,7 +5297,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("time-series-create",
-                    Some(r##"Creates or adds data to one or more time series. The response is empty if all time series in the request were written. If any time series could not be written, a corresponding failure message is included in the error response."##),
+                    Some(r##"Creates or adds data to one or more time series. The response is empty if all time series in the request were written. If any time series could not be written, a corresponding failure message is included in the error response. This method does not support resource locations constraint of an organization policy (https://cloud.google.com/resource-manager/docs/organization-policy/defining-locations#setting_the_organization_policy)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_monitoring3_cli/projects_time-series-create",
                   vec![
                     (Some(r##"name"##),
@@ -5490,7 +5502,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"A unique resource name for this Uptime check configuration. The format is: projects/[PROJECT_ID_OR_NUMBER]/uptimeCheckConfigs/[UPTIME_CHECK_ID] [PROJECT_ID_OR_NUMBER] is the Workspace host project associated with the Uptime check.This field should be omitted when creating the Uptime check configuration; on create, the resource name is assigned by the server and included in the response."##),
+                     Some(r##"Identifier. A unique resource name for this Uptime check configuration. The format is: projects/[PROJECT_ID_OR_NUMBER]/uptimeCheckConfigs/[UPTIME_CHECK_ID] [PROJECT_ID_OR_NUMBER] is the Workspace host project associated with the Uptime check.This field should be omitted when creating the Uptime check configuration; on create, the resource name is assigned by the server and included in the response."##),
                      Some(true),
                      Some(false)),
         
@@ -5784,7 +5796,7 @@ async fn main() {
     
     let mut app = App::new("monitoring3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230115")
+           .version("5.0.4+20240225")
            .about("Manages your Cloud Monitoring data and configurations.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_monitoring3_cli")
            .arg(Arg::with_name("url")

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-searchconsole1"
-version = "5.0.3+20230123"
+version = "5.0.4+20240304"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Search Console (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/searchconsole1"
 homepage = "https://developers.google.com/webmaster-tools/search-console-api/"
-documentation = "https://docs.rs/google-searchconsole1/5.0.3+20230123"
+documentation = "https://docs.rs/google-searchconsole1/5.0.4+20240304"
 license = "MIT"
 keywords = ["searchconsole", "google", "protocol", "web", "api"]
 autobins = false

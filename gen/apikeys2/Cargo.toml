@@ -4,12 +4,12 @@
 [package]
 
 name = "google-apikeys2"
-version = "5.0.3+20230118"
+version = "5.0.4+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Api Keys Service (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/apikeys2"
 homepage = "https://cloud.google.com/api-keys/docs"
-documentation = "https://docs.rs/google-apikeys2/5.0.3+20230118"
+documentation = "https://docs.rs/google-apikeys2/5.0.4+20240303"
 license = "MIT"
 keywords = ["apikeys", "google", "protocol", "web", "api"]
 autobins = false

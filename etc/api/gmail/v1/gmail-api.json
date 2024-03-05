@@ -945,7 +945,7 @@
                             ]
                         },
                         "import": {
-                            "description": "Imports a message into only this user's mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. This method doesn't perform SPF checks, so it might not work for some spam messages, such as those attempting to perform domain spoofing. This method does not send a message. Note: This function doesn't trigger forwarding rules or filters set up by the user.",
+                            "description": "Imports a message into only this user's mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. This method doesn't perform SPF checks, so it might not work for some spam messages, such as those attempting to perform domain spoofing. This method does not send a message.",
                             "flatPath": "gmail/v1/users/{userId}/messages/import",
                             "httpMethod": "POST",
                             "id": "gmail.users.messages.import",
@@ -971,7 +971,7 @@
                             "parameters": {
                                 "deleted": {
                                     "default": "false",
-                                    "description": "Mark the email as permanently deleted (not TRASH) and only visible in Google Vault to a Vault administrator. Only used for G Suite accounts.",
+                                    "description": "Mark the email as permanently deleted (not TRASH) and only visible in Google Vault to a Vault administrator. Only used for Google Workspace accounts.",
                                     "location": "query",
                                     "type": "boolean"
                                 },
@@ -1050,7 +1050,7 @@
                             "parameters": {
                                 "deleted": {
                                     "default": "false",
-                                    "description": "Mark the email as permanently deleted (not TRASH) and only visible in Google Vault to a Vault administrator. Only used for G Suite accounts.",
+                                    "description": "Mark the email as permanently deleted (not TRASH) and only visible in Google Vault to a Vault administrator. Only used for Google Workspace accounts.",
                                     "location": "query",
                                     "type": "boolean"
                                 },
@@ -1106,7 +1106,7 @@
                                     "type": "boolean"
                                 },
                                 "labelIds": {
-                                    "description": "Only return messages with labels that match all of the specified label IDs.",
+                                    "description": "Only return messages with labels that match all of the specified label IDs. Messages in a thread might have labels that other messages in the same thread don't have. To learn more, see [Manage labels on messages and threads](https://developers.google.com/gmail/api/guides/labels#manage_labels_on_messages_threads).",
                                     "location": "query",
                                     "repeated": true,
                                     "type": "string"
@@ -1184,7 +1184,7 @@
                             ]
                         },
                         "send": {
-                            "description": "Sends the specified message to the recipients in the `To`, `Cc`, and `Bcc` headers.",
+                            "description": "Sends the specified message to the recipients in the `To`, `Cc`, and `Bcc` headers. For example usage, see [Sending email](https://developers.google.com/gmail/api/guides/sending).",
                             "flatPath": "gmail/v1/users/{userId}/messages/send",
                             "httpMethod": "POST",
                             "id": "gmail.users.messages.send",
@@ -2031,7 +2031,7 @@
                         "delegates": {
                             "methods": {
                                 "create": {
-                                    "description": "Adds a delegate with its verification status set directly to `accepted`, without sending any verification email. The delegate user must be a member of the same G Suite organization as the delegator user. Gmail imposes limitations on the number of delegates and delegators each user in a G Suite organization can have. These limits depend on your organization, but in general each user can have up to 25 delegates and up to 10 delegators. Note that a delegate user must be referred to by their primary email address, and not an email alias. Also note that when a new delegate is created, there may be up to a one minute delay before the new delegate is available for use. This method is only available to service account clients that have been delegated domain-wide authority.",
+                                    "description": "Adds a delegate with its verification status set directly to `accepted`, without sending any verification email. The delegate user must be a member of the same Google Workspace organization as the delegator user. Gmail imposes limitations on the number of delegates and delegators each user in a Google Workspace organization can have. These limits depend on your organization, but in general each user can have up to 25 delegates and up to 10 delegators. Note that a delegate user must be referred to by their primary email address, and not an email alias. Also note that when a new delegate is created, there may be up to a one minute delay before the new delegate is available for use. This method is only available to service account clients that have been delegated domain-wide authority.",
                                     "flatPath": "gmail/v1/users/{userId}/settings/delegates",
                                     "httpMethod": "POST",
                                     "id": "gmail.users.settings.delegates.create",
@@ -3077,7 +3077,7 @@
             }
         }
     },
-    "revision": "20230116",
+    "revision": "20240226",
     "rootUrl": "https://gmail.googleapis.com/",
     "schemas": {
         "AutoForwarding": {
@@ -3162,8 +3162,12 @@
                     "type": "string"
                 },
                 "primaryKeyPairId": {
-                    "description": "If a key pair is associated, the identifier of the key pair, CseKeyPair.",
+                    "description": "If a key pair is associated, the ID of the key pair, CseKeyPair.",
                     "type": "string"
+                },
+                "signAndEncryptKeyPairs": {
+                    "$ref": "SignAndEncryptKeyPairs",
+                    "description": "The configuration of a CSE identity that uses different key pairs for signing and encryption."
                 }
             },
             "type": "object"
@@ -3229,6 +3233,10 @@
             "description": "Metadata for a private key instance.",
             "id": "CsePrivateKeyMetadata",
             "properties": {
+                "hardwareKeyMetadata": {
+                    "$ref": "HardwareKeyMetadata",
+                    "description": "Metadata for hardware keys."
+                },
                 "kaclsKeyMetadata": {
                     "$ref": "KaclsKeyMetadata",
                     "description": "Metadata for a private key instance managed by an external key access control list service."
@@ -3420,6 +3428,17 @@
                         "The address is ready to use for forwarding.",
                         "The address is awaiting verification by the owner."
                     ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "HardwareKeyMetadata": {
+            "description": "Metadata for hardware keys.",
+            "id": "HardwareKeyMetadata",
+            "properties": {
+                "description": {
+                    "description": "Description about the hardware key.",
                     "type": "string"
                 }
             },
@@ -4198,6 +4217,21 @@
             },
             "type": "object"
         },
+        "SignAndEncryptKeyPairs": {
+            "description": "The configuration of a CSE identity that uses different key pairs for signing and encryption.",
+            "id": "SignAndEncryptKeyPairs",
+            "properties": {
+                "encryptionKeyPairId": {
+                    "description": "The ID of the CseKeyPair that encrypts signed outgoing mail.",
+                    "type": "string"
+                },
+                "signingKeyPairId": {
+                    "description": "The ID of the CseKeyPair that signs outgoing mail.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "SmimeInfo": {
             "description": "An S/MIME email config.",
             "id": "SmimeInfo",
@@ -4332,7 +4366,7 @@
                     "type": "boolean"
                 },
                 "restrictToDomain": {
-                    "description": "Flag that determines whether responses are sent to recipients who are outside of the user's domain. This feature is only available for G Suite users.",
+                    "description": "Flag that determines whether responses are sent to recipients who are outside of the user's domain. This feature is only available for Google Workspace users.",
                     "type": "boolean"
                 },
                 "startTime": {
@@ -4348,7 +4382,20 @@
             "id": "WatchRequest",
             "properties": {
                 "labelFilterAction": {
-                    "description": "Filtering behavior of labelIds list specified.",
+                    "deprecated": true,
+                    "description": "Filtering behavior of `labelIds list` specified. This field is deprecated because it caused incorrect behavior in some cases; use `label_filter_behavior` instead.",
+                    "enum": [
+                        "include",
+                        "exclude"
+                    ],
+                    "enumDescriptions": [
+                        "Only get push notifications for message changes relating to labelIds specified.",
+                        "Get push notifications for all message changes except those relating to labelIds specified."
+                    ],
+                    "type": "string"
+                },
+                "labelFilterBehavior": {
+                    "description": "Filtering behavior of `labelIds list` specified. This field replaces `label_filter_action`; if set, `label_filter_action` is ignored.",
                     "enum": [
                         "include",
                         "exclude"

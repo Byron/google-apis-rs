@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Service Directory* API at revision *20230105*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Service Directory* API at revision *20240226*. The CLI is at version *5.0.4*.
 
 ```bash
 servicedirectory1-beta1 [options]
@@ -38,9 +38,6 @@ servicedirectory1-beta1 [options]
                 locations-namespaces-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-namespaces-list <parent> [-p <v>]... [-o <out>]
                 locations-namespaces-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-namespaces-service-workloads-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-namespaces-service-workloads-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-namespaces-service-workloads-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-namespaces-services-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-namespaces-services-delete <name> [-p <v>]... [-o <out>]
                 locations-namespaces-services-endpoints-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -57,9 +54,9 @@ servicedirectory1-beta1 [options]
                 locations-namespaces-services-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-namespaces-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-namespaces-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-registration-policies-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-registration-policies-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-registration-policies-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-namespaces-workloads-get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-namespaces-workloads-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-namespaces-workloads-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
   servicedirectory1-beta1 --help
 
 Configuration:

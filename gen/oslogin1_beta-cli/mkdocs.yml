@@ -1,4 +1,4 @@
-site_name: Cloud OS Login v5.0.3+20230115
+site_name: Cloud OS Login v5.0.4+20240225
 site_url: http://byron.github.io/google-apis-rs/google-oslogin1_beta-cli
 site_description: A complete library to interact with Cloud OS Login (protocol v1beta)
 
@@ -13,6 +13,8 @@ nav:
     - 'Get Login Profile': 'users_get-login-profile.md'
     - 'Import Ssh Public Key': 'users_import-ssh-public-key.md'
     - 'Projects Delete': 'users_projects-delete.md'
+    - 'Projects Locations Sign Ssh Public Key': 'users_projects-locations-sign-ssh-public-key.md'
+    - 'Projects Zones Sign Ssh Public Key': 'users_projects-zones-sign-ssh-public-key.md'
     - 'Ssh Public Keys Create': 'users_ssh-public-keys-create.md'
     - 'Ssh Public Keys Delete': 'users_ssh-public-keys-delete.md'
     - 'Ssh Public Keys Get': 'users_ssh-public-keys-get.md'

@@ -1,4 +1,4 @@
-site_name: Firebaseappcheck v5.0.3+20230116
+site_name: Firebaseappcheck v5.0.4+20240226
 site_url: http://byron.github.io/google-apis-rs/google-firebaseappcheck1_beta-cli
 site_description: A complete library to interact with Firebaseappcheck (protocol v1beta)
 
@@ -11,6 +11,11 @@ nav:
 - Home: 'index.md'
 - 'Jwks':
     - 'Get': 'jwks_get.md'
+- 'Oauth Clients':
+    - 'Exchange App Attest Assertion': 'oauth-clients_exchange-app-attest-assertion.md'
+    - 'Exchange App Attest Attestation': 'oauth-clients_exchange-app-attest-attestation.md'
+    - 'Exchange Debug Token': 'oauth-clients_exchange-debug-token.md'
+    - 'Generate App Attest Challenge': 'oauth-clients_generate-app-attest-challenge.md'
 - 'Projects':
     - 'Apps App Attest Config Batch Get': 'projects_apps-app-attest-config-batch-get.md'
     - 'Apps App Attest Config Get': 'projects_apps-app-attest-config-get.md'
@@ -54,6 +59,13 @@ nav:
     - 'Services Get': 'projects_services-get.md'
     - 'Services List': 'projects_services-list.md'
     - 'Services Patch': 'projects_services-patch.md'
+    - 'Services Resource Policies Batch Update': 'projects_services-resource-policies-batch-update.md'
+    - 'Services Resource Policies Create': 'projects_services-resource-policies-create.md'
+    - 'Services Resource Policies Delete': 'projects_services-resource-policies-delete.md'
+    - 'Services Resource Policies Get': 'projects_services-resource-policies-get.md'
+    - 'Services Resource Policies List': 'projects_services-resource-policies-list.md'
+    - 'Services Resource Policies Patch': 'projects_services-resource-policies-patch.md'
+    - 'Verify App Check Token': 'projects_verify-app-check-token.md'
 
 theme: readthedocs
 

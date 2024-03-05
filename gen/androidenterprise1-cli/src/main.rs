@@ -359,15 +359,22 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "android-id" => Some(("androidId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "device" => Some(("device", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "latest-build-fingerprint" => Some(("latestBuildFingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "maker" => Some(("maker", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "management-type" => Some(("managementType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "model" => Some(("model", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.auto-update-policy" => Some(("policy.autoUpdatePolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.device-report-policy" => Some(("policy.deviceReportPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.maintenance-window.duration-ms" => Some(("policy.maintenanceWindow.durationMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.maintenance-window.start-time-after-midnight-ms" => Some(("policy.maintenanceWindow.startTimeAfterMidnightMs", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "policy.product-availability-policy" => Some(("policy.productAvailabilityPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product" => Some(("product", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "report.last-updated-timestamp-millis" => Some(("report.lastUpdatedTimestampMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "retail-brand" => Some(("retailBrand", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sdk-version" => Some(("sdkVersion", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-id", "auto-update-policy", "device-report-policy", "duration-ms", "last-updated-timestamp-millis", "maintenance-window", "management-type", "policy", "product-availability-policy", "report", "start-time-after-midnight-ms"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-id", "auto-update-policy", "device", "device-report-policy", "duration-ms", "last-updated-timestamp-millis", "latest-build-fingerprint", "maintenance-window", "maker", "management-type", "model", "policy", "product", "product-availability-policy", "report", "retail-brand", "sdk-version", "start-time-after-midnight-ms"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5881,7 +5888,7 @@ async fn main() {
         
         ("installs", "methods: 'delete', 'get', 'list' and 'update'", vec![
             ("delete",
-                    Some(r##"Requests to remove an app from a device. A call to get or list will still show the app as installed on the device until it is actually removed."##),
+                    Some(r##"Requests to remove an app from a device. A call to get or list will still show the app as installed on the device until it is actually removed. A successful response indicates that a removal request has been sent to the device. The call will be considered successful even if the app is not present on the device (e.g. it was never installed, or was removed by the user)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli/installs_delete",
                   vec![
                     (Some(r##"enterprise-id"##),
@@ -7344,7 +7351,7 @@ async fn main() {
     
     let mut app = App::new("androidenterprise1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
+           .version("5.0.4+20240304")
            .about("Manages the deployment of apps to Android Enterprise devices.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_androidenterprise1_cli")
            .arg(Arg::with_name("url")

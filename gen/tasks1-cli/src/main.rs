@@ -1548,7 +1548,7 @@ async fn main() {
     
     let mut app = App::new("tasks1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230122")
+           .version("5.0.4+20240303")
            .about("The Google Tasks API lets you manage your tasks and task lists.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tasks1_cli")
            .arg(Arg::with_name("url")

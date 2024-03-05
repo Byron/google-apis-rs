@@ -89,6 +89,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "bundle-location-gcs-path" => {
+                    call = call.bundle_location_gcs_path(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -102,6 +105,401 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["bundle-location-gcs-path"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_device_sessions_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CancelDeviceSessionRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().device_sessions_cancel(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_device_sessions_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "active-start-time" => Some(("activeStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "android-device.android-model-id" => Some(("androidDevice.androidModelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "android-device.android-version-id" => Some(("androidDevice.androidVersionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "android-device.locale" => Some(("androidDevice.locale", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "android-device.orientation" => Some(("androidDevice.orientation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "inactivity-timeout" => Some(("inactivityTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ttl" => Some(("ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-start-time", "android-device", "android-model-id", "android-version-id", "create-time", "display-name", "expire-time", "inactivity-timeout", "locale", "name", "orientation", "state", "ttl"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::DeviceSession = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().device_sessions_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_device_sessions_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().device_sessions_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_device_sessions_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().device_sessions_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_device_sessions_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "active-start-time" => Some(("activeStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "android-device.android-model-id" => Some(("androidDevice.androidModelId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "android-device.android-version-id" => Some(("androidDevice.androidVersionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "android-device.locale" => Some(("androidDevice.locale", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "android-device.orientation" => Some(("androidDevice.orientation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "inactivity-timeout" => Some(("inactivityTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ttl" => Some(("ttl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-start-time", "android-device", "android-model-id", "android-version-id", "create-time", "display-name", "expire-time", "inactivity-timeout", "locale", "name", "orientation", "state", "ttl"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::DeviceSession = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().device_sessions_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -233,6 +631,7 @@ where
                     "test-specification.android-instrumentation-test.app-bundle.bundle-location.gcs-path" => Some(("testSpecification.androidInstrumentationTest.appBundle.bundleLocation.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.android-instrumentation-test.app-package-id" => Some(("testSpecification.androidInstrumentationTest.appPackageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.android-instrumentation-test.orchestrator-option" => Some(("testSpecification.androidInstrumentationTest.orchestratorOption", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "test-specification.android-instrumentation-test.sharding-option.smart-sharding.targeted-shard-duration" => Some(("testSpecification.androidInstrumentationTest.shardingOption.smartSharding.targetedShardDuration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.android-instrumentation-test.sharding-option.uniform-sharding.num-shards" => Some(("testSpecification.androidInstrumentationTest.shardingOption.uniformSharding.numShards", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "test-specification.android-instrumentation-test.test-apk.gcs-path" => Some(("testSpecification.androidInstrumentationTest.testApk.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.android-instrumentation-test.test-package-id" => Some(("testSpecification.androidInstrumentationTest.testPackageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -253,6 +652,9 @@ where
                     "test-specification.android-test-loop.scenarios" => Some(("testSpecification.androidTestLoop.scenarios", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
                     "test-specification.disable-performance-metrics" => Some(("testSpecification.disablePerformanceMetrics", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "test-specification.disable-video-recording" => Some(("testSpecification.disableVideoRecording", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "test-specification.ios-robo-test.app-bundle-id" => Some(("testSpecification.iosRoboTest.appBundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "test-specification.ios-robo-test.app-ipa.gcs-path" => Some(("testSpecification.iosRoboTest.appIpa.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "test-specification.ios-robo-test.robo-script.gcs-path" => Some(("testSpecification.iosRoboTest.roboScript.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.ios-test-loop.app-bundle-id" => Some(("testSpecification.iosTestLoop.appBundleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.ios-test-loop.app-ipa.gcs-path" => Some(("testSpecification.iosTestLoop.appIpa.gcsPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "test-specification.ios-test-loop.scenarios" => Some(("testSpecification.iosTestLoop.scenarios", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
@@ -269,7 +671,7 @@ where
                     "test-specification.test-timeout" => Some(("testSpecification.testTimeout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "timestamp" => Some(("timestamp", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-instrumentation-test", "android-matrix", "android-model-ids", "android-robo-test", "android-test-loop", "android-version-ids", "app-apk", "app-bundle", "app-bundle-id", "app-initial-activity", "app-ipa", "app-package-id", "bundle-location", "client-info", "directories-to-pull", "disable-performance-metrics", "disable-video-recording", "dont-autogrant-permissions", "duration-seconds", "environment-matrix", "execution-id", "fail-fast", "flaky-test-attempts", "gcs-path", "google-cloud-storage", "history-id", "invalid-matrix-details", "ios-test-loop", "ios-test-setup", "ios-xc-test", "locales", "max-depth", "max-steps", "name", "network-profile", "num-shards", "orchestrator-option", "orientations", "outcome-summary", "project-id", "result-storage", "results-url", "robo-mode", "robo-script", "scenario-labels", "scenarios", "sharding-option", "state", "systrace", "test-apk", "test-matrix-id", "test-package-id", "test-runner-class", "test-setup", "test-special-entitlements", "test-specification", "test-targets", "test-timeout", "tests-zip", "timestamp", "tool-results-execution", "tool-results-history", "uniform-sharding", "xcode-version", "xctestrun"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["android-instrumentation-test", "android-matrix", "android-model-ids", "android-robo-test", "android-test-loop", "android-version-ids", "app-apk", "app-bundle", "app-bundle-id", "app-initial-activity", "app-ipa", "app-package-id", "bundle-location", "client-info", "directories-to-pull", "disable-performance-metrics", "disable-video-recording", "dont-autogrant-permissions", "duration-seconds", "environment-matrix", "execution-id", "fail-fast", "flaky-test-attempts", "gcs-path", "google-cloud-storage", "history-id", "invalid-matrix-details", "ios-robo-test", "ios-test-loop", "ios-test-setup", "ios-xc-test", "locales", "max-depth", "max-steps", "name", "network-profile", "num-shards", "orchestrator-option", "orientations", "outcome-summary", "project-id", "result-storage", "results-url", "robo-mode", "robo-script", "scenario-labels", "scenarios", "sharding-option", "smart-sharding", "state", "systrace", "targeted-shard-duration", "test-apk", "test-matrix-id", "test-package-id", "test-runner-class", "test-setup", "test-special-entitlements", "test-specification", "test-targets", "test-timeout", "tests-zip", "timestamp", "tool-results-execution", "tool-results-history", "uniform-sharding", "xcode-version", "xctestrun"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -459,6 +861,21 @@ where
             },
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
+                    ("device-sessions-cancel", Some(opt)) => {
+                        call_result = self._projects_device_sessions_cancel(opt, dry_run, &mut err).await;
+                    },
+                    ("device-sessions-create", Some(opt)) => {
+                        call_result = self._projects_device_sessions_create(opt, dry_run, &mut err).await;
+                    },
+                    ("device-sessions-get", Some(opt)) => {
+                        call_result = self._projects_device_sessions_get(opt, dry_run, &mut err).await;
+                    },
+                    ("device-sessions-list", Some(opt)) => {
+                        call_result = self._projects_device_sessions_list(opt, dry_run, &mut err).await;
+                    },
+                    ("device-sessions-patch", Some(opt)) => {
+                        call_result = self._projects_device_sessions_patch(opt, dry_run, &mut err).await;
+                    },
                     ("test-matrices-cancel", Some(opt)) => {
                         call_result = self._projects_test_matrices_cancel(opt, dry_run, &mut err).await;
                     },
@@ -583,7 +1000,135 @@ async fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'test-matrices-cancel', 'test-matrices-create' and 'test-matrices-get'", vec![
+        ("projects", "methods: 'device-sessions-cancel', 'device-sessions-create', 'device-sessions-get', 'device-sessions-list', 'device-sessions-patch', 'test-matrices-cancel', 'test-matrices-create' and 'test-matrices-get'", vec![
+            ("device-sessions-cancel",
+                    Some(r##"POST /v1/projects/{project_id}/deviceSessions/{device_session_id}:cancel Changes the DeviceSession to state FINISHED and terminates all connections. Canceled sessions are not deleted and can be retrieved or listed by the user until they expire based on the 28 day deletion policy."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_testing1_cli/projects_device-sessions-cancel",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the DeviceSession, e.g. "projects/{project_id}/deviceSessions/{session_id}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("device-sessions-create",
+                    Some(r##"POST /v1/projects/{project_id}/deviceSessions"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_testing1_cli/projects_device-sessions-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The Compute Engine project under which this device will be allocated. "projects/{project_id}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("device-sessions-get",
+                    Some(r##"GET /v1/projects/{project_id}/deviceSessions/{device_session_id} Return a DeviceSession, which documents the allocation status and whether the device is allocated. Clients making requests from this API must poll GetDeviceSession."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_testing1_cli/projects_device-sessions-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the DeviceSession, e.g. "projects/{project_id}/deviceSessions/{session_id}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("device-sessions-list",
+                    Some(r##"GET /v1/projects/{project_id}/deviceSessions Lists device Sessions owned by the project user."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_testing1_cli/projects_device-sessions-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The name of the parent to request, e.g. "projects/{project_id}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("device-sessions-patch",
+                    Some(r##"PATCH /v1/projects/{projectId}/deviceSessions/deviceSessionId}:updateDeviceSession Updates the current device session to the fields described by the update_mask."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_testing1_cli/projects_device-sessions-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Optional. Name of the DeviceSession, e.g. "projects/{project_id}/deviceSessions/{session_id}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("test-matrices-cancel",
                     Some(r##"Cancels unfinished test executions in a test matrix. This call returns immediately and cancellation proceeds asynchronously. If the matrix is already final, this operation will have no effect. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to read project - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the Test Matrix does not exist"##),
                     "Details at http://byron.github.io/google-apis-rs/google_testing1_cli/projects_test-matrices-cancel",
@@ -613,7 +1158,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("test-matrices-create",
-                    Some(r##"Creates and runs a matrix of tests according to the given specifications. Unsupported environments will be returned in the state UNSUPPORTED. A test matrix is limited to use at most 2000 devices in parallel. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to write to project - INVALID_ARGUMENT - if the request is malformed or if the matrix tries to use too many simultaneous devices."##),
+                    Some(r##"Creates and runs a matrix of tests according to the given specifications. Unsupported environments will be returned in the state UNSUPPORTED. A test matrix is limited to use at most 2000 devices in parallel. The returned matrix will not yet contain the executions that will be created for this matrix. Execution creation happens later on and will require a call to GetTestMatrix. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to write to project - INVALID_ARGUMENT - if the request is malformed or if the matrix tries to use too many simultaneous devices."##),
                     "Details at http://byron.github.io/google-apis-rs/google_testing1_cli/projects_test-matrices-create",
                   vec![
                     (Some(r##"project-id"##),
@@ -641,7 +1186,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("test-matrices-get",
-                    Some(r##"Checks the status of a test matrix. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to read project - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the Test Matrix does not exist"##),
+                    Some(r##"Checks the status of a test matrix and the executions once they are created. The test matrix will contain the list of test executions to run if and only if the resultStorage.toolResultsExecution fields have been populated. Note: Flaky test executions may be added to the matrix at a later stage. May return any of the following canonical error codes: - PERMISSION_DENIED - if the user is not authorized to read project - INVALID_ARGUMENT - if the request is malformed - NOT_FOUND - if the Test Matrix does not exist"##),
                     "Details at http://byron.github.io/google-apis-rs/google_testing1_cli/projects_test-matrices-get",
                   vec![
                     (Some(r##"project-id"##),
@@ -699,7 +1244,7 @@ async fn main() {
     
     let mut app = App::new("testing1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230119")
+           .version("5.0.4+20240227")
            .about("Allows developers to run automated tests for their mobile applications on Google infrastructure.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_testing1_cli")
            .arg(Arg::with_name("url")

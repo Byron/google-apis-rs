@@ -4,7 +4,7 @@
 [package]
 
 name = "google-firebasestorage1_beta-cli"
-version = "5.0.3+20230106"
+version = "5.0.4+20240301"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firebasestorage (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/firebasestorage1_beta-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-firebasestorage1_beta]
 path = "../firebasestorage1_beta"
-version = "5.0.3+20230106"
+version = "5.0.4+20240301"
 

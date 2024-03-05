@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -120,7 +120,7 @@ impl<'a, S> OnDemandScanning<S> {
         OnDemandScanning {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://ondemandscanning.googleapis.com/".to_string(),
             _root_url: "https://ondemandscanning.googleapis.com/".to_string(),
         }
@@ -131,7 +131,7 @@ impl<'a, S> OnDemandScanning<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -254,7 +254,7 @@ pub struct AttestationOccurrence {
     /// Required. The serialized payload that is verified by one or more `signatures`.
     #[serde(rename="serializedPayload")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub serialized_payload: Option<Vec<u8>>,
     /// One or more signatures over `serialized_payload`. Verifier implementations should consider this attestation message verified if at least one `signature` verifies `serialized_payload`. See `Signature` in common.proto for more details on signature structure and verification.
     
@@ -264,6 +264,78 @@ pub struct AttestationOccurrence {
 impl client::Part for AttestationOccurrence {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BinarySourceInfo {
+    /// The binary package. This is significant when the source is different than the binary itself. Historically if they've differed, we've stored the name of the source and its version in the package/version fields, but we should also store the binary package info, as that's what's actually installed. See b/175908657#comment15.
+    #[serde(rename="binaryVersion")]
+    
+    pub binary_version: Option<PackageVersion>,
+    /// The source package. Similar to the above, this is significant when the source is different than the binary itself. Since the top-level package/version fields are based on an if/else, we need a separate field for both binary and source if we want to know definitively where the data is coming from.
+    #[serde(rename="sourceVersion")]
+    
+    pub source_version: Option<PackageVersion>,
+}
+
+impl client::Part for BinarySourceInfo {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuildDefinition {
+    /// no description provided
+    #[serde(rename="buildType")]
+    
+    pub build_type: Option<String>,
+    /// no description provided
+    #[serde(rename="externalParameters")]
+    
+    pub external_parameters: Option<HashMap<String, json::Value>>,
+    /// no description provided
+    #[serde(rename="internalParameters")]
+    
+    pub internal_parameters: Option<HashMap<String, json::Value>>,
+    /// no description provided
+    #[serde(rename="resolvedDependencies")]
+    
+    pub resolved_dependencies: Option<Vec<ResourceDescriptor>>,
+}
+
+impl client::Part for BuildDefinition {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BuildMetadata {
+    /// no description provided
+    #[serde(rename="finishedOn")]
+    
+    pub finished_on: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// no description provided
+    #[serde(rename="invocationId")]
+    
+    pub invocation_id: Option<String>,
+    /// no description provided
+    #[serde(rename="startedOn")]
+    
+    pub started_on: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+}
+
+impl client::Part for BuildMetadata {}
+
+
 /// Details of a build occurrence.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -271,6 +343,10 @@ impl client::Part for AttestationOccurrence {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct BuildOccurrence {
+    /// In-Toto Slsa Provenance V1 represents a slsa provenance meeting the slsa spec, wrapped in an in-toto statement. This allows for direct jsonification of a to-spec in-toto slsa statement with a to-spec slsa provenance.
+    #[serde(rename="inTotoSlsaProvenanceV1")]
+    
+    pub in_toto_slsa_provenance_v1: Option<InTotoSlsaProvenanceV1>,
     /// Deprecated. See InTotoStatement for the replacement. In-toto Provenance representation as defined in spec.
     #[serde(rename="intotoProvenance")]
     
@@ -633,6 +709,10 @@ pub struct DiscoveryOccurrence {
     #[serde(rename="lastScanTime")]
     
     pub last_scan_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// The status of an SBOM generation.
+    #[serde(rename="sbomStatus")]
+    
+    pub sbom_status: Option<SBOMStatus>,
 }
 
 impl client::Part for DiscoveryOccurrence {}
@@ -663,7 +743,7 @@ impl client::ResponseResult for Empty {}
 pub struct Envelope {
     /// no description provided
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub payload: Option<Vec<u8>>,
     /// no description provided
     #[serde(rename="payloadType")]
@@ -689,7 +769,7 @@ pub struct EnvelopeSignature {
     pub keyid: Option<String>,
     /// no description provided
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub sig: Option<Vec<u8>>,
 }
 
@@ -956,7 +1036,7 @@ pub struct Hash {
     pub type_: Option<String>,
     /// Required. The hash value.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub value: Option<Vec<u8>>,
 }
 
@@ -1033,6 +1113,31 @@ pub struct InTotoProvenance {
 impl client::Part for InTotoProvenance {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InTotoSlsaProvenanceV1 {
+    /// InToto spec defined at https://github.com/in-toto/attestation/tree/main/spec#statement
+    
+    pub _type: Option<String>,
+    /// no description provided
+    
+    pub predicate: Option<SlsaProvenanceV1>,
+    /// no description provided
+    #[serde(rename="predicateType")]
+    
+    pub predicate_type: Option<String>,
+    /// no description provided
+    
+    pub subject: Option<Vec<Subject>>,
+}
+
+impl client::Part for InTotoSlsaProvenanceV1 {}
+
+
 /// Spec defined at https://github.com/in-toto/attestation/tree/main/spec#statement The serialized InTotoStatement will be stored as Envelope.payload. Envelope.payloadType is always "application/vnd.in-toto+json".
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1064,6 +1169,25 @@ pub struct InTotoStatement {
 }
 
 impl client::Part for InTotoStatement {}
+
+
+/// Justification provides the justification when the state of the assessment if NOT_AFFECTED.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Justification {
+    /// Additional details on why this justification was chosen.
+    
+    pub details: Option<String>,
+    /// The justification type for this vulnerability.
+    #[serde(rename="justificationType")]
+    
+    pub justification_type: Option<String>,
+}
+
+impl client::Part for Justification {}
 
 
 /// There is no detailed description.
@@ -1210,6 +1334,30 @@ impl client::Part for Location {}
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Maintainer {
+    /// no description provided
+    
+    pub email: Option<String>,
+    /// no description provided
+    
+    pub kind: Option<String>,
+    /// no description provided
+    
+    pub name: Option<String>,
+    /// no description provided
+    
+    pub url: Option<String>,
+}
+
+impl client::Part for Maintainer {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Material {
     /// no description provided
     
@@ -1330,6 +1478,10 @@ pub struct Occurrence {
     #[serde(rename="resourceUri")]
     
     pub resource_uri: Option<String>,
+    /// Describes a specific SBOM reference occurrences.
+    #[serde(rename="sbomReference")]
+    
+    pub sbom_reference: Option<SBOMReferenceOccurrence>,
     /// Output only. The time this occurrence was last updated.
     #[serde(rename="updateTime")]
     
@@ -1370,7 +1522,7 @@ pub struct Operation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -1385,6 +1537,17 @@ impl client::ResponseResult for Operation {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PackageData {
+    /// The architecture of the package.
+    
+    pub architecture: Option<String>,
+    /// A bundle containing the binary and source information.
+    #[serde(rename="binarySourceInfo")]
+    
+    pub binary_source_info: Option<Vec<BinarySourceInfo>>,
+    /// DEPRECATED
+    #[serde(rename="binaryVersion")]
+    
+    pub binary_version: Option<PackageVersion>,
     /// The cpe_uri in [cpe format] (https://cpe.mitre.org/specification/) in which the vulnerability may manifest. Examples include distro or storage location for vulnerable jar.
     #[serde(rename="cpeUri")]
     
@@ -1401,6 +1564,12 @@ pub struct PackageData {
     #[serde(rename="hashDigest")]
     
     pub hash_digest: Option<String>,
+    /// The list of licenses found that are related to a given package. Note that licenses may also be stored on the BinarySourceInfo. If there is no BinarySourceInfo (because there's no concept of source vs binary), then it will be stored here, while if there are BinarySourceInfos, it will be stored there, as one source can have multiple binaries with different licenses.
+    
+    pub licenses: Option<Vec<String>>,
+    /// The maintainer of the package.
+    
+    pub maintainer: Option<Maintainer>,
     /// The OS affected by a vulnerability Used to generate the cpe_uri for OS packages
     
     pub os: Option<String>,
@@ -1419,6 +1588,10 @@ pub struct PackageData {
     #[serde(rename="patchedCve")]
     
     pub patched_cve: Option<Vec<String>>,
+    /// DEPRECATED
+    #[serde(rename="sourceVersion")]
+    
+    pub source_version: Option<PackageVersion>,
     /// no description provided
     
     pub unused: Option<String>,
@@ -1517,6 +1690,27 @@ pub struct PackageOccurrence {
 impl client::Part for PackageOccurrence {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PackageVersion {
+    /// The licenses associated with this package. Note that this has to go on the PackageVersion level, because we can have cases with images with the same source having different licences. E.g. in Alpine, musl and musl-utils both have the same origin musl, but have different sets of licenses.
+    
+    pub licenses: Option<Vec<String>>,
+    /// no description provided
+    
+    pub name: Option<String>,
+    /// no description provided
+    
+    pub version: Option<String>,
+}
+
+impl client::Part for PackageVersion {}
+
+
 /// Selects a repo using a Google Cloud Platform project ID (e.g., winged-cargo-31) and a repo name within that project.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1535,6 +1729,28 @@ pub struct ProjectRepoId {
 }
 
 impl client::Part for ProjectRepoId {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProvenanceBuilder {
+    /// no description provided
+    #[serde(rename="builderDependencies")]
+    
+    pub builder_dependencies: Option<Vec<ResourceDescriptor>>,
+    /// no description provided
+    
+    pub id: Option<String>,
+    /// no description provided
+    
+    pub version: Option<HashMap<String, String>>,
+}
+
+impl client::Part for ProvenanceBuilder {}
 
 
 /// Steps taken to build the artifact. For a TaskRun, typically each container corresponds to one step in the recipe.
@@ -1586,6 +1802,29 @@ pub struct RelatedUrl {
 impl client::Part for RelatedUrl {}
 
 
+/// Specifies details on how to handle (and presumably, fix) a vulnerability.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Remediation {
+    /// Contains a comprehensive human-readable discussion of the remediation.
+    
+    pub details: Option<String>,
+    /// The type of remediation that can be applied.
+    #[serde(rename="remediationType")]
+    
+    pub remediation_type: Option<String>,
+    /// Contains the URL where to obtain the remediation.
+    #[serde(rename="remediationUri")]
+    
+    pub remediation_uri: Option<RelatedUrl>,
+}
+
+impl client::Part for Remediation {}
+
+
 /// A unique identifier for a Cloud Repo.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1605,6 +1844,155 @@ pub struct RepoId {
 impl client::Part for RepoId {}
 
 
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceDescriptor {
+    /// no description provided
+    
+    pub annotations: Option<HashMap<String, json::Value>>,
+    /// no description provided
+    
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    pub content: Option<Vec<u8>>,
+    /// no description provided
+    
+    pub digest: Option<HashMap<String, String>>,
+    /// no description provided
+    #[serde(rename="downloadLocation")]
+    
+    pub download_location: Option<String>,
+    /// no description provided
+    #[serde(rename="mediaType")]
+    
+    pub media_type: Option<String>,
+    /// no description provided
+    
+    pub name: Option<String>,
+    /// no description provided
+    
+    pub uri: Option<String>,
+}
+
+impl client::Part for ResourceDescriptor {}
+
+
+/// There is no detailed description.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RunDetails {
+    /// no description provided
+    
+    pub builder: Option<ProvenanceBuilder>,
+    /// no description provided
+    
+    pub byproducts: Option<Vec<ResourceDescriptor>>,
+    /// no description provided
+    
+    pub metadata: Option<BuildMetadata>,
+}
+
+impl client::Part for RunDetails {}
+
+
+/// The occurrence representing an SBOM reference as applied to a specific resource. The occurrence follows the DSSE specification. See https://github.com/secure-systems-lab/dsse/blob/master/envelope.md for more details.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SBOMReferenceOccurrence {
+    /// The actual payload that contains the SBOM reference data.
+    
+    pub payload: Option<SbomReferenceIntotoPayload>,
+    /// The kind of payload that SbomReferenceIntotoPayload takes. Since it's in the intoto format, this value is expected to be 'application/vnd.in-toto+json'.
+    #[serde(rename="payloadType")]
+    
+    pub payload_type: Option<String>,
+    /// The signatures over the payload.
+    
+    pub signatures: Option<Vec<EnvelopeSignature>>,
+}
+
+impl client::Part for SBOMReferenceOccurrence {}
+
+
+/// The status of an SBOM generation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SBOMStatus {
+    /// If there was an error generating an SBOM, this will indicate what that error was.
+    
+    pub error: Option<String>,
+    /// The progress of the SBOM generation.
+    #[serde(rename="sbomState")]
+    
+    pub sbom_state: Option<String>,
+}
+
+impl client::Part for SBOMStatus {}
+
+
+/// The actual payload that contains the SBOM Reference data. The payload follows the intoto statement specification. See https://github.com/in-toto/attestation/blob/main/spec/v1.0/statement.md for more details.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SbomReferenceIntotoPayload {
+    /// Identifier for the schema of the Statement.
+    
+    pub _type: Option<String>,
+    /// Additional parameters of the Predicate. Includes the actual data about the SBOM.
+    
+    pub predicate: Option<SbomReferenceIntotoPredicate>,
+    /// URI identifying the type of the Predicate.
+    #[serde(rename="predicateType")]
+    
+    pub predicate_type: Option<String>,
+    /// Set of software artifacts that the attestation applies to. Each element represents a single software artifact.
+    
+    pub subject: Option<Vec<Subject>>,
+}
+
+impl client::Part for SbomReferenceIntotoPayload {}
+
+
+/// A predicate which describes the SBOM being referenced.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SbomReferenceIntotoPredicate {
+    /// A map of algorithm to digest of the contents of the SBOM.
+    
+    pub digest: Option<HashMap<String, String>>,
+    /// The location of the SBOM.
+    
+    pub location: Option<String>,
+    /// The mime type of the SBOM.
+    #[serde(rename="mimeType")]
+    
+    pub mime_type: Option<String>,
+    /// The person or system referring this predicate to the consumer.
+    #[serde(rename="referrerId")]
+    
+    pub referrer_id: Option<String>,
+}
+
+impl client::Part for SbomReferenceIntotoPredicate {}
+
+
 /// Verifiers (e.g. Kritis implementations) MUST verify signatures with respect to the trust anchors defined in policy (e.g. a Kritis policy). Typically this means that the verifier has been configured with a map from `public_key_id` to public key material (and any required parameters, e.g. signing algorithm). In particular, verification implementations MUST NOT treat the signature `public_key_id` as anything more than a key lookup hint. The `public_key_id` DOES NOT validate or authenticate a public key; it only provides a mechanism for quickly selecting a public key ALREADY CONFIGURED on the verifier through a trusted channel. Verification implementations MUST reject signatures in any of the following circumstances: * The `public_key_id` is not recognized by the verifier. * The public key that `public_key_id` refers to does not verify the signature with respect to the payload. The `signature` contents SHOULD NOT be "attached" (where the payload is included with the serialized `signature` bytes). Verifiers MUST ignore any "attached" payload and only verify signatures with respect to explicitly provided payload (e.g. a `payload` field on the proto message that holds this Signature, or the canonical serialization of the proto message that holds this signature).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1618,7 +2006,7 @@ pub struct Signature {
     pub public_key_id: Option<String>,
     /// The content of the signature, an opaque bytestring. The payload that this signature verifies MUST be unambiguously provided with the Signature during verification. A wrapper message might provide the payload explicitly. Alternatively, a message might have a canonical serialization that can always be unambiguously computed to derive the payload.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub signature: Option<Vec<u8>>,
 }
 
@@ -1713,6 +2101,26 @@ pub struct SlsaProvenance {
 }
 
 impl client::Part for SlsaProvenance {}
+
+
+/// Keep in sync with schema at https://github.com/slsa-framework/slsa/blob/main/docs/provenance/schema/v1/provenance.proto Builder renamed to ProvenanceBuilder because of Java conflicts.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SlsaProvenanceV1 {
+    /// no description provided
+    #[serde(rename="buildDefinition")]
+    
+    pub build_definition: Option<BuildDefinition>,
+    /// no description provided
+    #[serde(rename="runDetails")]
+    
+    pub run_details: Option<RunDetails>,
+}
+
+impl client::Part for SlsaProvenanceV1 {}
 
 
 /// See full explanation of fields at slsa.dev/provenance/v0.2.
@@ -1951,6 +2359,45 @@ pub struct Version {
 impl client::Part for Version {}
 
 
+/// VexAssessment provides all publisher provided Vex information that is related to this vulnerability.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VexAssessment {
+    /// Holds the MITRE standard Common Vulnerabilities and Exposures (CVE) tracking number for the vulnerability. Deprecated: Use vulnerability_id instead to denote CVEs.
+    
+    pub cve: Option<String>,
+    /// Contains information about the impact of this vulnerability, this will change with time.
+    
+    pub impacts: Option<Vec<String>>,
+    /// Justification provides the justification when the state of the assessment if NOT_AFFECTED.
+    
+    pub justification: Option<Justification>,
+    /// The VulnerabilityAssessment note from which this VexAssessment was generated. This will be of the form: `projects/[PROJECT_ID]/notes/[NOTE_ID]`.
+    #[serde(rename="noteName")]
+    
+    pub note_name: Option<String>,
+    /// Holds a list of references associated with this vulnerability item and assessment.
+    #[serde(rename="relatedUris")]
+    
+    pub related_uris: Option<Vec<RelatedUrl>>,
+    /// Specifies details on how to handle (and presumably, fix) a vulnerability.
+    
+    pub remediations: Option<Vec<Remediation>>,
+    /// Provides the state of this Vulnerability assessment.
+    
+    pub state: Option<String>,
+    /// The vulnerability identifier for this Assessment. Will hold one of common identifiers e.g. CVE, GHSA etc.
+    #[serde(rename="vulnerabilityId")]
+    
+    pub vulnerability_id: Option<String>,
+}
+
+impl client::Part for VexAssessment {}
+
+
 /// An occurrence of a severity vulnerability on a resource.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -1962,6 +2409,10 @@ pub struct VulnerabilityOccurrence {
     #[serde(rename="cvssScore")]
     
     pub cvss_score: Option<f32>,
+    /// The cvss v2 score for the vulnerability.
+    #[serde(rename="cvssV2")]
+    
+    pub cvss_v2: Option<CVSS>,
     /// Output only. CVSS version used to populate cvss_score and severity.
     #[serde(rename="cvssVersion")]
     
@@ -1973,6 +2424,10 @@ pub struct VulnerabilityOccurrence {
     #[serde(rename="effectiveSeverity")]
     
     pub effective_severity: Option<String>,
+    /// Occurrence-specific extra details about the vulnerability.
+    #[serde(rename="extraDetails")]
+    
+    pub extra_details: Option<String>,
     /// Output only. Whether at least one of the affected packages has a fix available.
     #[serde(rename="fixAvailable")]
     
@@ -2000,6 +2455,10 @@ pub struct VulnerabilityOccurrence {
     #[serde(rename="type")]
     
     pub type_: Option<String>,
+    /// no description provided
+    #[serde(rename="vexAssessment")]
+    
+    pub vex_assessment: Option<VexAssessment>,
 }
 
 impl client::Part for VulnerabilityOccurrence {}
@@ -2137,7 +2596,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
     /// 
     /// # Arguments
     ///
@@ -3006,7 +3465,7 @@ where
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *locations.operations.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.

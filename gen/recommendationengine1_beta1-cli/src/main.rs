@@ -2017,7 +2017,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-catalogs-event-stores-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_recommendationengine1_beta1_cli/projects_locations-catalogs-event-stores-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -2339,7 +2339,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-catalogs-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_recommendationengine1_beta1_cli/projects_locations-catalogs-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -2394,7 +2394,7 @@ async fn main() {
     
     let mut app = App::new("recommendationengine1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230105")
+           .version("5.0.4+20240229")
            .about("Note that we now highly recommend new customers to use Retail API, which incorporates the GA version of the Recommendations AI funtionalities. To enable Retail API, please visit https://console.cloud.google.com/apis/library/retail.googleapis.com. The Recommendations AI service enables customers to build end-to-end personalized recommendation systems without requiring a high level of expertise in machine learning, recommendation system, or Google Cloud.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_recommendationengine1_beta1_cli")
            .arg(Arg::with_name("url")

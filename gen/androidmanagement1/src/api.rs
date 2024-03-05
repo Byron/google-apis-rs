@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// Manage Android devices and apps for your customers
     Full,
@@ -129,7 +129,7 @@ impl<'a, S> AndroidManagement<S> {
         AndroidManagement {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://androidmanagement.googleapis.com/".to_string(),
             _root_url: "https://androidmanagement.googleapis.com/".to_string(),
         }
@@ -138,12 +138,15 @@ impl<'a, S> AndroidManagement<S> {
     pub fn enterprises(&'a self) -> EnterpriseMethods<'a, S> {
         EnterpriseMethods { hub: &self }
     }
+    pub fn provisioning_info(&'a self) -> ProvisioningInfoMethods<'a, S> {
+        ProvisioningInfoMethods { hub: &self }
+    }
     pub fn signup_urls(&'a self) -> SignupUrlMethods<'a, S> {
         SignupUrlMethods { hub: &self }
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -171,7 +174,7 @@ impl<'a, S> AndroidManagement<S> {
 // ############
 // SCHEMAS ###
 // ##########
-/// Security policies set to secure values by default. To maintain the security posture of a device, we don't recommend overriding any of the default values.
+/// Advanced security settings. In most cases, setting these is not needed.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -190,6 +193,10 @@ pub struct AdvancedSecurityOverrides {
     #[serde(rename="googlePlayProtectVerifyApps")]
     
     pub google_play_protect_verify_apps: Option<String>,
+    /// Optional. Controls Memory Tagging Extension (MTE) (https://source.android.com/docs/security/test/memory-safety/arm-mte) on the device. The device needs to be rebooted to apply changes to the MTE policy.
+    #[serde(rename="mtePolicy")]
+    
+    pub mte_policy: Option<String>,
     /// Personal apps that can read work profile notifications using a NotificationListenerService (https://developer.android.com/reference/android/service/notification/NotificationListenerService). By default, no personal apps (aside from system apps) can read work notifications. Each value in the list must be a package name.
     #[serde(rename="personalAppsThatCanReadWorkNotifications")]
     
@@ -425,7 +432,7 @@ pub struct ApplicationPermission {
 impl client::Part for ApplicationPermission {}
 
 
-/// Policy for an individual app.
+/// Policy for an individual app. Note: Application availability on a given device cannot be changed using this policy if installAppsDisabled is enabled. The maximum number of applications that you can specify per policy is 3,000.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -448,11 +455,15 @@ pub struct ApplicationPolicy {
     #[serde(rename="connectedWorkAndPersonalApp")]
     
     pub connected_work_and_personal_app: Option<String>,
+    /// Optional. Whether the app is allowed to act as a credential provider on Android 14 and above.
+    #[serde(rename="credentialProviderPolicy")]
+    
+    pub credential_provider_policy: Option<String>,
     /// The default policy for all permissions requested by the app. If specified, this overrides the policy-level default_permission_policy which applies to all apps. It does not override the permission_grants which applies to all apps.
     #[serde(rename="defaultPermissionPolicy")]
     
     pub default_permission_policy: Option<String>,
-    /// The scopes delegated to the app from Android Device Policy.
+    /// The scopes delegated to the app from Android Device Policy. These provide additional privileges for the applications they are applied to.
     #[serde(rename="delegatedScopes")]
     
     pub delegated_scopes: Option<Vec<String>>,
@@ -463,6 +474,14 @@ pub struct ApplicationPolicy {
     #[serde(rename="extensionConfig")]
     
     pub extension_config: Option<ExtensionConfig>,
+    /// Optional. The constraints for installing the app. You can specify a maximum of one InstallConstraint. Multiple constraints are rejected.
+    #[serde(rename="installConstraint")]
+    
+    pub install_constraint: Option<Vec<InstallConstraint>>,
+    /// Optional. Amongst apps with installType set to: FORCE_INSTALLED PREINSTALLEDthis controls the relative priority of installation. A value of 0 (default) means this app has no priority over other apps. For values between 1 and 10,000, a lower value means a higher priority. Values outside of the range 0 to 10,000 inclusive are rejected.
+    #[serde(rename="installPriority")]
+    
+    pub install_priority: Option<i32>,
     /// The type of installation to perform.
     #[serde(rename="installType")]
     
@@ -541,6 +560,10 @@ pub struct ApplicationReport {
     /// Application state.
     
     pub state: Option<String>,
+    /// Whether the app is user facing.
+    #[serde(rename="userFacingType")]
+    
+    pub user_facing_type: Option<String>,
     /// The app version code, which can be used to determine whether one version is more recent than another.
     #[serde(rename="versionCode")]
     
@@ -676,7 +699,7 @@ pub struct Command {
     #[serde(rename="errorCode")]
     
     pub error_code: Option<String>,
-    /// For commands of type RESET_PASSWORD, optionally specifies the new password.
+    /// For commands of type RESET_PASSWORD, optionally specifies the new password. Note: The new password must be at least 6 characters long if it is numeric in case of Android 14 devices. Else the command will fail with INVALID_VALUE.
     #[serde(rename="newPassword")]
     
     pub new_password: Option<String>,
@@ -684,6 +707,22 @@ pub struct Command {
     #[serde(rename="resetPasswordFlags")]
     
     pub reset_password_flags: Option<Vec<String>>,
+    /// Parameters for the START_LOST_MODE command to put the device into lost mode. See StartLostModeParams. If this is set, then it is suggested that type should not be set. In this case, the server automatically sets it to START_LOST_MODE. It is also acceptable to explicitly set type to START_LOST_MODE.
+    #[serde(rename="startLostModeParams")]
+    
+    pub start_lost_mode_params: Option<StartLostModeParams>,
+    /// Output only. Status of the START_LOST_MODE command to put the device into lost mode. See StartLostModeStatus.
+    #[serde(rename="startLostModeStatus")]
+    
+    pub start_lost_mode_status: Option<StartLostModeStatus>,
+    /// Parameters for the STOP_LOST_MODE command to take the device out of lost mode. See StopLostModeParams. If this is set, then it is suggested that type should not be set. In this case, the server automatically sets it to STOP_LOST_MODE. It is also acceptable to explicitly set type to STOP_LOST_MODE.
+    #[serde(rename="stopLostModeParams")]
+    
+    pub stop_lost_mode_params: Option<StopLostModeParams>,
+    /// Output only. Status of the STOP_LOST_MODE command to take the device out of lost mode. See StopLostModeStatus.
+    #[serde(rename="stopLostModeStatus")]
+    
+    pub stop_lost_mode_status: Option<StopLostModeStatus>,
     /// The type of the command.
     #[serde(rename="type")]
     
@@ -804,7 +843,7 @@ pub struct ContentProviderEndpoint {
 impl client::Part for ContentProviderEndpoint {}
 
 
-/// Cross-profile policies applied on the device.
+/// Controls the data from the work profile that can be accessed from the personal profile and vice versa. A nonComplianceDetail with MANAGEMENT_MODE is reported if the device does not have a work profile.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -819,7 +858,11 @@ pub struct CrossProfilePolicies {
     #[serde(rename="crossProfileDataSharing")]
     
     pub cross_profile_data_sharing: Option<String>,
-    /// Whether contacts stored in the work profile can be shown in personal profile contact searches and incoming calls.
+    /// List of apps which are excluded from the ShowWorkContactsInPersonalProfile setting. For this to be set, ShowWorkContactsInPersonalProfile must be set to one of the following values: SHOW_WORK_CONTACTS_IN_PERSONAL_PROFILE_ALLOWED. In this case, these exemptions act as a blocklist. SHOW_WORK_CONTACTS_IN_PERSONAL_PROFILE_DISALLOWED. In this case, these exemptions act as an allowlist. SHOW_WORK_CONTACTS_IN_PERSONAL_PROFILE_DISALLOWED_EXCEPT_SYSTEM. In this case, these exemptions act as an allowlist, in addition to the already allowlisted system apps.Supported on Android 14 and above. A nonComplianceDetail with API_LEVEL is reported if the Android version is less than 14.
+    #[serde(rename="exemptionsToShowWorkContactsInPersonalProfile")]
+    
+    pub exemptions_to_show_work_contacts_in_personal_profile: Option<PackageNameList>,
+    /// Whether personal apps can access contacts stored in the work profile.See also exemptions_to_show_work_contacts_in_personal_profile.
     #[serde(rename="showWorkContactsInPersonalProfile")]
     
     pub show_work_contacts_in_personal_profile: Option<String>,
@@ -905,6 +948,10 @@ pub struct Device {
     /// Detailed information about displays on the device. This information is only available if displayInfoEnabled is true in the device's policy.
     
     pub displays: Option<Vec<Display>>,
+    /// Output only. Information related to whether this device was migrated from being managed by another Device Policy Controller (DPC).
+    #[serde(rename="dpcMigrationInfo")]
+    
+    pub dpc_migration_info: Option<DpcMigrationInfo>,
     /// The time of device enrollment.
     #[serde(rename="enrollmentTime")]
     
@@ -941,7 +988,7 @@ pub struct Device {
     #[serde(rename="managementMode")]
     
     pub management_mode: Option<String>,
-    /// Events related to memory and storage measurements in chronological order. This information is only available if memoryInfoEnabled is true in the device's policy.
+    /// Events related to memory and storage measurements in chronological order. This information is only available if memoryInfoEnabled is true in the device's policy.Events are retained for a certain period of time and old events are deleted.
     #[serde(rename="memoryEvents")]
     
     pub memory_events: Option<Vec<MemoryEvent>>,
@@ -1005,6 +1052,66 @@ pub struct Device {
 
 impl client::RequestValue for Device {}
 impl client::ResponseResult for Device {}
+
+
+/// Covers controls for device connectivity such as Wi-Fi, USB data access, keyboard/mouse connections, and more.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeviceConnectivityManagement {
+    /// Controls Wi-Fi configuring privileges. Based on the option set, user will have either full or limited or no control in configuring Wi-Fi networks.
+    #[serde(rename="configureWifi")]
+    
+    pub configure_wifi: Option<String>,
+    /// Controls tethering settings. Based on the value set, the user is partially or fully disallowed from using different forms of tethering.
+    #[serde(rename="tetheringSettings")]
+    
+    pub tethering_settings: Option<String>,
+    /// Controls what files and/or data can be transferred via USB. Supported only on company-owned devices.
+    #[serde(rename="usbDataAccess")]
+    
+    pub usb_data_access: Option<String>,
+    /// Controls configuring and using Wi-Fi direct settings. Supported on company-owned devices running Android 13 and above.
+    #[serde(rename="wifiDirectSettings")]
+    
+    pub wifi_direct_settings: Option<String>,
+}
+
+impl client::Part for DeviceConnectivityManagement {}
+
+
+/// Controls for device radio settings.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DeviceRadioState {
+    /// Controls whether airplane mode can be toggled by the user or not.
+    #[serde(rename="airplaneModeState")]
+    
+    pub airplane_mode_state: Option<String>,
+    /// Controls whether cellular 2G setting can be toggled by the user or not.
+    #[serde(rename="cellularTwoGState")]
+    
+    pub cellular_two_g_state: Option<String>,
+    /// The minimum required security level of Wi-Fi networks that the device can connect to.
+    #[serde(rename="minimumWifiSecurityLevel")]
+    
+    pub minimum_wifi_security_level: Option<String>,
+    /// Controls the state of the ultra wideband setting and whether the user can toggle it on or off.
+    #[serde(rename="ultraWidebandState")]
+    
+    pub ultra_wideband_state: Option<String>,
+    /// Controls current state of Wi-Fi and if user can change its state.
+    #[serde(rename="wifiState")]
+    
+    pub wifi_state: Option<String>,
+}
+
+impl client::Part for DeviceRadioState {}
 
 
 /// Information about security related device settings on device.
@@ -1082,6 +1189,26 @@ pub struct Display {
 impl client::Part for Display {}
 
 
+/// Information related to whether this device was migrated from being managed by another Device Policy Controller (DPC).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DpcMigrationInfo {
+    /// Output only. If this device was migrated from another DPC, the additionalData field of the migration token is populated here.
+    #[serde(rename="additionalData")]
+    
+    pub additional_data: Option<String>,
+    /// Output only. If this device was migrated from another DPC, this is its package name. Not populated otherwise.
+    #[serde(rename="previousDpc")]
+    
+    pub previous_dpc: Option<String>,
+}
+
+impl client::Part for DpcMigrationInfo {}
+
+
 /// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); } 
 /// 
 /// # Activities
@@ -1090,7 +1217,6 @@ impl client::Part for Display {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [devices operations cancel enterprises](EnterpriseDeviceOperationCancelCall) (response)
-/// * [devices operations delete enterprises](EnterpriseDeviceOperationDeleteCall) (response)
 /// * [devices delete enterprises](EnterpriseDeviceDeleteCall) (response)
 /// * [enrollment tokens delete enterprises](EnterpriseEnrollmentTokenDeleteCall) (response)
 /// * [policies delete enterprises](EnterprisePolicyDeleteCall) (response)
@@ -1167,7 +1293,6 @@ impl client::ResponseResult for EnrollmentToken {}
 /// 
 /// * [applications get enterprises](EnterpriseApplicationGetCall) (none)
 /// * [devices operations cancel enterprises](EnterpriseDeviceOperationCancelCall) (none)
-/// * [devices operations delete enterprises](EnterpriseDeviceOperationDeleteCall) (none)
 /// * [devices operations get enterprises](EnterpriseDeviceOperationGetCall) (none)
 /// * [devices operations list enterprises](EnterpriseDeviceOperationListCall) (none)
 /// * [devices delete enterprises](EnterpriseDeviceDeleteCall) (none)
@@ -1179,6 +1304,9 @@ impl client::ResponseResult for EnrollmentToken {}
 /// * [enrollment tokens delete enterprises](EnterpriseEnrollmentTokenDeleteCall) (none)
 /// * [enrollment tokens get enterprises](EnterpriseEnrollmentTokenGetCall) (none)
 /// * [enrollment tokens list enterprises](EnterpriseEnrollmentTokenListCall) (none)
+/// * [migration tokens create enterprises](EnterpriseMigrationTokenCreateCall) (none)
+/// * [migration tokens get enterprises](EnterpriseMigrationTokenGetCall) (none)
+/// * [migration tokens list enterprises](EnterpriseMigrationTokenListCall) (none)
 /// * [policies delete enterprises](EnterprisePolicyDeleteCall) (none)
 /// * [policies get enterprises](EnterprisePolicyGetCall) (none)
 /// * [policies list enterprises](EnterprisePolicyListCall) (none)
@@ -1209,7 +1337,7 @@ pub struct Enterprise {
     #[serde(rename="enabledNotificationTypes")]
     
     pub enabled_notification_types: Option<Vec<String>>,
-    /// The name of the enterprise displayed to users.
+    /// The name of the enterprise displayed to users. This field has a maximum length of 100 characters.
     #[serde(rename="enterpriseDisplayName")]
     
     pub enterprise_display_name: Option<String>,
@@ -1281,7 +1409,7 @@ pub struct ExternalData {
 impl client::Part for ExternalData {}
 
 
-/// A system freeze period. When a device’s clock is within the freeze period, all incoming system updates (including security patches) are blocked and won’t be installed. When a device is outside the freeze period, normal update behavior applies. Leap years are ignored in freeze period calculations, in particular: * If Feb. 29th is set as the start or end date of a freeze period, the freeze period will start or end on Feb. 28th instead. * When a device’s system clock reads Feb. 29th, it’s treated as Feb. 28th. * When calculating the number of days in a freeze period or the time between two freeze periods, Feb. 29th is ignored and not counted as a day.Note: For Freeze Periods to take effect, SystemUpdateType cannot be specified as SYSTEM_UPDATE_TYPE_UNSPECIFIED, because freeze periods require a defined policy to be specified.
+/// A system freeze period. When a device’s clock is within the freeze period, all incoming system updates (including security patches) are blocked and won’t be installed.When the device is outside any set freeze periods, the normal policy behavior (automatic, windowed, or postponed) applies.Leap years are ignored in freeze period calculations, in particular: If Feb. 29th is set as the start or end date of a freeze period, the freeze period will start or end on Feb. 28th instead. When a device’s system clock reads Feb. 29th, it’s treated as Feb. 28th. When calculating the number of days in a freeze period or the time between two freeze periods, Feb. 29th is ignored and not counted as a day.Note: For Freeze Periods to take effect, SystemUpdateType cannot be specified as SYSTEM_UPDATE_TYPE_UNSPECIFIED, because freeze periods require a defined policy to be specified.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1407,6 +1535,30 @@ pub struct HardwareStatus {
 }
 
 impl client::Part for HardwareStatus {}
+
+
+/// Amongst apps with InstallType set to: FORCE_INSTALLED PREINSTALLEDthis defines a set of restrictions for the app installation. At least one of the fields must be set. When multiple fields are set, then all the constraints need to be satisfied for the app to be installed.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct InstallConstraint {
+    /// Optional. Charging constraint.
+    #[serde(rename="chargingConstraint")]
+    
+    pub charging_constraint: Option<String>,
+    /// Optional. Device idle constraint.
+    #[serde(rename="deviceIdleConstraint")]
+    
+    pub device_idle_constraint: Option<String>,
+    /// Optional. Network type constraint.
+    #[serde(rename="networkTypeConstraint")]
+    
+    pub network_type_constraint: Option<String>,
+}
+
+impl client::Part for InstallConstraint {}
 
 
 /// Keyed app state reported by the app.
@@ -1559,6 +1711,30 @@ pub struct ListEnterprisesResponse {
 impl client::ResponseResult for ListEnterprisesResponse {}
 
 
+/// Response to a request to list migration tokens for a given enterprise.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [migration tokens list enterprises](EnterpriseMigrationTokenListCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListMigrationTokensResponse {
+    /// The migration tokens from the specified enterprise.
+    #[serde(rename="migrationTokens")]
+    
+    pub migration_tokens: Option<Vec<MigrationToken>>,
+    /// A token, which can be sent as page_token to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+}
+
+impl client::ResponseResult for ListMigrationTokensResponse {}
+
+
 /// The response message for Operations.ListOperations.
 /// 
 /// # Activities
@@ -1703,7 +1879,7 @@ pub struct ManagedPropertyEntry {
 impl client::Part for ManagedPropertyEntry {}
 
 
-/// An event related to memory and storage measurements.
+/// An event related to memory and storage measurements.To distinguish between new and old events, we recommend using the createTime field.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -1748,6 +1924,64 @@ pub struct MemoryInfo {
 }
 
 impl client::Part for MemoryInfo {}
+
+
+/// A token to initiate the migration of a device from being managed by a third-party DPC to being managed by Android Management API. A migration token is valid only for a single device.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [migration tokens create enterprises](EnterpriseMigrationTokenCreateCall) (request|response)
+/// * [migration tokens get enterprises](EnterpriseMigrationTokenGetCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MigrationToken {
+    /// Immutable. Optional EMM-specified additional data. Once the device is migrated this will be populated in the migrationAdditionalData field of the Device resource. This must be at most 1024 characters.
+    #[serde(rename="additionalData")]
+    
+    pub additional_data: Option<String>,
+    /// Output only. Time when this migration token was created.
+    #[serde(rename="createTime")]
+    
+    pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Output only. Once this migration token is used to migrate a device, the name of the resulting Device resource will be populated here, in the form enterprises/{enterprise}/devices/{device}.
+    
+    pub device: Option<String>,
+    /// Required. Immutable. The id of the device, as in the Play EMM API. This corresponds to the deviceId parameter in Play EMM API's Devices.get (https://developers.google.com/android/work/play/emm-api/v1/devices/get#parameters) call.
+    #[serde(rename="deviceId")]
+    
+    pub device_id: Option<String>,
+    /// Immutable. The time when this migration token expires. This can be at most seven days from the time of creation. The migration token is deleted seven days after it expires.
+    #[serde(rename="expireTime")]
+    
+    pub expire_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Required. Immutable. The management mode of the device or profile being migrated.
+    #[serde(rename="managementMode")]
+    
+    pub management_mode: Option<String>,
+    /// Output only. The name of the migration token, which is generated by the server during creation, in the form enterprises/{enterprise}/migrationTokens/{migration_token}.
+    
+    pub name: Option<String>,
+    /// Required. Immutable. The name of the policy initially applied to the enrolled device, in the form enterprises/{enterprise}/policies/{policy}.
+    
+    pub policy: Option<String>,
+    /// Input only. The time that this migration token is valid for. This is input-only, and for returning a migration token the server will populate the expireTime field. This can be at most seven days. The default is seven days.
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub ttl: Option<client::chrono::Duration>,
+    /// Required. Immutable. The user id of the Managed Google Play account on the device, as in the Play EMM API. This corresponds to the userId parameter in Play EMM API's Devices.get (https://developers.google.com/android/work/play/emm-api/v1/devices/get#parameters) call.
+    #[serde(rename="userId")]
+    
+    pub user_id: Option<String>,
+    /// Output only. The value of the migration token.
+    
+    pub value: Option<String>,
+}
+
+impl client::RequestValue for MigrationToken {}
+impl client::ResponseResult for MigrationToken {}
 
 
 /// Device network info.
@@ -1908,7 +2142,7 @@ pub struct Operation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the name should be a resource name ending with operations/{unique_id}.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as Delete, the response is google.protobuf.Empty. If the original method is standard Get/Create/Update, the response should be the resource. For other methods, the response should have the type XxxResponse, where Xxx is the original method name. For example, if the original method name is TakeSnapshot(), the inferred response type is TakeSnapshotResponse.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as Delete, the response is google.protobuf.Empty. If the original method is standard Get/Create/Update, the response should be the resource. For other methods, the response should have the type XxxResponse, where Xxx is the original method name. For example, if the original method name is TakeSnapshot(), the inferred response type is TakeSnapshotResponse.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -2108,7 +2342,7 @@ pub struct PersonalUsagePolicies {
     #[serde(rename="cameraDisabled")]
     
     pub camera_disabled: Option<bool>,
-    /// Controls how long the work profile can stay off. The duration must be at least 3 days.
+    /// Controls how long the work profile can stay off. The minimum duration must be at least 3 days. Other details are as follows: - If the duration is set to 0, the feature is turned off. - If the duration is set to a value smaller than the minimum duration, the feature returns an error. *Note:* If you want to avoid personal profiles being suspended during long periods of off-time, you can temporarily set a large value for this parameter.
     #[serde(rename="maxDaysWithWorkOff")]
     
     pub max_days_with_work_off: Option<i32>,
@@ -2153,7 +2387,7 @@ pub struct Policy {
     #[serde(rename="adjustVolumeDisabled")]
     
     pub adjust_volume_disabled: Option<bool>,
-    /// Security policies set to secure values by default. To maintain the security posture of a device, we don't recommend overriding any of the default values.
+    /// Advanced security settings. In most cases, setting these is not needed.
     #[serde(rename="advancedSecurityOverrides")]
     
     pub advanced_security_overrides: Option<AdvancedSecurityOverrides>,
@@ -2161,15 +2395,15 @@ pub struct Policy {
     #[serde(rename="alwaysOnVpnPackage")]
     
     pub always_on_vpn_package: Option<AlwaysOnVpnPackage>,
-    /// The app tracks for Android Device Policy the device can access. The device receives the latest version among all accessible tracks. If no tracks are specified, then the device only uses the production track.
+    /// This setting is not supported. Any value is ignored.
     #[serde(rename="androidDevicePolicyTracks")]
     
     pub android_device_policy_tracks: Option<Vec<String>>,
-    /// Deprecated. Use autoUpdateMode instead.When autoUpdateMode is set to AUTO_UPDATE_POSTPONED or AUTO_UPDATE_HIGH_PRIORITY, this field has no effect.The app auto update policy, which controls when automatic app updates can be applied.
+    /// Recommended alternative: autoUpdateMode which is set per app, provides greater flexibility around update frequency.When autoUpdateMode is set to AUTO_UPDATE_POSTPONED or AUTO_UPDATE_HIGH_PRIORITY, this field has no effect.The app auto update policy, which controls when automatic app updates can be applied.
     #[serde(rename="appAutoUpdatePolicy")]
     
     pub app_auto_update_policy: Option<String>,
-    /// Policy applied to apps.
+    /// Policy applied to apps. This can have at most 3,000 elements.
     
     pub applications: Option<Vec<ApplicationPolicy>>,
     /// Whether auto date, time, and time zone are enabled on a company-owned device. If this is set, then autoTimeRequired is ignored.
@@ -2208,7 +2442,7 @@ pub struct Policy {
     #[serde(rename="cellBroadcastsConfigDisabled")]
     
     pub cell_broadcasts_config_disabled: Option<bool>,
-    /// Rules for determining apps' access to private keys. See ChoosePrivateKeyRule for details.
+    /// Rules for determining apps' access to private keys. See ChoosePrivateKeyRule for details. This must be empty if any application has CERT_SELECTION delegation scope.
     #[serde(rename="choosePrivateKeyRules")]
     
     pub choose_private_key_rules: Option<Vec<ChoosePrivateKeyRule>>,
@@ -2220,6 +2454,10 @@ pub struct Policy {
     #[serde(rename="createWindowsDisabled")]
     
     pub create_windows_disabled: Option<bool>,
+    /// Controls which apps are allowed to act as credential providers on Android 14 and above. These apps store credentials, see this (https://developer.android.com/training/sign-in/passkeys) and this (https://developer.android.com/reference/androidx/credentials/CredentialManager) for details. See also credentialProviderPolicy.
+    #[serde(rename="credentialProviderPolicyDefault")]
+    
+    pub credential_provider_policy_default: Option<String>,
     /// Whether configuring user credentials is disabled.
     #[serde(rename="credentialsConfigDisabled")]
     
@@ -2240,10 +2478,18 @@ pub struct Policy {
     #[serde(rename="defaultPermissionPolicy")]
     
     pub default_permission_policy: Option<String>,
+    /// Covers controls for device connectivity such as Wi-Fi, USB data access, keyboard/mouse connections, and more.
+    #[serde(rename="deviceConnectivityManagement")]
+    
+    pub device_connectivity_management: Option<DeviceConnectivityManagement>,
     /// The device owner information to be shown on the lock screen.
     #[serde(rename="deviceOwnerLockScreenInfo")]
     
     pub device_owner_lock_screen_info: Option<UserFacingMessage>,
+    /// Covers controls for radio state such as Wi-Fi, bluetooth, and more.
+    #[serde(rename="deviceRadioState")]
+    
+    pub device_radio_state: Option<DeviceRadioState>,
     /// Whether encryption is enabled
     #[serde(rename="encryptionPolicy")]
     
@@ -2324,7 +2570,7 @@ pub struct Policy {
     /// The name of the policy in the form enterprises/{enterpriseId}/policies/{policyId}.
     
     pub name: Option<String>,
-    /// Whether the network escape hatch is enabled. If a network connection can't be made at boot time, the escape hatch prompts the user to temporarily connect to a network in order to refresh the device policy. After applying policy, the temporary network will be forgotten and the device will continue booting. This prevents being unable to connect to a network if there is no suitable network in the last policy and the device boots into an app in lock task mode, or the user is otherwise unable to reach device settings.Note: Setting wifiConfigDisabled to true will override this setting under specific circumstances. Please see wifiConfigDisabled for further details.
+    /// Whether the network escape hatch is enabled. If a network connection can't be made at boot time, the escape hatch prompts the user to temporarily connect to a network in order to refresh the device policy. After applying policy, the temporary network will be forgotten and the device will continue booting. This prevents being unable to connect to a network if there is no suitable network in the last policy and the device boots into an app in lock task mode, or the user is otherwise unable to reach device settings.Note: Setting wifiConfigDisabled to true will override this setting under specific circumstances. Please see wifiConfigDisabled for further details. Setting configureWifi to DISALLOW_CONFIGURING_WIFI will override this setting under specific circumstances. Please see DISALLOW_CONFIGURING_WIFI for further details.
     #[serde(rename="networkEscapeHatchEnabled")]
     
     pub network_escape_hatch_enabled: Option<bool>,
@@ -2388,7 +2634,11 @@ pub struct Policy {
     #[serde(rename="preferentialNetworkService")]
     
     pub preferential_network_service: Option<String>,
-    /// Allows showing UI on a device for a user to choose a private key alias if there are no matching rules in ChoosePrivateKeyRules. For devices below Android P, setting this may leave enterprise keys vulnerable.
+    /// Optional. Controls whether printing is allowed. This is supported on devices running Android 9 and above. .
+    #[serde(rename="printingPolicy")]
+    
+    pub printing_policy: Option<String>,
+    /// Allows showing UI on a device for a user to choose a private key alias if there are no matching rules in ChoosePrivateKeyRules. For devices below Android P, setting this may leave enterprise keys vulnerable. This value will have no effect if any application has CERT_SELECTION delegation scope.
     #[serde(rename="privateKeySelectionEnabled")]
     
     pub private_key_selection_enabled: Option<bool>,
@@ -2452,7 +2702,7 @@ pub struct Policy {
     #[serde(rename="systemUpdate")]
     
     pub system_update: Option<SystemUpdate>,
-    /// Whether configuring tethering and portable hotspots is disabled.
+    /// Whether configuring tethering and portable hotspots is disabled. If tetheringSettings is set to anything other than TETHERING_SETTINGS_UNSPECIFIED, this setting is ignored.
     #[serde(rename="tetheringConfigDisabled")]
     
     pub tethering_config_disabled: Option<bool>,
@@ -2484,7 +2734,7 @@ pub struct Policy {
     #[serde(rename="vpnConfigDisabled")]
     
     pub vpn_config_disabled: Option<bool>,
-    /// Whether configuring Wi-Fi access points is disabled. Note: If a network connection can't be made at boot time and configuring Wi-Fi is disabled then network escape hatch will be shown in order to refresh the device policy (see networkEscapeHatchEnabled).
+    /// Whether configuring Wi-Fi networks is disabled. Supported on fully managed devices and work profiles on company-owned devices. For fully managed devices, setting this to true removes all configured networks and retains only the networks configured using openNetworkConfiguration. For work profiles on company-owned devices, existing configured networks are not affected and the user is not allowed to add, remove, or modify Wi-Fi networks. If configureWifi is set to anything other than CONFIGURE_WIFI_UNSPECIFIED, this setting is ignored. Note: If a network connection can't be made at boot time and configuring Wi-Fi is disabled then network escape hatch will be shown in order to refresh the device policy (see networkEscapeHatchEnabled).
     #[serde(rename="wifiConfigDisabled")]
     
     pub wifi_config_disabled: Option<bool>,
@@ -2498,7 +2748,7 @@ impl client::RequestValue for Policy {}
 impl client::ResponseResult for Policy {}
 
 
-/// A rule that defines the actions to take if a device or work profile is not compliant with the policy specified in settingName.
+/// A rule that defines the actions to take if a device or work profile is not compliant with the policy specified in settingName. In the case of multiple matching or multiple triggered enforcement rules, a merge will occur with the most severe action being taken. However, all triggered rules are still kept track of: this includes initial trigger time and all associated non-compliance details. In the situation where the most severe enforcement rule is satisfied, the next most appropriate action is applied.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2563,6 +2813,45 @@ pub struct PowerManagementEvent {
 }
 
 impl client::Part for PowerManagementEvent {}
+
+
+/// Information about a device that is available during setup.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [get provisioning info](ProvisioningInfoGetCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ProvisioningInfo {
+    /// The API level of the Android platform version running on the device.
+    #[serde(rename="apiLevel")]
+    
+    pub api_level: Option<i32>,
+    /// The brand of the device. For example, Google.
+    
+    pub brand: Option<String>,
+    /// The name of the enterprise in the form enterprises/{enterprise}.
+    
+    pub enterprise: Option<String>,
+    /// The management mode of the device or profile.
+    #[serde(rename="managementMode")]
+    
+    pub management_mode: Option<String>,
+    /// The model of the device. For example, Asus Nexus 7.
+    
+    pub model: Option<String>,
+    /// The name of this resource in the form provisioningInfo/{provisioning_info}.
+    
+    pub name: Option<String>,
+    /// Ownership of the managed device.
+    
+    pub ownership: Option<String>,
+}
+
+impl client::ResponseResult for ProvisioningInfo {}
 
 
 /// Configuration info for an HTTP proxy. For a direct proxy, set the host, port, and excluded_hosts fields. For a PAC script proxy, set the pac_uri field.
@@ -2633,7 +2922,7 @@ pub struct SetupAction {
 impl client::Part for SetupAction {}
 
 
-/// A resource containing sign in details for an enterprise.
+/// A resource containing sign in details for an enterprise. Use enterprises to manage SigninDetails for a given enterprise.For an enterprise, we can have any number of SigninDetails that is uniquely identified by combination of the following three fields (signin_url, allow_personal_usage, token_tag). One cannot create two SigninDetails with the same (signin_url, allow_personal_usage, token_tag). (token_tag is an optional field).Patch: The operation updates the current list of SigninDetails with the new list of SigninDetails. If the stored SigninDetail configuration is passed, it returns the same signin_enrollment_token and qr_code. If we pass multiple identical SigninDetail configurations that are not stored, it will store the first one amongst those SigninDetail configurations. if the configuration already exists we cannot request it more than once in a particular patch API call, otherwise it will give a duplicate key error and the whole operation will fail. If we remove certain SigninDetail configuration from the request then it will get removed from the storage. We can then request another signin_enrollment_token and qr_code for the same SigninDetail configuration.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2656,6 +2945,10 @@ pub struct SigninDetail {
     #[serde(rename="signinUrl")]
     
     pub signin_url: Option<String>,
+    /// An EMM-specified metadata to distinguish between instances of SigninDetail.
+    #[serde(rename="tokenTag")]
+    
+    pub token_tag: Option<String>,
 }
 
 impl client::Part for SigninDetail {}
@@ -2760,6 +3053,53 @@ pub struct SpecificNonComplianceContext {
 impl client::Part for SpecificNonComplianceContext {}
 
 
+/// Parameters associated with the START_LOST_MODE command to put the device into lost mode. At least one of the parameters, not including the organization name, must be provided in order for the device to be put into lost mode.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StartLostModeParams {
+    /// The email address displayed to the user when the device is in lost mode.
+    #[serde(rename="lostEmailAddress")]
+    
+    pub lost_email_address: Option<String>,
+    /// The message displayed to the user when the device is in lost mode.
+    #[serde(rename="lostMessage")]
+    
+    pub lost_message: Option<UserFacingMessage>,
+    /// The organization name displayed to the user when the device is in lost mode.
+    #[serde(rename="lostOrganization")]
+    
+    pub lost_organization: Option<UserFacingMessage>,
+    /// The phone number displayed to the user when the device is in lost mode.
+    #[serde(rename="lostPhoneNumber")]
+    
+    pub lost_phone_number: Option<UserFacingMessage>,
+    /// The street address displayed to the user when the device is in lost mode.
+    #[serde(rename="lostStreetAddress")]
+    
+    pub lost_street_address: Option<UserFacingMessage>,
+}
+
+impl client::Part for StartLostModeParams {}
+
+
+/// Status of the START_LOST_MODE command to put the device into lost mode.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StartLostModeStatus {
+    /// The status. See StartLostModeStatus.
+    
+    pub status: Option<String>,
+}
+
+impl client::Part for StartLostModeStatus {}
+
+
 /// The Status type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by gRPC (https://github.com/grpc). Each Status message contains three pieces of data: error code, error message, and error details.You can find out more about this error model and how to work with it in the API Design Guide (https://cloud.google.com/apis/design/errors).
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2835,6 +3175,32 @@ pub struct StatusReportingSettings {
 }
 
 impl client::Part for StatusReportingSettings {}
+
+
+/// Parameters associated with the STOP_LOST_MODE command to take the device out of lost mode.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StopLostModeParams { _never_set: Option<bool> }
+
+impl client::Part for StopLostModeParams {}
+
+
+/// Status of the STOP_LOST_MODE command to take the device out of lost mode.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StopLostModeStatus {
+    /// The status. See StopLostModeStatus.
+    
+    pub status: Option<String>,
+}
+
+impl client::Part for StopLostModeStatus {}
 
 
 /// Configuration for managing system updates
@@ -3118,7 +3484,7 @@ impl client::Part for WipeAction {}
 ///     ).build().await.unwrap();
 /// let mut hub = AndroidManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `applications_get(...)`, `create(...)`, `delete(...)`, `devices_delete(...)`, `devices_get(...)`, `devices_issue_command(...)`, `devices_list(...)`, `devices_operations_cancel(...)`, `devices_operations_delete(...)`, `devices_operations_get(...)`, `devices_operations_list(...)`, `devices_patch(...)`, `enrollment_tokens_create(...)`, `enrollment_tokens_delete(...)`, `enrollment_tokens_get(...)`, `enrollment_tokens_list(...)`, `get(...)`, `list(...)`, `patch(...)`, `policies_delete(...)`, `policies_get(...)`, `policies_list(...)`, `policies_patch(...)`, `web_apps_create(...)`, `web_apps_delete(...)`, `web_apps_get(...)`, `web_apps_list(...)`, `web_apps_patch(...)` and `web_tokens_create(...)`
+/// // like `applications_get(...)`, `create(...)`, `delete(...)`, `devices_delete(...)`, `devices_get(...)`, `devices_issue_command(...)`, `devices_list(...)`, `devices_operations_cancel(...)`, `devices_operations_get(...)`, `devices_operations_list(...)`, `devices_patch(...)`, `enrollment_tokens_create(...)`, `enrollment_tokens_delete(...)`, `enrollment_tokens_get(...)`, `enrollment_tokens_list(...)`, `get(...)`, `list(...)`, `migration_tokens_create(...)`, `migration_tokens_get(...)`, `migration_tokens_list(...)`, `patch(...)`, `policies_delete(...)`, `policies_get(...)`, `policies_list(...)`, `policies_patch(...)`, `web_apps_create(...)`, `web_apps_delete(...)`, `web_apps_get(...)`, `web_apps_list(...)`, `web_apps_patch(...)` and `web_tokens_create(...)`
 /// // to build up your call.
 /// let rb = hub.enterprises();
 /// # }
@@ -3170,23 +3536,6 @@ impl<'a, S> EnterpriseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns google.rpc.Code.UNIMPLEMENTED.
-    /// 
-    /// # Arguments
-    ///
-    /// * `name` - The name of the operation resource to be deleted.
-    pub fn devices_operations_delete(&self, name: &str) -> EnterpriseDeviceOperationDeleteCall<'a, S> {
-        EnterpriseDeviceOperationDeleteCall {
-            hub: self.hub,
-            _name: name.to_string(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
     /// Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.
     /// 
     /// # Arguments
@@ -3204,7 +3553,7 @@ impl<'a, S> EnterpriseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED.NOTE: the name binding allows API services to override the binding to use different resource name schemes, such as users/*/operations. To override the binding, API services can add a binding such as "/v1/{name=users/*}/operations" to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED.
     /// 
     /// # Arguments
     ///
@@ -3378,6 +3727,61 @@ impl<'a, S> EnterpriseMethods<'a, S> {
     /// * `parent` - Required. The name of the enterprise in the form enterprises/{enterpriseId}.
     pub fn enrollment_tokens_list(&self, parent: &str) -> EnterpriseEnrollmentTokenListCall<'a, S> {
         EnterpriseEnrollmentTokenListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates a migration token, to migrate an existing device from being managed by the EMM's Device Policy Controller (DPC) to being managed by the Android Management API.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The enterprise in which this migration token will be created. Format: enterprises/{enterprise}
+    pub fn migration_tokens_create(&self, request: MigrationToken, parent: &str) -> EnterpriseMigrationTokenCreateCall<'a, S> {
+        EnterpriseMigrationTokenCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets a migration token.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the migration token to retrieve. Format: enterprises/{enterprise}/migrationTokens/{migration_token}
+    pub fn migration_tokens_get(&self, name: &str) -> EnterpriseMigrationTokenGetCall<'a, S> {
+        EnterpriseMigrationTokenGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Lists migration tokens.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The enterprise which the migration tokens belong to. Format: enterprises/{enterprise}
+    pub fn migration_tokens_list(&self, parent: &str) -> EnterpriseMigrationTokenListCall<'a, S> {
+        EnterpriseMigrationTokenListCall {
             hub: self.hub,
             _parent: parent.to_string(),
             _page_token: Default::default(),
@@ -3574,7 +3978,7 @@ impl<'a, S> EnterpriseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates an enterprise. This is the last step in the enterprise signup flow.
+    /// Creates an enterprise. This is the last step in the enterprise signup flow. See also: SigninDetail
     /// 
     /// # Arguments
     ///
@@ -3595,7 +3999,7 @@ impl<'a, S> EnterpriseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Deletes an enterprise. Only available for EMM-managed enterprises.
+    /// Permanently deletes an enterprise and all accounts and data associated with it. Warning: this will result in a cascaded deletion of all AM API devices associated with the deleted enterprise. Only available for EMM-managed enterprises.
     /// 
     /// # Arguments
     ///
@@ -3645,7 +4049,7 @@ impl<'a, S> EnterpriseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Updates an enterprise.
+    /// Updates an enterprise. See also: SigninDetail
     /// 
     /// # Arguments
     ///
@@ -3657,6 +4061,64 @@ impl<'a, S> EnterpriseMethods<'a, S> {
             _request: request,
             _name: name.to_string(),
             _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+}
+
+
+
+/// A builder providing access to all methods supported on *provisioningInfo* resources.
+/// It is not used directly, but through the [`AndroidManagement`] hub.
+///
+/// # Example
+///
+/// Instantiate a resource builder
+///
+/// ```test_harness,no_run
+/// extern crate hyper;
+/// extern crate hyper_rustls;
+/// extern crate google_androidmanagement1 as androidmanagement1;
+/// 
+/// # async fn dox() {
+/// use std::default::Default;
+/// use androidmanagement1::{AndroidManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// let secret: oauth2::ApplicationSecret = Default::default();
+/// let auth = oauth2::InstalledFlowAuthenticator::builder(
+///         secret,
+///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+///     ).build().await.unwrap();
+/// let mut hub = AndroidManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
+/// // like `get(...)`
+/// // to build up your call.
+/// let rb = hub.provisioning_info();
+/// # }
+/// ```
+pub struct ProvisioningInfoMethods<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidManagement<S>,
+}
+
+impl<'a, S> client::MethodsBuilder for ProvisioningInfoMethods<'a, S> {}
+
+impl<'a, S> ProvisioningInfoMethods<'a, S> {
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Get the device provisioning information by the identifier provided in the sign-in url.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The identifier that Android Device Policy passes to the 3P sign-in page in the form of provisioningInfo/{provisioning_info}.
+    pub fn get(&self, name: &str) -> ProvisioningInfoGetCall<'a, S> {
+        ProvisioningInfoGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -4263,268 +4725,6 @@ where
 }
 
 
-/// Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns google.rpc.Code.UNIMPLEMENTED.
-///
-/// A builder for the *devices.operations.delete* method supported by a *enterprise* resource.
-/// It is not used directly, but through a [`EnterpriseMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_androidmanagement1 as androidmanagement1;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use androidmanagement1::{AndroidManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = AndroidManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.enterprises().devices_operations_delete("name")
-///              .doit().await;
-/// # }
-/// ```
-pub struct EnterpriseDeviceOperationDeleteCall<'a, S>
-    where S: 'a {
-
-    hub: &'a AndroidManagement<S>,
-    _name: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
-}
-
-impl<'a, S> client::CallBuilder for EnterpriseDeviceOperationDeleteCall<'a, S> {}
-
-impl<'a, S> EnterpriseDeviceOperationDeleteCall<'a, S>
-where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
-{
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
-        use std::borrow::Cow;
-
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "androidmanagement.enterprises.devices.operations.delete",
-                               http_method: hyper::Method::DELETE });
-
-        for &field in ["alt", "name"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(3 + self._additional_params.len());
-        params.push("name", self._name);
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+name}";
-        if self._scopes.is_empty() {
-            self._scopes.insert(Scope::Full.as_ref().to_string());
-        }
-
-        for &(find_this, param_name) in [("{+name}", "name")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["name"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-
-
-        loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
-                    }
-                }
-            };
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::DELETE)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-
-                        let request = req_builder
-                        .body(hyper::body::Body::empty());
-
-                client.request(request.unwrap()).await
-
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
-
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    /// The name of the operation resource to be deleted.
-    ///
-    /// Sets the *name* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn name(mut self, new_value: &str) -> EnterpriseDeviceOperationDeleteCall<'a, S> {
-        self._name = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseDeviceOperationDeleteCall<'a, S> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseDeviceOperationDeleteCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::Full`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> EnterpriseDeviceOperationDeleteCall<'a, S>
-                                                        where St: AsRef<str> {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> EnterpriseDeviceOperationDeleteCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> EnterpriseDeviceOperationDeleteCall<'a, S> {
-        self._scopes.clear();
-        self
-    }
-}
-
-
 /// Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.
 ///
 /// A builder for the *devices.operations.get* method supported by a *enterprise* resource.
@@ -4787,7 +4987,7 @@ where
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED.NOTE: the name binding allows API services to override the binding to use different resource name schemes, such as users/*/operations. To override the binding, API services can add a binding such as "/v1/{name=users/*}/operations" to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED.
 ///
 /// A builder for the *devices.operations.list* method supported by a *enterprise* resource.
 /// It is not used directly, but through a [`EnterpriseMethods`] instance.
@@ -4814,9 +5014,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().devices_operations_list("name")
-///              .page_token("ipsum")
-///              .page_size(-88)
-///              .filter("amet")
+///              .page_token("ea")
+///              .page_size(-55)
+///              .filter("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5112,8 +5312,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().devices_delete("name")
-///              .wipe_reason_message("ipsum")
-///              .add_wipe_data_flags("sed")
+///              .wipe_reason_message("duo")
+///              .add_wipe_data_flags("ipsum")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5955,8 +6155,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().devices_list("parent")
-///              .page_token("est")
-///              .page_size(-50)
+///              .page_token("rebum.")
+///              .page_size(-57)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7361,8 +7561,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().enrollment_tokens_list("parent")
-///              .page_token("Lorem")
-///              .page_size(-25)
+///              .page_token("dolor")
+///              .page_size(-56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7614,6 +7814,846 @@ where
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
     pub fn clear_scopes(mut self) -> EnterpriseEnrollmentTokenListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Creates a migration token, to migrate an existing device from being managed by the EMM's Device Policy Controller (DPC) to being managed by the Android Management API.
+///
+/// A builder for the *migrationTokens.create* method supported by a *enterprise* resource.
+/// It is not used directly, but through a [`EnterpriseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidmanagement1 as androidmanagement1;
+/// use androidmanagement1::api::MigrationToken;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidmanagement1::{AndroidManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = MigrationToken::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.enterprises().migration_tokens_create(req, "parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct EnterpriseMigrationTokenCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidManagement<S>,
+    _request: MigrationToken,
+    _parent: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for EnterpriseMigrationTokenCreateCall<'a, S> {}
+
+impl<'a, S> EnterpriseMigrationTokenCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, MigrationToken)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidmanagement.enterprises.migrationTokens.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/migrationTokens";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: MigrationToken) -> EnterpriseMigrationTokenCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The enterprise in which this migration token will be created. Format: enterprises/{enterprise}
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> EnterpriseMigrationTokenCreateCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseMigrationTokenCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseMigrationTokenCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> EnterpriseMigrationTokenCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> EnterpriseMigrationTokenCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> EnterpriseMigrationTokenCreateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Gets a migration token.
+///
+/// A builder for the *migrationTokens.get* method supported by a *enterprise* resource.
+/// It is not used directly, but through a [`EnterpriseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidmanagement1 as androidmanagement1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidmanagement1::{AndroidManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.enterprises().migration_tokens_get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct EnterpriseMigrationTokenGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidManagement<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for EnterpriseMigrationTokenGetCall<'a, S> {}
+
+impl<'a, S> EnterpriseMigrationTokenGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, MigrationToken)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidmanagement.enterprises.migrationTokens.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the migration token to retrieve. Format: enterprises/{enterprise}/migrationTokens/{migration_token}
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> EnterpriseMigrationTokenGetCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseMigrationTokenGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseMigrationTokenGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> EnterpriseMigrationTokenGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> EnterpriseMigrationTokenGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> EnterpriseMigrationTokenGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Lists migration tokens.
+///
+/// A builder for the *migrationTokens.list* method supported by a *enterprise* resource.
+/// It is not used directly, but through a [`EnterpriseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidmanagement1 as androidmanagement1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidmanagement1::{AndroidManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.enterprises().migration_tokens_list("parent")
+///              .page_token("duo")
+///              .page_size(-80)
+///              .doit().await;
+/// # }
+/// ```
+pub struct EnterpriseMigrationTokenListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidManagement<S>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for EnterpriseMigrationTokenListCall<'a, S> {}
+
+impl<'a, S> EnterpriseMigrationTokenListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListMigrationTokensResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidmanagement.enterprises.migrationTokens.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/migrationTokens";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The enterprise which the migration tokens belong to. Format: enterprises/{enterprise}
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> EnterpriseMigrationTokenListCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// A page token, received from a previous ListMigrationTokens call. Provide this to retrieve the subsequent page.When paginating, all other parameters provided to ListMigrationTokens must match the call that provided the page token.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> EnterpriseMigrationTokenListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of migration tokens to return. Fewer migration tokens may be returned. If unspecified, at most 100 migration tokens will be returned. The maximum value is 100; values above 100 will be coerced to 100.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> EnterpriseMigrationTokenListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> EnterpriseMigrationTokenListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> EnterpriseMigrationTokenListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> EnterpriseMigrationTokenListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> EnterpriseMigrationTokenListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> EnterpriseMigrationTokenListCall<'a, S> {
         self._scopes.clear();
         self
     }
@@ -8171,8 +9211,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().policies_list("parent")
-///              .page_token("sed")
-///              .page_size(-61)
+///              .page_token("et")
+///              .page_size(-43)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9577,8 +10617,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().web_apps_list("parent")
-///              .page_token("et")
-///              .page_size(-76)
+///              .page_token("duo")
+///              .page_size(-34)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10432,7 +11472,7 @@ where
 }
 
 
-/// Creates an enterprise. This is the last step in the enterprise signup flow.
+/// Creates an enterprise. This is the last step in the enterprise signup flow. See also: SigninDetail
 ///
 /// A builder for the *create* method supported by a *enterprise* resource.
 /// It is not used directly, but through a [`EnterpriseMethods`] instance.
@@ -10465,10 +11505,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().create(req)
-///              .signup_url_name("duo")
-///              .project_id("dolore")
-///              .enterprise_token("et")
-///              .agreement_accepted(false)
+///              .signup_url_name("amet.")
+///              .project_id("consetetur")
+///              .enterprise_token("diam")
+///              .agreement_accepted(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10753,7 +11793,7 @@ where
 }
 
 
-/// Deletes an enterprise. Only available for EMM-managed enterprises.
+/// Permanently deletes an enterprise and all accounts and data associated with it. Warning: this will result in a cascaded deletion of all AM API devices associated with the deleted enterprise. Only available for EMM-managed enterprises.
 ///
 /// A builder for the *delete* method supported by a *enterprise* resource.
 /// It is not used directly, but through a [`EnterpriseMethods`] instance.
@@ -11304,10 +12344,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.enterprises().list()
-///              .view("et")
-///              .project_id("et")
-///              .page_token("sadipscing")
-///              .page_size(-15)
+///              .view("sadipscing")
+///              .project_id("Stet")
+///              .page_token("dolor")
+///              .page_size(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11568,7 +12608,7 @@ where
 }
 
 
-/// Updates an enterprise.
+/// Updates an enterprise. See also: SigninDetail
 ///
 /// A builder for the *patch* method supported by a *enterprise* resource.
 /// It is not used directly, but through a [`EnterpriseMethods`] instance.
@@ -11872,6 +12912,268 @@ where
 }
 
 
+/// Get the device provisioning information by the identifier provided in the sign-in url.
+///
+/// A builder for the *get* method supported by a *provisioningInfo* resource.
+/// It is not used directly, but through a [`ProvisioningInfoMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_androidmanagement1 as androidmanagement1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use androidmanagement1::{AndroidManagement, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = AndroidManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.provisioning_info().get("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProvisioningInfoGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a AndroidManagement<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProvisioningInfoGetCall<'a, S> {}
+
+impl<'a, S> ProvisioningInfoGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ProvisioningInfo)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "androidmanagement.provisioningInfo.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::Full.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The identifier that Android Device Policy passes to the 3P sign-in page in the form of provisioningInfo/{provisioning_info}.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProvisioningInfoGetCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProvisioningInfoGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProvisioningInfoGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::Full`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProvisioningInfoGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProvisioningInfoGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProvisioningInfoGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Creates an enterprise signup URL.
 ///
 /// A builder for the *create* method supported by a *signupUrl* resource.
@@ -11899,8 +13201,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.signup_urls().create()
-///              .project_id("duo")
-///              .callback_url("vero")
+///              .project_id("invidunt")
+///              .callback_url("Stet")
 ///              .doit().await;
 /// # }
 /// ```

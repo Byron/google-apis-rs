@@ -25,33 +25,15 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Certificate Authority Service* API at revision *20230105*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Certificate Authority Service* API at revision *20240221*. The CLI is at version *5.0.4*.
 
 ```bash
 privateca1-beta1 [options]
         projects
-                locations-certificate-authorities-activate <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-certificate-authorities-certificate-revocation-lists-get <name> [-p <v>]... [-o <out>]
                 locations-certificate-authorities-certificate-revocation-lists-get-iam-policy <resource> [-p <v>]... [-o <out>]
-                locations-certificate-authorities-certificate-revocation-lists-list <parent> [-p <v>]... [-o <out>]
-                locations-certificate-authorities-certificate-revocation-lists-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-certificate-authorities-certificate-revocation-lists-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-certificate-authorities-certificate-revocation-lists-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-certificate-authorities-certificates-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-certificate-authorities-certificates-get <name> [-p <v>]... [-o <out>]
-                locations-certificate-authorities-certificates-list <parent> [-p <v>]... [-o <out>]
-                locations-certificate-authorities-certificates-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-certificate-authorities-certificates-revoke <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-certificate-authorities-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-certificate-authorities-disable <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-certificate-authorities-enable <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-certificate-authorities-fetch <name> [-p <v>]... [-o <out>]
-                locations-certificate-authorities-get <name> [-p <v>]... [-o <out>]
                 locations-certificate-authorities-get-iam-policy <resource> [-p <v>]... [-o <out>]
-                locations-certificate-authorities-list <parent> [-p <v>]... [-o <out>]
-                locations-certificate-authorities-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-certificate-authorities-restore <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-certificate-authorities-schedule-delete <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-certificate-authorities-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-certificate-authorities-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
@@ -60,9 +42,7 @@ privateca1-beta1 [options]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
-                locations-reusable-configs-get <name> [-p <v>]... [-o <out>]
                 locations-reusable-configs-get-iam-policy <resource> [-p <v>]... [-o <out>]
-                locations-reusable-configs-list <parent> [-p <v>]... [-o <out>]
                 locations-reusable-configs-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-reusable-configs-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
   privateca1-beta1 --help

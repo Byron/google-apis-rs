@@ -4,7 +4,7 @@
 [package]
 
 name = "google-privateca1-cli"
-version = "5.0.3+20230105"
+version = "5.0.4+20240221"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Certificate Authority Service (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/privateca1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-privateca1]
 path = "../privateca1"
-version = "5.0.3+20230105"
+version = "5.0.4+20240221"
 

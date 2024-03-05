@@ -364,7 +364,7 @@ async fn main() {
     
     let mut app = App::new("verifiedaccess1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230117")
+           .version("5.0.4+20240227")
            .about("API for Verified Access chrome extension to provide credential verification for chrome devices connecting to an enterprise network")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_verifiedaccess1_cli")
            .arg(Arg::with_name("url")

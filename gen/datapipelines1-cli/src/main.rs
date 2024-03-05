@@ -1054,7 +1054,7 @@ async fn main() {
     
     let mut app = App::new("datapipelines1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230115")
+           .version("5.0.4+20240225")
            .about("Data Pipelines provides an interface for creating, updating, and managing recurring Data Analytics jobs.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datapipelines1_cli")
            .arg(Arg::with_name("url")

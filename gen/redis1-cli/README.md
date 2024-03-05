@@ -25,11 +25,17 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Redis* API at revision *20230111*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud Redis* API at revision *20240226*. The CLI is at version *5.0.4*.
 
 ```bash
 redis1 [options]
         projects
+                locations-clusters-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-clusters-delete <name> [-p <v>]... [-o <out>]
+                locations-clusters-get <name> [-p <v>]... [-o <out>]
+                locations-clusters-get-certificate-authority <name> [-p <v>]... [-o <out>]
+                locations-clusters-list <parent> [-p <v>]... [-o <out>]
+                locations-clusters-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-instances-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-instances-delete <name> [-p <v>]... [-o <out>]

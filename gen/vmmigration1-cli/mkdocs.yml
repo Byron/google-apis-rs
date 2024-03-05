@@ -1,4 +1,4 @@
-site_name: VM Migration Service v5.0.3+20230119
+site_name: VM Migration Service v5.0.4+20240222
 site_url: http://byron.github.io/google-apis-rs/google-vmmigration1-cli
 site_description: A complete library to interact with VM Migration Service (protocol v1)
 
@@ -18,6 +18,13 @@ nav:
     - 'Locations Groups List': 'projects_locations-groups-list.md'
     - 'Locations Groups Patch': 'projects_locations-groups-patch.md'
     - 'Locations Groups Remove Group Migration': 'projects_locations-groups-remove-group-migration.md'
+    - 'Locations Image Imports Create': 'projects_locations-image-imports-create.md'
+    - 'Locations Image Imports Delete': 'projects_locations-image-imports-delete.md'
+    - 'Locations Image Imports Get': 'projects_locations-image-imports-get.md'
+    - 'Locations Image Imports Image Import Jobs Cancel': 'projects_locations-image-imports-image-import-jobs-cancel.md'
+    - 'Locations Image Imports Image Import Jobs Get': 'projects_locations-image-imports-image-import-jobs-get.md'
+    - 'Locations Image Imports Image Import Jobs List': 'projects_locations-image-imports-image-import-jobs-list.md'
+    - 'Locations Image Imports List': 'projects_locations-image-imports-list.md'
     - 'Locations List': 'projects_locations-list.md'
     - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
     - 'Locations Operations Delete': 'projects_locations-operations-delete.md'

@@ -1881,7 +1881,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the file to retrieve."##),
+                     Some(r##"Required. The name of the file to retrieve."##),
                      Some(true),
                      Some(false)),
         
@@ -1903,7 +1903,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the repository whose files will be listed. For example: "projects/p1/locations/us-central1/repositories/repo1"##),
+                     Some(r##"Required. The name of the repository whose files will be listed. For example: "projects/p1/locations/us-central1/repositories/repo1"##),
                      Some(true),
                      Some(false)),
         
@@ -2129,7 +2129,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the parent resource whose tags will be listed."##),
+                     Some(r##"The name of the parent package whose tags will be listed. For example: `projects/p1/locations/us-central1/repositories/repo1/packages/pkg1`."##),
                      Some(true),
                      Some(false)),
         
@@ -2245,7 +2245,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the repository, for example: "projects/p1/locations/us-central1/repositories/repo1"."##),
+                     Some(r##"The name of the repository, for example: `projects/p1/locations/us-central1/repositories/repo1`."##),
                      Some(true),
                      Some(false)),
         
@@ -2329,7 +2329,7 @@ async fn main() {
     
     let mut app = App::new("artifactregistry1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230113")
+           .version("5.0.4+20240213")
            .about("Store and manage build artifacts in a scalable and integrated service built on Google infrastructure.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_artifactregistry1_beta1_cli")
            .arg(Arg::with_name("url")

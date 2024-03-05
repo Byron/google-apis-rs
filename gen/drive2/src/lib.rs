@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *drive* crate version *5.0.3+20230115*, where *20230115* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *drive* crate version *5.0.4+20240227*, where *20240227* is the exact revision of the *drive:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *drive* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/drive/).
@@ -50,14 +50,12 @@
 //! 
 //! * [*export files*](api::FileExportCall)
 //! * [*get files*](api::FileGetCall)
-//! * [*watch files*](api::FileWatchCall)
 //! 
 //! Subscription supported by ...
 //! 
 //! * [*list changes*](api::ChangeListCall)
 //! * [*watch changes*](api::ChangeWatchCall)
 //! * [*get files*](api::FileGetCall)
-//! * [*insert files*](api::FileInsertCall)
 //! * [*watch files*](api::FileWatchCall)
 //! 
 //! 

@@ -3,14 +3,14 @@ DO NOT EDIT !
 This file was generated automatically from 'src/generator/templates/cli/README.md.mako'
 DO NOT EDIT !
 -->
-The `bigquery2` command-line interface *(CLI)* allows to use most features of the *Google bigquery* service from the comfort of your terminal.
+The `bigquery2` command-line interface *(CLI)* allows to use most features of the *Google Bigquery* service from the comfort of your terminal.
 
 By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.
 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
-Everything else about the *bigquery* API can be found at the
+Everything else about the *Bigquery* API can be found at the
 [official documentation site](https://cloud.google.com/bigquery/).
 
 # Installation and Source Code
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *bigquery* API at revision *20230114*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Bigquery* API at revision *20240214*. The CLI is at version *5.0.3*.
 
 ```bash
 bigquery2 [options]
@@ -35,6 +35,7 @@ bigquery2 [options]
                 insert <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project-id> [-p <v>]... [-o <out>]
                 patch <project-id> <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
+                undelete <project-id> <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 update <project-id> <dataset-id> (-r <kv>)... [-p <v>]... [-o <out>]
         jobs
                 cancel <project-id> <job-id> [-p <v>]... [-o <out>]
@@ -61,7 +62,6 @@ bigquery2 [options]
         row-access-policies
                 get-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 list <project-id> <dataset-id> <table-id> [-p <v>]... [-o <out>]
-                set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
         tabledata
                 insert-all <project-id> <dataset-id> <table-id> (-r <kv>)... [-p <v>]... [-o <out>]

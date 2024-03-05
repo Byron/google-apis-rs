@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *pagespeedonline* crate version *5.0.3+20191206*, where *20191206* is the exact revision of the *pagespeedonline:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *pagespeedonline* crate version *5.0.4+20191206*, where *20191206* is the exact revision of the *pagespeedonline:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *pagespeedonline* *v2* API can be found at the
 //! [official documentation site](https://developers.google.com/speed/docs/insights/v2/getting-started).

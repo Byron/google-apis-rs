@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -125,7 +125,7 @@ impl<'a, S> Document<S> {
         Document {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://documentai.googleapis.com/".to_string(),
             _root_url: "https://documentai.googleapis.com/".to_string(),
         }
@@ -136,7 +136,7 @@ impl<'a, S> Document<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -255,7 +255,7 @@ impl client::Part for GoogleCloudDocumentaiV1beta2BoundingPoly {}
 pub struct GoogleCloudDocumentaiV1beta2Document {
     /// Optional. Inline document content, represented as a stream of bytes. Note: As with all `bytes` fields, protobuffers use a pure binary representation, whereas JSON representations use base64.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub content: Option<Vec<u8>>,
     /// A list of entities detected on Document.text. For document shards, entities in this list may cross shard boundaries.
     
@@ -270,7 +270,7 @@ pub struct GoogleCloudDocumentaiV1beta2Document {
     /// Labels for this document.
     
     pub labels: Option<Vec<GoogleCloudDocumentaiV1beta2DocumentLabel>>,
-    /// An IANA published MIME type (also referred to as media type). For more information, see https://www.iana.org/assignments/media-types/media-types.xhtml.
+    /// An IANA published [media type (MIME type)](https://www.iana.org/assignments/media-types/media-types.xhtml).
     #[serde(rename="mimeType")]
     
     pub mime_type: Option<String>,
@@ -295,7 +295,7 @@ pub struct GoogleCloudDocumentaiV1beta2Document {
     #[serde(rename="textStyles")]
     
     pub text_styles: Option<Vec<GoogleCloudDocumentaiV1beta2DocumentStyle>>,
-    /// Optional. Currently supports Google Cloud Storage URI of the form `gs://bucket_name/object_name`. Object versioning is not supported. See [Google Cloud Storage Request URIs](https://cloud.google.com/storage/docs/reference-uris) for more info.
+    /// Optional. Currently supports Google Cloud Storage URI of the form `gs://bucket_name/object_name`. Object versioning is not supported. For more information, refer to [Google Cloud Storage Request URIs](https://cloud.google.com/storage/docs/reference-uris).
     
     pub uri: Option<String>,
 }
@@ -470,7 +470,7 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentPage {
     /// Rendered image for this page. This image is preprocessed to remove any skew, rotation, and distortions such that the annotation bounding boxes can be upright and axis-aligned.
     
     pub image: Option<GoogleCloudDocumentaiV1beta2DocumentPageImage>,
-    /// Image Quality Scores.
+    /// Image quality scores.
     #[serde(rename="imageQualityScores")]
     
     pub image_quality_scores: Option<GoogleCloudDocumentaiV1beta2DocumentPageImageQualityScores>,
@@ -534,7 +534,7 @@ impl client::Part for GoogleCloudDocumentaiV1beta2DocumentPageAnchor {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDocumentaiV1beta2DocumentPageAnchorPageRef {
-    /// Optional. Identifies the bounding polygon of a layout element on the page.
+    /// Optional. Identifies the bounding polygon of a layout element on the page. If `layout_type` is set, the bounding polygon must be exactly the same to the layout element it's referring to.
     #[serde(rename="boundingPoly")]
     
     pub bounding_poly: Option<GoogleCloudDocumentaiV1beta2BoundingPoly>,
@@ -608,7 +608,7 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentPageDetectedLanguage {
     /// Confidence of detected language. Range `[0, 1]`.
     
     pub confidence: Option<f32>,
-    /// The BCP-47 language code, such as `en-US` or `sr-Latn`. For more information, see https://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
+    /// The [BCP-47 language code](https://www.unicode.org/reports/tr35/#Unicode_locale_identifier), such as `en-US` or `sr-Latn`.
     #[serde(rename="languageCode")]
     
     pub language_code: Option<String>,
@@ -690,12 +690,12 @@ impl client::Part for GoogleCloudDocumentaiV1beta2DocumentPageFormField {}
 pub struct GoogleCloudDocumentaiV1beta2DocumentPageImage {
     /// Raw byte content of the image.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub content: Option<Vec<u8>>,
     /// Height of the image in pixels.
     
     pub height: Option<i32>,
-    /// Encoding mime type for the image.
+    /// Encoding [media type (MIME type)](https://www.iana.org/assignments/media-types/media-types.xhtml) for the image.
     #[serde(rename="mimeType")]
     
     pub mime_type: Option<String>,
@@ -707,7 +707,7 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentPageImage {
 impl client::Part for GoogleCloudDocumentaiV1beta2DocumentPageImage {}
 
 
-/// Image Quality Scores for the page image
+/// Image quality scores for the page image.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -718,7 +718,7 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentPageImageQualityScores {
     #[serde(rename="detectedDefects")]
     
     pub detected_defects: Option<Vec<GoogleCloudDocumentaiV1beta2DocumentPageImageQualityScoresDetectedDefect>>,
-    /// The overall quality score. Range `[0, 1]` where 1 is perfect quality.
+    /// The overall quality score. Range `[0, 1]` where `1` is perfect quality.
     #[serde(rename="qualityScore")]
     
     pub quality_score: Option<f32>,
@@ -734,7 +734,7 @@ impl client::Part for GoogleCloudDocumentaiV1beta2DocumentPageImageQualityScores
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDocumentaiV1beta2DocumentPageImageQualityScoresDetectedDefect {
-    /// Confidence of detected defect. Range `[0, 1]` where 1 indicates strong confidence of that the defect exists.
+    /// Confidence of detected defect. Range `[0, 1]` where `1` indicates strong confidence that the defect exists.
     
     pub confidence: Option<f32>,
     /// Name of the defect type. Supported values are: - `quality/defect_blurry` - `quality/defect_noisy` - `quality/defect_dark` - `quality/defect_faint` - `quality/defect_text_too_small` - `quality/defect_document_cutoff` - `quality/defect_text_cutoff` - `quality/defect_glare`
@@ -806,7 +806,7 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentPageMatrix {
     pub cols: Option<i32>,
     /// The matrix data.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub data: Option<Vec<u8>>,
     /// Number of rows in the matrix.
     
@@ -954,6 +954,10 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentPageToken {
     /// The history of this annotation.
     
     pub provenance: Option<GoogleCloudDocumentaiV1beta2DocumentProvenance>,
+    /// Text style attributes.
+    #[serde(rename="styleInfo")]
+    
+    pub style_info: Option<GoogleCloudDocumentaiV1beta2DocumentPageTokenStyleInfo>,
 }
 
 impl client::Part for GoogleCloudDocumentaiV1beta2DocumentPageToken {}
@@ -973,6 +977,70 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentPageTokenDetectedBreak {
 }
 
 impl client::Part for GoogleCloudDocumentaiV1beta2DocumentPageTokenDetectedBreak {}
+
+
+/// Font and other text style attributes.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDocumentaiV1beta2DocumentPageTokenStyleInfo {
+    /// Color of the background.
+    #[serde(rename="backgroundColor")]
+    
+    pub background_color: Option<GoogleTypeColor>,
+    /// Whether the text is bold (equivalent to font_weight is at least `700`).
+    
+    pub bold: Option<bool>,
+    /// Font size in points (`1` point is `¹⁄₇₂` inches).
+    #[serde(rename="fontSize")]
+    
+    pub font_size: Option<i32>,
+    /// Name or style of the font.
+    #[serde(rename="fontType")]
+    
+    pub font_type: Option<String>,
+    /// TrueType weight on a scale `100` (thin) to `1000` (ultra-heavy). Normal is `400`, bold is `700`.
+    #[serde(rename="fontWeight")]
+    
+    pub font_weight: Option<i32>,
+    /// Whether the text is handwritten.
+    
+    pub handwritten: Option<bool>,
+    /// Whether the text is italic.
+    
+    pub italic: Option<bool>,
+    /// Letter spacing in points.
+    #[serde(rename="letterSpacing")]
+    
+    pub letter_spacing: Option<f64>,
+    /// Font size in pixels, equal to _unrounded font_size_ * _resolution_ ÷ `72.0`.
+    #[serde(rename="pixelFontSize")]
+    
+    pub pixel_font_size: Option<f64>,
+    /// Whether the text is in small caps.
+    
+    pub smallcaps: Option<bool>,
+    /// Whether the text is strikethrough.
+    
+    pub strikeout: Option<bool>,
+    /// Whether the text is a subscript.
+    
+    pub subscript: Option<bool>,
+    /// Whether the text is a superscript.
+    
+    pub superscript: Option<bool>,
+    /// Color of the text.
+    #[serde(rename="textColor")]
+    
+    pub text_color: Option<GoogleTypeColor>,
+    /// Whether the text is underlined.
+    
+    pub underlined: Option<bool>,
+}
+
+impl client::Part for GoogleCloudDocumentaiV1beta2DocumentPageTokenStyleInfo {}
 
 
 /// Detected non-text visual elements e.g. checkbox, signature etc. on the page.
@@ -1054,7 +1122,7 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentRevision {
     /// If the change was made by a person specify the name or id of that person.
     
     pub agent: Option<String>,
-    /// The time that the revision was created.
+    /// The time that the revision was created, internally generated by doc proto storage at the time of create.
     #[serde(rename="createTime")]
     
     pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
@@ -1062,7 +1130,7 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentRevision {
     #[serde(rename="humanReview")]
     
     pub human_review: Option<GoogleCloudDocumentaiV1beta2DocumentRevisionHumanReview>,
-    /// Id of the revision. Unique within the context of the document.
+    /// Id of the revision, internally generated by doc proto storage. Unique within the context of the document.
     
     pub id: Option<String>,
     /// The revisions that this revision is based on. This can include one or more parent (when documents are merged.) This field represents the index into the `revisions` field.
@@ -1148,7 +1216,7 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentStyle {
     #[serde(rename="fontSize")]
     
     pub font_size: Option<GoogleCloudDocumentaiV1beta2DocumentStyleFontSize>,
-    /// Font weight. Possible values are normal, bold, bolder, and lighter. https://www.w3schools.com/cssref/pr_font_weight.asp
+    /// [Font weight](https://www.w3schools.com/cssref/pr_font_weight.asp). Possible values are `normal`, `bold`, `bolder`, and `lighter`.
     #[serde(rename="fontWeight")]
     
     pub font_weight: Option<String>,
@@ -1156,11 +1224,11 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentStyle {
     #[serde(rename="textAnchor")]
     
     pub text_anchor: Option<GoogleCloudDocumentaiV1beta2DocumentTextAnchor>,
-    /// Text decoration. Follows CSS standard. https://www.w3schools.com/cssref/pr_text_text-decoration.asp
+    /// [Text decoration](https://www.w3schools.com/cssref/pr_text_text-decoration.asp). Follows CSS standard. 
     #[serde(rename="textDecoration")]
     
     pub text_decoration: Option<String>,
-    /// Text style. Possible values are normal, italic, and oblique. https://www.w3schools.com/cssref/pr_font_font-style.asp
+    /// [Text style](https://www.w3schools.com/cssref/pr_font_font-style.asp). Possible values are `normal`, `italic`, and `oblique`.
     #[serde(rename="textStyle")]
     
     pub text_style: Option<String>,
@@ -1179,7 +1247,7 @@ pub struct GoogleCloudDocumentaiV1beta2DocumentStyleFontSize {
     /// Font size for the text.
     
     pub size: Option<f32>,
-    /// Unit for the font size. Follows CSS naming (in, px, pt, etc.).
+    /// Unit for the font size. Follows CSS naming (such as `in`, `px`, and `pt`).
     
     pub unit: Option<String>,
 }
@@ -1332,7 +1400,7 @@ impl client::Part for GoogleCloudDocumentaiV1beta2GcsSource {}
 pub struct GoogleCloudDocumentaiV1beta2InputConfig {
     /// Content in bytes, represented as a stream of bytes. Note: As with all `bytes` fields, proto buffer messages use a pure binary representation, whereas JSON representations use base64. This field only works for synchronous ProcessDocument method.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub contents: Option<Vec<u8>>,
     /// The Google Cloud Storage location to read the input from. This must be a single file.
     #[serde(rename="gcsSource")]
@@ -1563,7 +1631,7 @@ pub struct GoogleLongrunningOperation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -1592,7 +1660,7 @@ pub struct GoogleRpcStatus {
 impl client::Part for GoogleRpcStatus {}
 
 
-/// Represents a color in the RGBA color space. This representation is designed for simplicity of conversion to/from color representations in various languages over compactness. For example, the fields of this representation can be trivially provided to the constructor of `java.awt.Color` in Java; it can also be trivially provided to UIColor's `+colorWithRed:green:blue:alpha` method in iOS; and, with just a little work, it can be easily formatted into a CSS `rgba()` string in JavaScript. This reference page doesn't carry information about the absolute color space that should be used to interpret the RGB value (e.g. sRGB, Adobe RGB, DCI-P3, BT.2020, etc.). By default, applications should assume the sRGB color space. When color equality needs to be decided, implementations, unless documented otherwise, treat two colors as equal if all their red, green, blue, and alpha values each differ by at most 1e-5. Example (Java): import com.google.type.Color; // ... public static java.awt.Color fromProto(Color protocolor) { float alpha = protocolor.hasAlpha() ? protocolor.getAlpha().getValue() : 1.0; return new java.awt.Color( protocolor.getRed(), protocolor.getGreen(), protocolor.getBlue(), alpha); } public static Color toProto(java.awt.Color color) { float red = (float) color.getRed(); float green = (float) color.getGreen(); float blue = (float) color.getBlue(); float denominator = 255.0; Color.Builder resultBuilder = Color .newBuilder() .setRed(red / denominator) .setGreen(green / denominator) .setBlue(blue / denominator); int alpha = color.getAlpha(); if (alpha != 255) { result.setAlpha( FloatValue .newBuilder() .setValue(((float) alpha) / denominator) .build()); } return resultBuilder.build(); } // ... Example (iOS / Obj-C): // ... static UIColor* fromProto(Color* protocolor) { float red = [protocolor red]; float green = [protocolor green]; float blue = [protocolor blue]; FloatValue* alpha_wrapper = [protocolor alpha]; float alpha = 1.0; if (alpha_wrapper != nil) { alpha = [alpha_wrapper value]; } return [UIColor colorWithRed:red green:green blue:blue alpha:alpha]; } static Color* toProto(UIColor* color) { CGFloat red, green, blue, alpha; if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) { return nil; } Color* result = [[Color alloc] init]; [result setRed:red]; [result setGreen:green]; [result setBlue:blue]; if (alpha <= 0.9999) { [result setAlpha:floatWrapperWithValue(alpha)]; } [result autorelease]; return result; } // ... Example (JavaScript): // ... var protoToCssColor = function(rgb_color) { var redFrac = rgb_color.red || 0.0; var greenFrac = rgb_color.green || 0.0; var blueFrac = rgb_color.blue || 0.0; var red = Math.floor(redFrac * 255); var green = Math.floor(greenFrac * 255); var blue = Math.floor(blueFrac * 255); if (!('alpha' in rgb_color)) { return rgbToCssColor(red, green, blue); } var alphaFrac = rgb_color.alpha.value || 0.0; var rgbParams = [red, green, blue].join(','); return ['rgba(', rgbParams, ',', alphaFrac, ')'].join(''); }; var rgbToCssColor = function(red, green, blue) { var rgbNumber = new Number((red << 16) | (green << 8) | blue); var hexString = rgbNumber.toString(16); var missingZeros = 6 - hexString.length; var resultBuilder = ['#']; for (var i = 0; i < missingZeros; i++) { resultBuilder.push('0'); } resultBuilder.push(hexString); return resultBuilder.join(''); }; // ...
+/// Represents a color in the RGBA color space. This representation is designed for simplicity of conversion to and from color representations in various languages over compactness. For example, the fields of this representation can be trivially provided to the constructor of `java.awt.Color` in Java; it can also be trivially provided to UIColor's `+colorWithRed:green:blue:alpha` method in iOS; and, with just a little work, it can be easily formatted into a CSS `rgba()` string in JavaScript. This reference page doesn't have information about the absolute color space that should be used to interpret the RGB value—for example, sRGB, Adobe RGB, DCI-P3, and BT.2020. By default, applications should assume the sRGB color space. When color equality needs to be decided, implementations, unless documented otherwise, treat two colors as equal if all their red, green, blue, and alpha values each differ by at most `1e-5`. Example (Java): import com.google.type.Color; // ... public static java.awt.Color fromProto(Color protocolor) { float alpha = protocolor.hasAlpha() ? protocolor.getAlpha().getValue() : 1.0; return new java.awt.Color( protocolor.getRed(), protocolor.getGreen(), protocolor.getBlue(), alpha); } public static Color toProto(java.awt.Color color) { float red = (float) color.getRed(); float green = (float) color.getGreen(); float blue = (float) color.getBlue(); float denominator = 255.0; Color.Builder resultBuilder = Color .newBuilder() .setRed(red / denominator) .setGreen(green / denominator) .setBlue(blue / denominator); int alpha = color.getAlpha(); if (alpha != 255) { result.setAlpha( FloatValue .newBuilder() .setValue(((float) alpha) / denominator) .build()); } return resultBuilder.build(); } // ... Example (iOS / Obj-C): // ... static UIColor* fromProto(Color* protocolor) { float red = [protocolor red]; float green = [protocolor green]; float blue = [protocolor blue]; FloatValue* alpha_wrapper = [protocolor alpha]; float alpha = 1.0; if (alpha_wrapper != nil) { alpha = [alpha_wrapper value]; } return [UIColor colorWithRed:red green:green blue:blue alpha:alpha]; } static Color* toProto(UIColor* color) { CGFloat red, green, blue, alpha; if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) { return nil; } Color* result = [[Color alloc] init]; [result setRed:red]; [result setGreen:green]; [result setBlue:blue]; if (alpha <= 0.9999) { [result setAlpha:floatWrapperWithValue(alpha)]; } [result autorelease]; return result; } // ... Example (JavaScript): // ... var protoToCssColor = function(rgb_color) { var redFrac = rgb_color.red || 0.0; var greenFrac = rgb_color.green || 0.0; var blueFrac = rgb_color.blue || 0.0; var red = Math.floor(redFrac * 255); var green = Math.floor(greenFrac * 255); var blue = Math.floor(blueFrac * 255); if (!('alpha' in rgb_color)) { return rgbToCssColor(red, green, blue); } var alphaFrac = rgb_color.alpha.value || 0.0; var rgbParams = [red, green, blue].join(','); return ['rgba(', rgbParams, ',', alphaFrac, ')'].join(''); }; var rgbToCssColor = function(red, green, blue) { var rgbNumber = new Number((red << 16) | (green << 8) | blue); var hexString = rgbNumber.toString(16); var missingZeros = 6 - hexString.length; var resultBuilder = ['#']; for (var i = 0; i < missingZeros; i++) { resultBuilder.push('0'); } resultBuilder.push(hexString); return resultBuilder.join(''); }; // ...
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 

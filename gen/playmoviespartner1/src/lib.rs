@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Play Movies* crate version *5.0.3+20170919*, where *20170919* is the exact revision of the *playmoviespartner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Play Movies* crate version *5.0.4+20170919*, where *20170919* is the exact revision of the *playmoviespartner:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Play Movies* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/playmoviespartner/).

@@ -1,4 +1,4 @@
-site_name: NetworkServices v5.0.3+20230105
+site_name: NetworkServices v5.0.4+20240224
 site_url: http://byron.github.io/google-apis-rs/google-networkservices1-cli
 site_description: A complete library to interact with NetworkServices (protocol v1)
 
@@ -46,6 +46,16 @@ nav:
     - 'Locations Http Routes Get': 'projects_locations-http-routes-get.md'
     - 'Locations Http Routes List': 'projects_locations-http-routes-list.md'
     - 'Locations Http Routes Patch': 'projects_locations-http-routes-patch.md'
+    - 'Locations Lb Route Extensions Create': 'projects_locations-lb-route-extensions-create.md'
+    - 'Locations Lb Route Extensions Delete': 'projects_locations-lb-route-extensions-delete.md'
+    - 'Locations Lb Route Extensions Get': 'projects_locations-lb-route-extensions-get.md'
+    - 'Locations Lb Route Extensions List': 'projects_locations-lb-route-extensions-list.md'
+    - 'Locations Lb Route Extensions Patch': 'projects_locations-lb-route-extensions-patch.md'
+    - 'Locations Lb Traffic Extensions Create': 'projects_locations-lb-traffic-extensions-create.md'
+    - 'Locations Lb Traffic Extensions Delete': 'projects_locations-lb-traffic-extensions-delete.md'
+    - 'Locations Lb Traffic Extensions Get': 'projects_locations-lb-traffic-extensions-get.md'
+    - 'Locations Lb Traffic Extensions List': 'projects_locations-lb-traffic-extensions-list.md'
+    - 'Locations Lb Traffic Extensions Patch': 'projects_locations-lb-traffic-extensions-patch.md'
     - 'Locations List': 'projects_locations-list.md'
     - 'Locations Meshes Create': 'projects_locations-meshes-create.md'
     - 'Locations Meshes Delete': 'projects_locations-meshes-delete.md'
@@ -66,6 +76,14 @@ nav:
     - 'Locations Service Bindings List': 'projects_locations-service-bindings-list.md'
     - 'Locations Service Bindings Set Iam Policy': 'projects_locations-service-bindings-set-iam-policy.md'
     - 'Locations Service Bindings Test Iam Permissions': 'projects_locations-service-bindings-test-iam-permissions.md'
+    - 'Locations Service Lb Policies Create': 'projects_locations-service-lb-policies-create.md'
+    - 'Locations Service Lb Policies Delete': 'projects_locations-service-lb-policies-delete.md'
+    - 'Locations Service Lb Policies Get': 'projects_locations-service-lb-policies-get.md'
+    - 'Locations Service Lb Policies Get Iam Policy': 'projects_locations-service-lb-policies-get-iam-policy.md'
+    - 'Locations Service Lb Policies List': 'projects_locations-service-lb-policies-list.md'
+    - 'Locations Service Lb Policies Patch': 'projects_locations-service-lb-policies-patch.md'
+    - 'Locations Service Lb Policies Set Iam Policy': 'projects_locations-service-lb-policies-set-iam-policy.md'
+    - 'Locations Service Lb Policies Test Iam Permissions': 'projects_locations-service-lb-policies-test-iam-permissions.md'
     - 'Locations Tcp Routes Create': 'projects_locations-tcp-routes-create.md'
     - 'Locations Tcp Routes Delete': 'projects_locations-tcp-routes-delete.md'
     - 'Locations Tcp Routes Get': 'projects_locations-tcp-routes-get.md'

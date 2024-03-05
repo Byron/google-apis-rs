@@ -1,4 +1,4 @@
-site_name: Smart Device Management v5.0.3+20230112
+site_name: Smart Device Management v5.0.4+20240218
 site_url: http://byron.github.io/google-apis-rs/google-smartdevicemanagement1-cli
 site_description: A complete library to interact with Smart Device Management (protocol v1)
 

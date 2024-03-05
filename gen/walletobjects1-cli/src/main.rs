@@ -329,6 +329,17 @@ where
                     "venue.name.kind" => Some(("venue.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "view-unlock-requirement" => Some(("viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.kind" => Some(("wideLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.language" => Some(("wideLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.value" => Some(("wideLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.kind" => Some(("wideLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.kind" => Some(("wideLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.description" => Some(("wideLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.kind" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.language" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.value" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.kind" => Some(("wideLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.uri" => Some(("wideLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.kind" => Some(("wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.language" => Some(("wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.value" => Some(("wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -341,7 +352,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "confirmation-code-label", "content-description", "country-code", "custom-confirmation-code-label", "custom-doors-open-label", "custom-gate-label", "custom-row-label", "custom-seat-label", "custom-section-label", "date-time", "default-value", "description", "doors-open", "doors-open-label", "enable-smart-tap", "end", "event-id", "event-name", "fine-print", "first-row-option", "gate-label", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "name", "redemption-issuers", "review", "review-status", "row-label", "seat-label", "section-label", "security-animation", "show-last-update-time", "source-uri", "start", "transit-option", "update-request-url", "uri", "url", "value", "venue", "version", "view-unlock-requirement", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "confirmation-code-label", "content-description", "country-code", "custom-confirmation-code-label", "custom-doors-open-label", "custom-gate-label", "custom-row-label", "custom-seat-label", "custom-section-label", "date-time", "default-value", "description", "doors-open", "doors-open-label", "enable-smart-tap", "end", "event-id", "event-name", "fine-print", "first-row-option", "gate-label", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "name", "redemption-issuers", "review", "review-status", "row-label", "seat-label", "section-label", "security-animation", "show-last-update-time", "source-uri", "start", "transit-option", "update-request-url", "uri", "url", "value", "venue", "version", "view-unlock-requirement", "wide-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -590,6 +601,17 @@ where
                     "venue.name.kind" => Some(("venue.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "view-unlock-requirement" => Some(("viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.kind" => Some(("wideLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.language" => Some(("wideLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.value" => Some(("wideLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.kind" => Some(("wideLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.kind" => Some(("wideLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.description" => Some(("wideLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.kind" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.language" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.value" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.kind" => Some(("wideLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.uri" => Some(("wideLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.kind" => Some(("wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.language" => Some(("wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.value" => Some(("wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -602,7 +624,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "confirmation-code-label", "content-description", "country-code", "custom-confirmation-code-label", "custom-doors-open-label", "custom-gate-label", "custom-row-label", "custom-seat-label", "custom-section-label", "date-time", "default-value", "description", "doors-open", "doors-open-label", "enable-smart-tap", "end", "event-id", "event-name", "fine-print", "first-row-option", "gate-label", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "name", "redemption-issuers", "review", "review-status", "row-label", "seat-label", "section-label", "security-animation", "show-last-update-time", "source-uri", "start", "transit-option", "update-request-url", "uri", "url", "value", "venue", "version", "view-unlock-requirement", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "confirmation-code-label", "content-description", "country-code", "custom-confirmation-code-label", "custom-doors-open-label", "custom-gate-label", "custom-row-label", "custom-seat-label", "custom-section-label", "date-time", "default-value", "description", "doors-open", "doors-open-label", "enable-smart-tap", "end", "event-id", "event-name", "fine-print", "first-row-option", "gate-label", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "name", "redemption-issuers", "review", "review-status", "row-label", "seat-label", "section-label", "security-animation", "show-last-update-time", "source-uri", "start", "transit-option", "update-request-url", "uri", "url", "value", "venue", "version", "view-unlock-requirement", "wide-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -789,6 +811,17 @@ where
                     "venue.name.kind" => Some(("venue.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "view-unlock-requirement" => Some(("viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.kind" => Some(("wideLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.language" => Some(("wideLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.value" => Some(("wideLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.kind" => Some(("wideLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.kind" => Some(("wideLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.description" => Some(("wideLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.kind" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.language" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.value" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.kind" => Some(("wideLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.uri" => Some(("wideLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.kind" => Some(("wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.language" => Some(("wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.value" => Some(("wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -801,7 +834,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "confirmation-code-label", "content-description", "country-code", "custom-confirmation-code-label", "custom-doors-open-label", "custom-gate-label", "custom-row-label", "custom-seat-label", "custom-section-label", "date-time", "default-value", "description", "doors-open", "doors-open-label", "enable-smart-tap", "end", "event-id", "event-name", "fine-print", "first-row-option", "gate-label", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "name", "redemption-issuers", "review", "review-status", "row-label", "seat-label", "section-label", "security-animation", "show-last-update-time", "source-uri", "start", "transit-option", "update-request-url", "uri", "url", "value", "venue", "version", "view-unlock-requirement", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "confirmation-code-label", "content-description", "country-code", "custom-confirmation-code-label", "custom-doors-open-label", "custom-gate-label", "custom-row-label", "custom-seat-label", "custom-section-label", "date-time", "default-value", "description", "doors-open", "doors-open-label", "enable-smart-tap", "end", "event-id", "event-name", "fine-print", "first-row-option", "gate-label", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "name", "redemption-issuers", "review", "review-status", "row-label", "seat-label", "section-label", "security-animation", "show-last-update-time", "source-uri", "start", "transit-option", "update-request-url", "uri", "url", "value", "venue", "version", "view-unlock-requirement", "wide-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1047,6 +1080,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1074,6 +1108,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1101,6 +1136,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1231,6 +1267,17 @@ where
                     "class-reference.venue.name.kind" => Some(("classReference.venue.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.version" => Some(("classReference.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.view-unlock-requirement" => Some(("classReference.viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.kind" => Some(("classReference.wideLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.language" => Some(("classReference.wideLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.value" => Some(("classReference.wideLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.kind" => Some(("classReference.wideLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.kind" => Some(("classReference.wideLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.description" => Some(("classReference.wideLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.language" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.value" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.kind" => Some(("classReference.wideLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.uri" => Some(("classReference.wideLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.kind" => Some(("classReference.wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.language" => Some(("classReference.wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.value" => Some(("classReference.wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1266,9 +1313,14 @@ where
                     "info-module-data.show-last-update-time" => Some(("infoModuleData.showLastUpdateTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "linked-offer-ids" => Some(("linkedOfferIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reservation-info.confirmation-code" => Some(("reservationInfo.confirmationCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reservation-info.kind" => Some(("reservationInfo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1308,7 +1360,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "confirmation-code", "confirmation-code-label", "content-description", "country-code", "currency-code", "custom-confirmation-code-label", "custom-doors-open-label", "custom-gate-label", "custom-row-label", "custom-seat-label", "custom-section-label", "date", "date-time", "default-value", "description", "disable-expiration-notification", "doors-open", "doors-open-label", "enable-smart-tap", "end", "event-id", "event-name", "face-value", "fine-print", "first-row-option", "gate", "gate-label", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "linked-offer-ids", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "name", "period-millis", "redemption-issuers", "render-encoding", "reservation-info", "review", "review-status", "rotating-barcode", "row", "row-label", "seat", "seat-info", "seat-label", "section", "section-label", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "ticket-holder-name", "ticket-number", "ticket-type", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "venue", "version", "view-unlock-requirement", "web-app-link-info", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "confirmation-code", "confirmation-code-label", "content-description", "country-code", "currency-code", "custom-confirmation-code-label", "custom-doors-open-label", "custom-gate-label", "custom-row-label", "custom-seat-label", "custom-section-label", "date", "date-time", "default-value", "description", "disable-expiration-notification", "doors-open", "doors-open-label", "enable-smart-tap", "end", "event-id", "event-name", "face-value", "fine-print", "first-row-option", "gate", "gate-label", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "ios-app-link-info", "issuer-name", "kind", "language", "linked-offer-ids", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "name", "nfc-constraint", "package-name", "pass-constraints", "period-millis", "redemption-issuers", "render-encoding", "reservation-info", "review", "review-status", "rotating-barcode", "row", "row-label", "screenshot-eligibility", "seat", "seat-info", "seat-label", "section", "section-label", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "target-uri", "ticket-holder-name", "ticket-number", "ticket-type", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "venue", "version", "view-unlock-requirement", "web-app-link-info", "wide-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1550,6 +1602,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1577,6 +1630,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1604,6 +1658,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1734,6 +1789,17 @@ where
                     "class-reference.venue.name.kind" => Some(("classReference.venue.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.version" => Some(("classReference.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.view-unlock-requirement" => Some(("classReference.viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.kind" => Some(("classReference.wideLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.language" => Some(("classReference.wideLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.value" => Some(("classReference.wideLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.kind" => Some(("classReference.wideLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.kind" => Some(("classReference.wideLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.description" => Some(("classReference.wideLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.language" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.value" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.kind" => Some(("classReference.wideLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.uri" => Some(("classReference.wideLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.kind" => Some(("classReference.wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.language" => Some(("classReference.wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.value" => Some(("classReference.wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1769,9 +1835,14 @@ where
                     "info-module-data.show-last-update-time" => Some(("infoModuleData.showLastUpdateTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "linked-offer-ids" => Some(("linkedOfferIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reservation-info.confirmation-code" => Some(("reservationInfo.confirmationCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reservation-info.kind" => Some(("reservationInfo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1811,7 +1882,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "confirmation-code", "confirmation-code-label", "content-description", "country-code", "currency-code", "custom-confirmation-code-label", "custom-doors-open-label", "custom-gate-label", "custom-row-label", "custom-seat-label", "custom-section-label", "date", "date-time", "default-value", "description", "disable-expiration-notification", "doors-open", "doors-open-label", "enable-smart-tap", "end", "event-id", "event-name", "face-value", "fine-print", "first-row-option", "gate", "gate-label", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "linked-offer-ids", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "name", "period-millis", "redemption-issuers", "render-encoding", "reservation-info", "review", "review-status", "rotating-barcode", "row", "row-label", "seat", "seat-info", "seat-label", "section", "section-label", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "ticket-holder-name", "ticket-number", "ticket-type", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "venue", "version", "view-unlock-requirement", "web-app-link-info", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "confirmation-code", "confirmation-code-label", "content-description", "country-code", "currency-code", "custom-confirmation-code-label", "custom-doors-open-label", "custom-gate-label", "custom-row-label", "custom-seat-label", "custom-section-label", "date", "date-time", "default-value", "description", "disable-expiration-notification", "doors-open", "doors-open-label", "enable-smart-tap", "end", "event-id", "event-name", "face-value", "fine-print", "first-row-option", "gate", "gate-label", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "ios-app-link-info", "issuer-name", "kind", "language", "linked-offer-ids", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "name", "nfc-constraint", "package-name", "pass-constraints", "period-millis", "redemption-issuers", "render-encoding", "reservation-info", "review", "review-status", "rotating-barcode", "row", "row-label", "screenshot-eligibility", "seat", "seat-info", "seat-label", "section", "section-label", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "target-uri", "ticket-holder-name", "ticket-number", "ticket-type", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "venue", "version", "view-unlock-requirement", "web-app-link-info", "wide-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1905,6 +1976,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1932,6 +2004,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1959,6 +2032,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2089,6 +2163,17 @@ where
                     "class-reference.venue.name.kind" => Some(("classReference.venue.name.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.version" => Some(("classReference.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.view-unlock-requirement" => Some(("classReference.viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.kind" => Some(("classReference.wideLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.language" => Some(("classReference.wideLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.value" => Some(("classReference.wideLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.kind" => Some(("classReference.wideLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.kind" => Some(("classReference.wideLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.description" => Some(("classReference.wideLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.language" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.value" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.kind" => Some(("classReference.wideLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.uri" => Some(("classReference.wideLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.kind" => Some(("classReference.wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.language" => Some(("classReference.wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.value" => Some(("classReference.wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2124,9 +2209,14 @@ where
                     "info-module-data.show-last-update-time" => Some(("infoModuleData.showLastUpdateTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "linked-offer-ids" => Some(("linkedOfferIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reservation-info.confirmation-code" => Some(("reservationInfo.confirmationCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reservation-info.kind" => Some(("reservationInfo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2166,7 +2256,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "confirmation-code", "confirmation-code-label", "content-description", "country-code", "currency-code", "custom-confirmation-code-label", "custom-doors-open-label", "custom-gate-label", "custom-row-label", "custom-seat-label", "custom-section-label", "date", "date-time", "default-value", "description", "disable-expiration-notification", "doors-open", "doors-open-label", "enable-smart-tap", "end", "event-id", "event-name", "face-value", "fine-print", "first-row-option", "gate", "gate-label", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "linked-offer-ids", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "name", "period-millis", "redemption-issuers", "render-encoding", "reservation-info", "review", "review-status", "rotating-barcode", "row", "row-label", "seat", "seat-info", "seat-label", "section", "section-label", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "ticket-holder-name", "ticket-number", "ticket-type", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "venue", "version", "view-unlock-requirement", "web-app-link-info", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "confirmation-code", "confirmation-code-label", "content-description", "country-code", "currency-code", "custom-confirmation-code-label", "custom-doors-open-label", "custom-gate-label", "custom-row-label", "custom-seat-label", "custom-section-label", "date", "date-time", "default-value", "description", "disable-expiration-notification", "doors-open", "doors-open-label", "enable-smart-tap", "end", "event-id", "event-name", "face-value", "fine-print", "first-row-option", "gate", "gate-label", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "ios-app-link-info", "issuer-name", "kind", "language", "linked-offer-ids", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "name", "nfc-constraint", "package-name", "pass-constraints", "period-millis", "redemption-issuers", "render-encoding", "reservation-info", "review", "review-status", "rotating-barcode", "row", "row-label", "screenshot-eligibility", "seat", "seat-info", "seat-label", "section", "section-label", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "target-uri", "ticket-holder-name", "ticket-number", "ticket-type", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "venue", "version", "view-unlock-requirement", "web-app-link-info", "wide-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2447,6 +2537,17 @@ where
                     "flight-header.carrier.carrier-iata-code" => Some(("flightHeader.carrier.carrierIataCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.carrier.carrier-icao-code" => Some(("flightHeader.carrier.carrierIcaoCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.carrier.kind" => Some(("flightHeader.carrier.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.content-description.default-value.kind" => Some(("flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.content-description.default-value.language" => Some(("flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.content-description.default-value.value" => Some(("flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.content-description.kind" => Some(("flightHeader.carrier.wideAirlineLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.kind" => Some(("flightHeader.carrier.wideAirlineLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.description" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.kind" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.language" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.value" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.localized-description.kind" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.uri" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.flight-number" => Some(("flightHeader.flightNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.flight-number-display-override" => Some(("flightHeader.flightNumberDisplayOverride", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.kind" => Some(("flightHeader.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2479,6 +2580,17 @@ where
                     "flight-header.operating-carrier.carrier-iata-code" => Some(("flightHeader.operatingCarrier.carrierIataCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.operating-carrier.carrier-icao-code" => Some(("flightHeader.operatingCarrier.carrierIcaoCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.operating-carrier.kind" => Some(("flightHeader.operatingCarrier.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.content-description.default-value.kind" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.content-description.default-value.language" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.content-description.default-value.value" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.content-description.kind" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.kind" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.description" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.kind" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.language" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.value" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.kind" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.uri" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.operating-flight-number" => Some(("flightHeader.operatingFlightNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-status" => Some(("flightStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hero-image.content-description.default-value.kind" => Some(("heroImage.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2543,7 +2655,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airline-alliance-logo", "airline-logo", "airline-name", "airport-iata-code", "airport-name-override", "allow-multiple-users-per-object", "animation-type", "boarding-and-seating-policy", "boarding-policy", "callback-options", "carrier", "carrier-iata-code", "carrier-icao-code", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "destination", "enable-smart-tap", "first-row-option", "flight-header", "flight-number", "flight-number-display-override", "flight-status", "gate", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "local-boarding-date-time", "local-estimated-or-actual-arrival-date-time", "local-estimated-or-actual-departure-date-time", "local-gate-closing-date-time", "local-scheduled-arrival-date-time", "local-scheduled-departure-date-time", "localized-description", "localized-issuer-name", "multiple-devices-and-holders-allowed-status", "operating-carrier", "operating-flight-number", "origin", "redemption-issuers", "review", "review-status", "seat-class-policy", "security-animation", "show-last-update-time", "source-uri", "terminal", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airline-alliance-logo", "airline-logo", "airline-name", "airport-iata-code", "airport-name-override", "allow-multiple-users-per-object", "animation-type", "boarding-and-seating-policy", "boarding-policy", "callback-options", "carrier", "carrier-iata-code", "carrier-icao-code", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "destination", "enable-smart-tap", "first-row-option", "flight-header", "flight-number", "flight-number-display-override", "flight-status", "gate", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "local-boarding-date-time", "local-estimated-or-actual-arrival-date-time", "local-estimated-or-actual-departure-date-time", "local-gate-closing-date-time", "local-scheduled-arrival-date-time", "local-scheduled-departure-date-time", "localized-description", "localized-issuer-name", "multiple-devices-and-holders-allowed-status", "operating-carrier", "operating-flight-number", "origin", "redemption-issuers", "review", "review-status", "seat-class-policy", "security-animation", "show-last-update-time", "source-uri", "terminal", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "wide-airline-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2734,6 +2846,17 @@ where
                     "flight-header.carrier.carrier-iata-code" => Some(("flightHeader.carrier.carrierIataCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.carrier.carrier-icao-code" => Some(("flightHeader.carrier.carrierIcaoCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.carrier.kind" => Some(("flightHeader.carrier.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.content-description.default-value.kind" => Some(("flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.content-description.default-value.language" => Some(("flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.content-description.default-value.value" => Some(("flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.content-description.kind" => Some(("flightHeader.carrier.wideAirlineLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.kind" => Some(("flightHeader.carrier.wideAirlineLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.description" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.kind" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.language" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.value" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.localized-description.kind" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.uri" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.flight-number" => Some(("flightHeader.flightNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.flight-number-display-override" => Some(("flightHeader.flightNumberDisplayOverride", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.kind" => Some(("flightHeader.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2766,6 +2889,17 @@ where
                     "flight-header.operating-carrier.carrier-iata-code" => Some(("flightHeader.operatingCarrier.carrierIataCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.operating-carrier.carrier-icao-code" => Some(("flightHeader.operatingCarrier.carrierIcaoCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.operating-carrier.kind" => Some(("flightHeader.operatingCarrier.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.content-description.default-value.kind" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.content-description.default-value.language" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.content-description.default-value.value" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.content-description.kind" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.kind" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.description" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.kind" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.language" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.value" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.kind" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.uri" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.operating-flight-number" => Some(("flightHeader.operatingFlightNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-status" => Some(("flightStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hero-image.content-description.default-value.kind" => Some(("heroImage.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2830,7 +2964,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airline-alliance-logo", "airline-logo", "airline-name", "airport-iata-code", "airport-name-override", "allow-multiple-users-per-object", "animation-type", "boarding-and-seating-policy", "boarding-policy", "callback-options", "carrier", "carrier-iata-code", "carrier-icao-code", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "destination", "enable-smart-tap", "first-row-option", "flight-header", "flight-number", "flight-number-display-override", "flight-status", "gate", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "local-boarding-date-time", "local-estimated-or-actual-arrival-date-time", "local-estimated-or-actual-departure-date-time", "local-gate-closing-date-time", "local-scheduled-arrival-date-time", "local-scheduled-departure-date-time", "localized-description", "localized-issuer-name", "multiple-devices-and-holders-allowed-status", "operating-carrier", "operating-flight-number", "origin", "redemption-issuers", "review", "review-status", "seat-class-policy", "security-animation", "show-last-update-time", "source-uri", "terminal", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airline-alliance-logo", "airline-logo", "airline-name", "airport-iata-code", "airport-name-override", "allow-multiple-users-per-object", "animation-type", "boarding-and-seating-policy", "boarding-policy", "callback-options", "carrier", "carrier-iata-code", "carrier-icao-code", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "destination", "enable-smart-tap", "first-row-option", "flight-header", "flight-number", "flight-number-display-override", "flight-status", "gate", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "local-boarding-date-time", "local-estimated-or-actual-arrival-date-time", "local-estimated-or-actual-departure-date-time", "local-gate-closing-date-time", "local-scheduled-arrival-date-time", "local-scheduled-departure-date-time", "localized-description", "localized-issuer-name", "multiple-devices-and-holders-allowed-status", "operating-carrier", "operating-flight-number", "origin", "redemption-issuers", "review", "review-status", "seat-class-policy", "security-animation", "show-last-update-time", "source-uri", "terminal", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "wide-airline-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2959,6 +3093,17 @@ where
                     "flight-header.carrier.carrier-iata-code" => Some(("flightHeader.carrier.carrierIataCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.carrier.carrier-icao-code" => Some(("flightHeader.carrier.carrierIcaoCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.carrier.kind" => Some(("flightHeader.carrier.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.content-description.default-value.kind" => Some(("flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.content-description.default-value.language" => Some(("flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.content-description.default-value.value" => Some(("flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.content-description.kind" => Some(("flightHeader.carrier.wideAirlineLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.kind" => Some(("flightHeader.carrier.wideAirlineLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.description" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.kind" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.language" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.value" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.localized-description.kind" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.carrier.wide-airline-logo.source-uri.uri" => Some(("flightHeader.carrier.wideAirlineLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.flight-number" => Some(("flightHeader.flightNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.flight-number-display-override" => Some(("flightHeader.flightNumberDisplayOverride", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.kind" => Some(("flightHeader.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2991,6 +3136,17 @@ where
                     "flight-header.operating-carrier.carrier-iata-code" => Some(("flightHeader.operatingCarrier.carrierIataCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.operating-carrier.carrier-icao-code" => Some(("flightHeader.operatingCarrier.carrierIcaoCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.operating-carrier.kind" => Some(("flightHeader.operatingCarrier.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.content-description.default-value.kind" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.content-description.default-value.language" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.content-description.default-value.value" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.content-description.kind" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.kind" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.description" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.kind" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.language" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.value" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.kind" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flight-header.operating-carrier.wide-airline-logo.source-uri.uri" => Some(("flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-header.operating-flight-number" => Some(("flightHeader.operatingFlightNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "flight-status" => Some(("flightStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "hero-image.content-description.default-value.kind" => Some(("heroImage.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3055,7 +3211,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airline-alliance-logo", "airline-logo", "airline-name", "airport-iata-code", "airport-name-override", "allow-multiple-users-per-object", "animation-type", "boarding-and-seating-policy", "boarding-policy", "callback-options", "carrier", "carrier-iata-code", "carrier-icao-code", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "destination", "enable-smart-tap", "first-row-option", "flight-header", "flight-number", "flight-number-display-override", "flight-status", "gate", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "local-boarding-date-time", "local-estimated-or-actual-arrival-date-time", "local-estimated-or-actual-departure-date-time", "local-gate-closing-date-time", "local-scheduled-arrival-date-time", "local-scheduled-departure-date-time", "localized-description", "localized-issuer-name", "multiple-devices-and-holders-allowed-status", "operating-carrier", "operating-flight-number", "origin", "redemption-issuers", "review", "review-status", "seat-class-policy", "security-animation", "show-last-update-time", "source-uri", "terminal", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airline-alliance-logo", "airline-logo", "airline-name", "airport-iata-code", "airport-name-override", "allow-multiple-users-per-object", "animation-type", "boarding-and-seating-policy", "boarding-policy", "callback-options", "carrier", "carrier-iata-code", "carrier-icao-code", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "destination", "enable-smart-tap", "first-row-option", "flight-header", "flight-number", "flight-number-display-override", "flight-status", "gate", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "local-boarding-date-time", "local-estimated-or-actual-arrival-date-time", "local-estimated-or-actual-departure-date-time", "local-gate-closing-date-time", "local-scheduled-arrival-date-time", "local-scheduled-departure-date-time", "localized-description", "localized-issuer-name", "multiple-devices-and-holders-allowed-status", "operating-carrier", "operating-flight-number", "origin", "redemption-issuers", "review", "review-status", "seat-class-policy", "security-animation", "show-last-update-time", "source-uri", "terminal", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "wide-airline-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3301,6 +3457,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3328,6 +3485,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3355,6 +3513,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3449,6 +3608,17 @@ where
                     "class-reference.flight-header.carrier.carrier-iata-code" => Some(("classReference.flightHeader.carrier.carrierIataCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.carrier.carrier-icao-code" => Some(("classReference.flightHeader.carrier.carrierIcaoCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.carrier.kind" => Some(("classReference.flightHeader.carrier.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.content-description.default-value.kind" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.content-description.default-value.language" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.content-description.default-value.value" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.content-description.kind" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.kind" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.description" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.language" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.value" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.localized-description.kind" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.uri" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.flight-number" => Some(("classReference.flightHeader.flightNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.flight-number-display-override" => Some(("classReference.flightHeader.flightNumberDisplayOverride", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.kind" => Some(("classReference.flightHeader.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3481,6 +3651,17 @@ where
                     "class-reference.flight-header.operating-carrier.carrier-iata-code" => Some(("classReference.flightHeader.operatingCarrier.carrierIataCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.operating-carrier.carrier-icao-code" => Some(("classReference.flightHeader.operatingCarrier.carrierIcaoCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.operating-carrier.kind" => Some(("classReference.flightHeader.operatingCarrier.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.content-description.default-value.kind" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.content-description.default-value.language" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.content-description.default-value.value" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.content-description.kind" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.kind" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.description" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.language" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.value" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.kind" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.uri" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.operating-flight-number" => Some(("classReference.flightHeader.operatingFlightNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-status" => Some(("classReference.flightStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.hero-image.content-description.default-value.kind" => Some(("classReference.heroImage.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3564,6 +3745,8 @@ where
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "info-module-data.show-last-update-time" => Some(("infoModuleData.showLastUpdateTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "passenger-name" => Some(("passengerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reservation-info.confirmation-code" => Some(("reservationInfo.confirmationCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reservation-info.eticket-number" => Some(("reservationInfo.eticketNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3575,6 +3758,9 @@ where
                     "reservation-info.frequent-flyer-info.kind" => Some(("reservationInfo.frequentFlyerInfo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reservation-info.kind" => Some(("reservationInfo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3602,7 +3788,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airline-alliance-logo", "airline-logo", "airline-name", "airport-iata-code", "airport-name-override", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "boarding-and-seating-info", "boarding-and-seating-policy", "boarding-door", "boarding-group", "boarding-policy", "boarding-position", "boarding-privilege-image", "callback-options", "carrier", "carrier-iata-code", "carrier-icao-code", "class-id", "class-reference", "class-template-info", "comments", "confirmation-code", "content-description", "country-code", "date", "default-value", "description", "destination", "disable-expiration-notification", "enable-smart-tap", "end", "eticket-number", "first-row-option", "flight-header", "flight-number", "flight-number-display-override", "flight-status", "frequent-flyer-info", "frequent-flyer-number", "frequent-flyer-program-name", "gate", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "local-boarding-date-time", "local-estimated-or-actual-arrival-date-time", "local-estimated-or-actual-departure-date-time", "local-gate-closing-date-time", "local-scheduled-arrival-date-time", "local-scheduled-departure-date-time", "localized-description", "localized-issuer-name", "multiple-devices-and-holders-allowed-status", "operating-carrier", "operating-flight-number", "origin", "passenger-name", "period-millis", "redemption-issuers", "render-encoding", "reservation-info", "review", "review-status", "rotating-barcode", "seat-assignment", "seat-class", "seat-class-policy", "seat-number", "security-animation", "security-program-logo", "sequence-number", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "terminal", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "web-app-link-info", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airline-alliance-logo", "airline-logo", "airline-name", "airport-iata-code", "airport-name-override", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "boarding-and-seating-info", "boarding-and-seating-policy", "boarding-door", "boarding-group", "boarding-policy", "boarding-position", "boarding-privilege-image", "callback-options", "carrier", "carrier-iata-code", "carrier-icao-code", "class-id", "class-reference", "class-template-info", "comments", "confirmation-code", "content-description", "country-code", "date", "default-value", "description", "destination", "disable-expiration-notification", "enable-smart-tap", "end", "eticket-number", "first-row-option", "flight-header", "flight-number", "flight-number-display-override", "flight-status", "frequent-flyer-info", "frequent-flyer-number", "frequent-flyer-program-name", "gate", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "local-boarding-date-time", "local-estimated-or-actual-arrival-date-time", "local-estimated-or-actual-departure-date-time", "local-gate-closing-date-time", "local-scheduled-arrival-date-time", "local-scheduled-departure-date-time", "localized-description", "localized-issuer-name", "multiple-devices-and-holders-allowed-status", "nfc-constraint", "operating-carrier", "operating-flight-number", "origin", "package-name", "pass-constraints", "passenger-name", "period-millis", "redemption-issuers", "render-encoding", "reservation-info", "review", "review-status", "rotating-barcode", "screenshot-eligibility", "seat-assignment", "seat-class", "seat-class-policy", "seat-number", "security-animation", "security-program-logo", "sequence-number", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "target-uri", "terminal", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "version", "view-unlock-requirement", "web-app-link-info", "wide-airline-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3758,6 +3944,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3785,6 +3972,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3812,6 +4000,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3906,6 +4095,17 @@ where
                     "class-reference.flight-header.carrier.carrier-iata-code" => Some(("classReference.flightHeader.carrier.carrierIataCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.carrier.carrier-icao-code" => Some(("classReference.flightHeader.carrier.carrierIcaoCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.carrier.kind" => Some(("classReference.flightHeader.carrier.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.content-description.default-value.kind" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.content-description.default-value.language" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.content-description.default-value.value" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.content-description.kind" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.kind" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.description" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.language" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.value" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.localized-description.kind" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.uri" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.flight-number" => Some(("classReference.flightHeader.flightNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.flight-number-display-override" => Some(("classReference.flightHeader.flightNumberDisplayOverride", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.kind" => Some(("classReference.flightHeader.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3938,6 +4138,17 @@ where
                     "class-reference.flight-header.operating-carrier.carrier-iata-code" => Some(("classReference.flightHeader.operatingCarrier.carrierIataCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.operating-carrier.carrier-icao-code" => Some(("classReference.flightHeader.operatingCarrier.carrierIcaoCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.operating-carrier.kind" => Some(("classReference.flightHeader.operatingCarrier.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.content-description.default-value.kind" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.content-description.default-value.language" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.content-description.default-value.value" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.content-description.kind" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.kind" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.description" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.language" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.value" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.kind" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.uri" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.operating-flight-number" => Some(("classReference.flightHeader.operatingFlightNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-status" => Some(("classReference.flightStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.hero-image.content-description.default-value.kind" => Some(("classReference.heroImage.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4021,6 +4232,8 @@ where
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "info-module-data.show-last-update-time" => Some(("infoModuleData.showLastUpdateTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "passenger-name" => Some(("passengerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reservation-info.confirmation-code" => Some(("reservationInfo.confirmationCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reservation-info.eticket-number" => Some(("reservationInfo.eticketNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4032,6 +4245,9 @@ where
                     "reservation-info.frequent-flyer-info.kind" => Some(("reservationInfo.frequentFlyerInfo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reservation-info.kind" => Some(("reservationInfo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4059,7 +4275,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airline-alliance-logo", "airline-logo", "airline-name", "airport-iata-code", "airport-name-override", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "boarding-and-seating-info", "boarding-and-seating-policy", "boarding-door", "boarding-group", "boarding-policy", "boarding-position", "boarding-privilege-image", "callback-options", "carrier", "carrier-iata-code", "carrier-icao-code", "class-id", "class-reference", "class-template-info", "comments", "confirmation-code", "content-description", "country-code", "date", "default-value", "description", "destination", "disable-expiration-notification", "enable-smart-tap", "end", "eticket-number", "first-row-option", "flight-header", "flight-number", "flight-number-display-override", "flight-status", "frequent-flyer-info", "frequent-flyer-number", "frequent-flyer-program-name", "gate", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "local-boarding-date-time", "local-estimated-or-actual-arrival-date-time", "local-estimated-or-actual-departure-date-time", "local-gate-closing-date-time", "local-scheduled-arrival-date-time", "local-scheduled-departure-date-time", "localized-description", "localized-issuer-name", "multiple-devices-and-holders-allowed-status", "operating-carrier", "operating-flight-number", "origin", "passenger-name", "period-millis", "redemption-issuers", "render-encoding", "reservation-info", "review", "review-status", "rotating-barcode", "seat-assignment", "seat-class", "seat-class-policy", "seat-number", "security-animation", "security-program-logo", "sequence-number", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "terminal", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "web-app-link-info", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airline-alliance-logo", "airline-logo", "airline-name", "airport-iata-code", "airport-name-override", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "boarding-and-seating-info", "boarding-and-seating-policy", "boarding-door", "boarding-group", "boarding-policy", "boarding-position", "boarding-privilege-image", "callback-options", "carrier", "carrier-iata-code", "carrier-icao-code", "class-id", "class-reference", "class-template-info", "comments", "confirmation-code", "content-description", "country-code", "date", "default-value", "description", "destination", "disable-expiration-notification", "enable-smart-tap", "end", "eticket-number", "first-row-option", "flight-header", "flight-number", "flight-number-display-override", "flight-status", "frequent-flyer-info", "frequent-flyer-number", "frequent-flyer-program-name", "gate", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "local-boarding-date-time", "local-estimated-or-actual-arrival-date-time", "local-estimated-or-actual-departure-date-time", "local-gate-closing-date-time", "local-scheduled-arrival-date-time", "local-scheduled-departure-date-time", "localized-description", "localized-issuer-name", "multiple-devices-and-holders-allowed-status", "nfc-constraint", "operating-carrier", "operating-flight-number", "origin", "package-name", "pass-constraints", "passenger-name", "period-millis", "redemption-issuers", "render-encoding", "reservation-info", "review", "review-status", "rotating-barcode", "screenshot-eligibility", "seat-assignment", "seat-class", "seat-class-policy", "seat-number", "security-animation", "security-program-logo", "sequence-number", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "target-uri", "terminal", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "version", "view-unlock-requirement", "web-app-link-info", "wide-airline-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4153,6 +4369,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4180,6 +4397,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4207,6 +4425,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4301,6 +4520,17 @@ where
                     "class-reference.flight-header.carrier.carrier-iata-code" => Some(("classReference.flightHeader.carrier.carrierIataCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.carrier.carrier-icao-code" => Some(("classReference.flightHeader.carrier.carrierIcaoCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.carrier.kind" => Some(("classReference.flightHeader.carrier.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.content-description.default-value.kind" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.content-description.default-value.language" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.content-description.default-value.value" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.content-description.kind" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.kind" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.description" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.language" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.localized-description.default-value.value" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.localized-description.kind" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.carrier.wide-airline-logo.source-uri.uri" => Some(("classReference.flightHeader.carrier.wideAirlineLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.flight-number" => Some(("classReference.flightHeader.flightNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.flight-number-display-override" => Some(("classReference.flightHeader.flightNumberDisplayOverride", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.kind" => Some(("classReference.flightHeader.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4333,6 +4563,17 @@ where
                     "class-reference.flight-header.operating-carrier.carrier-iata-code" => Some(("classReference.flightHeader.operatingCarrier.carrierIataCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.operating-carrier.carrier-icao-code" => Some(("classReference.flightHeader.operatingCarrier.carrierIcaoCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.operating-carrier.kind" => Some(("classReference.flightHeader.operatingCarrier.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.content-description.default-value.kind" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.content-description.default-value.language" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.content-description.default-value.value" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.content-description.kind" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.kind" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.description" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.language" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.default-value.value" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.localized-description.kind" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.flight-header.operating-carrier.wide-airline-logo.source-uri.uri" => Some(("classReference.flightHeader.operatingCarrier.wideAirlineLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-header.operating-flight-number" => Some(("classReference.flightHeader.operatingFlightNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.flight-status" => Some(("classReference.flightStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.hero-image.content-description.default-value.kind" => Some(("classReference.heroImage.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4416,6 +4657,8 @@ where
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "info-module-data.show-last-update-time" => Some(("infoModuleData.showLastUpdateTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "passenger-name" => Some(("passengerName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reservation-info.confirmation-code" => Some(("reservationInfo.confirmationCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reservation-info.eticket-number" => Some(("reservationInfo.eticketNumber", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4427,6 +4670,9 @@ where
                     "reservation-info.frequent-flyer-info.kind" => Some(("reservationInfo.frequentFlyerInfo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "reservation-info.kind" => Some(("reservationInfo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4454,7 +4700,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airline-alliance-logo", "airline-logo", "airline-name", "airport-iata-code", "airport-name-override", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "boarding-and-seating-info", "boarding-and-seating-policy", "boarding-door", "boarding-group", "boarding-policy", "boarding-position", "boarding-privilege-image", "callback-options", "carrier", "carrier-iata-code", "carrier-icao-code", "class-id", "class-reference", "class-template-info", "comments", "confirmation-code", "content-description", "country-code", "date", "default-value", "description", "destination", "disable-expiration-notification", "enable-smart-tap", "end", "eticket-number", "first-row-option", "flight-header", "flight-number", "flight-number-display-override", "flight-status", "frequent-flyer-info", "frequent-flyer-number", "frequent-flyer-program-name", "gate", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "local-boarding-date-time", "local-estimated-or-actual-arrival-date-time", "local-estimated-or-actual-departure-date-time", "local-gate-closing-date-time", "local-scheduled-arrival-date-time", "local-scheduled-departure-date-time", "localized-description", "localized-issuer-name", "multiple-devices-and-holders-allowed-status", "operating-carrier", "operating-flight-number", "origin", "passenger-name", "period-millis", "redemption-issuers", "render-encoding", "reservation-info", "review", "review-status", "rotating-barcode", "seat-assignment", "seat-class", "seat-class-policy", "seat-number", "security-animation", "security-program-logo", "sequence-number", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "terminal", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "web-app-link-info", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["airline-alliance-logo", "airline-logo", "airline-name", "airport-iata-code", "airport-name-override", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "boarding-and-seating-info", "boarding-and-seating-policy", "boarding-door", "boarding-group", "boarding-policy", "boarding-position", "boarding-privilege-image", "callback-options", "carrier", "carrier-iata-code", "carrier-icao-code", "class-id", "class-reference", "class-template-info", "comments", "confirmation-code", "content-description", "country-code", "date", "default-value", "description", "destination", "disable-expiration-notification", "enable-smart-tap", "end", "eticket-number", "first-row-option", "flight-header", "flight-number", "flight-number-display-override", "flight-status", "frequent-flyer-info", "frequent-flyer-number", "frequent-flyer-program-name", "gate", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "local-boarding-date-time", "local-estimated-or-actual-arrival-date-time", "local-estimated-or-actual-departure-date-time", "local-gate-closing-date-time", "local-scheduled-arrival-date-time", "local-scheduled-departure-date-time", "localized-description", "localized-issuer-name", "multiple-devices-and-holders-allowed-status", "nfc-constraint", "operating-carrier", "operating-flight-number", "origin", "package-name", "pass-constraints", "passenger-name", "period-millis", "redemption-issuers", "render-encoding", "reservation-info", "review", "review-status", "rotating-barcode", "screenshot-eligibility", "seat-assignment", "seat-class", "seat-class-policy", "seat-number", "security-animation", "security-program-logo", "sequence-number", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "target-uri", "terminal", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "version", "view-unlock-requirement", "web-app-link-info", "wide-airline-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4465,6 +4711,106 @@ where
         }
         let mut request: api::FlightObject = json::value::from_value(object).unwrap();
         let mut call = self.hub.flightobject().update(request, opt.value_of("resource-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _genericclass_addmessage(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "message.body" => Some(("message.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.display-interval.end.date" => Some(("message.displayInterval.end.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.display-interval.kind" => Some(("message.displayInterval.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.display-interval.start.date" => Some(("message.displayInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.header" => Some(("message.header", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.id" => Some(("message.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.kind" => Some(("message.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-body.default-value.kind" => Some(("message.localizedBody.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-body.default-value.language" => Some(("message.localizedBody.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-body.default-value.value" => Some(("message.localizedBody.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-body.kind" => Some(("message.localizedBody.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-header.default-value.kind" => Some(("message.localizedHeader.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-header.default-value.language" => Some(("message.localizedHeader.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-header.default-value.value" => Some(("message.localizedHeader.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-header.kind" => Some(("message.localizedHeader.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.message-type" => Some(("message.messageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["body", "date", "default-value", "display-interval", "end", "header", "id", "kind", "language", "localized-body", "localized-header", "message", "message-type", "start", "value"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AddMessageRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.genericclass().addmessage(request, opt.value_of("resource-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -4907,6 +5253,106 @@ where
         }
     }
 
+    async fn _genericobject_addmessage(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "message.body" => Some(("message.body", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.display-interval.end.date" => Some(("message.displayInterval.end.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.display-interval.kind" => Some(("message.displayInterval.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.display-interval.start.date" => Some(("message.displayInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.header" => Some(("message.header", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.id" => Some(("message.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.kind" => Some(("message.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-body.default-value.kind" => Some(("message.localizedBody.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-body.default-value.language" => Some(("message.localizedBody.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-body.default-value.value" => Some(("message.localizedBody.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-body.kind" => Some(("message.localizedBody.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-header.default-value.kind" => Some(("message.localizedHeader.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-header.default-value.language" => Some(("message.localizedHeader.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-header.default-value.value" => Some(("message.localizedHeader.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.localized-header.kind" => Some(("message.localizedHeader.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "message.message-type" => Some(("message.messageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["body", "date", "default-value", "display-interval", "end", "header", "id", "kind", "language", "localized-body", "localized-header", "message", "message-type", "start", "value"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AddMessageRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.genericobject().addmessage(request, opt.value_of("resource-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _genericobject_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.genericobject().get(opt.value_of("resource-id").unwrap_or(""));
@@ -4993,6 +5439,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5020,6 +5467,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5047,6 +5495,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5111,7 +5560,12 @@ where
                     "logo.source-uri.uri" => Some(("logo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notifications.expiry-notification.enable-notification" => Some(("notifications.expiryNotification.enableNotification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "notifications.upcoming-notification.enable-notification" => Some(("notifications.upcomingNotification.enableNotification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5130,8 +5584,19 @@ where
                     "valid-time-interval.end.date" => Some(("validTimeInterval.end.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "valid-time-interval.kind" => Some(("validTimeInterval.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.kind" => Some(("wideLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.language" => Some(("wideLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.value" => Some(("wideLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.kind" => Some(("wideLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.kind" => Some(("wideLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.description" => Some(("wideLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.kind" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.language" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.value" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.kind" => Some(("wideLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.uri" => Some(("wideLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "alternate-text", "android-app-link-info", "app-link-data", "app-logo-image", "app-target", "barcode", "card-title", "class-id", "content-description", "date", "default-value", "description", "enable-notification", "end", "expiry-notification", "generic-type", "grouping-id", "grouping-info", "has-users", "header", "hero-image", "hex-background-color", "id", "ios-app-link-info", "kind", "language", "localized-description", "logo", "notifications", "period-millis", "render-encoding", "rotating-barcode", "show-code-text", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "subheader", "target-uri", "title", "totp-details", "type", "upcoming-notification", "uri", "valid-time-interval", "value", "value-pattern", "web-app-link-info"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "alternate-text", "android-app-link-info", "app-link-data", "app-logo-image", "app-target", "barcode", "card-title", "class-id", "content-description", "date", "default-value", "description", "enable-notification", "end", "expiry-notification", "generic-type", "grouping-id", "grouping-info", "has-users", "header", "hero-image", "hex-background-color", "id", "initial-rotating-barcode-values", "ios-app-link-info", "kind", "language", "localized-description", "logo", "nfc-constraint", "notifications", "package-name", "pass-constraints", "period-millis", "render-encoding", "rotating-barcode", "screenshot-eligibility", "show-code-text", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "subheader", "target-uri", "title", "totp-details", "type", "upcoming-notification", "uri", "valid-time-interval", "value", "value-pattern", "values", "web-app-link-info", "wide-logo"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5287,6 +5752,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5314,6 +5780,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5341,6 +5808,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5405,7 +5873,12 @@ where
                     "logo.source-uri.uri" => Some(("logo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notifications.expiry-notification.enable-notification" => Some(("notifications.expiryNotification.enableNotification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "notifications.upcoming-notification.enable-notification" => Some(("notifications.upcomingNotification.enableNotification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5424,8 +5897,19 @@ where
                     "valid-time-interval.end.date" => Some(("validTimeInterval.end.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "valid-time-interval.kind" => Some(("validTimeInterval.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.kind" => Some(("wideLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.language" => Some(("wideLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.value" => Some(("wideLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.kind" => Some(("wideLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.kind" => Some(("wideLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.description" => Some(("wideLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.kind" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.language" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.value" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.kind" => Some(("wideLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.uri" => Some(("wideLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "alternate-text", "android-app-link-info", "app-link-data", "app-logo-image", "app-target", "barcode", "card-title", "class-id", "content-description", "date", "default-value", "description", "enable-notification", "end", "expiry-notification", "generic-type", "grouping-id", "grouping-info", "has-users", "header", "hero-image", "hex-background-color", "id", "ios-app-link-info", "kind", "language", "localized-description", "logo", "notifications", "period-millis", "render-encoding", "rotating-barcode", "show-code-text", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "subheader", "target-uri", "title", "totp-details", "type", "upcoming-notification", "uri", "valid-time-interval", "value", "value-pattern", "web-app-link-info"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "alternate-text", "android-app-link-info", "app-link-data", "app-logo-image", "app-target", "barcode", "card-title", "class-id", "content-description", "date", "default-value", "description", "enable-notification", "end", "expiry-notification", "generic-type", "grouping-id", "grouping-info", "has-users", "header", "hero-image", "hex-background-color", "id", "initial-rotating-barcode-values", "ios-app-link-info", "kind", "language", "localized-description", "logo", "nfc-constraint", "notifications", "package-name", "pass-constraints", "period-millis", "render-encoding", "rotating-barcode", "screenshot-eligibility", "show-code-text", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "subheader", "target-uri", "title", "totp-details", "type", "upcoming-notification", "uri", "valid-time-interval", "value", "value-pattern", "values", "web-app-link-info", "wide-logo"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5519,6 +6003,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5546,6 +6031,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5573,6 +6059,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5637,7 +6124,12 @@ where
                     "logo.source-uri.uri" => Some(("logo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notifications.expiry-notification.enable-notification" => Some(("notifications.expiryNotification.enableNotification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "notifications.upcoming-notification.enable-notification" => Some(("notifications.upcomingNotification.enableNotification", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5656,8 +6148,19 @@ where
                     "valid-time-interval.end.date" => Some(("validTimeInterval.end.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "valid-time-interval.kind" => Some(("validTimeInterval.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.kind" => Some(("wideLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.language" => Some(("wideLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.value" => Some(("wideLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.kind" => Some(("wideLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.kind" => Some(("wideLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.description" => Some(("wideLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.kind" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.language" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.value" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.kind" => Some(("wideLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.uri" => Some(("wideLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "alternate-text", "android-app-link-info", "app-link-data", "app-logo-image", "app-target", "barcode", "card-title", "class-id", "content-description", "date", "default-value", "description", "enable-notification", "end", "expiry-notification", "generic-type", "grouping-id", "grouping-info", "has-users", "header", "hero-image", "hex-background-color", "id", "ios-app-link-info", "kind", "language", "localized-description", "logo", "notifications", "period-millis", "render-encoding", "rotating-barcode", "show-code-text", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "subheader", "target-uri", "title", "totp-details", "type", "upcoming-notification", "uri", "valid-time-interval", "value", "value-pattern", "web-app-link-info"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "alternate-text", "android-app-link-info", "app-link-data", "app-logo-image", "app-target", "barcode", "card-title", "class-id", "content-description", "date", "default-value", "description", "enable-notification", "end", "expiry-notification", "generic-type", "grouping-id", "grouping-info", "has-users", "header", "hero-image", "hex-background-color", "id", "initial-rotating-barcode-values", "ios-app-link-info", "kind", "language", "localized-description", "logo", "nfc-constraint", "notifications", "package-name", "pass-constraints", "period-millis", "render-encoding", "rotating-barcode", "screenshot-eligibility", "show-code-text", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "subheader", "target-uri", "title", "totp-details", "type", "upcoming-notification", "uri", "valid-time-interval", "value", "value-pattern", "values", "web-app-link-info", "wide-logo"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5965,6 +6468,17 @@ where
                     "security-animation.animation-type" => Some(("securityAnimation.animationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "view-unlock-requirement" => Some(("viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.kind" => Some(("wideProgramLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.language" => Some(("wideProgramLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.value" => Some(("wideProgramLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.kind" => Some(("wideProgramLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.kind" => Some(("wideProgramLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.description" => Some(("wideProgramLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.kind" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.language" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.value" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.kind" => Some(("wideProgramLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.uri" => Some(("wideProgramLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.kind" => Some(("wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.language" => Some(("wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.value" => Some(("wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5977,7 +6491,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-barcode-redemption", "allow-multiple-users-per-object", "animation-type", "callback-options", "card-number-label", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "enable-smart-tap", "event-number-label", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-card-number-label", "localized-description", "localized-event-number-label", "localized-issuer-name", "localized-merchant-name", "localized-pin-label", "merchant-name", "multiple-devices-and-holders-allowed-status", "pin-label", "program-logo", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-barcode-redemption", "allow-multiple-users-per-object", "animation-type", "callback-options", "card-number-label", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "enable-smart-tap", "event-number-label", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-card-number-label", "localized-description", "localized-event-number-label", "localized-issuer-name", "localized-merchant-name", "localized-pin-label", "merchant-name", "multiple-devices-and-holders-allowed-status", "pin-label", "program-logo", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "wide-program-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6195,6 +6709,17 @@ where
                     "security-animation.animation-type" => Some(("securityAnimation.animationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "view-unlock-requirement" => Some(("viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.kind" => Some(("wideProgramLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.language" => Some(("wideProgramLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.value" => Some(("wideProgramLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.kind" => Some(("wideProgramLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.kind" => Some(("wideProgramLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.description" => Some(("wideProgramLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.kind" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.language" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.value" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.kind" => Some(("wideProgramLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.uri" => Some(("wideProgramLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.kind" => Some(("wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.language" => Some(("wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.value" => Some(("wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6207,7 +6732,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-barcode-redemption", "allow-multiple-users-per-object", "animation-type", "callback-options", "card-number-label", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "enable-smart-tap", "event-number-label", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-card-number-label", "localized-description", "localized-event-number-label", "localized-issuer-name", "localized-merchant-name", "localized-pin-label", "merchant-name", "multiple-devices-and-holders-allowed-status", "pin-label", "program-logo", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-barcode-redemption", "allow-multiple-users-per-object", "animation-type", "callback-options", "card-number-label", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "enable-smart-tap", "event-number-label", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-card-number-label", "localized-description", "localized-event-number-label", "localized-issuer-name", "localized-merchant-name", "localized-pin-label", "merchant-name", "multiple-devices-and-holders-allowed-status", "pin-label", "program-logo", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "wide-program-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6363,6 +6888,17 @@ where
                     "security-animation.animation-type" => Some(("securityAnimation.animationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "view-unlock-requirement" => Some(("viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.kind" => Some(("wideProgramLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.language" => Some(("wideProgramLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.value" => Some(("wideProgramLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.kind" => Some(("wideProgramLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.kind" => Some(("wideProgramLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.description" => Some(("wideProgramLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.kind" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.language" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.value" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.kind" => Some(("wideProgramLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.uri" => Some(("wideProgramLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.kind" => Some(("wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.language" => Some(("wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.value" => Some(("wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6375,7 +6911,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-barcode-redemption", "allow-multiple-users-per-object", "animation-type", "callback-options", "card-number-label", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "enable-smart-tap", "event-number-label", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-card-number-label", "localized-description", "localized-event-number-label", "localized-issuer-name", "localized-merchant-name", "localized-pin-label", "merchant-name", "multiple-devices-and-holders-allowed-status", "pin-label", "program-logo", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-barcode-redemption", "allow-multiple-users-per-object", "animation-type", "callback-options", "card-number-label", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "enable-smart-tap", "event-number-label", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-card-number-label", "localized-description", "localized-event-number-label", "localized-issuer-name", "localized-merchant-name", "localized-pin-label", "merchant-name", "multiple-devices-and-holders-allowed-status", "pin-label", "program-logo", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "wide-program-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6621,6 +7157,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6648,6 +7185,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6675,6 +7213,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6779,6 +7318,17 @@ where
                     "class-reference.security-animation.animation-type" => Some(("classReference.securityAnimation.animationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.version" => Some(("classReference.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.view-unlock-requirement" => Some(("classReference.viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.kind" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.language" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.value" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.kind" => Some(("classReference.wideProgramLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.kind" => Some(("classReference.wideProgramLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.description" => Some(("classReference.wideProgramLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.language" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.value" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.kind" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.uri" => Some(("classReference.wideProgramLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.kind" => Some(("classReference.wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.language" => Some(("classReference.wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.value" => Some(("classReference.wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6810,8 +7360,13 @@ where
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "info-module-data.show-last-update-time" => Some(("infoModuleData.showLastUpdateTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pin" => Some(("pin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -6828,7 +7383,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allow-barcode-redemption", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "balance", "balance-update-time", "barcode", "callback-options", "card-number", "card-number-label", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "currency-code", "date", "default-value", "description", "disable-expiration-notification", "enable-smart-tap", "end", "event-number", "event-number-label", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "list-template-override", "localized-card-number-label", "localized-description", "localized-event-number-label", "localized-issuer-name", "localized-merchant-name", "localized-pin-label", "merchant-name", "micros", "multiple-devices-and-holders-allowed-status", "period-millis", "pin", "pin-label", "program-logo", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "web-app-link-info", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allow-barcode-redemption", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "balance", "balance-update-time", "barcode", "callback-options", "card-number", "card-number-label", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "currency-code", "date", "default-value", "description", "disable-expiration-notification", "enable-smart-tap", "end", "event-number", "event-number-label", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "ios-app-link-info", "issuer-name", "kind", "language", "list-template-override", "localized-card-number-label", "localized-description", "localized-event-number-label", "localized-issuer-name", "localized-merchant-name", "localized-pin-label", "merchant-name", "micros", "multiple-devices-and-holders-allowed-status", "nfc-constraint", "package-name", "pass-constraints", "period-millis", "pin", "pin-label", "program-logo", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "screenshot-eligibility", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "target-uri", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "version", "view-unlock-requirement", "web-app-link-info", "wide-program-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6984,6 +7539,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7011,6 +7567,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7038,6 +7595,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7142,6 +7700,17 @@ where
                     "class-reference.security-animation.animation-type" => Some(("classReference.securityAnimation.animationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.version" => Some(("classReference.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.view-unlock-requirement" => Some(("classReference.viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.kind" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.language" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.value" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.kind" => Some(("classReference.wideProgramLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.kind" => Some(("classReference.wideProgramLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.description" => Some(("classReference.wideProgramLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.language" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.value" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.kind" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.uri" => Some(("classReference.wideProgramLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.kind" => Some(("classReference.wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.language" => Some(("classReference.wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.value" => Some(("classReference.wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7173,8 +7742,13 @@ where
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "info-module-data.show-last-update-time" => Some(("infoModuleData.showLastUpdateTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pin" => Some(("pin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7191,7 +7765,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allow-barcode-redemption", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "balance", "balance-update-time", "barcode", "callback-options", "card-number", "card-number-label", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "currency-code", "date", "default-value", "description", "disable-expiration-notification", "enable-smart-tap", "end", "event-number", "event-number-label", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "list-template-override", "localized-card-number-label", "localized-description", "localized-event-number-label", "localized-issuer-name", "localized-merchant-name", "localized-pin-label", "merchant-name", "micros", "multiple-devices-and-holders-allowed-status", "period-millis", "pin", "pin-label", "program-logo", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "web-app-link-info", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allow-barcode-redemption", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "balance", "balance-update-time", "barcode", "callback-options", "card-number", "card-number-label", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "currency-code", "date", "default-value", "description", "disable-expiration-notification", "enable-smart-tap", "end", "event-number", "event-number-label", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "ios-app-link-info", "issuer-name", "kind", "language", "list-template-override", "localized-card-number-label", "localized-description", "localized-event-number-label", "localized-issuer-name", "localized-merchant-name", "localized-pin-label", "merchant-name", "micros", "multiple-devices-and-holders-allowed-status", "nfc-constraint", "package-name", "pass-constraints", "period-millis", "pin", "pin-label", "program-logo", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "screenshot-eligibility", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "target-uri", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "version", "view-unlock-requirement", "web-app-link-info", "wide-program-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7285,6 +7859,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7312,6 +7887,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7339,6 +7915,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7443,6 +8020,17 @@ where
                     "class-reference.security-animation.animation-type" => Some(("classReference.securityAnimation.animationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.version" => Some(("classReference.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.view-unlock-requirement" => Some(("classReference.viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.kind" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.language" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.value" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.kind" => Some(("classReference.wideProgramLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.kind" => Some(("classReference.wideProgramLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.description" => Some(("classReference.wideProgramLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.language" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.value" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.kind" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.uri" => Some(("classReference.wideProgramLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.kind" => Some(("classReference.wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.language" => Some(("classReference.wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.value" => Some(("classReference.wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7474,8 +8062,13 @@ where
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "info-module-data.show-last-update-time" => Some(("infoModuleData.showLastUpdateTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "pin" => Some(("pin", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7492,7 +8085,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allow-barcode-redemption", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "balance", "balance-update-time", "barcode", "callback-options", "card-number", "card-number-label", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "currency-code", "date", "default-value", "description", "disable-expiration-notification", "enable-smart-tap", "end", "event-number", "event-number-label", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "list-template-override", "localized-card-number-label", "localized-description", "localized-event-number-label", "localized-issuer-name", "localized-merchant-name", "localized-pin-label", "merchant-name", "micros", "multiple-devices-and-holders-allowed-status", "period-millis", "pin", "pin-label", "program-logo", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "web-app-link-info", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allow-barcode-redemption", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "balance", "balance-update-time", "barcode", "callback-options", "card-number", "card-number-label", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "currency-code", "date", "default-value", "description", "disable-expiration-notification", "enable-smart-tap", "end", "event-number", "event-number-label", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "ios-app-link-info", "issuer-name", "kind", "language", "list-template-override", "localized-card-number-label", "localized-description", "localized-event-number-label", "localized-issuer-name", "localized-merchant-name", "localized-pin-label", "merchant-name", "micros", "multiple-devices-and-holders-allowed-status", "nfc-constraint", "package-name", "pass-constraints", "period-millis", "pin", "pin-label", "program-logo", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "screenshot-eligibility", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "target-uri", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "version", "view-unlock-requirement", "web-app-link-info", "wide-program-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7627,6 +8220,8 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "callback-options.update-request-url" => Some(("callbackOptions.updateRequestUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "callback-options.url" => Some(("callbackOptions.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-info.alerts-emails" => Some(("contactInfo.alertsEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "contact-info.email" => Some(("contactInfo.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-info.name" => Some(("contactInfo.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7636,7 +8231,7 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "smart-tap-merchant-data.smart-tap-merchant-id" => Some(("smartTapMerchantData.smartTapMerchantId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alerts-emails", "contact-info", "email", "homepage-url", "issuer-id", "name", "phone", "smart-tap-merchant-data", "smart-tap-merchant-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alerts-emails", "callback-options", "contact-info", "email", "homepage-url", "issuer-id", "name", "phone", "smart-tap-merchant-data", "smart-tap-merchant-id", "update-request-url", "url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7771,6 +8366,8 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "callback-options.update-request-url" => Some(("callbackOptions.updateRequestUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "callback-options.url" => Some(("callbackOptions.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-info.alerts-emails" => Some(("contactInfo.alertsEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "contact-info.email" => Some(("contactInfo.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-info.name" => Some(("contactInfo.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7780,7 +8377,7 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "smart-tap-merchant-data.smart-tap-merchant-id" => Some(("smartTapMerchantData.smartTapMerchantId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alerts-emails", "contact-info", "email", "homepage-url", "issuer-id", "name", "phone", "smart-tap-merchant-data", "smart-tap-merchant-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alerts-emails", "callback-options", "contact-info", "email", "homepage-url", "issuer-id", "name", "phone", "smart-tap-merchant-data", "smart-tap-merchant-id", "update-request-url", "url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7863,6 +8460,8 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "callback-options.update-request-url" => Some(("callbackOptions.updateRequestUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "callback-options.url" => Some(("callbackOptions.url", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-info.alerts-emails" => Some(("contactInfo.alertsEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "contact-info.email" => Some(("contactInfo.email", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "contact-info.name" => Some(("contactInfo.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7872,7 +8471,7 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "smart-tap-merchant-data.smart-tap-merchant-id" => Some(("smartTapMerchantData.smartTapMerchantId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alerts-emails", "contact-info", "email", "homepage-url", "issuer-id", "name", "phone", "smart-tap-merchant-data", "smart-tap-merchant-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["alerts-emails", "callback-options", "contact-info", "email", "homepage-url", "issuer-id", "name", "phone", "smart-tap-merchant-data", "smart-tap-merchant-id", "update-request-url", "url"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -8297,6 +8896,17 @@ where
                     "security-animation.animation-type" => Some(("securityAnimation.animationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "view-unlock-requirement" => Some(("viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.kind" => Some(("wideProgramLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.language" => Some(("wideProgramLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.value" => Some(("wideProgramLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.kind" => Some(("wideProgramLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.kind" => Some(("wideProgramLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.description" => Some(("wideProgramLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.kind" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.language" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.value" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.kind" => Some(("wideProgramLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.uri" => Some(("wideProgramLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.kind" => Some(("wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.language" => Some(("wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.value" => Some(("wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -8309,7 +8919,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id-label", "account-name-label", "allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "discoverable-program", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-account-id-label", "localized-account-name-label", "localized-description", "localized-issuer-name", "localized-program-name", "localized-rewards-tier", "localized-rewards-tier-label", "localized-secondary-rewards-tier", "localized-secondary-rewards-tier-label", "merchant-signin-info", "merchant-signup-info", "multiple-devices-and-holders-allowed-status", "program-logo", "program-name", "redemption-issuers", "review", "review-status", "rewards-tier", "rewards-tier-label", "secondary-rewards-tier", "secondary-rewards-tier-label", "security-animation", "show-last-update-time", "signin-website", "signup-shared-datas", "signup-website", "source-uri", "state", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id-label", "account-name-label", "allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "discoverable-program", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-account-id-label", "localized-account-name-label", "localized-description", "localized-issuer-name", "localized-program-name", "localized-rewards-tier", "localized-rewards-tier-label", "localized-secondary-rewards-tier", "localized-secondary-rewards-tier-label", "merchant-signin-info", "merchant-signup-info", "multiple-devices-and-holders-allowed-status", "program-logo", "program-name", "redemption-issuers", "review", "review-status", "rewards-tier", "rewards-tier-label", "secondary-rewards-tier", "secondary-rewards-tier-label", "security-animation", "show-last-update-time", "signin-website", "signup-shared-datas", "signup-website", "source-uri", "state", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "wide-program-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -8559,6 +9169,17 @@ where
                     "security-animation.animation-type" => Some(("securityAnimation.animationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "view-unlock-requirement" => Some(("viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.kind" => Some(("wideProgramLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.language" => Some(("wideProgramLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.value" => Some(("wideProgramLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.kind" => Some(("wideProgramLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.kind" => Some(("wideProgramLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.description" => Some(("wideProgramLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.kind" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.language" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.value" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.kind" => Some(("wideProgramLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.uri" => Some(("wideProgramLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.kind" => Some(("wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.language" => Some(("wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.value" => Some(("wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -8571,7 +9192,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id-label", "account-name-label", "allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "discoverable-program", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-account-id-label", "localized-account-name-label", "localized-description", "localized-issuer-name", "localized-program-name", "localized-rewards-tier", "localized-rewards-tier-label", "localized-secondary-rewards-tier", "localized-secondary-rewards-tier-label", "merchant-signin-info", "merchant-signup-info", "multiple-devices-and-holders-allowed-status", "program-logo", "program-name", "redemption-issuers", "review", "review-status", "rewards-tier", "rewards-tier-label", "secondary-rewards-tier", "secondary-rewards-tier-label", "security-animation", "show-last-update-time", "signin-website", "signup-shared-datas", "signup-website", "source-uri", "state", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id-label", "account-name-label", "allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "discoverable-program", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-account-id-label", "localized-account-name-label", "localized-description", "localized-issuer-name", "localized-program-name", "localized-rewards-tier", "localized-rewards-tier-label", "localized-secondary-rewards-tier", "localized-secondary-rewards-tier-label", "merchant-signin-info", "merchant-signup-info", "multiple-devices-and-holders-allowed-status", "program-logo", "program-name", "redemption-issuers", "review", "review-status", "rewards-tier", "rewards-tier-label", "secondary-rewards-tier", "secondary-rewards-tier-label", "security-animation", "show-last-update-time", "signin-website", "signup-shared-datas", "signup-website", "source-uri", "state", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "wide-program-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -8759,6 +9380,17 @@ where
                     "security-animation.animation-type" => Some(("securityAnimation.animationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "view-unlock-requirement" => Some(("viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.kind" => Some(("wideProgramLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.language" => Some(("wideProgramLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.default-value.value" => Some(("wideProgramLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.content-description.kind" => Some(("wideProgramLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.kind" => Some(("wideProgramLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.description" => Some(("wideProgramLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.kind" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.language" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.default-value.value" => Some(("wideProgramLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.localized-description.kind" => Some(("wideProgramLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-program-logo.source-uri.uri" => Some(("wideProgramLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.kind" => Some(("wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.language" => Some(("wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.value" => Some(("wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -8771,7 +9403,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id-label", "account-name-label", "allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "discoverable-program", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-account-id-label", "localized-account-name-label", "localized-description", "localized-issuer-name", "localized-program-name", "localized-rewards-tier", "localized-rewards-tier-label", "localized-secondary-rewards-tier", "localized-secondary-rewards-tier-label", "merchant-signin-info", "merchant-signup-info", "multiple-devices-and-holders-allowed-status", "program-logo", "program-name", "redemption-issuers", "review", "review-status", "rewards-tier", "rewards-tier-label", "secondary-rewards-tier", "secondary-rewards-tier-label", "security-animation", "show-last-update-time", "signin-website", "signup-shared-datas", "signup-website", "source-uri", "state", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id-label", "account-name-label", "allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "discoverable-program", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-account-id-label", "localized-account-name-label", "localized-description", "localized-issuer-name", "localized-program-name", "localized-rewards-tier", "localized-rewards-tier-label", "localized-secondary-rewards-tier", "localized-secondary-rewards-tier-label", "merchant-signin-info", "merchant-signup-info", "multiple-devices-and-holders-allowed-status", "program-logo", "program-name", "redemption-issuers", "review", "review-status", "rewards-tier", "rewards-tier-label", "secondary-rewards-tier", "secondary-rewards-tier-label", "security-animation", "show-last-update-time", "signin-website", "signup-shared-datas", "signup-website", "source-uri", "state", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "wide-program-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -9019,6 +9651,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -9046,6 +9679,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -9073,6 +9707,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -9204,6 +9839,17 @@ where
                     "class-reference.security-animation.animation-type" => Some(("classReference.securityAnimation.animationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.version" => Some(("classReference.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.view-unlock-requirement" => Some(("classReference.viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.kind" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.language" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.value" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.kind" => Some(("classReference.wideProgramLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.kind" => Some(("classReference.wideProgramLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.description" => Some(("classReference.wideProgramLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.language" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.value" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.kind" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.uri" => Some(("classReference.wideProgramLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.kind" => Some(("classReference.wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.language" => Some(("classReference.wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.value" => Some(("classReference.wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -9246,7 +9892,12 @@ where
                     "loyalty-points.localized-label.default-value.language" => Some(("loyaltyPoints.localizedLabel.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "loyalty-points.localized-label.default-value.value" => Some(("loyaltyPoints.localizedLabel.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "loyalty-points.localized-label.kind" => Some(("loyaltyPoints.localizedLabel.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -9274,7 +9925,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-id-label", "account-name", "account-name-label", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "balance", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "currency-code", "date", "default-value", "description", "disable-expiration-notification", "discoverable-program", "double", "enable-smart-tap", "end", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "int", "ios-app-link-info", "issuer-name", "kind", "label", "language", "linked-offer-ids", "list-template-override", "localized-account-id-label", "localized-account-name-label", "localized-description", "localized-issuer-name", "localized-label", "localized-program-name", "localized-rewards-tier", "localized-rewards-tier-label", "localized-secondary-rewards-tier", "localized-secondary-rewards-tier-label", "loyalty-points", "merchant-signin-info", "merchant-signup-info", "micros", "money", "multiple-devices-and-holders-allowed-status", "period-millis", "program-logo", "program-name", "redemption-issuers", "render-encoding", "review", "review-status", "rewards-tier", "rewards-tier-label", "rotating-barcode", "secondary-loyalty-points", "secondary-rewards-tier", "secondary-rewards-tier-label", "security-animation", "show-code-text", "show-last-update-time", "signin-website", "signup-shared-datas", "signup-website", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "string", "target-uri", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "web-app-link-info", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-id-label", "account-name", "account-name-label", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "balance", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "currency-code", "date", "default-value", "description", "disable-expiration-notification", "discoverable-program", "double", "enable-smart-tap", "end", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "int", "ios-app-link-info", "issuer-name", "kind", "label", "language", "linked-offer-ids", "list-template-override", "localized-account-id-label", "localized-account-name-label", "localized-description", "localized-issuer-name", "localized-label", "localized-program-name", "localized-rewards-tier", "localized-rewards-tier-label", "localized-secondary-rewards-tier", "localized-secondary-rewards-tier-label", "loyalty-points", "merchant-signin-info", "merchant-signup-info", "micros", "money", "multiple-devices-and-holders-allowed-status", "nfc-constraint", "package-name", "pass-constraints", "period-millis", "program-logo", "program-name", "redemption-issuers", "render-encoding", "review", "review-status", "rewards-tier", "rewards-tier-label", "rotating-barcode", "screenshot-eligibility", "secondary-loyalty-points", "secondary-rewards-tier", "secondary-rewards-tier-label", "security-animation", "show-code-text", "show-last-update-time", "signin-website", "signup-shared-datas", "signup-website", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "string", "target-uri", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "version", "view-unlock-requirement", "web-app-link-info", "wide-program-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -9518,6 +10169,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -9545,6 +10197,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -9572,6 +10225,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -9703,6 +10357,17 @@ where
                     "class-reference.security-animation.animation-type" => Some(("classReference.securityAnimation.animationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.version" => Some(("classReference.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.view-unlock-requirement" => Some(("classReference.viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.kind" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.language" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.value" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.kind" => Some(("classReference.wideProgramLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.kind" => Some(("classReference.wideProgramLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.description" => Some(("classReference.wideProgramLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.language" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.value" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.kind" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.uri" => Some(("classReference.wideProgramLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.kind" => Some(("classReference.wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.language" => Some(("classReference.wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.value" => Some(("classReference.wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -9745,7 +10410,12 @@ where
                     "loyalty-points.localized-label.default-value.language" => Some(("loyaltyPoints.localizedLabel.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "loyalty-points.localized-label.default-value.value" => Some(("loyaltyPoints.localizedLabel.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "loyalty-points.localized-label.kind" => Some(("loyaltyPoints.localizedLabel.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -9773,7 +10443,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-id-label", "account-name", "account-name-label", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "balance", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "currency-code", "date", "default-value", "description", "disable-expiration-notification", "discoverable-program", "double", "enable-smart-tap", "end", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "int", "ios-app-link-info", "issuer-name", "kind", "label", "language", "linked-offer-ids", "list-template-override", "localized-account-id-label", "localized-account-name-label", "localized-description", "localized-issuer-name", "localized-label", "localized-program-name", "localized-rewards-tier", "localized-rewards-tier-label", "localized-secondary-rewards-tier", "localized-secondary-rewards-tier-label", "loyalty-points", "merchant-signin-info", "merchant-signup-info", "micros", "money", "multiple-devices-and-holders-allowed-status", "period-millis", "program-logo", "program-name", "redemption-issuers", "render-encoding", "review", "review-status", "rewards-tier", "rewards-tier-label", "rotating-barcode", "secondary-loyalty-points", "secondary-rewards-tier", "secondary-rewards-tier-label", "security-animation", "show-code-text", "show-last-update-time", "signin-website", "signup-shared-datas", "signup-website", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "string", "target-uri", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "web-app-link-info", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-id-label", "account-name", "account-name-label", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "balance", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "currency-code", "date", "default-value", "description", "disable-expiration-notification", "discoverable-program", "double", "enable-smart-tap", "end", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "int", "ios-app-link-info", "issuer-name", "kind", "label", "language", "linked-offer-ids", "list-template-override", "localized-account-id-label", "localized-account-name-label", "localized-description", "localized-issuer-name", "localized-label", "localized-program-name", "localized-rewards-tier", "localized-rewards-tier-label", "localized-secondary-rewards-tier", "localized-secondary-rewards-tier-label", "loyalty-points", "merchant-signin-info", "merchant-signup-info", "micros", "money", "multiple-devices-and-holders-allowed-status", "nfc-constraint", "package-name", "pass-constraints", "period-millis", "program-logo", "program-name", "redemption-issuers", "render-encoding", "review", "review-status", "rewards-tier", "rewards-tier-label", "rotating-barcode", "screenshot-eligibility", "secondary-loyalty-points", "secondary-rewards-tier", "secondary-rewards-tier-label", "security-animation", "show-code-text", "show-last-update-time", "signin-website", "signup-shared-datas", "signup-website", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "string", "target-uri", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "version", "view-unlock-requirement", "web-app-link-info", "wide-program-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -9869,6 +10539,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -9896,6 +10567,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -9923,6 +10595,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -10054,6 +10727,17 @@ where
                     "class-reference.security-animation.animation-type" => Some(("classReference.securityAnimation.animationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.version" => Some(("classReference.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.view-unlock-requirement" => Some(("classReference.viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.kind" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.language" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.default-value.value" => Some(("classReference.wideProgramLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.content-description.kind" => Some(("classReference.wideProgramLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.kind" => Some(("classReference.wideProgramLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.description" => Some(("classReference.wideProgramLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.language" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.default-value.value" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.localized-description.kind" => Some(("classReference.wideProgramLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-program-logo.source-uri.uri" => Some(("classReference.wideProgramLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.kind" => Some(("classReference.wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.language" => Some(("classReference.wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.value" => Some(("classReference.wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -10096,7 +10780,12 @@ where
                     "loyalty-points.localized-label.default-value.language" => Some(("loyaltyPoints.localizedLabel.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "loyalty-points.localized-label.default-value.value" => Some(("loyaltyPoints.localizedLabel.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "loyalty-points.localized-label.kind" => Some(("loyaltyPoints.localizedLabel.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -10124,7 +10813,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-id-label", "account-name", "account-name-label", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "balance", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "currency-code", "date", "default-value", "description", "disable-expiration-notification", "discoverable-program", "double", "enable-smart-tap", "end", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "int", "ios-app-link-info", "issuer-name", "kind", "label", "language", "linked-offer-ids", "list-template-override", "localized-account-id-label", "localized-account-name-label", "localized-description", "localized-issuer-name", "localized-label", "localized-program-name", "localized-rewards-tier", "localized-rewards-tier-label", "localized-secondary-rewards-tier", "localized-secondary-rewards-tier-label", "loyalty-points", "merchant-signin-info", "merchant-signup-info", "micros", "money", "multiple-devices-and-holders-allowed-status", "period-millis", "program-logo", "program-name", "redemption-issuers", "render-encoding", "review", "review-status", "rewards-tier", "rewards-tier-label", "rotating-barcode", "secondary-loyalty-points", "secondary-rewards-tier", "secondary-rewards-tier-label", "security-animation", "show-code-text", "show-last-update-time", "signin-website", "signup-shared-datas", "signup-website", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "string", "target-uri", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "web-app-link-info", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "account-id-label", "account-name", "account-name-label", "algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "balance", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "currency-code", "date", "default-value", "description", "disable-expiration-notification", "discoverable-program", "double", "enable-smart-tap", "end", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "int", "ios-app-link-info", "issuer-name", "kind", "label", "language", "linked-offer-ids", "list-template-override", "localized-account-id-label", "localized-account-name-label", "localized-description", "localized-issuer-name", "localized-label", "localized-program-name", "localized-rewards-tier", "localized-rewards-tier-label", "localized-secondary-rewards-tier", "localized-secondary-rewards-tier-label", "loyalty-points", "merchant-signin-info", "merchant-signup-info", "micros", "money", "multiple-devices-and-holders-allowed-status", "nfc-constraint", "package-name", "pass-constraints", "period-millis", "program-logo", "program-name", "redemption-issuers", "render-encoding", "review", "review-status", "rewards-tier", "rewards-tier-label", "rotating-barcode", "screenshot-eligibility", "secondary-loyalty-points", "secondary-rewards-tier", "secondary-rewards-tier-label", "security-animation", "show-code-text", "show-last-update-time", "signin-website", "signup-shared-datas", "signup-website", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "string", "target-uri", "title", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "version", "view-unlock-requirement", "web-app-link-info", "wide-program-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -10178,6 +10867,68 @@ where
                     remove_json_null_values(&mut value);
                     json::to_writer_pretty(&mut ostream, &value).unwrap();
                     ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _media_download(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut download_mode = false;
+        let mut call = self.hub.media().download(opt.value_of("resource-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            if key == "alt" && value.unwrap_or("unset") == "media" {
+                                download_mode = true;
+                            }
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    if !download_mode {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    } else {
+                    let bytes = hyper::body::to_bytes(response.into_body()).await.expect("a string as API currently is inefficient").to_vec();
+                    ostream.write_all(&bytes).expect("write to be complete");
+                    ostream.flush().expect("io to never fail which should really be fixed one day");
+                    }
                     Ok(())
                 }
             }
@@ -10357,10 +11108,11 @@ where
                     "media-request-info.final-status" => Some(("mediaRequestInfo.finalStatus", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "media-request-info.notification-type" => Some(("mediaRequestInfo.notificationType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "media-request-info.request-id" => Some(("mediaRequestInfo.requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "media-request-info.request-received-params-serving-info" => Some(("mediaRequestInfo.requestReceivedParamsServingInfo", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "media-request-info.total-bytes" => Some(("mediaRequestInfo.totalBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "media-request-info.total-bytes-is-estimated" => Some(("mediaRequestInfo.totalBytesIsEstimated", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allow-gzip-compression", "best-guess", "bigstore-object-ref", "blob", "blob-generation", "blob-id", "blob-ref", "blobstore2-info", "bucket-name", "checksums-info", "checksums-location", "chunk-size-bytes", "content-type", "content-type-info", "cosmo-binary-reference", "crc32c-hash", "current-bytes", "custom-data", "diff-checksums-response", "diff-download-response", "diff-object-version", "diff-upload-request", "diff-upload-response", "diff-version-response", "download-parameters", "download-read-handle", "filename", "final-status", "from-bytes", "from-file-name", "from-header", "from-url-path", "generation", "hash", "hash-verified", "ignore-range", "inline", "is-potential-retry", "length", "md5-hash", "media-id", "media-request-info", "notification-type", "object-id", "object-info", "object-location", "object-name", "object-size-bytes", "object-version", "original-object", "path", "read-token", "reference-type", "request-id", "sha1-hash", "sha256-hash", "timestamp", "token", "total-bytes", "total-bytes-is-estimated", "upload-metadata-container"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allow-gzip-compression", "best-guess", "bigstore-object-ref", "blob", "blob-generation", "blob-id", "blob-ref", "blobstore2-info", "bucket-name", "checksums-info", "checksums-location", "chunk-size-bytes", "content-type", "content-type-info", "cosmo-binary-reference", "crc32c-hash", "current-bytes", "custom-data", "diff-checksums-response", "diff-download-response", "diff-object-version", "diff-upload-request", "diff-upload-response", "diff-version-response", "download-parameters", "download-read-handle", "filename", "final-status", "from-bytes", "from-file-name", "from-header", "from-url-path", "generation", "hash", "hash-verified", "ignore-range", "inline", "is-potential-retry", "length", "md5-hash", "media-id", "media-request-info", "notification-type", "object-id", "object-info", "object-location", "object-name", "object-size-bytes", "object-version", "original-object", "path", "read-token", "reference-type", "request-id", "request-received-params-serving-info", "sha1-hash", "sha256-hash", "timestamp", "token", "total-bytes", "total-bytes-is-estimated", "upload-metadata-container"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -10369,8 +11121,8 @@ where
                 FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
             }
         }
-        let mut request: api::UploadPrivateImageRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.media().upload(request, opt.value_of("issuer-id").unwrap_or(""));
+        let mut request: api::TransitObjectUploadRotatingBarcodeValuesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.media().upload(request, opt.value_of("resource-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -10684,6 +11436,17 @@ where
                     "title-image.source-uri.uri" => Some(("titleImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "view-unlock-requirement" => Some(("viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.content-description.default-value.kind" => Some(("wideTitleImage.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.content-description.default-value.language" => Some(("wideTitleImage.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.content-description.default-value.value" => Some(("wideTitleImage.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.content-description.kind" => Some(("wideTitleImage.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.kind" => Some(("wideTitleImage.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.description" => Some(("wideTitleImage.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.localized-description.default-value.kind" => Some(("wideTitleImage.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.localized-description.default-value.language" => Some(("wideTitleImage.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.localized-description.default-value.value" => Some(("wideTitleImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.localized-description.kind" => Some(("wideTitleImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.uri" => Some(("wideTitleImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.kind" => Some(("wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.language" => Some(("wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.value" => Some(("wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -10696,7 +11459,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "details", "enable-smart-tap", "fine-print", "first-row-option", "help-uri", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-details", "localized-fine-print", "localized-issuer-name", "localized-provider", "localized-short-title", "localized-title", "multiple-devices-and-holders-allowed-status", "provider", "redemption-channel", "redemption-issuers", "review", "review-status", "security-animation", "short-title", "show-last-update-time", "source-uri", "title", "title-image", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "details", "enable-smart-tap", "fine-print", "first-row-option", "help-uri", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-details", "localized-fine-print", "localized-issuer-name", "localized-provider", "localized-short-title", "localized-title", "multiple-devices-and-holders-allowed-status", "provider", "redemption-channel", "redemption-issuers", "review", "review-status", "security-animation", "short-title", "show-last-update-time", "source-uri", "title", "title-image", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "wide-title-image", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -10927,6 +11690,17 @@ where
                     "title-image.source-uri.uri" => Some(("titleImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "view-unlock-requirement" => Some(("viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.content-description.default-value.kind" => Some(("wideTitleImage.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.content-description.default-value.language" => Some(("wideTitleImage.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.content-description.default-value.value" => Some(("wideTitleImage.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.content-description.kind" => Some(("wideTitleImage.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.kind" => Some(("wideTitleImage.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.description" => Some(("wideTitleImage.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.localized-description.default-value.kind" => Some(("wideTitleImage.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.localized-description.default-value.language" => Some(("wideTitleImage.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.localized-description.default-value.value" => Some(("wideTitleImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.localized-description.kind" => Some(("wideTitleImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.uri" => Some(("wideTitleImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.kind" => Some(("wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.language" => Some(("wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.value" => Some(("wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -10939,7 +11713,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "details", "enable-smart-tap", "fine-print", "first-row-option", "help-uri", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-details", "localized-fine-print", "localized-issuer-name", "localized-provider", "localized-short-title", "localized-title", "multiple-devices-and-holders-allowed-status", "provider", "redemption-channel", "redemption-issuers", "review", "review-status", "security-animation", "short-title", "show-last-update-time", "source-uri", "title", "title-image", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "details", "enable-smart-tap", "fine-print", "first-row-option", "help-uri", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-details", "localized-fine-print", "localized-issuer-name", "localized-provider", "localized-short-title", "localized-title", "multiple-devices-and-holders-allowed-status", "provider", "redemption-channel", "redemption-issuers", "review", "review-status", "security-animation", "short-title", "show-last-update-time", "source-uri", "title", "title-image", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "wide-title-image", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -11108,6 +11882,17 @@ where
                     "title-image.source-uri.uri" => Some(("titleImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "view-unlock-requirement" => Some(("viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.content-description.default-value.kind" => Some(("wideTitleImage.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.content-description.default-value.language" => Some(("wideTitleImage.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.content-description.default-value.value" => Some(("wideTitleImage.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.content-description.kind" => Some(("wideTitleImage.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.kind" => Some(("wideTitleImage.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.description" => Some(("wideTitleImage.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.localized-description.default-value.kind" => Some(("wideTitleImage.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.localized-description.default-value.language" => Some(("wideTitleImage.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.localized-description.default-value.value" => Some(("wideTitleImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.localized-description.kind" => Some(("wideTitleImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-title-image.source-uri.uri" => Some(("wideTitleImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.kind" => Some(("wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.language" => Some(("wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.value" => Some(("wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -11120,7 +11905,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "details", "enable-smart-tap", "fine-print", "first-row-option", "help-uri", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-details", "localized-fine-print", "localized-issuer-name", "localized-provider", "localized-short-title", "localized-title", "multiple-devices-and-holders-allowed-status", "provider", "redemption-channel", "redemption-issuers", "review", "review-status", "security-animation", "short-title", "show-last-update-time", "source-uri", "title", "title-image", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-multiple-users-per-object", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "default-value", "description", "details", "enable-smart-tap", "fine-print", "first-row-option", "help-uri", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-details", "localized-fine-print", "localized-issuer-name", "localized-provider", "localized-short-title", "localized-title", "multiple-devices-and-holders-allowed-status", "provider", "redemption-channel", "redemption-issuers", "review", "review-status", "security-animation", "short-title", "show-last-update-time", "source-uri", "title", "title-image", "transit-option", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "wide-title-image", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -11366,6 +12151,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -11393,6 +12179,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -11420,6 +12207,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -11532,6 +12320,17 @@ where
                     "class-reference.title-image.source-uri.uri" => Some(("classReference.titleImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.version" => Some(("classReference.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.view-unlock-requirement" => Some(("classReference.viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.content-description.default-value.kind" => Some(("classReference.wideTitleImage.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.content-description.default-value.language" => Some(("classReference.wideTitleImage.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.content-description.default-value.value" => Some(("classReference.wideTitleImage.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.content-description.kind" => Some(("classReference.wideTitleImage.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.kind" => Some(("classReference.wideTitleImage.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.description" => Some(("classReference.wideTitleImage.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.localized-description.default-value.kind" => Some(("classReference.wideTitleImage.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.localized-description.default-value.language" => Some(("classReference.wideTitleImage.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.localized-description.default-value.value" => Some(("classReference.wideTitleImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.localized-description.kind" => Some(("classReference.wideTitleImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.uri" => Some(("classReference.wideTitleImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.kind" => Some(("classReference.wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.language" => Some(("classReference.wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.value" => Some(("classReference.wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -11562,7 +12361,12 @@ where
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "info-module-data.show-last-update-time" => Some(("infoModuleData.showLastUpdateTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -11579,7 +12383,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "date", "default-value", "description", "details", "disable-expiration-notification", "enable-smart-tap", "end", "fine-print", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "help-uri", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-details", "localized-fine-print", "localized-issuer-name", "localized-provider", "localized-short-title", "localized-title", "multiple-devices-and-holders-allowed-status", "period-millis", "provider", "redemption-channel", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "security-animation", "short-title", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "title", "title-image", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "web-app-link-info", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "date", "default-value", "description", "details", "disable-expiration-notification", "enable-smart-tap", "end", "fine-print", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "help-uri", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "ios-app-link-info", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-details", "localized-fine-print", "localized-issuer-name", "localized-provider", "localized-short-title", "localized-title", "multiple-devices-and-holders-allowed-status", "nfc-constraint", "package-name", "pass-constraints", "period-millis", "provider", "redemption-channel", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "screenshot-eligibility", "security-animation", "short-title", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "target-uri", "title", "title-image", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "version", "view-unlock-requirement", "web-app-link-info", "wide-title-image", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -11735,6 +12539,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -11762,6 +12567,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -11789,6 +12595,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -11901,6 +12708,17 @@ where
                     "class-reference.title-image.source-uri.uri" => Some(("classReference.titleImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.version" => Some(("classReference.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.view-unlock-requirement" => Some(("classReference.viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.content-description.default-value.kind" => Some(("classReference.wideTitleImage.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.content-description.default-value.language" => Some(("classReference.wideTitleImage.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.content-description.default-value.value" => Some(("classReference.wideTitleImage.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.content-description.kind" => Some(("classReference.wideTitleImage.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.kind" => Some(("classReference.wideTitleImage.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.description" => Some(("classReference.wideTitleImage.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.localized-description.default-value.kind" => Some(("classReference.wideTitleImage.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.localized-description.default-value.language" => Some(("classReference.wideTitleImage.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.localized-description.default-value.value" => Some(("classReference.wideTitleImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.localized-description.kind" => Some(("classReference.wideTitleImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.uri" => Some(("classReference.wideTitleImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.kind" => Some(("classReference.wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.language" => Some(("classReference.wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.value" => Some(("classReference.wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -11931,7 +12749,12 @@ where
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "info-module-data.show-last-update-time" => Some(("infoModuleData.showLastUpdateTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -11948,7 +12771,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "date", "default-value", "description", "details", "disable-expiration-notification", "enable-smart-tap", "end", "fine-print", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "help-uri", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-details", "localized-fine-print", "localized-issuer-name", "localized-provider", "localized-short-title", "localized-title", "multiple-devices-and-holders-allowed-status", "period-millis", "provider", "redemption-channel", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "security-animation", "short-title", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "title", "title-image", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "web-app-link-info", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "date", "default-value", "description", "details", "disable-expiration-notification", "enable-smart-tap", "end", "fine-print", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "help-uri", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "ios-app-link-info", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-details", "localized-fine-print", "localized-issuer-name", "localized-provider", "localized-short-title", "localized-title", "multiple-devices-and-holders-allowed-status", "nfc-constraint", "package-name", "pass-constraints", "period-millis", "provider", "redemption-channel", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "screenshot-eligibility", "security-animation", "short-title", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "target-uri", "title", "title-image", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "version", "view-unlock-requirement", "web-app-link-info", "wide-title-image", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -12042,6 +12865,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -12069,6 +12893,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -12096,6 +12921,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -12208,6 +13034,17 @@ where
                     "class-reference.title-image.source-uri.uri" => Some(("classReference.titleImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.version" => Some(("classReference.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.view-unlock-requirement" => Some(("classReference.viewUnlockRequirement", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.content-description.default-value.kind" => Some(("classReference.wideTitleImage.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.content-description.default-value.language" => Some(("classReference.wideTitleImage.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.content-description.default-value.value" => Some(("classReference.wideTitleImage.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.content-description.kind" => Some(("classReference.wideTitleImage.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.kind" => Some(("classReference.wideTitleImage.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.description" => Some(("classReference.wideTitleImage.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.localized-description.default-value.kind" => Some(("classReference.wideTitleImage.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.localized-description.default-value.language" => Some(("classReference.wideTitleImage.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.localized-description.default-value.value" => Some(("classReference.wideTitleImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.localized-description.kind" => Some(("classReference.wideTitleImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-title-image.source-uri.uri" => Some(("classReference.wideTitleImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.kind" => Some(("classReference.wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.language" => Some(("classReference.wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.value" => Some(("classReference.wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -12238,7 +13075,12 @@ where
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "info-module-data.show-last-update-time" => Some(("infoModuleData.showLastUpdateTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "kind" => Some(("kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -12255,7 +13097,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "date", "default-value", "description", "details", "disable-expiration-notification", "enable-smart-tap", "end", "fine-print", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "help-uri", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-details", "localized-fine-print", "localized-issuer-name", "localized-provider", "localized-short-title", "localized-title", "multiple-devices-and-holders-allowed-status", "period-millis", "provider", "redemption-channel", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "security-animation", "short-title", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "title", "title-image", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "web-app-link-info", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["algorithm", "allow-multiple-users-per-object", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "barcode", "callback-options", "class-id", "class-reference", "class-template-info", "comments", "content-description", "country-code", "date", "default-value", "description", "details", "disable-expiration-notification", "enable-smart-tap", "end", "fine-print", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "help-uri", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "ios-app-link-info", "issuer-name", "kind", "language", "list-template-override", "localized-description", "localized-details", "localized-fine-print", "localized-issuer-name", "localized-provider", "localized-short-title", "localized-title", "multiple-devices-and-holders-allowed-status", "nfc-constraint", "package-name", "pass-constraints", "period-millis", "provider", "redemption-channel", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "screenshot-eligibility", "security-animation", "short-title", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "target-uri", "title", "title-image", "totp-details", "transit-option", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "version", "view-unlock-requirement", "web-app-link-info", "wide-title-image", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -12861,6 +13703,17 @@ where
                     "watermark.source-uri.localized-description.default-value.value" => Some(("watermark.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "watermark.source-uri.localized-description.kind" => Some(("watermark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "watermark.source-uri.uri" => Some(("watermark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.kind" => Some(("wideLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.language" => Some(("wideLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.value" => Some(("wideLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.kind" => Some(("wideLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.kind" => Some(("wideLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.description" => Some(("wideLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.kind" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.language" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.value" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.kind" => Some(("wideLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.uri" => Some(("wideLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.kind" => Some(("wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.language" => Some(("wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.value" => Some(("wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -12873,7 +13726,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-options", "activation-url", "allow-multiple-users-per-object", "allow-reactivation", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "default-value", "description", "enable-single-leg-itinerary", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-operator-name", "transit-option", "transit-type", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "watermark", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-options", "activation-url", "allow-multiple-users-per-object", "allow-reactivation", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "default-value", "description", "enable-single-leg-itinerary", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-operator-name", "transit-option", "transit-type", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "watermark", "wide-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -13165,6 +14018,17 @@ where
                     "watermark.source-uri.localized-description.default-value.value" => Some(("watermark.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "watermark.source-uri.localized-description.kind" => Some(("watermark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "watermark.source-uri.uri" => Some(("watermark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.kind" => Some(("wideLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.language" => Some(("wideLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.value" => Some(("wideLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.kind" => Some(("wideLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.kind" => Some(("wideLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.description" => Some(("wideLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.kind" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.language" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.value" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.kind" => Some(("wideLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.uri" => Some(("wideLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.kind" => Some(("wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.language" => Some(("wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.value" => Some(("wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13177,7 +14041,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-options", "activation-url", "allow-multiple-users-per-object", "allow-reactivation", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "default-value", "description", "enable-single-leg-itinerary", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-operator-name", "transit-option", "transit-type", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "watermark", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-options", "activation-url", "allow-multiple-users-per-object", "allow-reactivation", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "default-value", "description", "enable-single-leg-itinerary", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-operator-name", "transit-option", "transit-type", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "watermark", "wide-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -13407,6 +14271,17 @@ where
                     "watermark.source-uri.localized-description.default-value.value" => Some(("watermark.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "watermark.source-uri.localized-description.kind" => Some(("watermark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "watermark.source-uri.uri" => Some(("watermark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.kind" => Some(("wideLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.language" => Some(("wideLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.default-value.value" => Some(("wideLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.content-description.kind" => Some(("wideLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.kind" => Some(("wideLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.description" => Some(("wideLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.kind" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.language" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.default-value.value" => Some(("wideLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.localized-description.kind" => Some(("wideLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wide-logo.source-uri.uri" => Some(("wideLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.kind" => Some(("wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.language" => Some(("wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.content-description.default-value.value" => Some(("wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13419,7 +14294,7 @@ where
                     "word-mark.source-uri.localized-description.kind" => Some(("wordMark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "word-mark.source-uri.uri" => Some(("wordMark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-options", "activation-url", "allow-multiple-users-per-object", "allow-reactivation", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "default-value", "description", "enable-single-leg-itinerary", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-operator-name", "transit-option", "transit-type", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "watermark", "word-mark"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["activation-options", "activation-url", "allow-multiple-users-per-object", "allow-reactivation", "animation-type", "callback-options", "class-template-info", "comments", "content-description", "country-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "default-value", "description", "enable-single-leg-itinerary", "enable-smart-tap", "first-row-option", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "multiple-devices-and-holders-allowed-status", "redemption-issuers", "review", "review-status", "security-animation", "show-last-update-time", "source-uri", "transit-operator-name", "transit-option", "transit-type", "update-request-url", "uri", "url", "value", "version", "view-unlock-requirement", "watermark", "wide-logo", "word-mark"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -13666,6 +14541,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13693,6 +14569,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13720,6 +14597,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13893,6 +14771,17 @@ where
                     "class-reference.watermark.source-uri.localized-description.default-value.value" => Some(("classReference.watermark.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.watermark.source-uri.localized-description.kind" => Some(("classReference.watermark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.watermark.source-uri.uri" => Some(("classReference.watermark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.kind" => Some(("classReference.wideLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.language" => Some(("classReference.wideLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.value" => Some(("classReference.wideLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.kind" => Some(("classReference.wideLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.kind" => Some(("classReference.wideLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.description" => Some(("classReference.wideLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.language" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.value" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.kind" => Some(("classReference.wideLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.uri" => Some(("classReference.wideLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.kind" => Some(("classReference.wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.language" => Some(("classReference.wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.value" => Some(("classReference.wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13933,6 +14822,8 @@ where
                     "hex-background-color" => Some(("hexBackgroundColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "info-module-data.show-last-update-time" => Some(("infoModuleData.showLastUpdateTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "passenger-names" => Some(("passengerNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "passenger-type" => Some(("passengerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-details.account-id" => Some(("purchaseDetails.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -13950,6 +14841,9 @@ where
                     "purchase-details.ticket-cost.purchase-price.kind" => Some(("purchaseDetails.ticketCost.purchasePrice.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-details.ticket-cost.purchase-price.micros" => Some(("purchaseDetails.ticketCost.purchasePrice.micros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14024,7 +14918,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "activation-options", "activation-status", "activation-url", "algorithm", "allow-multiple-users-per-object", "allow-reactivation", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "arrival-date-time", "barcode", "callback-options", "carriage", "class-id", "class-reference", "class-template-info", "coach", "comments", "concession-category", "confirmation-code", "content-description", "country-code", "currency-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-ticket-status", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "date", "default-value", "departure-date-time", "description", "destination-name", "destination-station-code", "device-context", "device-token", "disable-expiration-notification", "discount-message", "enable-single-leg-itinerary", "enable-smart-tap", "end", "face-value", "fare-class", "fare-name", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "origin-name", "origin-station-code", "other-restrictions", "passenger-names", "passenger-type", "period-millis", "platform", "purchase-date-time", "purchase-details", "purchase-price", "purchase-receipt-number", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "route-restrictions", "route-restrictions-details", "seat", "seat-assignment", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "ticket-cost", "ticket-leg", "ticket-number", "ticket-restrictions", "ticket-seat", "ticket-status", "time-restrictions", "title", "totp-details", "transit-operator-name", "transit-option", "transit-terminus-name", "transit-type", "trip-id", "trip-type", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "watermark", "web-app-link-info", "word-mark", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "activation-options", "activation-status", "activation-url", "algorithm", "allow-multiple-users-per-object", "allow-reactivation", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "arrival-date-time", "barcode", "callback-options", "carriage", "class-id", "class-reference", "class-template-info", "coach", "comments", "concession-category", "confirmation-code", "content-description", "country-code", "currency-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-ticket-status", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "date", "default-value", "departure-date-time", "description", "destination-name", "destination-station-code", "device-context", "device-token", "disable-expiration-notification", "discount-message", "enable-single-leg-itinerary", "enable-smart-tap", "end", "face-value", "fare-class", "fare-name", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "nfc-constraint", "origin-name", "origin-station-code", "other-restrictions", "package-name", "pass-constraints", "passenger-names", "passenger-type", "period-millis", "platform", "purchase-date-time", "purchase-details", "purchase-price", "purchase-receipt-number", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "route-restrictions", "route-restrictions-details", "screenshot-eligibility", "seat", "seat-assignment", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "target-uri", "ticket-cost", "ticket-leg", "ticket-number", "ticket-restrictions", "ticket-seat", "ticket-status", "time-restrictions", "title", "totp-details", "transit-operator-name", "transit-option", "transit-terminus-name", "transit-type", "trip-id", "trip-type", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "version", "view-unlock-requirement", "watermark", "web-app-link-info", "wide-logo", "word-mark", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -14181,6 +15075,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14208,6 +15103,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14235,6 +15131,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14408,6 +15305,17 @@ where
                     "class-reference.watermark.source-uri.localized-description.default-value.value" => Some(("classReference.watermark.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.watermark.source-uri.localized-description.kind" => Some(("classReference.watermark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.watermark.source-uri.uri" => Some(("classReference.watermark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.kind" => Some(("classReference.wideLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.language" => Some(("classReference.wideLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.value" => Some(("classReference.wideLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.kind" => Some(("classReference.wideLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.kind" => Some(("classReference.wideLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.description" => Some(("classReference.wideLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.language" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.value" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.kind" => Some(("classReference.wideLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.uri" => Some(("classReference.wideLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.kind" => Some(("classReference.wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.language" => Some(("classReference.wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.value" => Some(("classReference.wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14448,6 +15356,8 @@ where
                     "hex-background-color" => Some(("hexBackgroundColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "info-module-data.show-last-update-time" => Some(("infoModuleData.showLastUpdateTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "passenger-names" => Some(("passengerNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "passenger-type" => Some(("passengerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-details.account-id" => Some(("purchaseDetails.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14465,6 +15375,9 @@ where
                     "purchase-details.ticket-cost.purchase-price.kind" => Some(("purchaseDetails.ticketCost.purchasePrice.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-details.ticket-cost.purchase-price.micros" => Some(("purchaseDetails.ticketCost.purchasePrice.micros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14539,7 +15452,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "activation-options", "activation-status", "activation-url", "algorithm", "allow-multiple-users-per-object", "allow-reactivation", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "arrival-date-time", "barcode", "callback-options", "carriage", "class-id", "class-reference", "class-template-info", "coach", "comments", "concession-category", "confirmation-code", "content-description", "country-code", "currency-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-ticket-status", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "date", "default-value", "departure-date-time", "description", "destination-name", "destination-station-code", "device-context", "device-token", "disable-expiration-notification", "discount-message", "enable-single-leg-itinerary", "enable-smart-tap", "end", "face-value", "fare-class", "fare-name", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "origin-name", "origin-station-code", "other-restrictions", "passenger-names", "passenger-type", "period-millis", "platform", "purchase-date-time", "purchase-details", "purchase-price", "purchase-receipt-number", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "route-restrictions", "route-restrictions-details", "seat", "seat-assignment", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "ticket-cost", "ticket-leg", "ticket-number", "ticket-restrictions", "ticket-seat", "ticket-status", "time-restrictions", "title", "totp-details", "transit-operator-name", "transit-option", "transit-terminus-name", "transit-type", "trip-id", "trip-type", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "watermark", "web-app-link-info", "word-mark", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "activation-options", "activation-status", "activation-url", "algorithm", "allow-multiple-users-per-object", "allow-reactivation", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "arrival-date-time", "barcode", "callback-options", "carriage", "class-id", "class-reference", "class-template-info", "coach", "comments", "concession-category", "confirmation-code", "content-description", "country-code", "currency-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-ticket-status", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "date", "default-value", "departure-date-time", "description", "destination-name", "destination-station-code", "device-context", "device-token", "disable-expiration-notification", "discount-message", "enable-single-leg-itinerary", "enable-smart-tap", "end", "face-value", "fare-class", "fare-name", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "nfc-constraint", "origin-name", "origin-station-code", "other-restrictions", "package-name", "pass-constraints", "passenger-names", "passenger-type", "period-millis", "platform", "purchase-date-time", "purchase-details", "purchase-price", "purchase-receipt-number", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "route-restrictions", "route-restrictions-details", "screenshot-eligibility", "seat", "seat-assignment", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "target-uri", "ticket-cost", "ticket-leg", "ticket-number", "ticket-restrictions", "ticket-seat", "ticket-status", "time-restrictions", "title", "totp-details", "transit-operator-name", "transit-option", "transit-terminus-name", "transit-type", "trip-id", "trip-type", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "version", "view-unlock-requirement", "watermark", "web-app-link-info", "wide-logo", "word-mark", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -14634,6 +15547,7 @@ where
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.androidAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.android-app-link-info.app-target.package-name" => Some(("appLinkData.androidAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.description" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.id" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.android-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.androidAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14661,6 +15575,7 @@ where
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.iosAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.ios-app-link-info.app-target.package-name" => Some(("appLinkData.iosAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.description" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.id" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.ios-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.iosAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14688,6 +15603,7 @@ where
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.default-value.value" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.localized-description.kind" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-logo-image.source-uri.uri" => Some(("appLinkData.webAppLinkInfo.appLogoImage.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "app-link-data.web-app-link-info.app-target.package-name" => Some(("appLinkData.webAppLinkInfo.appTarget.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.description" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.id" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "app-link-data.web-app-link-info.app-target.target-uri.kind" => Some(("appLinkData.webAppLinkInfo.appTarget.targetUri.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14861,6 +15777,17 @@ where
                     "class-reference.watermark.source-uri.localized-description.default-value.value" => Some(("classReference.watermark.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.watermark.source-uri.localized-description.kind" => Some(("classReference.watermark.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.watermark.source-uri.uri" => Some(("classReference.watermark.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.kind" => Some(("classReference.wideLogo.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.language" => Some(("classReference.wideLogo.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.default-value.value" => Some(("classReference.wideLogo.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.content-description.kind" => Some(("classReference.wideLogo.contentDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.kind" => Some(("classReference.wideLogo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.description" => Some(("classReference.wideLogo.sourceUri.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.kind" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.language" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.default-value.value" => Some(("classReference.wideLogo.sourceUri.localizedDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.localized-description.kind" => Some(("classReference.wideLogo.sourceUri.localizedDescription.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "class-reference.wide-logo.source-uri.uri" => Some(("classReference.wideLogo.sourceUri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.kind" => Some(("classReference.wordMark.contentDescription.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.language" => Some(("classReference.wordMark.contentDescription.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "class-reference.word-mark.content-description.default-value.value" => Some(("classReference.wordMark.contentDescription.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14901,6 +15828,8 @@ where
                     "hex-background-color" => Some(("hexBackgroundColor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "id" => Some(("id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "info-module-data.show-last-update-time" => Some(("infoModuleData.showLastUpdateTime", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "pass-constraints.nfc-constraint" => Some(("passConstraints.nfcConstraint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "pass-constraints.screenshot-eligibility" => Some(("passConstraints.screenshotEligibility", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "passenger-names" => Some(("passengerNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "passenger-type" => Some(("passengerType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-details.account-id" => Some(("purchaseDetails.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14918,6 +15847,9 @@ where
                     "purchase-details.ticket-cost.purchase-price.kind" => Some(("purchaseDetails.ticketCost.purchasePrice.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "purchase-details.ticket-cost.purchase-price.micros" => Some(("purchaseDetails.ticketCost.purchasePrice.micros", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.alternate-text" => Some(("rotatingBarcode.alternateText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.period-millis" => Some(("rotatingBarcode.initialRotatingBarcodeValues.periodMillis", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.start-date-time" => Some(("rotatingBarcode.initialRotatingBarcodeValues.startDateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rotating-barcode.initial-rotating-barcode-values.values" => Some(("rotatingBarcode.initialRotatingBarcodeValues.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "rotating-barcode.render-encoding" => Some(("rotatingBarcode.renderEncoding", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.kind" => Some(("rotatingBarcode.showCodeText.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rotating-barcode.show-code-text.default-value.language" => Some(("rotatingBarcode.showCodeText.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -14992,7 +15924,7 @@ where
                     "valid-time-interval.start.date" => Some(("validTimeInterval.start.date", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "activation-options", "activation-status", "activation-url", "algorithm", "allow-multiple-users-per-object", "allow-reactivation", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "arrival-date-time", "barcode", "callback-options", "carriage", "class-id", "class-reference", "class-template-info", "coach", "comments", "concession-category", "confirmation-code", "content-description", "country-code", "currency-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-ticket-status", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "date", "default-value", "departure-date-time", "description", "destination-name", "destination-station-code", "device-context", "device-token", "disable-expiration-notification", "discount-message", "enable-single-leg-itinerary", "enable-smart-tap", "end", "face-value", "fare-class", "fare-name", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "origin-name", "origin-station-code", "other-restrictions", "passenger-names", "passenger-type", "period-millis", "platform", "purchase-date-time", "purchase-details", "purchase-price", "purchase-receipt-number", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "route-restrictions", "route-restrictions-details", "seat", "seat-assignment", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "state", "target-uri", "ticket-cost", "ticket-leg", "ticket-number", "ticket-restrictions", "ticket-seat", "ticket-status", "time-restrictions", "title", "totp-details", "transit-operator-name", "transit-option", "transit-terminus-name", "transit-type", "trip-id", "trip-type", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "version", "view-unlock-requirement", "watermark", "web-app-link-info", "word-mark", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "activation-options", "activation-status", "activation-url", "algorithm", "allow-multiple-users-per-object", "allow-reactivation", "alternate-text", "android-app-link-info", "animation-type", "app-link-data", "app-logo-image", "app-target", "arrival-date-time", "barcode", "callback-options", "carriage", "class-id", "class-reference", "class-template-info", "coach", "comments", "concession-category", "confirmation-code", "content-description", "country-code", "currency-code", "custom-carriage-label", "custom-coach-label", "custom-concession-category", "custom-concession-category-label", "custom-confirmation-code-label", "custom-discount-message-label", "custom-fare-class", "custom-fare-class-label", "custom-fare-name-label", "custom-other-restrictions-label", "custom-platform-label", "custom-purchase-face-value-label", "custom-purchase-price-label", "custom-purchase-receipt-number-label", "custom-route-restrictions-details-label", "custom-route-restrictions-label", "custom-seat-label", "custom-ticket-number-label", "custom-ticket-status", "custom-time-restrictions-label", "custom-transit-terminus-name-label", "custom-zone-label", "date", "default-value", "departure-date-time", "description", "destination-name", "destination-station-code", "device-context", "device-token", "disable-expiration-notification", "discount-message", "enable-single-leg-itinerary", "enable-smart-tap", "end", "face-value", "fare-class", "fare-name", "first-row-option", "grouping-id", "grouping-info", "has-linked-device", "has-users", "hero-image", "hex-background-color", "homepage-uri", "id", "info-module-data", "initial-rotating-barcode-values", "ios-app-link-info", "issuer-name", "kind", "language", "language-override", "list-template-override", "localized-description", "localized-issuer-name", "logo", "micros", "multiple-devices-and-holders-allowed-status", "nfc-constraint", "origin-name", "origin-station-code", "other-restrictions", "package-name", "pass-constraints", "passenger-names", "passenger-type", "period-millis", "platform", "purchase-date-time", "purchase-details", "purchase-price", "purchase-receipt-number", "redemption-issuers", "render-encoding", "review", "review-status", "rotating-barcode", "route-restrictions", "route-restrictions-details", "screenshot-eligibility", "seat", "seat-assignment", "security-animation", "show-code-text", "show-last-update-time", "smart-tap-redemption-value", "sort-index", "source-uri", "start", "start-date-time", "state", "target-uri", "ticket-cost", "ticket-leg", "ticket-number", "ticket-restrictions", "ticket-seat", "ticket-status", "time-restrictions", "title", "totp-details", "transit-operator-name", "transit-option", "transit-terminus-name", "transit-type", "trip-id", "trip-type", "type", "update-request-url", "uri", "url", "valid-time-interval", "value", "value-pattern", "values", "version", "view-unlock-requirement", "watermark", "web-app-link-info", "wide-logo", "word-mark", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -15003,104 +15935,6 @@ where
         }
         let mut request: api::TransitObject = json::value::from_value(object).unwrap();
         let mut call = self.hub.transitobject().update(request, opt.value_of("resource-id").unwrap_or(""));
-        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let (key, value) = parse_kv_arg(&*parg, err, false);
-            match key {
-                _ => {
-                    let mut found = false;
-                    for param in &self.gp {
-                        if key == *param {
-                            found = true;
-                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
-                            break;
-                        }
-                    }
-                    if !found {
-                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
-                                                                  {let mut v = Vec::new();
-                                                                           v.extend(self.gp.iter().map(|v|*v));
-                                                                           v } ));
-                    }
-                }
-            }
-        }
-        let protocol = CallType::Standard;
-        if dry_run {
-            Ok(())
-        } else {
-            assert!(err.issues.len() == 0);
-            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-                call = call.add_scope(scope);
-            }
-            let mut ostream = match writer_from_opts(opt.value_of("out")) {
-                Ok(mut f) => f,
-                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
-            };
-            match match protocol {
-                CallType::Standard => call.doit().await,
-                _ => unreachable!()
-            } {
-                Err(api_err) => Err(DoitError::ApiError(api_err)),
-                Ok((mut response, output_schema)) => {
-                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
-                    remove_json_null_values(&mut value);
-                    json::to_writer_pretty(&mut ostream, &value).unwrap();
-                    ostream.flush().unwrap();
-                    Ok(())
-                }
-            }
-        }
-    }
-
-    async fn _walletobjects_v1_private_content_upload_private_data(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
-                                                    -> Result<(), DoitError> {
-        
-        let mut field_cursor = FieldCursor::default();
-        let mut object = json::value::Value::Object(Default::default());
-        
-        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
-            let last_errc = err.issues.len();
-            let (key, value) = parse_kv_arg(&*kvarg, err, false);
-            let mut temp_cursor = field_cursor.clone();
-            if let Err(field_err) = temp_cursor.set(&*key) {
-                err.issues.push(field_err);
-            }
-            if value.is_none() {
-                field_cursor = temp_cursor.clone();
-                if err.issues.len() > last_errc {
-                    err.issues.remove(last_errc);
-                }
-                continue;
-            }
-        
-            let type_info: Option<(&'static str, JsonTypeInfo)> =
-                match &temp_cursor.to_string()[..] {
-                    "issuer-id" => Some(("issuerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "text.body.default-value.kind" => Some(("text.body.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "text.body.default-value.language" => Some(("text.body.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "text.body.default-value.value" => Some(("text.body.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "text.body.kind" => Some(("text.body.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "text.header.default-value.kind" => Some(("text.header.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "text.header.default-value.language" => Some(("text.header.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "text.header.default-value.value" => Some(("text.header.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "text.header.kind" => Some(("text.header.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uri.description.default-value.kind" => Some(("uri.description.defaultValue.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uri.description.default-value.language" => Some(("uri.description.defaultValue.language", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uri.description.default-value.value" => Some(("uri.description.defaultValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uri.description.kind" => Some(("uri.description.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    "uri.uri" => Some(("uri.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
-                    _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["body", "default-value", "description", "header", "issuer-id", "kind", "language", "text", "uri", "value"]);
-                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
-                        None
-                    }
-                };
-            if let Some((field_cursor_str, type_info)) = type_info {
-                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
-            }
-        }
-        let mut request: api::UploadPrivateDataRequest = json::value::from_value(object).unwrap();
-        let mut call = self.hub.walletobjects().v1_private_content_upload_private_data(request);
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -15264,6 +16098,9 @@ where
             },
             ("genericclass", Some(opt)) => {
                 match opt.subcommand() {
+                    ("addmessage", Some(opt)) => {
+                        call_result = self._genericclass_addmessage(opt, dry_run, &mut err).await;
+                    },
                     ("get", Some(opt)) => {
                         call_result = self._genericclass_get(opt, dry_run, &mut err).await;
                     },
@@ -15287,6 +16124,9 @@ where
             },
             ("genericobject", Some(opt)) => {
                 match opt.subcommand() {
+                    ("addmessage", Some(opt)) => {
+                        call_result = self._genericobject_addmessage(opt, dry_run, &mut err).await;
+                    },
                     ("get", Some(opt)) => {
                         call_result = self._genericobject_get(opt, dry_run, &mut err).await;
                     },
@@ -15451,6 +16291,9 @@ where
             },
             ("media", Some(opt)) => {
                 match opt.subcommand() {
+                    ("download", Some(opt)) => {
+                        call_result = self._media_download(opt, dry_run, &mut err).await;
+                    },
                     ("upload", Some(opt)) => {
                         call_result = self._media_upload(opt, dry_run, &mut err).await;
                     },
@@ -15585,17 +16428,6 @@ where
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("transitobject".to_string()));
-                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
-                    }
-                }
-            },
-            ("walletobjects", Some(opt)) => {
-                match opt.subcommand() {
-                    ("v1-private-content-upload-private-data", Some(opt)) => {
-                        call_result = self._walletobjects_v1_private_content_upload_private_data(opt, dry_run, &mut err).await;
-                    },
-                    _ => {
-                        err.issues.push(CLIError::MissingMethodError("walletobjects".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -16290,7 +17122,35 @@ async fn main() {
                   ]),
             ]),
         
-        ("genericclass", "methods: 'get', 'insert', 'list', 'patch' and 'update'", vec![
+        ("genericclass", "methods: 'addmessage', 'get', 'insert', 'list', 'patch' and 'update'", vec![
+            ("addmessage",
+                    Some(r##"Adds a message to the generic class referenced by the given class ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_walletobjects1_cli/genericclass_addmessage",
+                  vec![
+                    (Some(r##"resource-id"##),
+                     None,
+                     Some(r##"The unique identifier for a class. This ID must be unique across all classes from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("get",
                     Some(r##"Returns the generic class with the given class ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_walletobjects1_cli/genericclass_get",
@@ -16409,7 +17269,35 @@ async fn main() {
                   ]),
             ]),
         
-        ("genericobject", "methods: 'get', 'insert', 'list', 'patch' and 'update'", vec![
+        ("genericobject", "methods: 'addmessage', 'get', 'insert', 'list', 'patch' and 'update'", vec![
+            ("addmessage",
+                    Some(r##"Adds a message to the generic object referenced by the given object ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_walletobjects1_cli/genericobject_addmessage",
+                  vec![
+                    (Some(r##"resource-id"##),
+                     None,
+                     Some(r##"The unique identifier for an object. This ID must be unique across all classes from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("get",
                     Some(r##"Returns the generic object with the given object ID."##),
                     "Details at http://byron.github.io/google-apis-rs/google_walletobjects1_cli/genericobject_get",
@@ -17288,14 +18176,36 @@ async fn main() {
                   ]),
             ]),
         
-        ("media", "methods: 'upload'", vec![
+        ("media", "methods: 'download' and 'upload'", vec![
+            ("download",
+                    Some(r##"Downloads rotating barcode values for the transit object referenced by the given object ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_walletobjects1_cli/media_download",
+                  vec![
+                    (Some(r##"resource-id"##),
+                     None,
+                     Some(r##"The unique identifier for an object. This ID must be unique across all objects from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("upload",
-                    Some(r##"Uploads a private image and returns an Id to be used in its place."##),
+                    Some(r##"Uploads rotating barcode values for the transit object referenced by the given object ID. Note the max upload size is specified in google3/production/config/cdd/apps-upload/customers/payments-consumer-passes/config.gcl and enforced by Scotty."##),
                     "Details at http://byron.github.io/google-apis-rs/google_walletobjects1_cli/media_upload",
                   vec![
-                    (Some(r##"issuer-id"##),
+                    (Some(r##"resource-id"##),
                      None,
-                     Some(r##"The ID of the issuer sending the image."##),
+                     Some(r##"The unique identifier for an object. This ID must be unique across all objects from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'."##),
                      Some(true),
                      Some(false)),
         
@@ -17991,36 +18901,11 @@ async fn main() {
                   ]),
             ]),
         
-        ("walletobjects", "methods: 'v1-private-content-upload-private-data'", vec![
-            ("v1-private-content-upload-private-data",
-                    Some(r##"Upload private data (text or URI) and returns an Id to be used in its place."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_walletobjects1_cli/walletobjects_v1-private-content-upload-private-data",
-                  vec![
-                    (Some(r##"kv"##),
-                     Some(r##"r"##),
-                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
-                     Some(true),
-                     Some(true)),
-        
-                    (Some(r##"v"##),
-                     Some(r##"p"##),
-                     Some(r##"Set various optional parameters, matching the key=value form"##),
-                     Some(false),
-                     Some(true)),
-        
-                    (Some(r##"out"##),
-                     Some(r##"o"##),
-                     Some(r##"Specify the file into which to write the program's output"##),
-                     Some(false),
-                     Some(false)),
-                  ]),
-            ]),
-        
     ];
     
     let mut app = App::new("walletobjects1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230124")
+           .version("5.0.4+20240304")
            .about("API for issuers to save and manage Google Wallet Objects.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_walletobjects1_cli")
            .arg(Arg::with_name("url")

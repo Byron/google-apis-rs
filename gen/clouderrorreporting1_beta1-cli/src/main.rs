@@ -650,7 +650,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("events-report",
-                    Some(r##"Report an individual error event and record the event to a log. This endpoint accepts **either** an OAuth token, **or** an [API key](https://support.google.com/cloud/answer/6158862) for authentication. To use an API key, append it to the URL as the value of a `key` parameter. For example: `POST https://clouderrorreporting.googleapis.com/v1beta1/{projectName}/events:report?key=123ABC456` **Note:** [Error Reporting] (https://cloud.google.com/error-reporting) is a global service built on Cloud Logging and doesn't analyze logs stored in regional log buckets or logs routed to other Google Cloud projects. For more information, see [Using Error Reporting with regionalized logs] (https://cloud.google.com/error-reporting/docs/regionalization)."##),
+                    Some(r##"Report an individual error event and record the event to a log. This endpoint accepts **either** an OAuth token, **or** an [API key](https://support.google.com/cloud/answer/6158862) for authentication. To use an API key, append it to the URL as the value of a `key` parameter. For example: `POST https://clouderrorreporting.googleapis.com/v1beta1/{projectName}/events:report?key=123ABC456` **Note:** [Error Reporting] (https://cloud.google.com/error-reporting) is a global service built on Cloud Logging and doesn't analyze logs stored in regional log buckets or logs routed to other Google Cloud projects."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouderrorreporting1_beta1_cli/projects_events-report",
                   vec![
                     (Some(r##"project-name"##),
@@ -705,7 +705,7 @@ async fn main() {
                   vec![
                     (Some(r##"group-name"##),
                      None,
-                     Some(r##"Required. The group resource name. Written as `projects/{projectID}/groups/{group_name}`. Call groupStats.list to return a list of groups belonging to this project. Example: `projects/my-project-123/groups/my-group`"##),
+                     Some(r##"Required. The group resource name. Written as `projects/{projectID}/groups/{group_id}`. Call groupStats.list to return a list of groups belonging to this project. Example: `projects/my-project-123/groups/my-group` In the group resource name, the `group_id` is a unique identifier for a particular error group. The identifier is derived from key parts of the error-log content and is treated as Service Data. For information about how Service Data is handled, see [Google Cloud Privacy Notice](https://cloud.google.com/terms/cloud-privacy-notice)."##),
                      Some(true),
                      Some(false)),
         
@@ -727,7 +727,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The group resource name. Example: projects/my-project-123/groups/CNSgkpnppqKCUw"##),
+                     Some(r##"The group resource name. Written as `projects/{projectID}/groups/{group_id}`. Example: `projects/my-project-123/groups/my-group` In the group resource name, the `group_id` is a unique identifier for a particular error group. The identifier is derived from key parts of the error-log content and is treated as Service Data. For information about how Service Data is handled, see [Google Cloud Privacy Notice](https://cloud.google.com/terms/cloud-privacy-notice)."##),
                      Some(true),
                      Some(false)),
         
@@ -755,7 +755,7 @@ async fn main() {
     
     let mut app = App::new("clouderrorreporting1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230112")
+           .version("5.0.4+20240221")
            .about("Groups and counts similar errors from cloud services and applications, reports new errors, and provides access to error groups and their associated errors. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouderrorreporting1_beta1_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *My Business Verifications* crate version *5.0.3+20230124*, where *20230124* is the exact revision of the *mybusinessverifications:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *My Business Verifications* crate version *5.0.4+20240304*, where *20240304* is the exact revision of the *mybusinessverifications:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *My Business Verifications* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/my-business/).
@@ -11,10 +11,8 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](MyBusinessVerifications) ... 
 //! 
-//! * [locations](api::Location)
+//! * locations
 //!  * [*fetch verification options*](api::LocationFetchVerificationOptionCall), [*get voice of merchant state*](api::LocationGetVoiceOfMerchantStateCall), [*verifications complete*](api::LocationVerificationCompleteCall), [*verifications list*](api::LocationVerificationListCall) and [*verify*](api::LocationVerifyCall)
-//! * [verification tokens](api::VerificationToken)
-//!  * [*generate*](api::VerificationTokenGenerateCall)
 //! 
 //! 
 //! 
@@ -49,10 +47,6 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.locations().verifications_complete(...).doit().await
-//! let r = hub.locations().verifications_list(...).doit().await
-//! let r = hub.locations().fetch_verification_options(...).doit().await
-//! let r = hub.locations().get_voice_of_merchant_state(...).doit().await
 //! let r = hub.locations().verify(...).doit().await
 //! ```
 //! 
@@ -80,6 +74,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_mybusinessverifications1 as mybusinessverifications1;
+//! use mybusinessverifications1::api::VerifyLocationRequest;
 //! use mybusinessverifications1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -98,12 +93,15 @@
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
+//! // Values shown here are possibly random and not representative !
+//! let mut req = VerifyLocationRequest::default();
+//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.locations().verifications_list("parent")
-//!              .page_token("voluptua.")
-//!              .page_size(-27)
+//! let result = hub.locations().verify(req, "name")
 //!              .doit().await;
 //! 
 //! match result {

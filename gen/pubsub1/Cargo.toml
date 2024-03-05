@@ -4,12 +4,12 @@
 [package]
 
 name = "google-pubsub1"
-version = "5.0.3+20230119"
+version = "5.0.4+20240227"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Pubsub (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/pubsub1"
 homepage = "https://cloud.google.com/pubsub/docs"
-documentation = "https://docs.rs/google-pubsub1/5.0.3+20230119"
+documentation = "https://docs.rs/google-pubsub1/5.0.4+20240227"
 license = "MIT"
 keywords = ["pubsub", "google", "protocol", "web", "api"]
 autobins = false

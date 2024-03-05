@@ -145,6 +145,7 @@ where
                     "features.support-gtag-configs" => Some(("features.supportGtagConfigs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.support-tags" => Some(("features.supportTags", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.support-templates" => Some(("features.supportTemplates", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "features.support-transformations" => Some(("features.supportTransformations", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.support-triggers" => Some(("features.supportTriggers", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.support-user-permissions" => Some(("features.supportUserPermissions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.support-variables" => Some(("features.supportVariables", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -161,7 +162,7 @@ where
                     "tagging-server-urls" => Some(("taggingServerUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "usage-context" => Some(("usageContext", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "container-id", "domain-name", "features", "fingerprint", "name", "notes", "path", "public-id", "support-built-in-variables", "support-clients", "support-environments", "support-folders", "support-gtag-configs", "support-tags", "support-templates", "support-triggers", "support-user-permissions", "support-variables", "support-versions", "support-workspaces", "support-zones", "tag-ids", "tag-manager-url", "tagging-server-urls", "usage-context"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "container-id", "domain-name", "features", "fingerprint", "name", "notes", "path", "public-id", "support-built-in-variables", "support-clients", "support-environments", "support-folders", "support-gtag-configs", "support-tags", "support-templates", "support-transformations", "support-triggers", "support-user-permissions", "support-variables", "support-versions", "support-workspaces", "support-zones", "tag-ids", "tag-manager-url", "tagging-server-urls", "usage-context"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1201,6 +1202,7 @@ where
                     "features.support-gtag-configs" => Some(("features.supportGtagConfigs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.support-tags" => Some(("features.supportTags", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.support-templates" => Some(("features.supportTemplates", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "features.support-transformations" => Some(("features.supportTransformations", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.support-triggers" => Some(("features.supportTriggers", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.support-user-permissions" => Some(("features.supportUserPermissions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "features.support-variables" => Some(("features.supportVariables", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1217,7 +1219,7 @@ where
                     "tagging-server-urls" => Some(("taggingServerUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "usage-context" => Some(("usageContext", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "container-id", "domain-name", "features", "fingerprint", "name", "notes", "path", "public-id", "support-built-in-variables", "support-clients", "support-environments", "support-folders", "support-gtag-configs", "support-tags", "support-templates", "support-triggers", "support-user-permissions", "support-variables", "support-versions", "support-workspaces", "support-zones", "tag-ids", "tag-manager-url", "tagging-server-urls", "usage-context"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "container-id", "domain-name", "features", "fingerprint", "name", "notes", "path", "public-id", "support-built-in-variables", "support-clients", "support-environments", "support-folders", "support-gtag-configs", "support-tags", "support-templates", "support-transformations", "support-triggers", "support-user-permissions", "support-variables", "support-versions", "support-workspaces", "support-zones", "tag-ids", "tag-manager-url", "tagging-server-urls", "usage-context"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1738,6 +1740,7 @@ where
                     "container.features.support-gtag-configs" => Some(("container.features.supportGtagConfigs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "container.features.support-tags" => Some(("container.features.supportTags", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "container.features.support-templates" => Some(("container.features.supportTemplates", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "container.features.support-transformations" => Some(("container.features.supportTransformations", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "container.features.support-triggers" => Some(("container.features.supportTriggers", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "container.features.support-user-permissions" => Some(("container.features.supportUserPermissions", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "container.features.support-variables" => Some(("container.features.supportVariables", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1762,7 +1765,7 @@ where
                     "path" => Some(("path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag-manager-url" => Some(("tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "container", "container-id", "container-version-id", "deleted", "description", "domain-name", "features", "fingerprint", "name", "notes", "path", "public-id", "support-built-in-variables", "support-clients", "support-environments", "support-folders", "support-gtag-configs", "support-tags", "support-templates", "support-triggers", "support-user-permissions", "support-variables", "support-versions", "support-workspaces", "support-zones", "tag-ids", "tag-manager-url", "tagging-server-urls", "usage-context"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "container", "container-id", "container-version-id", "deleted", "description", "domain-name", "features", "fingerprint", "name", "notes", "path", "public-id", "support-built-in-variables", "support-clients", "support-environments", "support-folders", "support-gtag-configs", "support-tags", "support-templates", "support-transformations", "support-triggers", "support-user-permissions", "support-variables", "support-versions", "support-workspaces", "support-zones", "tag-ids", "tag-manager-url", "tagging-server-urls", "usage-context"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3792,6 +3795,12 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "built-in-variable.account-id" => Some(("builtInVariable.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "built-in-variable.container-id" => Some(("builtInVariable.containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "built-in-variable.name" => Some(("builtInVariable.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "built-in-variable.path" => Some(("builtInVariable.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "built-in-variable.type" => Some(("builtInVariable.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "built-in-variable.workspace-id" => Some(("builtInVariable.workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "change-status" => Some(("changeStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client.account-id" => Some(("client.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client.client-id" => Some(("client.clientId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3805,6 +3814,21 @@ where
                     "client.tag-manager-url" => Some(("client.tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client.type" => Some(("client.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "client.workspace-id" => Some(("client.workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-template.account-id" => Some(("customTemplate.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-template.container-id" => Some(("customTemplate.containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-template.fingerprint" => Some(("customTemplate.fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-template.gallery-reference.host" => Some(("customTemplate.galleryReference.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-template.gallery-reference.is-modified" => Some(("customTemplate.galleryReference.isModified", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "custom-template.gallery-reference.owner" => Some(("customTemplate.galleryReference.owner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-template.gallery-reference.repository" => Some(("customTemplate.galleryReference.repository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-template.gallery-reference.signature" => Some(("customTemplate.galleryReference.signature", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-template.gallery-reference.version" => Some(("customTemplate.galleryReference.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-template.name" => Some(("customTemplate.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-template.path" => Some(("customTemplate.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-template.tag-manager-url" => Some(("customTemplate.tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-template.template-data" => Some(("customTemplate.templateData", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-template.template-id" => Some(("customTemplate.templateId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-template.workspace-id" => Some(("customTemplate.workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder.account-id" => Some(("folder.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder.container-id" => Some(("folder.containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder.fingerprint" => Some(("folder.fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3814,10 +3838,19 @@ where
                     "folder.path" => Some(("folder.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder.tag-manager-url" => Some(("folder.tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "folder.workspace-id" => Some(("folder.workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gtag-config.account-id" => Some(("gtagConfig.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gtag-config.container-id" => Some(("gtagConfig.containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gtag-config.fingerprint" => Some(("gtagConfig.fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gtag-config.gtag-config-id" => Some(("gtagConfig.gtagConfigId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gtag-config.path" => Some(("gtagConfig.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gtag-config.tag-manager-url" => Some(("gtagConfig.tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gtag-config.type" => Some(("gtagConfig.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gtag-config.workspace-id" => Some(("gtagConfig.workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.account-id" => Some(("tag.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.blocking-rule-id" => Some(("tag.blockingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tag.blocking-trigger-id" => Some(("tag.blockingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tag.consent-settings.consent-status" => Some(("tag.consentSettings.consentStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag.consent-settings.consent-type.is-weak-reference" => Some(("tag.consentSettings.consentType.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "tag.consent-settings.consent-type.key" => Some(("tag.consentSettings.consentType.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.consent-settings.consent-type.type" => Some(("tag.consentSettings.consentType.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.consent-settings.consent-type.value" => Some(("tag.consentSettings.consentType.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3826,6 +3859,7 @@ where
                     "tag.firing-rule-id" => Some(("tag.firingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tag.firing-trigger-id" => Some(("tag.firingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tag.live-only" => Some(("tag.liveOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "tag.monitoring-metadata.is-weak-reference" => Some(("tag.monitoringMetadata.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "tag.monitoring-metadata.key" => Some(("tag.monitoringMetadata.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.monitoring-metadata.type" => Some(("tag.monitoringMetadata.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.monitoring-metadata.value" => Some(("tag.monitoringMetadata.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3835,6 +3869,7 @@ where
                     "tag.parent-folder-id" => Some(("tag.parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.path" => Some(("tag.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.paused" => Some(("tag.paused", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "tag.priority.is-weak-reference" => Some(("tag.priority.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "tag.priority.key" => Some(("tag.priority.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.priority.type" => Some(("tag.priority.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.priority.value" => Some(("tag.priority.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3845,30 +3880,49 @@ where
                     "tag.tag-manager-url" => Some(("tag.tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.type" => Some(("tag.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag.workspace-id" => Some(("tag.workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transformation.account-id" => Some(("transformation.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transformation.container-id" => Some(("transformation.containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transformation.fingerprint" => Some(("transformation.fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transformation.name" => Some(("transformation.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transformation.notes" => Some(("transformation.notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transformation.parent-folder-id" => Some(("transformation.parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transformation.path" => Some(("transformation.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transformation.tag-manager-url" => Some(("transformation.tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transformation.transformation-id" => Some(("transformation.transformationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transformation.type" => Some(("transformation.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transformation.workspace-id" => Some(("transformation.workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.account-id" => Some(("trigger.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.check-validation.is-weak-reference" => Some(("trigger.checkValidation.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.check-validation.key" => Some(("trigger.checkValidation.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.check-validation.type" => Some(("trigger.checkValidation.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.check-validation.value" => Some(("trigger.checkValidation.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.container-id" => Some(("trigger.containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.continuous-time-min-milliseconds.is-weak-reference" => Some(("trigger.continuousTimeMinMilliseconds.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.continuous-time-min-milliseconds.key" => Some(("trigger.continuousTimeMinMilliseconds.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.continuous-time-min-milliseconds.type" => Some(("trigger.continuousTimeMinMilliseconds.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.continuous-time-min-milliseconds.value" => Some(("trigger.continuousTimeMinMilliseconds.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.event-name.is-weak-reference" => Some(("trigger.eventName.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.event-name.key" => Some(("trigger.eventName.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.event-name.type" => Some(("trigger.eventName.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.event-name.value" => Some(("trigger.eventName.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.fingerprint" => Some(("trigger.fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.horizontal-scroll-percentage-list.is-weak-reference" => Some(("trigger.horizontalScrollPercentageList.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.horizontal-scroll-percentage-list.key" => Some(("trigger.horizontalScrollPercentageList.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.horizontal-scroll-percentage-list.type" => Some(("trigger.horizontalScrollPercentageList.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.horizontal-scroll-percentage-list.value" => Some(("trigger.horizontalScrollPercentageList.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.interval.is-weak-reference" => Some(("trigger.interval.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.interval.key" => Some(("trigger.interval.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.interval.type" => Some(("trigger.interval.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.interval.value" => Some(("trigger.interval.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.interval-seconds.is-weak-reference" => Some(("trigger.intervalSeconds.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.interval-seconds.key" => Some(("trigger.intervalSeconds.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.interval-seconds.type" => Some(("trigger.intervalSeconds.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.interval-seconds.value" => Some(("trigger.intervalSeconds.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.limit.is-weak-reference" => Some(("trigger.limit.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.limit.key" => Some(("trigger.limit.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.limit.type" => Some(("trigger.limit.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.limit.value" => Some(("trigger.limit.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.max-timer-length-seconds.is-weak-reference" => Some(("trigger.maxTimerLengthSeconds.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.max-timer-length-seconds.key" => Some(("trigger.maxTimerLengthSeconds.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.max-timer-length-seconds.type" => Some(("trigger.maxTimerLengthSeconds.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.max-timer-length-seconds.value" => Some(("trigger.maxTimerLengthSeconds.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3876,33 +3930,42 @@ where
                     "trigger.notes" => Some(("trigger.notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.parent-folder-id" => Some(("trigger.parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.path" => Some(("trigger.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.selector.is-weak-reference" => Some(("trigger.selector.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.selector.key" => Some(("trigger.selector.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.selector.type" => Some(("trigger.selector.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.selector.value" => Some(("trigger.selector.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.tag-manager-url" => Some(("trigger.tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.total-time-min-milliseconds.is-weak-reference" => Some(("trigger.totalTimeMinMilliseconds.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.total-time-min-milliseconds.key" => Some(("trigger.totalTimeMinMilliseconds.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.total-time-min-milliseconds.type" => Some(("trigger.totalTimeMinMilliseconds.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.total-time-min-milliseconds.value" => Some(("trigger.totalTimeMinMilliseconds.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.trigger-id" => Some(("trigger.triggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.type" => Some(("trigger.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.unique-trigger-id.is-weak-reference" => Some(("trigger.uniqueTriggerId.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.unique-trigger-id.key" => Some(("trigger.uniqueTriggerId.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.unique-trigger-id.type" => Some(("trigger.uniqueTriggerId.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.unique-trigger-id.value" => Some(("trigger.uniqueTriggerId.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.vertical-scroll-percentage-list.is-weak-reference" => Some(("trigger.verticalScrollPercentageList.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.vertical-scroll-percentage-list.key" => Some(("trigger.verticalScrollPercentageList.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.vertical-scroll-percentage-list.type" => Some(("trigger.verticalScrollPercentageList.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.vertical-scroll-percentage-list.value" => Some(("trigger.verticalScrollPercentageList.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.visibility-selector.is-weak-reference" => Some(("trigger.visibilitySelector.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.visibility-selector.key" => Some(("trigger.visibilitySelector.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.visibility-selector.type" => Some(("trigger.visibilitySelector.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.visibility-selector.value" => Some(("trigger.visibilitySelector.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.visible-percentage-max.is-weak-reference" => Some(("trigger.visiblePercentageMax.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.visible-percentage-max.key" => Some(("trigger.visiblePercentageMax.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.visible-percentage-max.type" => Some(("trigger.visiblePercentageMax.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.visible-percentage-max.value" => Some(("trigger.visiblePercentageMax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.visible-percentage-min.is-weak-reference" => Some(("trigger.visiblePercentageMin.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.visible-percentage-min.key" => Some(("trigger.visiblePercentageMin.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.visible-percentage-min.type" => Some(("trigger.visiblePercentageMin.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.visible-percentage-min.value" => Some(("trigger.visiblePercentageMin.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.wait-for-tags.is-weak-reference" => Some(("trigger.waitForTags.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.wait-for-tags.key" => Some(("trigger.waitForTags.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.wait-for-tags.type" => Some(("trigger.waitForTags.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.wait-for-tags.value" => Some(("trigger.waitForTags.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "trigger.wait-for-tags-timeout.is-weak-reference" => Some(("trigger.waitForTagsTimeout.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "trigger.wait-for-tags-timeout.key" => Some(("trigger.waitForTagsTimeout.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.wait-for-tags-timeout.type" => Some(("trigger.waitForTagsTimeout.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger.wait-for-tags-timeout.value" => Some(("trigger.waitForTagsTimeout.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3913,15 +3976,19 @@ where
                     "variable.enabling-trigger-id" => Some(("variable.enablingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "variable.fingerprint" => Some(("variable.fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.format-value.case-conversion-type" => Some(("variable.formatValue.caseConversionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-false-to-value.is-weak-reference" => Some(("variable.formatValue.convertFalseToValue.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "variable.format-value.convert-false-to-value.key" => Some(("variable.formatValue.convertFalseToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.format-value.convert-false-to-value.type" => Some(("variable.formatValue.convertFalseToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.format-value.convert-false-to-value.value" => Some(("variable.formatValue.convertFalseToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-null-to-value.is-weak-reference" => Some(("variable.formatValue.convertNullToValue.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "variable.format-value.convert-null-to-value.key" => Some(("variable.formatValue.convertNullToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.format-value.convert-null-to-value.type" => Some(("variable.formatValue.convertNullToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.format-value.convert-null-to-value.value" => Some(("variable.formatValue.convertNullToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-true-to-value.is-weak-reference" => Some(("variable.formatValue.convertTrueToValue.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "variable.format-value.convert-true-to-value.key" => Some(("variable.formatValue.convertTrueToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.format-value.convert-true-to-value.type" => Some(("variable.formatValue.convertTrueToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.format-value.convert-true-to-value.value" => Some(("variable.formatValue.convertTrueToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "variable.format-value.convert-undefined-to-value.is-weak-reference" => Some(("variable.formatValue.convertUndefinedToValue.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "variable.format-value.convert-undefined-to-value.key" => Some(("variable.formatValue.convertUndefinedToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.format-value.convert-undefined-to-value.type" => Some(("variable.formatValue.convertUndefinedToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.format-value.convert-undefined-to-value.value" => Some(("variable.formatValue.convertUndefinedToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -3935,8 +4002,20 @@ where
                     "variable.type" => Some(("variable.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.variable-id" => Some(("variable.variableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "variable.workspace-id" => Some(("variable.workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone.account-id" => Some(("zone.accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone.boundary.custom-evaluation-trigger-id" => Some(("zone.boundary.customEvaluationTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "zone.container-id" => Some(("zone.containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone.fingerprint" => Some(("zone.fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone.name" => Some(("zone.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone.notes" => Some(("zone.notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone.path" => Some(("zone.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone.tag-manager-url" => Some(("zone.tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone.type-restriction.enable" => Some(("zone.typeRestriction.enable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "zone.type-restriction.whitelisted-type-id" => Some(("zone.typeRestriction.whitelistedTypeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "zone.workspace-id" => Some(("zone.workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "zone.zone-id" => Some(("zone.zoneId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "case-conversion-type", "change-status", "check-validation", "client", "client-id", "consent-settings", "consent-status", "consent-type", "container-id", "continuous-time-min-milliseconds", "convert-false-to-value", "convert-null-to-value", "convert-true-to-value", "convert-undefined-to-value", "disabling-trigger-id", "enabling-trigger-id", "event-name", "fingerprint", "firing-rule-id", "firing-trigger-id", "folder", "folder-id", "format-value", "horizontal-scroll-percentage-list", "interval", "interval-seconds", "key", "limit", "live-only", "max-timer-length-seconds", "monitoring-metadata", "monitoring-metadata-tag-name-key", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "selector", "tag", "tag-firing-option", "tag-id", "tag-manager-url", "total-time-min-milliseconds", "trigger", "trigger-id", "type", "unique-trigger-id", "value", "variable", "variable-id", "vertical-scroll-percentage-list", "visibility-selector", "visible-percentage-max", "visible-percentage-min", "wait-for-tags", "wait-for-tags-timeout", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "boundary", "built-in-variable", "case-conversion-type", "change-status", "check-validation", "client", "client-id", "consent-settings", "consent-status", "consent-type", "container-id", "continuous-time-min-milliseconds", "convert-false-to-value", "convert-null-to-value", "convert-true-to-value", "convert-undefined-to-value", "custom-evaluation-trigger-id", "custom-template", "disabling-trigger-id", "enable", "enabling-trigger-id", "event-name", "fingerprint", "firing-rule-id", "firing-trigger-id", "folder", "folder-id", "format-value", "gallery-reference", "gtag-config", "gtag-config-id", "horizontal-scroll-percentage-list", "host", "interval", "interval-seconds", "is-modified", "is-weak-reference", "key", "limit", "live-only", "max-timer-length-seconds", "monitoring-metadata", "monitoring-metadata-tag-name-key", "name", "notes", "owner", "parent-folder-id", "path", "paused", "priority", "repository", "schedule-end-ms", "schedule-start-ms", "selector", "signature", "tag", "tag-firing-option", "tag-id", "tag-manager-url", "template-data", "template-id", "total-time-min-milliseconds", "transformation", "transformation-id", "trigger", "trigger-id", "type", "type-restriction", "unique-trigger-id", "value", "variable", "variable-id", "version", "vertical-scroll-percentage-list", "visibility-selector", "visible-percentage-max", "visible-percentage-min", "wait-for-tags", "wait-for-tags-timeout", "whitelisted-type-id", "workspace-id", "zone", "zone-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4071,6 +4150,7 @@ where
                     "blocking-rule-id" => Some(("blockingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "blocking-trigger-id" => Some(("blockingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "consent-settings.consent-status" => Some(("consentSettings.consentStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "consent-settings.consent-type.is-weak-reference" => Some(("consentSettings.consentType.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "consent-settings.consent-type.key" => Some(("consentSettings.consentType.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "consent-settings.consent-type.type" => Some(("consentSettings.consentType.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "consent-settings.consent-type.value" => Some(("consentSettings.consentType.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4079,6 +4159,7 @@ where
                     "firing-rule-id" => Some(("firingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "firing-trigger-id" => Some(("firingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "live-only" => Some(("liveOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "monitoring-metadata.is-weak-reference" => Some(("monitoringMetadata.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "monitoring-metadata.key" => Some(("monitoringMetadata.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "monitoring-metadata.type" => Some(("monitoringMetadata.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "monitoring-metadata.value" => Some(("monitoringMetadata.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4088,6 +4169,7 @@ where
                     "parent-folder-id" => Some(("parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "path" => Some(("path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "paused" => Some(("paused", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "priority.is-weak-reference" => Some(("priority.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "priority.key" => Some(("priority.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "priority.type" => Some(("priority.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "priority.value" => Some(("priority.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4099,7 +4181,7 @@ where
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "consent-settings", "consent-status", "consent-type", "container-id", "fingerprint", "firing-rule-id", "firing-trigger-id", "key", "live-only", "monitoring-metadata", "monitoring-metadata-tag-name-key", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "tag-firing-option", "tag-id", "tag-manager-url", "type", "value", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "consent-settings", "consent-status", "consent-type", "container-id", "fingerprint", "firing-rule-id", "firing-trigger-id", "is-weak-reference", "key", "live-only", "monitoring-metadata", "monitoring-metadata-tag-name-key", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "tag-firing-option", "tag-id", "tag-manager-url", "type", "value", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4394,6 +4476,7 @@ where
                     "blocking-rule-id" => Some(("blockingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "blocking-trigger-id" => Some(("blockingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "consent-settings.consent-status" => Some(("consentSettings.consentStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "consent-settings.consent-type.is-weak-reference" => Some(("consentSettings.consentType.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "consent-settings.consent-type.key" => Some(("consentSettings.consentType.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "consent-settings.consent-type.type" => Some(("consentSettings.consentType.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "consent-settings.consent-type.value" => Some(("consentSettings.consentType.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4402,6 +4485,7 @@ where
                     "firing-rule-id" => Some(("firingRuleId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "firing-trigger-id" => Some(("firingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "live-only" => Some(("liveOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "monitoring-metadata.is-weak-reference" => Some(("monitoringMetadata.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "monitoring-metadata.key" => Some(("monitoringMetadata.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "monitoring-metadata.type" => Some(("monitoringMetadata.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "monitoring-metadata.value" => Some(("monitoringMetadata.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4411,6 +4495,7 @@ where
                     "parent-folder-id" => Some(("parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "path" => Some(("path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "paused" => Some(("paused", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "priority.is-weak-reference" => Some(("priority.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "priority.key" => Some(("priority.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "priority.type" => Some(("priority.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "priority.value" => Some(("priority.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4422,7 +4507,7 @@ where
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "consent-settings", "consent-status", "consent-type", "container-id", "fingerprint", "firing-rule-id", "firing-trigger-id", "key", "live-only", "monitoring-metadata", "monitoring-metadata-tag-name-key", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "tag-firing-option", "tag-id", "tag-manager-url", "type", "value", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "blocking-rule-id", "blocking-trigger-id", "consent-settings", "consent-status", "consent-type", "container-id", "fingerprint", "firing-rule-id", "firing-trigger-id", "is-weak-reference", "key", "live-only", "monitoring-metadata", "monitoring-metadata-tag-name-key", "name", "notes", "parent-folder-id", "path", "paused", "priority", "schedule-end-ms", "schedule-start-ms", "tag-firing-option", "tag-id", "tag-manager-url", "type", "value", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4896,6 +4981,408 @@ where
         }
     }
 
+    async fn _accounts_containers_workspaces_transformations_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-folder-id" => Some(("parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "path" => Some(("path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag-manager-url" => Some(("tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transformation-id" => Some(("transformationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "container-id", "fingerprint", "name", "notes", "parent-folder-id", "path", "tag-manager-url", "transformation-id", "type", "workspace-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Transformation = json::value::from_value(object).unwrap();
+        let mut call = self.hub.accounts().containers_workspaces_transformations_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accounts_containers_workspaces_transformations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().containers_workspaces_transformations_delete(opt.value_of("path").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok(mut response) => {
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accounts_containers_workspaces_transformations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().containers_workspaces_transformations_get(opt.value_of("path").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accounts_containers_workspaces_transformations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().containers_workspaces_transformations_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accounts_containers_workspaces_transformations_revert(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().containers_workspaces_transformations_revert(opt.value_of("path").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "fingerprint" => {
+                    call = call.fingerprint(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["fingerprint"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accounts_containers_workspaces_transformations_update(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "parent-folder-id" => Some(("parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "path" => Some(("path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag-manager-url" => Some(("tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "transformation-id" => Some(("transformationId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "container-id", "fingerprint", "name", "notes", "parent-folder-id", "path", "tag-manager-url", "transformation-id", "type", "workspace-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Transformation = json::value::from_value(object).unwrap();
+        let mut call = self.hub.accounts().containers_workspaces_transformations_update(request, opt.value_of("path").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "fingerprint" => {
+                    call = call.fingerprint(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["fingerprint"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _accounts_containers_workspaces_triggers_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -4920,29 +5407,37 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "check-validation.is-weak-reference" => Some(("checkValidation.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "check-validation.key" => Some(("checkValidation.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "check-validation.type" => Some(("checkValidation.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "check-validation.value" => Some(("checkValidation.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "continuous-time-min-milliseconds.is-weak-reference" => Some(("continuousTimeMinMilliseconds.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "continuous-time-min-milliseconds.key" => Some(("continuousTimeMinMilliseconds.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "continuous-time-min-milliseconds.type" => Some(("continuousTimeMinMilliseconds.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "continuous-time-min-milliseconds.value" => Some(("continuousTimeMinMilliseconds.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event-name.is-weak-reference" => Some(("eventName.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "event-name.key" => Some(("eventName.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-name.type" => Some(("eventName.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-name.value" => Some(("eventName.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "horizontal-scroll-percentage-list.is-weak-reference" => Some(("horizontalScrollPercentageList.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "horizontal-scroll-percentage-list.key" => Some(("horizontalScrollPercentageList.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "horizontal-scroll-percentage-list.type" => Some(("horizontalScrollPercentageList.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "horizontal-scroll-percentage-list.value" => Some(("horizontalScrollPercentageList.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "interval.is-weak-reference" => Some(("interval.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "interval.key" => Some(("interval.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "interval.type" => Some(("interval.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "interval.value" => Some(("interval.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "interval-seconds.is-weak-reference" => Some(("intervalSeconds.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "interval-seconds.key" => Some(("intervalSeconds.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "interval-seconds.type" => Some(("intervalSeconds.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "interval-seconds.value" => Some(("intervalSeconds.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "limit.is-weak-reference" => Some(("limit.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "limit.key" => Some(("limit.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "limit.type" => Some(("limit.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "limit.value" => Some(("limit.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-timer-length-seconds.is-weak-reference" => Some(("maxTimerLengthSeconds.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "max-timer-length-seconds.key" => Some(("maxTimerLengthSeconds.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-timer-length-seconds.type" => Some(("maxTimerLengthSeconds.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-timer-length-seconds.value" => Some(("maxTimerLengthSeconds.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4950,39 +5445,48 @@ where
                     "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-folder-id" => Some(("parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "path" => Some(("path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "selector.is-weak-reference" => Some(("selector.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "selector.key" => Some(("selector.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "selector.type" => Some(("selector.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "selector.value" => Some(("selector.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag-manager-url" => Some(("tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "total-time-min-milliseconds.is-weak-reference" => Some(("totalTimeMinMilliseconds.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "total-time-min-milliseconds.key" => Some(("totalTimeMinMilliseconds.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "total-time-min-milliseconds.type" => Some(("totalTimeMinMilliseconds.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "total-time-min-milliseconds.value" => Some(("totalTimeMinMilliseconds.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger-id" => Some(("triggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "unique-trigger-id.is-weak-reference" => Some(("uniqueTriggerId.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "unique-trigger-id.key" => Some(("uniqueTriggerId.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "unique-trigger-id.type" => Some(("uniqueTriggerId.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "unique-trigger-id.value" => Some(("uniqueTriggerId.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vertical-scroll-percentage-list.is-weak-reference" => Some(("verticalScrollPercentageList.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "vertical-scroll-percentage-list.key" => Some(("verticalScrollPercentageList.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vertical-scroll-percentage-list.type" => Some(("verticalScrollPercentageList.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vertical-scroll-percentage-list.value" => Some(("verticalScrollPercentageList.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visibility-selector.is-weak-reference" => Some(("visibilitySelector.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "visibility-selector.key" => Some(("visibilitySelector.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visibility-selector.type" => Some(("visibilitySelector.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visibility-selector.value" => Some(("visibilitySelector.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visible-percentage-max.is-weak-reference" => Some(("visiblePercentageMax.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "visible-percentage-max.key" => Some(("visiblePercentageMax.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visible-percentage-max.type" => Some(("visiblePercentageMax.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visible-percentage-max.value" => Some(("visiblePercentageMax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visible-percentage-min.is-weak-reference" => Some(("visiblePercentageMin.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "visible-percentage-min.key" => Some(("visiblePercentageMin.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visible-percentage-min.type" => Some(("visiblePercentageMin.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visible-percentage-min.value" => Some(("visiblePercentageMin.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wait-for-tags.is-weak-reference" => Some(("waitForTags.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "wait-for-tags.key" => Some(("waitForTags.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "wait-for-tags.type" => Some(("waitForTags.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "wait-for-tags.value" => Some(("waitForTags.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wait-for-tags-timeout.is-weak-reference" => Some(("waitForTagsTimeout.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "wait-for-tags-timeout.key" => Some(("waitForTagsTimeout.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "wait-for-tags-timeout.type" => Some(("waitForTagsTimeout.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "wait-for-tags-timeout.value" => Some(("waitForTagsTimeout.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "check-validation", "container-id", "continuous-time-min-milliseconds", "event-name", "fingerprint", "horizontal-scroll-percentage-list", "interval", "interval-seconds", "key", "limit", "max-timer-length-seconds", "name", "notes", "parent-folder-id", "path", "selector", "tag-manager-url", "total-time-min-milliseconds", "trigger-id", "type", "unique-trigger-id", "value", "vertical-scroll-percentage-list", "visibility-selector", "visible-percentage-max", "visible-percentage-min", "wait-for-tags", "wait-for-tags-timeout", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "check-validation", "container-id", "continuous-time-min-milliseconds", "event-name", "fingerprint", "horizontal-scroll-percentage-list", "interval", "interval-seconds", "is-weak-reference", "key", "limit", "max-timer-length-seconds", "name", "notes", "parent-folder-id", "path", "selector", "tag-manager-url", "total-time-min-milliseconds", "trigger-id", "type", "unique-trigger-id", "value", "vertical-scroll-percentage-list", "visibility-selector", "visible-percentage-max", "visible-percentage-min", "wait-for-tags", "wait-for-tags-timeout", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5274,29 +5778,37 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "account-id" => Some(("accountId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "check-validation.is-weak-reference" => Some(("checkValidation.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "check-validation.key" => Some(("checkValidation.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "check-validation.type" => Some(("checkValidation.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "check-validation.value" => Some(("checkValidation.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "container-id" => Some(("containerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "continuous-time-min-milliseconds.is-weak-reference" => Some(("continuousTimeMinMilliseconds.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "continuous-time-min-milliseconds.key" => Some(("continuousTimeMinMilliseconds.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "continuous-time-min-milliseconds.type" => Some(("continuousTimeMinMilliseconds.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "continuous-time-min-milliseconds.value" => Some(("continuousTimeMinMilliseconds.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "event-name.is-weak-reference" => Some(("eventName.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "event-name.key" => Some(("eventName.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-name.type" => Some(("eventName.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-name.value" => Some(("eventName.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "horizontal-scroll-percentage-list.is-weak-reference" => Some(("horizontalScrollPercentageList.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "horizontal-scroll-percentage-list.key" => Some(("horizontalScrollPercentageList.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "horizontal-scroll-percentage-list.type" => Some(("horizontalScrollPercentageList.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "horizontal-scroll-percentage-list.value" => Some(("horizontalScrollPercentageList.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "interval.is-weak-reference" => Some(("interval.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "interval.key" => Some(("interval.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "interval.type" => Some(("interval.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "interval.value" => Some(("interval.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "interval-seconds.is-weak-reference" => Some(("intervalSeconds.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "interval-seconds.key" => Some(("intervalSeconds.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "interval-seconds.type" => Some(("intervalSeconds.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "interval-seconds.value" => Some(("intervalSeconds.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "limit.is-weak-reference" => Some(("limit.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "limit.key" => Some(("limit.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "limit.type" => Some(("limit.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "limit.value" => Some(("limit.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "max-timer-length-seconds.is-weak-reference" => Some(("maxTimerLengthSeconds.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "max-timer-length-seconds.key" => Some(("maxTimerLengthSeconds.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-timer-length-seconds.type" => Some(("maxTimerLengthSeconds.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "max-timer-length-seconds.value" => Some(("maxTimerLengthSeconds.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5304,39 +5816,48 @@ where
                     "notes" => Some(("notes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent-folder-id" => Some(("parentFolderId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "path" => Some(("path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "selector.is-weak-reference" => Some(("selector.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "selector.key" => Some(("selector.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "selector.type" => Some(("selector.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "selector.value" => Some(("selector.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag-manager-url" => Some(("tagManagerUrl", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "total-time-min-milliseconds.is-weak-reference" => Some(("totalTimeMinMilliseconds.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "total-time-min-milliseconds.key" => Some(("totalTimeMinMilliseconds.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "total-time-min-milliseconds.type" => Some(("totalTimeMinMilliseconds.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "total-time-min-milliseconds.value" => Some(("totalTimeMinMilliseconds.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "trigger-id" => Some(("triggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "unique-trigger-id.is-weak-reference" => Some(("uniqueTriggerId.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "unique-trigger-id.key" => Some(("uniqueTriggerId.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "unique-trigger-id.type" => Some(("uniqueTriggerId.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "unique-trigger-id.value" => Some(("uniqueTriggerId.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vertical-scroll-percentage-list.is-weak-reference" => Some(("verticalScrollPercentageList.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "vertical-scroll-percentage-list.key" => Some(("verticalScrollPercentageList.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vertical-scroll-percentage-list.type" => Some(("verticalScrollPercentageList.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vertical-scroll-percentage-list.value" => Some(("verticalScrollPercentageList.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visibility-selector.is-weak-reference" => Some(("visibilitySelector.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "visibility-selector.key" => Some(("visibilitySelector.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visibility-selector.type" => Some(("visibilitySelector.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visibility-selector.value" => Some(("visibilitySelector.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visible-percentage-max.is-weak-reference" => Some(("visiblePercentageMax.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "visible-percentage-max.key" => Some(("visiblePercentageMax.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visible-percentage-max.type" => Some(("visiblePercentageMax.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visible-percentage-max.value" => Some(("visiblePercentageMax.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "visible-percentage-min.is-weak-reference" => Some(("visiblePercentageMin.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "visible-percentage-min.key" => Some(("visiblePercentageMin.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visible-percentage-min.type" => Some(("visiblePercentageMin.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "visible-percentage-min.value" => Some(("visiblePercentageMin.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wait-for-tags.is-weak-reference" => Some(("waitForTags.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "wait-for-tags.key" => Some(("waitForTags.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "wait-for-tags.type" => Some(("waitForTags.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "wait-for-tags.value" => Some(("waitForTags.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "wait-for-tags-timeout.is-weak-reference" => Some(("waitForTagsTimeout.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "wait-for-tags-timeout.key" => Some(("waitForTagsTimeout.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "wait-for-tags-timeout.type" => Some(("waitForTagsTimeout.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "wait-for-tags-timeout.value" => Some(("waitForTagsTimeout.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "check-validation", "container-id", "continuous-time-min-milliseconds", "event-name", "fingerprint", "horizontal-scroll-percentage-list", "interval", "interval-seconds", "key", "limit", "max-timer-length-seconds", "name", "notes", "parent-folder-id", "path", "selector", "tag-manager-url", "total-time-min-milliseconds", "trigger-id", "type", "unique-trigger-id", "value", "vertical-scroll-percentage-list", "visibility-selector", "visible-percentage-max", "visible-percentage-min", "wait-for-tags", "wait-for-tags-timeout", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "check-validation", "container-id", "continuous-time-min-milliseconds", "event-name", "fingerprint", "horizontal-scroll-percentage-list", "interval", "interval-seconds", "is-weak-reference", "key", "limit", "max-timer-length-seconds", "name", "notes", "parent-folder-id", "path", "selector", "tag-manager-url", "total-time-min-milliseconds", "trigger-id", "type", "unique-trigger-id", "value", "vertical-scroll-percentage-list", "visibility-selector", "visible-percentage-max", "visible-percentage-min", "wait-for-tags", "wait-for-tags-timeout", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5525,15 +6046,19 @@ where
                     "enabling-trigger-id" => Some(("enablingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.case-conversion-type" => Some(("formatValue.caseConversionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-false-to-value.is-weak-reference" => Some(("formatValue.convertFalseToValue.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "format-value.convert-false-to-value.key" => Some(("formatValue.convertFalseToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-false-to-value.type" => Some(("formatValue.convertFalseToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-false-to-value.value" => Some(("formatValue.convertFalseToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-null-to-value.is-weak-reference" => Some(("formatValue.convertNullToValue.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "format-value.convert-null-to-value.key" => Some(("formatValue.convertNullToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-null-to-value.type" => Some(("formatValue.convertNullToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-null-to-value.value" => Some(("formatValue.convertNullToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-true-to-value.is-weak-reference" => Some(("formatValue.convertTrueToValue.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "format-value.convert-true-to-value.key" => Some(("formatValue.convertTrueToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-true-to-value.type" => Some(("formatValue.convertTrueToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-true-to-value.value" => Some(("formatValue.convertTrueToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-undefined-to-value.is-weak-reference" => Some(("formatValue.convertUndefinedToValue.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "format-value.convert-undefined-to-value.key" => Some(("formatValue.convertUndefinedToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-undefined-to-value.type" => Some(("formatValue.convertUndefinedToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-undefined-to-value.value" => Some(("formatValue.convertUndefinedToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5548,7 +6073,7 @@ where
                     "variable-id" => Some(("variableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "case-conversion-type", "container-id", "convert-false-to-value", "convert-null-to-value", "convert-true-to-value", "convert-undefined-to-value", "disabling-trigger-id", "enabling-trigger-id", "fingerprint", "format-value", "key", "name", "notes", "parent-folder-id", "path", "schedule-end-ms", "schedule-start-ms", "tag-manager-url", "type", "value", "variable-id", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "case-conversion-type", "container-id", "convert-false-to-value", "convert-null-to-value", "convert-true-to-value", "convert-undefined-to-value", "disabling-trigger-id", "enabling-trigger-id", "fingerprint", "format-value", "is-weak-reference", "key", "name", "notes", "parent-folder-id", "path", "schedule-end-ms", "schedule-start-ms", "tag-manager-url", "type", "value", "variable-id", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5845,15 +6370,19 @@ where
                     "enabling-trigger-id" => Some(("enablingTriggerId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "fingerprint" => Some(("fingerprint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.case-conversion-type" => Some(("formatValue.caseConversionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-false-to-value.is-weak-reference" => Some(("formatValue.convertFalseToValue.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "format-value.convert-false-to-value.key" => Some(("formatValue.convertFalseToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-false-to-value.type" => Some(("formatValue.convertFalseToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-false-to-value.value" => Some(("formatValue.convertFalseToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-null-to-value.is-weak-reference" => Some(("formatValue.convertNullToValue.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "format-value.convert-null-to-value.key" => Some(("formatValue.convertNullToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-null-to-value.type" => Some(("formatValue.convertNullToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-null-to-value.value" => Some(("formatValue.convertNullToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-true-to-value.is-weak-reference" => Some(("formatValue.convertTrueToValue.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "format-value.convert-true-to-value.key" => Some(("formatValue.convertTrueToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-true-to-value.type" => Some(("formatValue.convertTrueToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-true-to-value.value" => Some(("formatValue.convertTrueToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "format-value.convert-undefined-to-value.is-weak-reference" => Some(("formatValue.convertUndefinedToValue.isWeakReference", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "format-value.convert-undefined-to-value.key" => Some(("formatValue.convertUndefinedToValue.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-undefined-to-value.type" => Some(("formatValue.convertUndefinedToValue.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "format-value.convert-undefined-to-value.value" => Some(("formatValue.convertUndefinedToValue.value", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -5868,7 +6397,7 @@ where
                     "variable-id" => Some(("variableId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "workspace-id" => Some(("workspaceId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "case-conversion-type", "container-id", "convert-false-to-value", "convert-null-to-value", "convert-true-to-value", "convert-undefined-to-value", "disabling-trigger-id", "enabling-trigger-id", "fingerprint", "format-value", "key", "name", "notes", "parent-folder-id", "path", "schedule-end-ms", "schedule-start-ms", "tag-manager-url", "type", "value", "variable-id", "workspace-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["account-id", "case-conversion-type", "container-id", "convert-false-to-value", "convert-null-to-value", "convert-true-to-value", "convert-undefined-to-value", "disabling-trigger-id", "enabling-trigger-id", "fingerprint", "format-value", "is-weak-reference", "key", "name", "notes", "parent-folder-id", "path", "schedule-end-ms", "schedule-start-ms", "tag-manager-url", "type", "value", "variable-id", "workspace-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7091,6 +7620,24 @@ where
                     ("containers-workspaces-templates-update", Some(opt)) => {
                         call_result = self._accounts_containers_workspaces_templates_update(opt, dry_run, &mut err).await;
                     },
+                    ("containers-workspaces-transformations-create", Some(opt)) => {
+                        call_result = self._accounts_containers_workspaces_transformations_create(opt, dry_run, &mut err).await;
+                    },
+                    ("containers-workspaces-transformations-delete", Some(opt)) => {
+                        call_result = self._accounts_containers_workspaces_transformations_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("containers-workspaces-transformations-get", Some(opt)) => {
+                        call_result = self._accounts_containers_workspaces_transformations_get(opt, dry_run, &mut err).await;
+                    },
+                    ("containers-workspaces-transformations-list", Some(opt)) => {
+                        call_result = self._accounts_containers_workspaces_transformations_list(opt, dry_run, &mut err).await;
+                    },
+                    ("containers-workspaces-transformations-revert", Some(opt)) => {
+                        call_result = self._accounts_containers_workspaces_transformations_revert(opt, dry_run, &mut err).await;
+                    },
+                    ("containers-workspaces-transformations-update", Some(opt)) => {
+                        call_result = self._accounts_containers_workspaces_transformations_update(opt, dry_run, &mut err).await;
+                    },
                     ("containers-workspaces-triggers-create", Some(opt)) => {
                         call_result = self._accounts_containers_workspaces_triggers_create(opt, dry_run, &mut err).await;
                     },
@@ -7251,7 +7798,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("accounts", "methods: 'containers-combine', 'containers-create', 'containers-delete', 'containers-destinations-get', 'containers-destinations-link', 'containers-destinations-list', 'containers-environments-create', 'containers-environments-delete', 'containers-environments-get', 'containers-environments-list', 'containers-environments-reauthorize', 'containers-environments-update', 'containers-get', 'containers-list', 'containers-lookup', 'containers-move-tag-id', 'containers-snippet', 'containers-update', 'containers-version-headers-latest', 'containers-version-headers-list', 'containers-versions-delete', 'containers-versions-get', 'containers-versions-live', 'containers-versions-publish', 'containers-versions-set-latest', 'containers-versions-undelete', 'containers-versions-update', 'containers-workspaces-built-in-variables-create', 'containers-workspaces-built-in-variables-delete', 'containers-workspaces-built-in-variables-list', 'containers-workspaces-built-in-variables-revert', 'containers-workspaces-clients-create', 'containers-workspaces-clients-delete', 'containers-workspaces-clients-get', 'containers-workspaces-clients-list', 'containers-workspaces-clients-revert', 'containers-workspaces-clients-update', 'containers-workspaces-create', 'containers-workspaces-create-version', 'containers-workspaces-delete', 'containers-workspaces-folders-create', 'containers-workspaces-folders-delete', 'containers-workspaces-folders-entities', 'containers-workspaces-folders-get', 'containers-workspaces-folders-list', 'containers-workspaces-folders-move-entities-to-folder', 'containers-workspaces-folders-revert', 'containers-workspaces-folders-update', 'containers-workspaces-get', 'containers-workspaces-get-status', 'containers-workspaces-gtag-config-create', 'containers-workspaces-gtag-config-delete', 'containers-workspaces-gtag-config-get', 'containers-workspaces-gtag-config-list', 'containers-workspaces-gtag-config-update', 'containers-workspaces-list', 'containers-workspaces-quick-preview', 'containers-workspaces-resolve-conflict', 'containers-workspaces-sync', 'containers-workspaces-tags-create', 'containers-workspaces-tags-delete', 'containers-workspaces-tags-get', 'containers-workspaces-tags-list', 'containers-workspaces-tags-revert', 'containers-workspaces-tags-update', 'containers-workspaces-templates-create', 'containers-workspaces-templates-delete', 'containers-workspaces-templates-get', 'containers-workspaces-templates-list', 'containers-workspaces-templates-revert', 'containers-workspaces-templates-update', 'containers-workspaces-triggers-create', 'containers-workspaces-triggers-delete', 'containers-workspaces-triggers-get', 'containers-workspaces-triggers-list', 'containers-workspaces-triggers-revert', 'containers-workspaces-triggers-update', 'containers-workspaces-update', 'containers-workspaces-variables-create', 'containers-workspaces-variables-delete', 'containers-workspaces-variables-get', 'containers-workspaces-variables-list', 'containers-workspaces-variables-revert', 'containers-workspaces-variables-update', 'containers-workspaces-zones-create', 'containers-workspaces-zones-delete', 'containers-workspaces-zones-get', 'containers-workspaces-zones-list', 'containers-workspaces-zones-revert', 'containers-workspaces-zones-update', 'get', 'list', 'update', 'user-permissions-create', 'user-permissions-delete', 'user-permissions-get', 'user-permissions-list' and 'user-permissions-update'", vec![
+        ("accounts", "methods: 'containers-combine', 'containers-create', 'containers-delete', 'containers-destinations-get', 'containers-destinations-link', 'containers-destinations-list', 'containers-environments-create', 'containers-environments-delete', 'containers-environments-get', 'containers-environments-list', 'containers-environments-reauthorize', 'containers-environments-update', 'containers-get', 'containers-list', 'containers-lookup', 'containers-move-tag-id', 'containers-snippet', 'containers-update', 'containers-version-headers-latest', 'containers-version-headers-list', 'containers-versions-delete', 'containers-versions-get', 'containers-versions-live', 'containers-versions-publish', 'containers-versions-set-latest', 'containers-versions-undelete', 'containers-versions-update', 'containers-workspaces-built-in-variables-create', 'containers-workspaces-built-in-variables-delete', 'containers-workspaces-built-in-variables-list', 'containers-workspaces-built-in-variables-revert', 'containers-workspaces-clients-create', 'containers-workspaces-clients-delete', 'containers-workspaces-clients-get', 'containers-workspaces-clients-list', 'containers-workspaces-clients-revert', 'containers-workspaces-clients-update', 'containers-workspaces-create', 'containers-workspaces-create-version', 'containers-workspaces-delete', 'containers-workspaces-folders-create', 'containers-workspaces-folders-delete', 'containers-workspaces-folders-entities', 'containers-workspaces-folders-get', 'containers-workspaces-folders-list', 'containers-workspaces-folders-move-entities-to-folder', 'containers-workspaces-folders-revert', 'containers-workspaces-folders-update', 'containers-workspaces-get', 'containers-workspaces-get-status', 'containers-workspaces-gtag-config-create', 'containers-workspaces-gtag-config-delete', 'containers-workspaces-gtag-config-get', 'containers-workspaces-gtag-config-list', 'containers-workspaces-gtag-config-update', 'containers-workspaces-list', 'containers-workspaces-quick-preview', 'containers-workspaces-resolve-conflict', 'containers-workspaces-sync', 'containers-workspaces-tags-create', 'containers-workspaces-tags-delete', 'containers-workspaces-tags-get', 'containers-workspaces-tags-list', 'containers-workspaces-tags-revert', 'containers-workspaces-tags-update', 'containers-workspaces-templates-create', 'containers-workspaces-templates-delete', 'containers-workspaces-templates-get', 'containers-workspaces-templates-list', 'containers-workspaces-templates-revert', 'containers-workspaces-templates-update', 'containers-workspaces-transformations-create', 'containers-workspaces-transformations-delete', 'containers-workspaces-transformations-get', 'containers-workspaces-transformations-list', 'containers-workspaces-transformations-revert', 'containers-workspaces-transformations-update', 'containers-workspaces-triggers-create', 'containers-workspaces-triggers-delete', 'containers-workspaces-triggers-get', 'containers-workspaces-triggers-list', 'containers-workspaces-triggers-revert', 'containers-workspaces-triggers-update', 'containers-workspaces-update', 'containers-workspaces-variables-create', 'containers-workspaces-variables-delete', 'containers-workspaces-variables-get', 'containers-workspaces-variables-list', 'containers-workspaces-variables-revert', 'containers-workspaces-variables-update', 'containers-workspaces-zones-create', 'containers-workspaces-zones-delete', 'containers-workspaces-zones-get', 'containers-workspaces-zones-list', 'containers-workspaces-zones-revert', 'containers-workspaces-zones-update', 'get', 'list', 'update', 'user-permissions-create', 'user-permissions-delete', 'user-permissions-get', 'user-permissions-list' and 'user-permissions-update'", vec![
             ("containers-combine",
                     Some(r##"Combines Containers."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-combine",
@@ -8261,7 +8808,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("containers-workspaces-folders-move-entities-to-folder",
-                    Some(r##"Moves entities to a GTM Folder."##),
+                    Some(r##"Moves entities to a GTM Folder. If {folder_id} in the request path equals 0, this will instead move entities out of the folder they currently belong to."##),
                     "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-folders-move-entities-to-folder",
                   vec![
                     (Some(r##"path"##),
@@ -8835,6 +9382,144 @@ async fn main() {
                     (Some(r##"path"##),
                      None,
                      Some(r##"GTM Custom Template's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/templates/{template_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("containers-workspaces-transformations-create",
+                    Some(r##"Creates a GTM Transformation."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-transformations-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("containers-workspaces-transformations-delete",
+                    Some(r##"Deletes a GTM Transformation."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-transformations-delete",
+                  vec![
+                    (Some(r##"path"##),
+                     None,
+                     Some(r##"GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+                  ]),
+            ("containers-workspaces-transformations-get",
+                    Some(r##"Gets a GTM Transformation."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-transformations-get",
+                  vec![
+                    (Some(r##"path"##),
+                     None,
+                     Some(r##"GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("containers-workspaces-transformations-list",
+                    Some(r##"Lists all GTM Transformations of a GTM container workspace."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-transformations-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("containers-workspaces-transformations-revert",
+                    Some(r##"Reverts changes to a GTM Transformation in a GTM Workspace."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-transformations-revert",
+                  vec![
+                    (Some(r##"path"##),
+                     None,
+                     Some(r##"GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("containers-workspaces-transformations-update",
+                    Some(r##"Updates a GTM Transformation."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_tagmanager2_cli/accounts_containers-workspaces-transformations-update",
+                  vec![
+                    (Some(r##"path"##),
+                     None,
+                     Some(r##"GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}"##),
                      Some(true),
                      Some(false)),
         
@@ -9486,7 +10171,7 @@ async fn main() {
     
     let mut app = App::new("tagmanager2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
+           .version("5.0.4+20240228")
            .about("This API allows clients to access and modify container and tag configuration.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_tagmanager2_cli")
            .arg(Arg::with_name("url")

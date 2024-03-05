@@ -4,7 +4,7 @@
 [package]
 
 name = "google-translate2-cli"
-version = "5.0.3+20170525"
+version = "5.0.4+20170525"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Translate (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/translate2-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-translate2]
 path = "../translate2"
-version = "5.0.3+20170525"
+version = "5.0.4+20170525"
 

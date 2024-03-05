@@ -4,12 +4,12 @@
 [package]
 
 name = "google-fcmdata1_beta1"
-version = "5.0.3+20230123"
+version = "5.0.4+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Fcmdata (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/fcmdata1_beta1"
 homepage = "https://firebase.google.com/docs/cloud-messaging"
-documentation = "https://docs.rs/google-fcmdata1_beta1/5.0.3+20230123"
+documentation = "https://docs.rs/google-fcmdata1_beta1/5.0.4+20240303"
 license = "MIT"
 keywords = ["fcmdata", "google", "protocol", "web", "api"]
 autobins = false

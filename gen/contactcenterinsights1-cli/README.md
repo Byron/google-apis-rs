@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Contactcenterinsights* API at revision *20230115*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Contactcenterinsights* API at revision *20240226*. The CLI is at version *5.0.4*.
 
 ```bash
 contactcenterinsights1 [options]
@@ -35,6 +35,7 @@ contactcenterinsights1 [options]
                 locations-conversations-analyses-get <name> [-p <v>]... [-o <out>]
                 locations-conversations-analyses-list <parent> [-p <v>]... [-o <out>]
                 locations-conversations-bulk-analyze <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversations-bulk-delete <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-conversations-calculate-stats <location> [-p <v>]... [-o <out>]
                 locations-conversations-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-conversations-delete <name> [-p <v>]... [-o <out>]
@@ -42,13 +43,16 @@ contactcenterinsights1 [options]
                 locations-conversations-ingest <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-conversations-list <parent> [-p <v>]... [-o <out>]
                 locations-conversations-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-conversations-upload <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get-settings <name> [-p <v>]... [-o <out>]
                 locations-insightsdata-export <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-issue-models-calculate-issue-model-stats <issue-model> [-p <v>]... [-o <out>]
                 locations-issue-models-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-issue-models-delete <name> [-p <v>]... [-o <out>]
                 locations-issue-models-deploy <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-issue-models-export <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-issue-models-get <name> [-p <v>]... [-o <out>]
+                locations-issue-models-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-issue-models-issues-delete <name> [-p <v>]... [-o <out>]
                 locations-issue-models-issues-get <name> [-p <v>]... [-o <out>]
                 locations-issue-models-issues-list <parent> [-p <v>]... [-o <out>]

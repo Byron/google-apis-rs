@@ -4,12 +4,12 @@
 [package]
 
 name = "google-mybusinessbusinessinformation1"
-version = "5.0.3+20230124"
+version = "5.0.4+20240304"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with My Business Business Information (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinessbusinessinformation1"
 homepage = "https://developers.google.com/my-business/"
-documentation = "https://docs.rs/google-mybusinessbusinessinformation1/5.0.3+20230124"
+documentation = "https://docs.rs/google-mybusinessbusinessinformation1/5.0.4+20240304"
 license = "MIT"
 keywords = ["mybusinessbusinessin", "google", "protocol", "web", "api"]
 autobins = false

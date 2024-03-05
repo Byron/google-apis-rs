@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud KMS* API at revision *20230106*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud KMS* API at revision *20240219*. The CLI is at version *5.0.4*.
 
 ```bash
 cloudkms1 [options]
@@ -40,8 +40,10 @@ cloudkms1 [options]
                 locations-ekm-connections-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-ekm-connections-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-ekm-connections-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-ekm-connections-verify-connectivity <name> [-p <v>]... [-o <out>]
                 locations-generate-random-bytes <location> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
+                locations-get-ekm-config <name> [-p <v>]... [-o <out>]
                 locations-key-rings-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -55,6 +57,8 @@ cloudkms1 [options]
                 locations-key-rings-crypto-keys-crypto-key-versions-mac-sign <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-mac-verify <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-key-rings-crypto-keys-crypto-key-versions-raw-decrypt <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-key-rings-crypto-keys-crypto-key-versions-raw-encrypt <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-crypto-key-versions-restore <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-decrypt <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-crypto-keys-encrypt <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -77,6 +81,7 @@ cloudkms1 [options]
                 locations-key-rings-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-key-rings-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
+                locations-update-ekm-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
   cloudkms1 --help
 
 Configuration:

@@ -1,4 +1,4 @@
-site_name: Managed Service for Microsoft Active Directory Consumer API v5.0.3+20221227
+site_name: Managed Service for Microsoft Active Directory Consumer API v5.0.4+20240112
 site_url: http://byron.github.io/google-apis-rs/google-managedidentities1-cli
 site_description: A complete library to interact with Managed Service for Microsoft Active Directory Consumer API (protocol v1)
 
@@ -20,9 +20,13 @@ nav:
     - 'Locations Global Domains Backups Patch': 'projects_locations-global-domains-backups-patch.md'
     - 'Locations Global Domains Backups Set Iam Policy': 'projects_locations-global-domains-backups-set-iam-policy.md'
     - 'Locations Global Domains Backups Test Iam Permissions': 'projects_locations-global-domains-backups-test-iam-permissions.md'
+    - 'Locations Global Domains Check Migration Permission': 'projects_locations-global-domains-check-migration-permission.md'
     - 'Locations Global Domains Create': 'projects_locations-global-domains-create.md'
     - 'Locations Global Domains Delete': 'projects_locations-global-domains-delete.md'
     - 'Locations Global Domains Detach Trust': 'projects_locations-global-domains-detach-trust.md'
+    - 'Locations Global Domains Disable Migration': 'projects_locations-global-domains-disable-migration.md'
+    - 'Locations Global Domains Domain Join Machine': 'projects_locations-global-domains-domain-join-machine.md'
+    - 'Locations Global Domains Enable Migration': 'projects_locations-global-domains-enable-migration.md'
     - 'Locations Global Domains Extend Schema': 'projects_locations-global-domains-extend-schema.md'
     - 'Locations Global Domains Get': 'projects_locations-global-domains-get.md'
     - 'Locations Global Domains Get Iam Policy': 'projects_locations-global-domains-get-iam-policy.md'

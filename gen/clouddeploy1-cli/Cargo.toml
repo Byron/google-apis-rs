@@ -4,7 +4,7 @@
 [package]
 
 name = "google-clouddeploy1-cli"
-version = "5.0.3+20230105"
+version = "5.0.4+20240221"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Deploy (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/clouddeploy1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-clouddeploy1]
 path = "../clouddeploy1"
-version = "5.0.3+20230105"
+version = "5.0.4+20240221"
 

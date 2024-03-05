@@ -1991,8 +1991,10 @@ where
                 match &temp_cursor.to_string()[..] {
                     "email-address" => Some(("emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary-key-pair-id" => Some(("primaryKeyPairId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sign-and-encrypt-key-pairs.encryption-key-pair-id" => Some(("signAndEncryptKeyPairs.encryptionKeyPairId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sign-and-encrypt-key-pairs.signing-key-pair-id" => Some(("signAndEncryptKeyPairs.signingKeyPairId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["email-address", "primary-key-pair-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["email-address", "encryption-key-pair-id", "primary-key-pair-id", "sign-and-encrypt-key-pairs", "signing-key-pair-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2232,8 +2234,10 @@ where
                 match &temp_cursor.to_string()[..] {
                     "email-address" => Some(("emailAddress", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "primary-key-pair-id" => Some(("primaryKeyPairId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sign-and-encrypt-key-pairs.encryption-key-pair-id" => Some(("signAndEncryptKeyPairs.encryptionKeyPairId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sign-and-encrypt-key-pairs.signing-key-pair-id" => Some(("signAndEncryptKeyPairs.signingKeyPairId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["email-address", "primary-key-pair-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["email-address", "encryption-key-pair-id", "primary-key-pair-id", "sign-and-encrypt-key-pairs", "signing-key-pair-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -5344,10 +5348,11 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "label-filter-action" => Some(("labelFilterAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "label-filter-behavior" => Some(("labelFilterBehavior", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "label-ids" => Some(("labelIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "topic-name" => Some(("topicName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["label-filter-action", "label-ids", "topic-name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["label-filter-action", "label-filter-behavior", "label-ids", "topic-name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6253,7 +6258,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("messages-import",
-                    Some(r##"Imports a message into only this user's mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. This method doesn't perform SPF checks, so it might not work for some spam messages, such as those attempting to perform domain spoofing. This method does not send a message. Note: This function doesn't trigger forwarding rules or filters set up by the user."##),
+                    Some(r##"Imports a message into only this user's mailbox, with standard email delivery scanning and classification similar to receiving via SMTP. This method doesn't perform SPF checks, so it might not work for some spam messages, such as those attempting to perform domain spoofing. This method does not send a message."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_messages-import",
                   vec![
                     (Some(r##"user-id"##),
@@ -6377,7 +6382,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("messages-send",
-                    Some(r##"Sends the specified message to the recipients in the `To`, `Cc`, and `Bcc` headers."##),
+                    Some(r##"Sends the specified message to the recipients in the `To`, `Cc`, and `Bcc` headers. For example usage, see [Sending email](https://developers.google.com/gmail/api/guides/sending)."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_messages-send",
                   vec![
                     (Some(r##"user-id"##),
@@ -6775,7 +6780,7 @@ async fn main() {
                      Some(true)),
                   ]),
             ("settings-delegates-create",
-                    Some(r##"Adds a delegate with its verification status set directly to `accepted`, without sending any verification email. The delegate user must be a member of the same G Suite organization as the delegator user. Gmail imposes limitations on the number of delegates and delegators each user in a G Suite organization can have. These limits depend on your organization, but in general each user can have up to 25 delegates and up to 10 delegators. Note that a delegate user must be referred to by their primary email address, and not an email alias. Also note that when a new delegate is created, there may be up to a one minute delay before the new delegate is available for use. This method is only available to service account clients that have been delegated domain-wide authority."##),
+                    Some(r##"Adds a delegate with its verification status set directly to `accepted`, without sending any verification email. The delegate user must be a member of the same Google Workspace organization as the delegator user. Gmail imposes limitations on the number of delegates and delegators each user in a Google Workspace organization can have. These limits depend on your organization, but in general each user can have up to 25 delegates and up to 10 delegators. Note that a delegate user must be referred to by their primary email address, and not an email alias. Also note that when a new delegate is created, there may be up to a one minute delay before the new delegate is available for use. This method is only available to service account clients that have been delegated domain-wide authority."##),
                     "Details at http://byron.github.io/google-apis-rs/google_gmail1_cli/users_settings-delegates-create",
                   vec![
                     (Some(r##"user-id"##),
@@ -7878,7 +7883,7 @@ async fn main() {
     
     let mut app = App::new("gmail1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230116")
+           .version("5.0.4+20240226")
            .about("The Gmail API lets you view and manage Gmail mailbox data like threads, messages, and labels.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_gmail1_cli")
            .arg(Arg::with_name("url")

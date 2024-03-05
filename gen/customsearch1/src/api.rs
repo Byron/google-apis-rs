@@ -128,7 +128,7 @@ impl<'a, S> CustomSearchAPI<S> {
         CustomSearchAPI {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://customsearch.googleapis.com/".to_string(),
             _root_url: "https://customsearch.googleapis.com/".to_string(),
         }
@@ -139,7 +139,7 @@ impl<'a, S> CustomSearchAPI<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -361,7 +361,7 @@ impl client::Part for PromotionImage {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultImage {
-    /// The size of the image, in pixels.
+    /// The size of the image, in bytes.
     #[serde(rename="byteSize")]
     
     pub byte_size: Option<i32>,
@@ -1444,7 +1444,7 @@ where
         self._rights = Some(new_value.to_string());
         self
     }
-    /// Specifies that all search results should be pages that are related to the specified URL.
+    /// Deprecated.
     ///
     /// Sets the *related site* query property to the given value.
     pub fn related_site(mut self, new_value: &str) -> CseSiterestrictListCall<'a, S> {
@@ -2014,7 +2014,7 @@ where
         self._rights = Some(new_value.to_string());
         self
     }
-    /// Specifies that all search results should be pages that are related to the specified URL.
+    /// Deprecated.
     ///
     /// Sets the *related site* query property to the given value.
     pub fn related_site(mut self, new_value: &str) -> CseListCall<'a, S> {

@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -81,9 +81,10 @@ impl Default for Scope {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cases().list("parent")
-///              .page_token("takimata")
-///              .page_size(-52)
-///              .filter("duo")
+///              .product_line("duo")
+///              .page_token("ipsum")
+///              .page_size(-62)
+///              .filter("Lorem")
 ///              .doit().await;
 /// 
 /// match result {
@@ -122,15 +123,12 @@ impl<'a, S> CloudSupport<S> {
         CloudSupport {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://cloudsupport.googleapis.com/".to_string(),
             _root_url: "https://cloudsupport.googleapis.com/".to_string(),
         }
     }
 
-    pub fn attachments(&'a self) -> AttachmentMethods<'a, S> {
-        AttachmentMethods { hub: &self }
-    }
     pub fn case_classifications(&'a self) -> CaseClassificationMethods<'a, S> {
         CaseClassificationMethods { hub: &self }
     }
@@ -142,7 +140,7 @@ impl<'a, S> CloudSupport<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -170,7 +168,7 @@ impl<'a, S> CloudSupport<S> {
 // ############
 // SCHEMAS ###
 // ##########
-/// An object containing information about the effective user and authenticated principal responsible for an action.
+/// An Actor represents an entity that performed an action. For example, an actor could be a user who posted a comment on a support case, a user who uploaded an attachment, or a service account that created a support case.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -181,26 +179,28 @@ pub struct Actor {
     #[serde(rename="displayName")]
     
     pub display_name: Option<String>,
-    /// The email address of the actor. If not provided, it is inferred from credentials supplied during case creation. If the authenticated principal does not have an email address, one must be provided. When a name is provided, an email must also be provided. This will be obfuscated if the user is a Google Support agent.
+    /// The email address of the actor. If not provided, it is inferred from the credentials supplied during case creation. When a name is provided, an email must also be provided. If the user is a Google Support agent, this is obfuscated. This field is deprecated. Use **username** field instead.
     
     pub email: Option<String>,
     /// Output only. Whether the actor is a Google support actor.
     #[serde(rename="googleSupport")]
     
     pub google_support: Option<bool>,
+    /// Output only. The username of the actor. It may look like an email or other format provided by the identity provider. If not provided, it is inferred from the credentials supplied. When a name is provided, a username must also be provided. If the user is a Google Support agent, this will not be set.
+    
+    pub username: Option<String>,
 }
 
 impl client::Part for Actor {}
 
 
-/// Represents a file attached to a support case.
+/// An Attachment contains metadata about a file that was uploaded to a case - it is NOT a file itself. That being said, the name of an Attachment object can be used to download its accompanying file through the `media.download` endpoint. While attachments can be uploaded in the console at the same time as a comment, they’re associated on a “case” level, not a “comment” level.
 /// 
 /// # Activities
 /// 
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [create attachments](AttachmentCreateCall) (response)
 /// * [upload media](MediaUploadCall) (response)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -229,7 +229,6 @@ pub struct Attachment {
     pub size_bytes: Option<i64>,
 }
 
-impl client::Resource for Attachment {}
 impl client::ResponseResult for Attachment {}
 
 
@@ -252,7 +251,7 @@ pub struct Blobstore2Info {
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="downloadReadHandle")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub download_read_handle: Option<Vec<u8>>,
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="readToken")]
@@ -261,14 +260,14 @@ pub struct Blobstore2Info {
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="uploadMetadataContainer")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub upload_metadata_container: Option<Vec<u8>>,
 }
 
 impl client::Part for Blobstore2Info {}
 
 
-/// A support case.
+/// A Case is an object that contains the details of a support case. It contains fields for the time it was created, its priority, its classification, and more. Cases can also have comments and attachments that get added over time. A case is parented by a Google Cloud organization or project. Organizations are identified by a number, so the name of a case parented by an organization would look like this: `organizations/123/cases/456` Projects have two unique identifiers, an ID and a number, and they look like this: `projects/abc/cases/456` `projects/123/cases/456` You can use either of them when calling the API. To learn more about project identifiers, see [AIP-2510](https://google.aip.dev/cloud/2510).
 /// 
 /// # Activities
 /// 
@@ -291,6 +290,10 @@ pub struct Case {
     /// The issue classification applicable to this case.
     
     pub classification: Option<CaseClassification>,
+    /// A user-supplied email address to send case update notifications for. This should only be used in BYOID flows, where we cannot infer the user's email address directly from their EUCs.
+    #[serde(rename="contactEmail")]
+    
+    pub contact_email: Option<String>,
     /// Output only. The time this case was created.
     #[serde(rename="createTime")]
     
@@ -315,10 +318,10 @@ pub struct Case {
     /// The resource name for the case.
     
     pub name: Option<String>,
-    /// The priority of this case. If this is set, do not set severity.
+    /// The priority of this case.
     
     pub priority: Option<String>,
-    /// The severity of this case. Deprecated. Use priority instead.
+    /// REMOVED. The severity of this case. Use priority instead.
     
     pub severity: Option<String>,
     /// Output only. The current status of the support case.
@@ -347,7 +350,7 @@ impl client::Resource for Case {}
 impl client::ResponseResult for Case {}
 
 
-/// A classification object with a product type and value.
+/// A Case Classification represents the topic that a case is about. It’s very important to use accurate classifications, because they’re used to route your cases to specialists who can help you. A classification always has an ID that is its unique identifier. A valid ID is required when creating a case.
 /// 
 /// # Activities
 /// 
@@ -358,13 +361,16 @@ impl client::ResponseResult for Case {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CaseClassification {
-    /// The display name of the classification.
+    /// A display name for the classification. The display name is not static and can change. To uniquely and consistently identify classifications, use the `CaseClassification.id` field.
     #[serde(rename="displayName")]
     
     pub display_name: Option<String>,
-    /// The unique ID for a classification. Must be specified for case creation. To retrieve valid classification IDs for case creation, use `caseClassifications.search`.
+    /// The unique ID for a classification. Must be specified for case creation. To retrieve valid classification IDs for case creation, use `caseClassifications.search`. Classification IDs returned by `caseClassifications.search` are guaranteed to be valid for at least 6 months. If a given classification is deactiveated, it will immediately stop being returned. After 6 months, `case.create` requests using the classification ID will fail.
     
     pub id: Option<String>,
+    /// The full product the classification corresponds to.
+    
+    pub product: Option<Product>,
 }
 
 impl client::Resource for CaseClassification {}
@@ -385,7 +391,7 @@ pub struct CloseCaseRequest { _never_set: Option<bool> }
 impl client::RequestValue for CloseCaseRequest {}
 
 
-/// A comment associated with a support case.
+/// Case comments are the main way Google Support communicates with a user who has opened a case. When a user responds to Google Support, the user’s responses also appear as comments.
 /// 
 /// # Activities
 /// 
@@ -396,7 +402,7 @@ impl client::RequestValue for CloseCaseRequest {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Comment {
-    /// The full comment body. Maximum of 120000 characters. This can contain rich text syntax.
+    /// The full comment body. Maximum of 12800 characters. This can contain rich text syntax.
     
     pub body: Option<String>,
     /// Output only. The time when this comment was created.
@@ -409,7 +415,7 @@ pub struct Comment {
     /// Output only. The resource name for the comment.
     
     pub name: Option<String>,
-    /// Output only. An automatically generated plain text version of body with all rich text syntax stripped.
+    /// Output only. DEPRECATED. An automatically generated plain text version of body with all rich text syntax stripped.
     #[serde(rename="plainTextBody")]
     
     pub plain_text_body: Option<String>,
@@ -429,7 +435,7 @@ pub struct CompositeMedia {
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="blobRef")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub blob_ref: Option<Vec<u8>>,
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="blobstore2Info")]
@@ -438,7 +444,7 @@ pub struct CompositeMedia {
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="cosmoBinaryReference")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub cosmo_binary_reference: Option<Vec<u8>>,
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="crc32cHash")]
@@ -446,7 +452,7 @@ pub struct CompositeMedia {
     pub crc32c_hash: Option<u32>,
     /// # gdata.* are outside protos with mising documentation
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub inline: Option<Vec<u8>>,
     /// # gdata.* are outside protos with mising documentation
     
@@ -455,7 +461,7 @@ pub struct CompositeMedia {
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="md5Hash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub md5_hash: Option<Vec<u8>>,
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="objectId")]
@@ -471,7 +477,7 @@ pub struct CompositeMedia {
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="sha1Hash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub sha1_hash: Option<Vec<u8>>,
 }
 
@@ -517,7 +523,6 @@ impl client::Part for ContentTypeInfo {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
-/// * [create attachments](AttachmentCreateCall) (request)
 /// * [upload media](MediaUploadCall) (request)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
@@ -676,7 +681,7 @@ impl client::Part for DownloadParameters {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EscalateCaseRequest {
-    /// The escalation object to be sent with the escalation request.
+    /// The escalation information to be sent with the escalation request.
     
     pub escalation: Option<Escalation>,
 }
@@ -713,10 +718,10 @@ impl client::Part for Escalation {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListAttachmentsResponse {
-    /// The list of attachments associated with the given case.
+    /// The list of attachments associated with a case.
     
     pub attachments: Option<Vec<Attachment>>,
-    /// A token to retrieve the next page of results. This should be set in the `page_token` field of subsequent `cases.attachments.list` requests. If unspecified, there are no more results to retrieve.
+    /// A token to retrieve the next page of results. Set this in the `page_token` field of subsequent `cases.attachments.list` requests. If unspecified, there are no more results to retrieve.
     #[serde(rename="nextPageToken")]
     
     pub next_page_token: Option<String>,
@@ -736,10 +741,10 @@ impl client::ResponseResult for ListAttachmentsResponse {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListCasesResponse {
-    /// The list of cases associated with the cloud resource, after any filters have been applied.
+    /// The list of cases associated with the parent after any filters have been applied.
     
     pub cases: Option<Vec<Case>>,
-    /// A token to retrieve the next page of results. This should be set in the `page_token` field of subsequent `ListCasesRequest` message that is issued. If unspecified, there are no more results to retrieve.
+    /// A token to retrieve the next page of results. Set this in the `page_token` field of subsequent `cases.list` requests. If unspecified, there are no more results to retrieve.
     #[serde(rename="nextPageToken")]
     
     pub next_page_token: Option<String>,
@@ -759,10 +764,10 @@ impl client::ResponseResult for ListCasesResponse {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListCommentsResponse {
-    /// The list of Comments associated with the given Case.
+    /// List of the comments associated with the case.
     
     pub comments: Option<Vec<Comment>>,
-    /// A token to retrieve the next page of results. This should be set in the `page_token` field of subsequent `ListCommentsRequest` message that is issued. If unspecified, there are no more results to retrieve.
+    /// A token to retrieve the next page of results. Set this in the `page_token` field of subsequent `cases.comments.list` requests. If unspecified, there are no more results to retrieve.
     #[serde(rename="nextPageToken")]
     
     pub next_page_token: Option<String>,
@@ -788,12 +793,12 @@ pub struct Media {
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="bigstoreObjectRef")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub bigstore_object_ref: Option<Vec<u8>>,
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="blobRef")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub blob_ref: Option<Vec<u8>>,
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="blobstore2Info")]
@@ -814,7 +819,7 @@ pub struct Media {
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="cosmoBinaryReference")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub cosmo_binary_reference: Option<Vec<u8>>,
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="crc32cHash")]
@@ -856,7 +861,7 @@ pub struct Media {
     pub hash_verified: Option<bool>,
     /// # gdata.* are outside protos with mising documentation
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub inline: Option<Vec<u8>>,
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="isPotentialRetry")]
@@ -869,12 +874,12 @@ pub struct Media {
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="md5Hash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub md5_hash: Option<Vec<u8>>,
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="mediaId")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub media_id: Option<Vec<u8>>,
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="objectId")]
@@ -890,12 +895,12 @@ pub struct Media {
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="sha1Hash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub sha1_hash: Option<Vec<u8>>,
     /// # gdata.* are outside protos with mising documentation
     #[serde(rename="sha256Hash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub sha256_hash: Option<Vec<u8>>,
     /// # gdata.* are outside protos with mising documentation
     
@@ -933,6 +938,26 @@ pub struct ObjectId {
 impl client::Part for ObjectId {}
 
 
+/// The full product a case may be associated with, including Product Line and Product Subline.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Product {
+    /// The Product Line of the Product.
+    #[serde(rename="productLine")]
+    
+    pub product_line: Option<String>,
+    /// The Product Subline of the Product, such as "Maps Billing".
+    #[serde(rename="productSubline")]
+    
+    pub product_subline: Option<String>,
+}
+
+impl client::Part for Product {}
+
+
 /// The response message for SearchCaseClassifications endpoint.
 /// 
 /// # Activities
@@ -948,7 +973,7 @@ pub struct SearchCaseClassificationsResponse {
     #[serde(rename="caseClassifications")]
     
     pub case_classifications: Option<Vec<CaseClassification>>,
-    /// A token to retrieve the next page of results. This should be set in the `page_token` field of subsequent `SearchCaseClassificationsRequest` message that is issued. If unspecified, there are no more results to retrieve.
+    /// A token to retrieve the next page of results. Set this in the `page_token` field of subsequent `caseClassifications.list` requests. If unspecified, there are no more results to retrieve.
     #[serde(rename="nextPageToken")]
     
     pub next_page_token: Option<String>,
@@ -968,10 +993,10 @@ impl client::ResponseResult for SearchCaseClassificationsResponse {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchCasesResponse {
-    /// The list of Case associated with the cloud resource, after any filters have been applied.
+    /// The list of cases associated with the parent after any filters have been applied.
     
     pub cases: Option<Vec<Case>>,
-    /// A token to retrieve the next page of results. This should be set in the `page_token` field of subsequent `SearchCaseRequest` message that is issued. If unspecified, there are no more results to retrieve.
+    /// A token to retrieve the next page of results. Set this in the `page_token` field of subsequent `cases.search` requests. If unspecified, there are no more results to retrieve.
     #[serde(rename="nextPageToken")]
     
     pub next_page_token: Option<String>,
@@ -984,66 +1009,6 @@ impl client::ResponseResult for SearchCasesResponse {}
 // ###################
 // MethodBuilders ###
 // #################
-
-/// A builder providing access to all methods supported on *attachment* resources.
-/// It is not used directly, but through the [`CloudSupport`] hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate google_cloudsupport2_beta as cloudsupport2_beta;
-/// 
-/// # async fn dox() {
-/// use std::default::Default;
-/// use cloudsupport2_beta::{CloudSupport, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `create(...)`
-/// // to build up your call.
-/// let rb = hub.attachments();
-/// # }
-/// ```
-pub struct AttachmentMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudSupport<S>,
-}
-
-impl<'a, S> client::MethodsBuilder for AttachmentMethods<'a, S> {}
-
-impl<'a, S> AttachmentMethods<'a, S> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Create a file attachment on a case or Cloud resource. The attachment object must have the following fields set: filename.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `parent` - Required. The resource name of the case (or case parent) to which the attachment should be attached.
-    pub fn create(&self, request: CreateAttachmentRequest, parent: &str) -> AttachmentCreateCall<'a, S> {
-        AttachmentCreateCall {
-            hub: self.hub,
-            _request: request,
-            _parent: parent.to_string(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-}
-
-
 
 /// A builder providing access to all methods supported on *caseClassification* resources.
 /// It is not used directly, but through the [`CloudSupport`] hub.
@@ -1085,11 +1050,13 @@ impl<'a, S> CaseClassificationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve valid classifications to be used when creating a support case. The classications are hierarchical, with each classification containing all levels of the hierarchy, separated by " > ". For example "Technical Issue > Compute > Compute Engine".
+    /// Retrieve valid classifications to use when creating a support case. Classifications are hierarchical. Each classification is a string containing all levels of the hierarchy separated by `" > "`. For example, `"Technical Issue > Compute > Compute Engine"`. Classification IDs returned by this endpoint are valid for at least six months. When a classification is deactivated, this endpoint immediately stops returning it. After six months, `case.create` requests using the classification will fail. EXAMPLES: cURL: ```shell curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ 'https://cloudsupport.googleapis.com/v2/caseClassifications:search?query=display_name:"*Compute%20Engine*"' ``` Python: ```python import googleapiclient.discovery supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version="v2", discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version=v2", ) request = supportApiService.caseClassifications().search( query='display_name:"*Compute Engine*"' ) print(request.execute()) ```
     pub fn search(&self) -> CaseClassificationSearchCall<'a, S> {
         CaseClassificationSearchCall {
             hub: self.hub,
             _query: Default::default(),
+            _product_product_subline: Default::default(),
+            _product_product_line: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _delegate: Default::default(),
@@ -1141,11 +1108,11 @@ impl<'a, S> CaseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve all attachments associated with a support case.
+    /// List all the attachments associated with a support case. EXAMPLES: cURL: ```shell case="projects/some-project/cases/23598314" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$case/attachments" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = ( supportApiService.cases() .attachments() .list(parent="projects/some-project/cases/43595344") ) print(request.execute()) ```
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The resource name of Case object for which attachments should be listed.
+    /// * `parent` - Required. The name of the case for which attachments should be listed.
     pub fn attachments_list(&self, parent: &str) -> CaseAttachmentListCall<'a, S> {
         CaseAttachmentListCall {
             hub: self.hub,
@@ -1160,12 +1127,12 @@ impl<'a, S> CaseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Add a new comment to the specified Case. The comment object must have the following fields set: body.
+    /// Add a new comment to a case. The comment must have the following fields set: `body`. EXAMPLES: cURL: ```shell case="projects/some-project/cases/43591344" curl \ --request POST \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ --header 'Content-Type: application/json' \ --data '{ "body": "This is a test comment." }' \ "https://cloudsupport.googleapis.com/v2/$case/comments" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = ( supportApiService.cases() .comments() .create( parent="projects/some-project/cases/43595344", body={"body": "This is a test comment."}, ) ) print(request.execute()) ```
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The resource name of Case to which this comment should be added.
+    /// * `parent` - Required. The name of the case to which the comment should be added.
     pub fn comments_create(&self, request: Comment, parent: &str) -> CaseCommentCreateCall<'a, S> {
         CaseCommentCreateCall {
             hub: self.hub,
@@ -1179,11 +1146,11 @@ impl<'a, S> CaseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve all Comments associated with the Case object.
+    /// List all the comments associated with a case. EXAMPLES: cURL: ```shell case="projects/some-project/cases/43595344" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$case/comments" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = ( supportApiService.cases() .comments() .list(parent="projects/some-project/cases/43595344") ) print(request.execute()) ```
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The resource name of Case object for which comments should be listed.
+    /// * `parent` - Required. The name of the case for which to list comments.
     pub fn comments_list(&self, parent: &str) -> CaseCommentListCall<'a, S> {
         CaseCommentListCall {
             hub: self.hub,
@@ -1198,12 +1165,12 @@ impl<'a, S> CaseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Close the specified case.
+    /// Close a case. EXAMPLES: cURL: ```shell case="projects/some-project/cases/43595344" curl \ --request POST \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$case:close" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().close( name="projects/some-project/cases/43595344" ) print(request.execute()) ```
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The fully qualified name of the case resource to be closed.
+    /// * `name` - Required. The name of the case to close.
     pub fn close(&self, request: CloseCaseRequest, name: &str) -> CaseCloseCall<'a, S> {
         CaseCloseCall {
             hub: self.hub,
@@ -1217,12 +1184,12 @@ impl<'a, S> CaseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a new case and associate it with the given Cloud resource. The case object must have the following fields set: display_name, description, classification, and severity.
+    /// Create a new case and associate it with a parent. It must have the following fields set: `display_name`, `description`, `classification`, and `priority`. If you're just testing the API and don't want to route your case to an agent, set `testCase=true`. EXAMPLES: cURL: ```shell parent="projects/some-project" curl \ --request POST \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ --header 'Content-Type: application/json' \ --data '{ "display_name": "Test case created by me.", "description": "a random test case, feel free to close", "classification": { "id": "100IK2AKCLHMGRJ9CDGMOCGP8DM6UTB4BT262T31BT1M2T31DHNMENPO6KS36CPJ786L2TBFEHGN6NPI64R3CDHN8880G08I1H3MURR7DHII0GRCDTQM8" }, "time_zone": "-07:00", "subscriber_email_addresses": [ "foo@domain.com", "bar@domain.com" ], "testCase": true, "priority": "P3" }' \ "https://cloudsupport.googleapis.com/v2/$parent/cases" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().create( parent="projects/some-project", body={ "displayName": "A Test Case", "description": "This is a test case.", "testCase": True, "priority": "P2", "classification": { "id": "100IK2AKCLHMGRJ9CDGMOCGP8DM6UTB4BT262T31BT1M2T31DHNMENPO6KS36CPJ786L2TBFEHGN6NPI64R3CDHN8880G08I1H3MURR7DHII0GRCDTQM8" }, }, ) print(request.execute()) ```
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The name of the Cloud resource under which the case should be created.
+    /// * `parent` - Required. The name of the parent under which the case should be created.
     pub fn create(&self, request: Case, parent: &str) -> CaseCreateCall<'a, S> {
         CaseCreateCall {
             hub: self.hub,
@@ -1236,12 +1203,12 @@ impl<'a, S> CaseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Escalate a case. Escalating a case will initiate the Cloud Support escalation management process. This operation is only available to certain Customer Care tiers. Go to https://cloud.google.com/support and look for 'Technical support escalations' in the feature list to find out which tiers are able to perform escalations.
+    /// Escalate a case, starting the Google Cloud Support escalation management process. This operation is only available for some support services. Go to https://cloud.google.com/support and look for 'Technical support escalations' in the feature list to find out which ones let you do that. EXAMPLES: cURL: ```shell case="projects/some-project/cases/43595344" curl \ --request POST \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ --header "Content-Type: application/json" \ --data '{ "escalation": { "reason": "BUSINESS_IMPACT", "justification": "This is a test escalation." } }' \ "https://cloudsupport.googleapis.com/v2/$case:escalate" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().escalate( name="projects/some-project/cases/43595344", body={ "escalation": { "reason": "BUSINESS_IMPACT", "justification": "This is a test escalation.", }, }, ) print(request.execute()) ```
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - Required. The fully qualified name of the Case resource to be escalated.
+    /// * `name` - Required. The name of the case to be escalated.
     pub fn escalate(&self, request: EscalateCaseRequest, name: &str) -> CaseEscalateCall<'a, S> {
         CaseEscalateCall {
             hub: self.hub,
@@ -1255,11 +1222,11 @@ impl<'a, S> CaseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve the specified case.
+    /// Retrieve a case. EXAMPLES: cURL: ```shell case="projects/some-project/cases/16033687" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$case" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().get( name="projects/some-project/cases/43595344", ) print(request.execute()) ```
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The fully qualified name of a case to be retrieved.
+    /// * `name` - Required. The full name of a case to be retrieved.
     pub fn get(&self, name: &str) -> CaseGetCall<'a, S> {
         CaseGetCall {
             hub: self.hub,
@@ -1272,15 +1239,16 @@ impl<'a, S> CaseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Retrieve all cases under the specified parent. Note: Listing cases under an Organization returns only the cases directly parented by that organization. To retrieve all cases under an organization, including cases parented by projects under that organization, use `cases.search`.
+    /// Retrieve all cases under a parent, but not its children. For example, listing cases under an organization only returns the cases that are directly parented by that organization. To retrieve cases under an organization and its projects, use `cases.search`. EXAMPLES: cURL: ```shell parent="projects/some-project" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$parent/cases" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().list(parent="projects/some-project") print(request.execute()) ```
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The fully qualified name of parent resource to list cases under.
+    /// * `parent` - Required. The name of a parent to list cases under.
     pub fn list(&self, parent: &str) -> CaseListCall<'a, S> {
         CaseListCall {
             hub: self.hub,
             _parent: parent.to_string(),
+            _product_line: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
@@ -1292,7 +1260,7 @@ impl<'a, S> CaseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Update the specified case. Only a subset of fields can be updated.
+    /// Update a case. Only some fields can be updated. EXAMPLES: cURL: ```shell case="projects/some-project/cases/43595344" curl \ --request PATCH \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ --header "Content-Type: application/json" \ --data '{ "priority": "P1" }' \ "https://cloudsupport.googleapis.com/v2/$case?updateMask=priority" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().patch( name="projects/some-project/cases/43112854", body={ "displayName": "This is Now a New Title", "priority": "P2", }, ) print(request.execute()) ```
     /// 
     /// # Arguments
     ///
@@ -1312,11 +1280,12 @@ impl<'a, S> CaseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Search cases using the specified query.
+    /// Search for cases using a query. EXAMPLES: cURL: ```shell parent="projects/some-project" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$parent/cases:search" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().search( parent="projects/some-project", query="state=OPEN" ) print(request.execute()) ```
     pub fn search(&self) -> CaseSearchCall<'a, S> {
         CaseSearchCall {
             hub: self.hub,
             _query: Default::default(),
+            _parent: Default::default(),
             _page_token: Default::default(),
             _page_size: Default::default(),
             _delegate: Default::default(),
@@ -1368,11 +1337,11 @@ impl<'a, S> MediaMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Download a file attachment on a case. Note: HTTP requests must append "?alt=media" to the URL.
+    /// Download a file attached to a case. Note: HTTP requests must append "?alt=media" to the URL. EXAMPLES: cURL: ```shell name="projects/some-project/cases/43594844/attachments/0674M00000WijAnZAJ" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$name:download?alt=media" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.media().download( name="projects/some-project/cases/43595344/attachments/0684M00000Pw6pHQAR" ) request.uri = request.uri.split("?")[0] + "?alt=media" print(request.execute()) ```
     /// 
     /// # Arguments
     ///
-    /// * `name` - The resource name of the attachment to be downloaded.
+    /// * `name` - The name of the file attachment to download.
     pub fn download(&self, name: &str) -> MediaDownloadCall<'a, S> {
         MediaDownloadCall {
             hub: self.hub,
@@ -1385,12 +1354,12 @@ impl<'a, S> MediaMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Create a file attachment on a case or Cloud resource. The attachment object must have the following fields set: filename.
+    /// Create a file attachment on a case or Cloud resource. The attachment must have the following fields set: `filename`. EXAMPLES: cURL: ```shell echo "This text is in a file I'm uploading using CSAPI." \ > "./example_file.txt" case="projects/some-project/cases/43594844" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ --data-binary @"./example_file.txt" \ "https://cloudsupport.googleapis.com/upload/v2beta/$case/attachments?attachment.filename=uploaded_via_curl.txt" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) file_path = "./example_file.txt" with open(file_path, "w") as file: file.write( "This text is inside a file I'm going to upload using the Cloud Support API.", ) request = supportApiService.media().upload( parent="projects/some-project/cases/43595344", media_body=file_path ) request.uri = request.uri.split("?")[0] + "?attachment.filename=uploaded_via_python.txt" print(request.execute()) ```
     /// 
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The resource name of the case (or case parent) to which the attachment should be attached.
+    /// * `parent` - Required. The name of the case or Cloud resource to which the attachment should be attached.
     pub fn upload(&self, request: CreateAttachmentRequest, parent: &str) -> MediaUploadCall<'a, S> {
         MediaUploadCall {
             hub: self.hub,
@@ -1411,299 +1380,7 @@ impl<'a, S> MediaMethods<'a, S> {
 // CallBuilders   ###
 // #################
 
-/// Create a file attachment on a case or Cloud resource. The attachment object must have the following fields set: filename.
-///
-/// A builder for the *create* method supported by a *attachment* resource.
-/// It is not used directly, but through a [`AttachmentMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_cloudsupport2_beta as cloudsupport2_beta;
-/// use cloudsupport2_beta::api::CreateAttachmentRequest;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use cloudsupport2_beta::{CloudSupport, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = CloudSupport::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = CreateAttachmentRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.attachments().create(req, "parent")
-///              .doit().await;
-/// # }
-/// ```
-pub struct AttachmentCreateCall<'a, S>
-    where S: 'a {
-
-    hub: &'a CloudSupport<S>,
-    _request: CreateAttachmentRequest,
-    _parent: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
-}
-
-impl<'a, S> client::CallBuilder for AttachmentCreateCall<'a, S> {}
-
-impl<'a, S> AttachmentCreateCall<'a, S>
-where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
-{
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Attachment)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
-        use std::borrow::Cow;
-
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "cloudsupport.attachments.create",
-                               http_method: hyper::Method::POST });
-
-        for &field in ["alt", "parent"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v2beta/{+parent}/attachments";
-        if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["parent"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
-                    }
-                }
-            };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
-
-                client.request(request.unwrap()).await
-
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
-
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: CreateAttachmentRequest) -> AttachmentCreateCall<'a, S> {
-        self._request = new_value;
-        self
-    }
-    /// Required. The resource name of the case (or case parent) to which the attachment should be attached.
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> AttachmentCreateCall<'a, S> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> AttachmentCreateCall<'a, S> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> AttachmentCreateCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> AttachmentCreateCall<'a, S>
-                                                        where St: AsRef<str> {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> AttachmentCreateCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> AttachmentCreateCall<'a, S> {
-        self._scopes.clear();
-        self
-    }
-}
-
-
-/// Retrieve valid classifications to be used when creating a support case. The classications are hierarchical, with each classification containing all levels of the hierarchy, separated by " > ". For example "Technical Issue > Compute > Compute Engine".
+/// Retrieve valid classifications to use when creating a support case. Classifications are hierarchical. Each classification is a string containing all levels of the hierarchy separated by `" > "`. For example, `"Technical Issue > Compute > Compute Engine"`. Classification IDs returned by this endpoint are valid for at least six months. When a classification is deactivated, this endpoint immediately stops returning it. After six months, `case.create` requests using the classification will fail. EXAMPLES: cURL: ```shell curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ 'https://cloudsupport.googleapis.com/v2/caseClassifications:search?query=display_name:"*Compute%20Engine*"' ``` Python: ```python import googleapiclient.discovery supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version="v2", discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version=v2", ) request = supportApiService.caseClassifications().search( query='display_name:"*Compute Engine*"' ) print(request.execute()) ```
 ///
 /// A builder for the *search* method supported by a *caseClassification* resource.
 /// It is not used directly, but through a [`CaseClassificationMethods`] instance.
@@ -1731,8 +1408,10 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.case_classifications().search()
 ///              .query("gubergren")
-///              .page_token("Lorem")
-///              .page_size(-12)
+///              .product_product_subline("eos")
+///              .product_product_line("dolor")
+///              .page_token("ea")
+///              .page_size(-55)
 ///              .doit().await;
 /// # }
 /// ```
@@ -1741,6 +1420,8 @@ pub struct CaseClassificationSearchCall<'a, S>
 
     hub: &'a CloudSupport<S>,
     _query: Option<String>,
+    _product_product_subline: Option<String>,
+    _product_product_line: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -1771,16 +1452,22 @@ where
         dlg.begin(client::MethodInfo { id: "cloudsupport.caseClassifications.search",
                                http_method: hyper::Method::GET });
 
-        for &field in ["alt", "query", "pageToken", "pageSize"].iter() {
+        for &field in ["alt", "query", "product.productSubline", "product.productLine", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         if let Some(value) = self._query.as_ref() {
             params.push("query", value);
+        }
+        if let Some(value) = self._product_product_subline.as_ref() {
+            params.push("product.productSubline", value);
+        }
+        if let Some(value) = self._product_product_line.as_ref() {
+            params.push("product.productLine", value);
         }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
@@ -1885,11 +1572,25 @@ where
     }
 
 
-    /// An expression written in the Cloud filter language. If non-empty, then only cases whose fields match the filter are returned. If empty, then no messages are filtered out.
+    /// An expression used to filter case classifications. If it's an empty string, then no filtering happens. Otherwise, case classifications will be returned that match the filter.
     ///
     /// Sets the *query* query property to the given value.
     pub fn query(mut self, new_value: &str) -> CaseClassificationSearchCall<'a, S> {
         self._query = Some(new_value.to_string());
+        self
+    }
+    /// The Product Subline of the Product, such as "Maps Billing".
+    ///
+    /// Sets the *product.product subline* query property to the given value.
+    pub fn product_product_subline(mut self, new_value: &str) -> CaseClassificationSearchCall<'a, S> {
+        self._product_product_subline = Some(new_value.to_string());
+        self
+    }
+    /// The Product Line of the Product.
+    ///
+    /// Sets the *product.product line* query property to the given value.
+    pub fn product_product_line(mut self, new_value: &str) -> CaseClassificationSearchCall<'a, S> {
+        self._product_product_line = Some(new_value.to_string());
         self
     }
     /// A token identifying the page of results to return. If unspecified, the first page is retrieved.
@@ -1899,7 +1600,7 @@ where
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of cases fetched with each request.
+    /// The maximum number of classifications fetched with each request.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> CaseClassificationSearchCall<'a, S> {
@@ -1982,7 +1683,7 @@ where
 }
 
 
-/// Retrieve all attachments associated with a support case.
+/// List all the attachments associated with a support case. EXAMPLES: cURL: ```shell case="projects/some-project/cases/23598314" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$case/attachments" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = ( supportApiService.cases() .attachments() .list(parent="projects/some-project/cases/43595344") ) print(request.execute()) ```
 ///
 /// A builder for the *attachments.list* method supported by a *case* resource.
 /// It is not used directly, but through a [`CaseMethods`] instance.
@@ -2009,8 +1710,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cases().attachments_list("parent")
-///              .page_token("dolor")
-///              .page_size(-17)
+///              .page_token("amet")
+///              .page_size(-20)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2168,7 +1869,7 @@ where
     }
 
 
-    /// Required. The resource name of Case object for which attachments should be listed.
+    /// Required. The name of the case for which attachments should be listed.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -2268,7 +1969,7 @@ where
 }
 
 
-/// Add a new comment to the specified Case. The comment object must have the following fields set: body.
+/// Add a new comment to a case. The comment must have the following fields set: `body`. EXAMPLES: cURL: ```shell case="projects/some-project/cases/43591344" curl \ --request POST \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ --header 'Content-Type: application/json' \ --data '{ "body": "This is a test comment." }' \ "https://cloudsupport.googleapis.com/v2/$case/comments" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = ( supportApiService.cases() .comments() .create( parent="projects/some-project/cases/43595344", body={"body": "This is a test comment."}, ) ) print(request.execute()) ```
 ///
 /// A builder for the *comments.create* method supported by a *case* resource.
 /// It is not used directly, but through a [`CaseMethods`] instance.
@@ -2474,7 +2175,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The resource name of Case to which this comment should be added.
+    /// Required. The name of the case to which the comment should be added.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -2560,7 +2261,7 @@ where
 }
 
 
-/// Retrieve all Comments associated with the Case object.
+/// List all the comments associated with a case. EXAMPLES: cURL: ```shell case="projects/some-project/cases/43595344" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$case/comments" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = ( supportApiService.cases() .comments() .list(parent="projects/some-project/cases/43595344") ) print(request.execute()) ```
 ///
 /// A builder for the *comments.list* method supported by a *case* resource.
 /// It is not used directly, but through a [`CaseMethods`] instance.
@@ -2587,8 +2288,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cases().comments_list("parent")
-///              .page_token("amet")
-///              .page_size(-20)
+///              .page_token("ut")
+///              .page_size(-12)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2746,7 +2447,7 @@ where
     }
 
 
-    /// Required. The resource name of Case object for which comments should be listed.
+    /// Required. The name of the case for which to list comments.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -2756,14 +2457,14 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// A token identifying the page of results to return. If unspecified, the first page is retrieved.
+    /// A token identifying the page of results to return. If unspecified, the first page is returned.
     ///
     /// Sets the *page token* query property to the given value.
     pub fn page_token(mut self, new_value: &str) -> CaseCommentListCall<'a, S> {
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of comments fetched with each request. Defaults to 10.
+    /// The maximum number of comments to fetch. Defaults to 10.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> CaseCommentListCall<'a, S> {
@@ -2846,7 +2547,7 @@ where
 }
 
 
-/// Close the specified case.
+/// Close a case. EXAMPLES: cURL: ```shell case="projects/some-project/cases/43595344" curl \ --request POST \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$case:close" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().close( name="projects/some-project/cases/43595344" ) print(request.execute()) ```
 ///
 /// A builder for the *close* method supported by a *case* resource.
 /// It is not used directly, but through a [`CaseMethods`] instance.
@@ -3052,7 +2753,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The fully qualified name of the case resource to be closed.
+    /// Required. The name of the case to close.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3138,7 +2839,7 @@ where
 }
 
 
-/// Create a new case and associate it with the given Cloud resource. The case object must have the following fields set: display_name, description, classification, and severity.
+/// Create a new case and associate it with a parent. It must have the following fields set: `display_name`, `description`, `classification`, and `priority`. If you're just testing the API and don't want to route your case to an agent, set `testCase=true`. EXAMPLES: cURL: ```shell parent="projects/some-project" curl \ --request POST \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ --header 'Content-Type: application/json' \ --data '{ "display_name": "Test case created by me.", "description": "a random test case, feel free to close", "classification": { "id": "100IK2AKCLHMGRJ9CDGMOCGP8DM6UTB4BT262T31BT1M2T31DHNMENPO6KS36CPJ786L2TBFEHGN6NPI64R3CDHN8880G08I1H3MURR7DHII0GRCDTQM8" }, "time_zone": "-07:00", "subscriber_email_addresses": [ "foo@domain.com", "bar@domain.com" ], "testCase": true, "priority": "P3" }' \ "https://cloudsupport.googleapis.com/v2/$parent/cases" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().create( parent="projects/some-project", body={ "displayName": "A Test Case", "description": "This is a test case.", "testCase": True, "priority": "P2", "classification": { "id": "100IK2AKCLHMGRJ9CDGMOCGP8DM6UTB4BT262T31BT1M2T31DHNMENPO6KS36CPJ786L2TBFEHGN6NPI64R3CDHN8880G08I1H3MURR7DHII0GRCDTQM8" }, }, ) print(request.execute()) ```
 ///
 /// A builder for the *create* method supported by a *case* resource.
 /// It is not used directly, but through a [`CaseMethods`] instance.
@@ -3344,7 +3045,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The name of the Cloud resource under which the case should be created.
+    /// Required. The name of the parent under which the case should be created.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -3430,7 +3131,7 @@ where
 }
 
 
-/// Escalate a case. Escalating a case will initiate the Cloud Support escalation management process. This operation is only available to certain Customer Care tiers. Go to https://cloud.google.com/support and look for 'Technical support escalations' in the feature list to find out which tiers are able to perform escalations.
+/// Escalate a case, starting the Google Cloud Support escalation management process. This operation is only available for some support services. Go to https://cloud.google.com/support and look for 'Technical support escalations' in the feature list to find out which ones let you do that. EXAMPLES: cURL: ```shell case="projects/some-project/cases/43595344" curl \ --request POST \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ --header "Content-Type: application/json" \ --data '{ "escalation": { "reason": "BUSINESS_IMPACT", "justification": "This is a test escalation." } }' \ "https://cloudsupport.googleapis.com/v2/$case:escalate" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().escalate( name="projects/some-project/cases/43595344", body={ "escalation": { "reason": "BUSINESS_IMPACT", "justification": "This is a test escalation.", }, }, ) print(request.execute()) ```
 ///
 /// A builder for the *escalate* method supported by a *case* resource.
 /// It is not used directly, but through a [`CaseMethods`] instance.
@@ -3636,7 +3337,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The fully qualified name of the Case resource to be escalated.
+    /// Required. The name of the case to be escalated.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3722,7 +3423,7 @@ where
 }
 
 
-/// Retrieve the specified case.
+/// Retrieve a case. EXAMPLES: cURL: ```shell case="projects/some-project/cases/16033687" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$case" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().get( name="projects/some-project/cases/43595344", ) print(request.execute()) ```
 ///
 /// A builder for the *get* method supported by a *case* resource.
 /// It is not used directly, but through a [`CaseMethods`] instance.
@@ -3898,7 +3599,7 @@ where
     }
 
 
-    /// Required. The fully qualified name of a case to be retrieved.
+    /// Required. The full name of a case to be retrieved.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3984,7 +3685,7 @@ where
 }
 
 
-/// Retrieve all cases under the specified parent. Note: Listing cases under an Organization returns only the cases directly parented by that organization. To retrieve all cases under an organization, including cases parented by projects under that organization, use `cases.search`.
+/// Retrieve all cases under a parent, but not its children. For example, listing cases under an organization only returns the cases that are directly parented by that organization. To retrieve cases under an organization and its projects, use `cases.search`. EXAMPLES: cURL: ```shell parent="projects/some-project" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$parent/cases" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().list(parent="projects/some-project") print(request.execute()) ```
 ///
 /// A builder for the *list* method supported by a *case* resource.
 /// It is not used directly, but through a [`CaseMethods`] instance.
@@ -4011,9 +3712,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cases().list("parent")
-///              .page_token("est")
-///              .page_size(-50)
-///              .filter("ipsum")
+///              .product_line("gubergren")
+///              .page_token("ea")
+///              .page_size(-99)
+///              .filter("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -4022,6 +3724,7 @@ pub struct CaseListCall<'a, S>
 
     hub: &'a CloudSupport<S>,
     _parent: String,
+    _product_line: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _filter: Option<String>,
@@ -4053,15 +3756,18 @@ where
         dlg.begin(client::MethodInfo { id: "cloudsupport.cases.list",
                                http_method: hyper::Method::GET });
 
-        for &field in ["alt", "parent", "pageToken", "pageSize", "filter"].iter() {
+        for &field in ["alt", "parent", "productLine", "pageToken", "pageSize", "filter"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
         params.push("parent", self._parent);
+        if let Some(value) = self._product_line.as_ref() {
+            params.push("productLine", value);
+        }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
         }
@@ -4175,7 +3881,7 @@ where
     }
 
 
-    /// Required. The fully qualified name of parent resource to list cases under.
+    /// Required. The name of a parent to list cases under.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4183,6 +3889,13 @@ where
     /// we provide this method for API completeness.
     pub fn parent(mut self, new_value: &str) -> CaseListCall<'a, S> {
         self._parent = new_value.to_string();
+        self
+    }
+    /// The product line for which to request cases for. If unspecified, only Google Cloud cases will be returned.
+    ///
+    /// Sets the *product line* query property to the given value.
+    pub fn product_line(mut self, new_value: &str) -> CaseListCall<'a, S> {
+        self._product_line = Some(new_value.to_string());
         self
     }
     /// A token identifying the page of results to return. If unspecified, the first page is retrieved.
@@ -4199,7 +3912,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// An expression written in filter language. If non-empty, the query returns the cases that match the filter. Else, the query doesn't filter the cases. Filter expressions use the following fields with the operators equals (`=`) and `AND`: - `state`: The accepted values are `OPEN` or `CLOSED`. - `priority`: The accepted values are `P0`, `P1`, `P2`, `P3`, or `P4`. You can specify multiple values for priority using the `OR` operator. For example, `priority=P1 OR priority=P2`. - [DEPRECATED] `severity`: The accepted values are `S0`, `S1`, `S2`, `S3`, or `S4`. - `creator.email`: The email address of the case creator. Examples: - `state=CLOSED` - `state=OPEN AND creator.email="tester@example.com"` - `state=OPEN AND (priority=P0 OR priority=P1)`
+    /// An expression used to filter cases. If it's an empty string, then no filtering happens. Otherwise, the endpoint returns the cases that match the filter. Expressions use the following fields separated by `AND` and specified with `=`: - `state`: Can be `OPEN` or `CLOSED`. - `priority`: Can be `P0`, `P1`, `P2`, `P3`, or `P4`. You can specify multiple values for priority using the `OR` operator. For example, `priority=P1 OR priority=P2`. - `creator.email`: The email address of the case creator. EXAMPLES: - `state=CLOSED` - `state=OPEN AND creator.email="tester@example.com"` - `state=OPEN AND (priority=P0 OR priority=P1)`
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> CaseListCall<'a, S> {
@@ -4282,7 +3995,7 @@ where
 }
 
 
-/// Update the specified case. Only a subset of fields can be updated.
+/// Update a case. Only some fields can be updated. EXAMPLES: cURL: ```shell case="projects/some-project/cases/43595344" curl \ --request PATCH \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ --header "Content-Type: application/json" \ --data '{ "priority": "P1" }' \ "https://cloudsupport.googleapis.com/v2/$case?updateMask=priority" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().patch( name="projects/some-project/cases/43112854", body={ "displayName": "This is Now a New Title", "priority": "P2", }, ) print(request.execute()) ```
 ///
 /// A builder for the *patch* method supported by a *case* resource.
 /// It is not used directly, but through a [`CaseMethods`] instance.
@@ -4503,7 +4216,7 @@ where
         self._name = new_value.to_string();
         self
     }
-    /// A list of attributes of the case object that should be updated as part of this request. Supported values are severity, display_name, and subscriber_email_addresses. If no fields are specified, all supported fields are updated. WARNING: If you do not provide a field mask, then you may accidentally clear some fields. For example, if you leave field mask empty and do not provide a value for subscriber_email_addresses, then subscriber_email_addresses is updated to empty.
+    /// A list of attributes of the case that should be updated. Supported values are `priority`, `display_name`, and `subscriber_email_addresses`. If no fields are specified, all supported fields are updated. Be careful - if you do not provide a field mask, then you might accidentally clear some fields. For example, if you leave the field mask empty and do not provide a value for `subscriber_email_addresses`, then `subscriber_email_addresses` is updated to empty.
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: client::FieldMask) -> CasePatchCall<'a, S> {
@@ -4586,7 +4299,7 @@ where
 }
 
 
-/// Search cases using the specified query.
+/// Search for cases using a query. EXAMPLES: cURL: ```shell parent="projects/some-project" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$parent/cases:search" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.cases().search( parent="projects/some-project", query="state=OPEN" ) print(request.execute()) ```
 ///
 /// A builder for the *search* method supported by a *case* resource.
 /// It is not used directly, but through a [`CaseMethods`] instance.
@@ -4613,9 +4326,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cases().search()
-///              .query("gubergren")
-///              .page_token("ea")
-///              .page_size(-99)
+///              .query("labore")
+///              .parent("sed")
+///              .page_token("duo")
+///              .page_size(-80)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4624,6 +4338,7 @@ pub struct CaseSearchCall<'a, S>
 
     hub: &'a CloudSupport<S>,
     _query: Option<String>,
+    _parent: Option<String>,
     _page_token: Option<String>,
     _page_size: Option<i32>,
     _delegate: Option<&'a mut dyn client::Delegate>,
@@ -4654,16 +4369,19 @@ where
         dlg.begin(client::MethodInfo { id: "cloudsupport.cases.search",
                                http_method: hyper::Method::GET });
 
-        for &field in ["alt", "query", "pageToken", "pageSize"].iter() {
+        for &field in ["alt", "query", "parent", "pageToken", "pageSize"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
         if let Some(value) = self._query.as_ref() {
             params.push("query", value);
+        }
+        if let Some(value) = self._parent.as_ref() {
+            params.push("parent", value);
         }
         if let Some(value) = self._page_token.as_ref() {
             params.push("pageToken", value);
@@ -4768,11 +4486,18 @@ where
     }
 
 
-    /// An expression written in filter language. A query uses the following fields with the operators equals (`=`) and `AND`: - `organization`: An organization name in the form `organizations/`. - `project`: A project name in the form `projects/`. - `state`: The accepted values are `OPEN` or `CLOSED`. - `priority`: The accepted values are `P0`, `P1`, `P2`, `P3`, or `P4`. You can specify multiple values for priority using the `OR` operator. For example, `priority=P1 OR priority=P2`. - [DEPRECATED] `severity`: The accepted values are `S0`, `S1`, `S2`, `S3`, or `S4`. - `creator.email`: The email address of the case creator. - `billingAccount`: A billing account in the form `billingAccounts/` You must specify eitehr `organization` or `project`. To search across `displayName`, `description`, and comments, use a global restriction with no keyword or operator. For example, `"my search"`. To search only cases updated after a certain date, use `update_time` retricted with that particular date, time, and timezone in ISO datetime format. For example, `update_time>"2020-01-01T00:00:00-05:00"`. `update_time` only supports the greater than operator (`>`). Examples: - `organization="organizations/123456789"` - `project="projects/my-project-id"` - `project="projects/123456789"` - `billing_account="billingAccounts/123456-A0B0C0-CUZ789"` - `organization="organizations/123456789" AND state=CLOSED` - `project="projects/my-project-id" AND creator.email="tester@example.com"` - `project="projects/my-project-id" AND (priority=P0 OR priority=P1)`
+    /// An expression used to filter cases. Expressions use the following fields separated by `AND` and specified with `=`: - `organization`: An organization name in the form `organizations/`. - `project`: A project name in the form `projects/`. - `state`: Can be `OPEN` or `CLOSED`. - `priority`: Can be `P0`, `P1`, `P2`, `P3`, or `P4`. You can specify multiple values for priority using the `OR` operator. For example, `priority=P1 OR priority=P2`. - `creator.email`: The email address of the case creator. You must specify either `organization` or `project`. To search across `displayName`, `description`, and comments, use a global restriction with no keyword or operator. For example, `"my search"`. To search only cases updated after a certain date, use `update_time` restricted with that particular date, time, and timezone in ISO datetime format. For example, `update_time>"2020-01-01T00:00:00-05:00"`. `update_time` only supports the greater than operator (`>`). Examples: - `organization="organizations/123456789"` - `project="projects/my-project-id"` - `project="projects/123456789"` - `organization="organizations/123456789" AND state=CLOSED` - `project="projects/my-project-id" AND creator.email="tester@example.com"` - `project="projects/my-project-id" AND (priority=P0 OR priority=P1)`
     ///
     /// Sets the *query* query property to the given value.
     pub fn query(mut self, new_value: &str) -> CaseSearchCall<'a, S> {
         self._query = Some(new_value.to_string());
+        self
+    }
+    /// The name of the parent resource to search for cases under.
+    ///
+    /// Sets the *parent* query property to the given value.
+    pub fn parent(mut self, new_value: &str) -> CaseSearchCall<'a, S> {
+        self._parent = Some(new_value.to_string());
         self
     }
     /// A token identifying the page of results to return. If unspecified, the first page is retrieved.
@@ -4865,7 +4590,7 @@ where
 }
 
 
-/// Download a file attachment on a case. Note: HTTP requests must append "?alt=media" to the URL.
+/// Download a file attached to a case. Note: HTTP requests must append "?alt=media" to the URL. EXAMPLES: cURL: ```shell name="projects/some-project/cases/43594844/attachments/0674M00000WijAnZAJ" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ "https://cloudsupport.googleapis.com/v2/$name:download?alt=media" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) request = supportApiService.media().download( name="projects/some-project/cases/43595344/attachments/0684M00000Pw6pHQAR" ) request.uri = request.uri.split("?")[0] + "?alt=media" print(request.execute()) ```
 ///
 /// This method supports **media download**. To enable it, adjust the builder like this:
 /// `.param("alt", "media")`.
@@ -5055,7 +4780,7 @@ where
     }
 
 
-    /// The resource name of the attachment to be downloaded.
+    /// The name of the file attachment to download.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -5141,7 +4866,7 @@ where
 }
 
 
-/// Create a file attachment on a case or Cloud resource. The attachment object must have the following fields set: filename.
+/// Create a file attachment on a case or Cloud resource. The attachment must have the following fields set: `filename`. EXAMPLES: cURL: ```shell echo "This text is in a file I'm uploading using CSAPI." \ > "./example_file.txt" case="projects/some-project/cases/43594844" curl \ --header "Authorization: Bearer $(gcloud auth print-access-token)" \ --data-binary @"./example_file.txt" \ "https://cloudsupport.googleapis.com/upload/v2beta/$case/attachments?attachment.filename=uploaded_via_curl.txt" ``` Python: ```python import googleapiclient.discovery api_version = "v2" supportApiService = googleapiclient.discovery.build( serviceName="cloudsupport", version=api_version, discoveryServiceUrl=f"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}", ) file_path = "./example_file.txt" with open(file_path, "w") as file: file.write( "This text is inside a file I'm going to upload using the Cloud Support API.", ) request = supportApiService.media().upload( parent="projects/some-project/cases/43595344", media_body=file_path ) request.uri = request.uri.split("?")[0] + "?attachment.filename=uploaded_via_python.txt" print(request.execute()) ```
 ///
 /// A builder for the *upload* method supported by a *media* resource.
 /// It is not used directly, but through a [`MediaMethods`] instance.
@@ -5379,7 +5104,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The resource name of the case (or case parent) to which the attachment should be attached.
+    /// Required. The name of the case or Cloud resource to which the attachment should be attached.
     ///
     /// Sets the *parent* path property to the given value.
     ///

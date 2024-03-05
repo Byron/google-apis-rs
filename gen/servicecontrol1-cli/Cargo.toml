@@ -4,7 +4,7 @@
 [package]
 
 name = "google-servicecontrol1-cli"
-version = "5.0.3+20230106"
+version = "5.0.4+20240223"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Service Control (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/servicecontrol1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-servicecontrol1]
 path = "../servicecontrol1"
-version = "5.0.3+20230106"
+version = "5.0.4+20240223"
 

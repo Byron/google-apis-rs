@@ -271,7 +271,7 @@ async fn main() {
     
     let mut app = App::new("playcustomapp1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
+           .version("5.0.4+20240304")
            .about("API to create and publish custom Android apps")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_playcustomapp1_cli")
            .arg(Arg::with_name("url")

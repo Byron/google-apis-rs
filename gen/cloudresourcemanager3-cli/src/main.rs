@@ -142,9 +142,10 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tags" => Some(("tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "delete-time", "display-name", "etag", "name", "parent", "state", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "delete-time", "display-name", "etag", "name", "parent", "state", "tags", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -573,9 +574,10 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tags" => Some(("tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "delete-time", "display-name", "etag", "name", "parent", "state", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "delete-time", "display-name", "etag", "name", "parent", "state", "tags", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1668,9 +1670,10 @@ where
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tags" => Some(("tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "delete-time", "display-name", "etag", "labels", "name", "parent", "project-id", "state", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "delete-time", "display-name", "etag", "labels", "name", "parent", "project-id", "state", "tags", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2101,9 +2104,10 @@ where
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "project-id" => Some(("projectId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tags" => Some(("tags", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "delete-time", "display-name", "etag", "labels", "name", "parent", "project-id", "state", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "delete-time", "display-name", "etag", "labels", "name", "parent", "project-id", "state", "tags", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2511,8 +2515,9 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "parent" => Some(("parent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "tag-value" => Some(("tagValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag-value-namespaced-name" => Some(("tagValueNamespacedName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "parent", "tag-value"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "parent", "tag-value", "tag-value-namespaced-name"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2951,6 +2956,62 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _tag_keys_get_namespaced(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.tag_keys().get_namespaced();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "name" => {
+                    call = call.name(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["name"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3578,6 +3639,62 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _tag_values_get_namespaced(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.tag_values().get_namespaced();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "name" => {
+                    call = call.name(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["name"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -4338,6 +4455,9 @@ where
                     ("get-iam-policy", Some(opt)) => {
                         call_result = self._tag_keys_get_iam_policy(opt, dry_run, &mut err).await;
                     },
+                    ("get-namespaced", Some(opt)) => {
+                        call_result = self._tag_keys_get_namespaced(opt, dry_run, &mut err).await;
+                    },
                     ("list", Some(opt)) => {
                         call_result = self._tag_keys_list(opt, dry_run, &mut err).await;
                     },
@@ -4369,6 +4489,9 @@ where
                     },
                     ("get-iam-policy", Some(opt)) => {
                         call_result = self._tag_values_get_iam_policy(opt, dry_run, &mut err).await;
+                    },
+                    ("get-namespaced", Some(opt)) => {
+                        call_result = self._tag_values_get_namespaced(opt, dry_run, &mut err).await;
                     },
                     ("list", Some(opt)) => {
                         call_result = self._tag_values_list(opt, dry_run, &mut err).await;
@@ -4920,7 +5043,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Searches organization resources that are visible to the user and satisfy the specified filter. This method returns organizations in an unspecified order. New organizations do not necessarily appear at the end of the results, and may take a small amount of time to appear. Search will only return organizations on which the user has the permission `resourcemanager.organizations.get`"##),
+                    Some(r##"Searches organization resources that are visible to the user and satisfy the specified filter. This method returns organizations in an unspecified order. New organizations do not necessarily appear at the end of the results, and may take a small amount of time to appear. Search will only return organizations on which the user has the permission `resourcemanager.organizations.get` or has super admin privileges."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager3_cli/organizations_search",
                   vec![
                     (Some(r##"v"##),
@@ -5161,7 +5284,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("search",
-                    Some(r##"Search for projects that the caller has both `resourcemanager.projects.get` permission on, and also satisfy the specified query. This method returns projects in an unspecified order. This method is eventually consistent with project mutations; this means that a newly created project may not appear in the results or recent updates to an existing project may not be reflected in the results. To retrieve the latest state of a project, use the GetProject method."##),
+                    Some(r##"Search for projects that the caller has the `resourcemanager.projects.get` permission on, and also satisfy the specified query. This method returns projects in an unspecified order. This method is eventually consistent with project mutations; this means that a newly created project may not appear in the results or recent updates to an existing project may not be reflected in the results. To retrieve the latest state of a project, use the GetProject method."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager3_cli/projects_search",
                   vec![
                     (Some(r##"v"##),
@@ -5325,7 +5448,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("tag-keys", "methods: 'create', 'delete', 'get', 'get-iam-policy', 'list', 'patch', 'set-iam-policy' and 'test-iam-permissions'", vec![
+        ("tag-keys", "methods: 'create', 'delete', 'get', 'get-iam-policy', 'get-namespaced', 'list', 'patch', 'set-iam-policy' and 'test-iam-permissions'", vec![
             ("create",
                     Some(r##"Creates a new TagKey. If another request with the same parameters is sent while the original request is in process, the second request will receive an error. A maximum of 1000 TagKeys can exist under a parent at any given time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager3_cli/tag-keys_create",
@@ -5408,6 +5531,22 @@ async fn main() {
                      Some(true),
                      Some(true)),
         
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get-namespaced",
+                    Some(r##"Retrieves a TagKey by its namespaced name. This method will return `PERMISSION_DENIED` if the key does not exist or the user does not have permission to view it."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager3_cli/tag-keys_get-namespaced",
+                  vec![
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -5522,7 +5661,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("tag-values", "methods: 'create', 'delete', 'get', 'get-iam-policy', 'list', 'patch', 'set-iam-policy', 'tag-holds-create', 'tag-holds-delete', 'tag-holds-list' and 'test-iam-permissions'", vec![
+        ("tag-values", "methods: 'create', 'delete', 'get', 'get-iam-policy', 'get-namespaced', 'list', 'patch', 'set-iam-policy', 'tag-holds-create', 'tag-holds-delete', 'tag-holds-list' and 'test-iam-permissions'", vec![
             ("create",
                     Some(r##"Creates a TagValue as a child of the specified TagKey. If a another request with the same parameters is sent while the original request is in process the second request will receive an error. A maximum of 1000 TagValues can exist under a TagKey at any given time."##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager3_cli/tag-values_create",
@@ -5605,6 +5744,22 @@ async fn main() {
                      Some(true),
                      Some(true)),
         
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("get-namespaced",
+                    Some(r##"Retrieves a TagValue by its namespaced name. This method will return `PERMISSION_DENIED` if the value does not exist or the user does not have permission to view it."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudresourcemanager3_cli/tag-values_get-namespaced",
+                  vec![
                     (Some(r##"v"##),
                      Some(r##"p"##),
                      Some(r##"Set various optional parameters, matching the key=value form"##),
@@ -5795,7 +5950,7 @@ async fn main() {
     
     let mut app = App::new("cloudresourcemanager3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230115")
+           .version("5.0.4+20240303")
            .about("Creates, reads, and updates metadata for Google Cloud Platform resource containers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudresourcemanager3_cli")
            .arg(Arg::with_name("url")

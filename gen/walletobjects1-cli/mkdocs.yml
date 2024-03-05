@@ -1,4 +1,4 @@
-site_name: Walletobjects v5.0.3+20230124
+site_name: Walletobjects v5.0.4+20240304
 site_url: http://byron.github.io/google-apis-rs/google-walletobjects1-cli
 site_description: A complete library to interact with Walletobjects (protocol v1)
 
@@ -39,12 +39,14 @@ nav:
     - 'Patch': 'flightobject_patch.md'
     - 'Update': 'flightobject_update.md'
 - 'Genericclass':
+    - 'Addmessage': 'genericclass_addmessage.md'
     - 'Get': 'genericclass_get.md'
     - 'Insert': 'genericclass_insert.md'
     - 'List': 'genericclass_list.md'
     - 'Patch': 'genericclass_patch.md'
     - 'Update': 'genericclass_update.md'
 - 'Genericobject':
+    - 'Addmessage': 'genericobject_addmessage.md'
     - 'Get': 'genericobject_get.md'
     - 'Insert': 'genericobject_insert.md'
     - 'List': 'genericobject_list.md'
@@ -88,6 +90,7 @@ nav:
     - 'Patch': 'loyaltyobject_patch.md'
     - 'Update': 'loyaltyobject_update.md'
 - 'Media':
+    - 'Download': 'media_download.md'
     - 'Upload': 'media_upload.md'
 - 'Offerclass':
     - 'Addmessage': 'offerclass_addmessage.md'
@@ -122,8 +125,6 @@ nav:
     - 'List': 'transitobject_list.md'
     - 'Patch': 'transitobject_patch.md'
     - 'Update': 'transitobject_update.md'
-- 'Walletobjects':
-    - 'V1 Private Content Upload Private Data': 'walletobjects_v1-private-content-upload-private-data.md'
 
 theme: readthedocs
 

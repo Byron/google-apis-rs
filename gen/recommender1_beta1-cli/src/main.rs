@@ -399,6 +399,68 @@ where
         }
     }
 
+    async fn _billing_accounts_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.billing_accounts().locations_list(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _billing_accounts_locations_recommenders_get_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.billing_accounts().locations_recommenders_get_config(opt.value_of("name").unwrap_or(""));
@@ -1205,6 +1267,68 @@ where
         }
     }
 
+    async fn _folders_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().locations_list(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _folders_locations_recommenders_recommendations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.folders().locations_recommenders_recommendations_get(opt.value_of("name").unwrap_or(""));
@@ -1662,6 +1786,65 @@ where
         }
     }
 
+    async fn _insight_types_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.insight_types().list();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _organizations_locations_insight_types_get_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.organizations().locations_insight_types_get_config(opt.value_of("name").unwrap_or(""));
@@ -1978,6 +2161,68 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["update-mask", "validate-only"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().locations_list(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2966,6 +3211,68 @@ where
         }
     }
 
+    async fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_list(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_recommenders_get_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_recommenders_get_config(opt.value_of("name").unwrap_or(""));
@@ -3572,6 +3879,65 @@ where
         }
     }
 
+    async fn _recommenders_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.recommenders().list();
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _doit(&self, dry_run: bool) -> Result<Result<(), DoitError>, Option<InvalidOptionsError>> {
         let mut err = InvalidOptionsError::new();
         let mut call_result: Result<(), DoitError> = Ok(());
@@ -3593,6 +3959,9 @@ where
                     },
                     ("locations-insight-types-update-config", Some(opt)) => {
                         call_result = self._billing_accounts_locations_insight_types_update_config(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-list", Some(opt)) => {
+                        call_result = self._billing_accounts_locations_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-recommenders-get-config", Some(opt)) => {
                         call_result = self._billing_accounts_locations_recommenders_get_config(opt, dry_run, &mut err).await;
@@ -3635,6 +4004,9 @@ where
                     ("locations-insight-types-insights-mark-accepted", Some(opt)) => {
                         call_result = self._folders_locations_insight_types_insights_mark_accepted(opt, dry_run, &mut err).await;
                     },
+                    ("locations-list", Some(opt)) => {
+                        call_result = self._folders_locations_list(opt, dry_run, &mut err).await;
+                    },
                     ("locations-recommenders-recommendations-get", Some(opt)) => {
                         call_result = self._folders_locations_recommenders_recommendations_get(opt, dry_run, &mut err).await;
                     },
@@ -3659,6 +4031,17 @@ where
                     }
                 }
             },
+            ("insight-types", Some(opt)) => {
+                match opt.subcommand() {
+                    ("list", Some(opt)) => {
+                        call_result = self._insight_types_list(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("insight-types".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
             ("organizations", Some(opt)) => {
                 match opt.subcommand() {
                     ("locations-insight-types-get-config", Some(opt)) => {
@@ -3675,6 +4058,9 @@ where
                     },
                     ("locations-insight-types-update-config", Some(opt)) => {
                         call_result = self._organizations_locations_insight_types_update_config(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-list", Some(opt)) => {
+                        call_result = self._organizations_locations_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-recommenders-get-config", Some(opt)) => {
                         call_result = self._organizations_locations_recommenders_get_config(opt, dry_run, &mut err).await;
@@ -3723,6 +4109,9 @@ where
                     ("locations-insight-types-update-config", Some(opt)) => {
                         call_result = self._projects_locations_insight_types_update_config(opt, dry_run, &mut err).await;
                     },
+                    ("locations-list", Some(opt)) => {
+                        call_result = self._projects_locations_list(opt, dry_run, &mut err).await;
+                    },
                     ("locations-recommenders-get-config", Some(opt)) => {
                         call_result = self._projects_locations_recommenders_get_config(opt, dry_run, &mut err).await;
                     },
@@ -3749,6 +4138,17 @@ where
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
+                        writeln!(io::stderr(), "{}\n", opt.usage()).ok();
+                    }
+                }
+            },
+            ("recommenders", Some(opt)) => {
+                match opt.subcommand() {
+                    ("list", Some(opt)) => {
+                        call_result = self._recommenders_list(opt, dry_run, &mut err).await;
+                    },
+                    _ => {
+                        err.issues.push(CLIError::MissingMethodError("recommenders".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
                     }
                 }
@@ -3826,7 +4226,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("billing-accounts", "methods: 'locations-insight-types-get-config', 'locations-insight-types-insights-get', 'locations-insight-types-insights-list', 'locations-insight-types-insights-mark-accepted', 'locations-insight-types-update-config', 'locations-recommenders-get-config', 'locations-recommenders-recommendations-get', 'locations-recommenders-recommendations-list', 'locations-recommenders-recommendations-mark-claimed', 'locations-recommenders-recommendations-mark-dismissed', 'locations-recommenders-recommendations-mark-failed', 'locations-recommenders-recommendations-mark-succeeded' and 'locations-recommenders-update-config'", vec![
+        ("billing-accounts", "methods: 'locations-insight-types-get-config', 'locations-insight-types-insights-get', 'locations-insight-types-insights-list', 'locations-insight-types-insights-mark-accepted', 'locations-insight-types-update-config', 'locations-list', 'locations-recommenders-get-config', 'locations-recommenders-recommendations-get', 'locations-recommenders-recommendations-list', 'locations-recommenders-recommendations-mark-claimed', 'locations-recommenders-recommendations-mark-dismissed', 'locations-recommenders-recommendations-mark-failed', 'locations-recommenders-recommendations-mark-succeeded' and 'locations-recommenders-update-config'", vec![
             ("locations-insight-types-get-config",
                     Some(r##"Gets the requested InsightTypeConfig. There is only one instance of the config for each InsightType."##),
                     "Details at http://byron.github.io/google-apis-rs/google_recommender1_beta1_cli/billing-accounts_locations-insight-types-get-config",
@@ -3949,6 +4349,28 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-list",
+                    Some(r##"Lists locations with recommendations or insights."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_recommender1_beta1_cli/billing-accounts_locations-list",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource that owns the locations collection, if applicable."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-recommenders-get-config",
                     Some(r##"Gets the requested Recommender Config. There is only one instance of the config for each Recommender."##),
                     "Details at http://byron.github.io/google-apis-rs/google_recommender1_beta1_cli/billing-accounts_locations-recommenders-get-config",
@@ -4049,7 +4471,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Name of the recommendation."##),
+                     Some(r##"Required. Name of the recommendation."##),
                      Some(true),
                      Some(false)),
         
@@ -4157,7 +4579,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("folders", "methods: 'locations-insight-types-insights-get', 'locations-insight-types-insights-list', 'locations-insight-types-insights-mark-accepted', 'locations-recommenders-recommendations-get', 'locations-recommenders-recommendations-list', 'locations-recommenders-recommendations-mark-claimed', 'locations-recommenders-recommendations-mark-dismissed', 'locations-recommenders-recommendations-mark-failed' and 'locations-recommenders-recommendations-mark-succeeded'", vec![
+        ("folders", "methods: 'locations-insight-types-insights-get', 'locations-insight-types-insights-list', 'locations-insight-types-insights-mark-accepted', 'locations-list', 'locations-recommenders-recommendations-get', 'locations-recommenders-recommendations-list', 'locations-recommenders-recommendations-mark-claimed', 'locations-recommenders-recommendations-mark-dismissed', 'locations-recommenders-recommendations-mark-failed' and 'locations-recommenders-recommendations-mark-succeeded'", vec![
             ("locations-insight-types-insights-get",
                     Some(r##"Gets the requested insight. Requires the recommender.*.get IAM permission for the specified insight type."##),
                     "Details at http://byron.github.io/google-apis-rs/google_recommender1_beta1_cli/folders_locations-insight-types-insights-get",
@@ -4217,6 +4639,28 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-list",
+                    Some(r##"Lists locations with recommendations or insights."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_recommender1_beta1_cli/folders_locations-list",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource that owns the locations collection, if applicable."##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -4308,7 +4752,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Name of the recommendation."##),
+                     Some(r##"Required. Name of the recommendation."##),
                      Some(true),
                      Some(false)),
         
@@ -4388,7 +4832,26 @@ async fn main() {
                   ]),
             ]),
         
-        ("organizations", "methods: 'locations-insight-types-get-config', 'locations-insight-types-insights-get', 'locations-insight-types-insights-list', 'locations-insight-types-insights-mark-accepted', 'locations-insight-types-update-config', 'locations-recommenders-get-config', 'locations-recommenders-recommendations-get', 'locations-recommenders-recommendations-list', 'locations-recommenders-recommendations-mark-claimed', 'locations-recommenders-recommendations-mark-dismissed', 'locations-recommenders-recommendations-mark-failed', 'locations-recommenders-recommendations-mark-succeeded' and 'locations-recommenders-update-config'", vec![
+        ("insight-types", "methods: 'list'", vec![
+            ("list",
+                    Some(r##"Lists available InsightTypes. No IAM permissions are required."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_recommender1_beta1_cli/insight-types_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
+        ("organizations", "methods: 'locations-insight-types-get-config', 'locations-insight-types-insights-get', 'locations-insight-types-insights-list', 'locations-insight-types-insights-mark-accepted', 'locations-insight-types-update-config', 'locations-list', 'locations-recommenders-get-config', 'locations-recommenders-recommendations-get', 'locations-recommenders-recommendations-list', 'locations-recommenders-recommendations-mark-claimed', 'locations-recommenders-recommendations-mark-dismissed', 'locations-recommenders-recommendations-mark-failed', 'locations-recommenders-recommendations-mark-succeeded' and 'locations-recommenders-update-config'", vec![
             ("locations-insight-types-get-config",
                     Some(r##"Gets the requested InsightTypeConfig. There is only one instance of the config for each InsightType."##),
                     "Details at http://byron.github.io/google-apis-rs/google_recommender1_beta1_cli/organizations_locations-insight-types-get-config",
@@ -4511,6 +4974,28 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-list",
+                    Some(r##"Lists locations with recommendations or insights."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_recommender1_beta1_cli/organizations_locations-list",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource that owns the locations collection, if applicable."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-recommenders-get-config",
                     Some(r##"Gets the requested Recommender Config. There is only one instance of the config for each Recommender."##),
                     "Details at http://byron.github.io/google-apis-rs/google_recommender1_beta1_cli/organizations_locations-recommenders-get-config",
@@ -4611,7 +5096,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Name of the recommendation."##),
+                     Some(r##"Required. Name of the recommendation."##),
                      Some(true),
                      Some(false)),
         
@@ -4719,7 +5204,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'locations-insight-types-get-config', 'locations-insight-types-insights-get', 'locations-insight-types-insights-list', 'locations-insight-types-insights-mark-accepted', 'locations-insight-types-update-config', 'locations-recommenders-get-config', 'locations-recommenders-recommendations-get', 'locations-recommenders-recommendations-list', 'locations-recommenders-recommendations-mark-claimed', 'locations-recommenders-recommendations-mark-dismissed', 'locations-recommenders-recommendations-mark-failed', 'locations-recommenders-recommendations-mark-succeeded' and 'locations-recommenders-update-config'", vec![
+        ("projects", "methods: 'locations-insight-types-get-config', 'locations-insight-types-insights-get', 'locations-insight-types-insights-list', 'locations-insight-types-insights-mark-accepted', 'locations-insight-types-update-config', 'locations-list', 'locations-recommenders-get-config', 'locations-recommenders-recommendations-get', 'locations-recommenders-recommendations-list', 'locations-recommenders-recommendations-mark-claimed', 'locations-recommenders-recommendations-mark-dismissed', 'locations-recommenders-recommendations-mark-failed', 'locations-recommenders-recommendations-mark-succeeded' and 'locations-recommenders-update-config'", vec![
             ("locations-insight-types-get-config",
                     Some(r##"Gets the requested InsightTypeConfig. There is only one instance of the config for each InsightType."##),
                     "Details at http://byron.github.io/google-apis-rs/google_recommender1_beta1_cli/projects_locations-insight-types-get-config",
@@ -4842,6 +5327,28 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-list",
+                    Some(r##"Lists locations with recommendations or insights."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_recommender1_beta1_cli/projects_locations-list",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The resource that owns the locations collection, if applicable."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-recommenders-get-config",
                     Some(r##"Gets the requested Recommender Config. There is only one instance of the config for each Recommender."##),
                     "Details at http://byron.github.io/google-apis-rs/google_recommender1_beta1_cli/projects_locations-recommenders-get-config",
@@ -4942,7 +5449,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Name of the recommendation."##),
+                     Some(r##"Required. Name of the recommendation."##),
                      Some(true),
                      Some(false)),
         
@@ -5050,11 +5557,30 @@ async fn main() {
                   ]),
             ]),
         
+        ("recommenders", "methods: 'list'", vec![
+            ("list",
+                    Some(r##"Lists all available Recommenders. No IAM permissions are required."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_recommender1_beta1_cli/recommenders_list",
+                  vec![
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ]),
+        
     ];
     
     let mut app = App::new("recommender1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230108")
+           .version("5.0.4+20240226")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_recommender1_beta1_cli")
            .arg(Arg::with_name("url")

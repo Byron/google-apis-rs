@@ -128,6 +128,7 @@ where
                     "api-endpoint" => Some(("apiEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "crypto-key-config.key-reference" => Some(("cryptoKeyConfig.keyReference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataplex-data-lineage-integration-enabled" => Some(("dataplexDataLineageIntegrationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dataproc-service-account" => Some(("dataprocServiceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disabled-reason" => Some(("disabledReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -141,11 +142,17 @@ where
                     "gcs-bucket" => Some(("gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-config.connection-type" => Some(("networkConfig.connectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-config.ip-allocation" => Some(("networkConfig.ipAllocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-config.network" => Some(("networkConfig.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-config.private-service-connect-config.effective-unreachable-cidr-block" => Some(("networkConfig.privateServiceConnectConfig.effectiveUnreachableCidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-config.private-service-connect-config.network-attachment" => Some(("networkConfig.privateServiceConnectConfig.networkAttachment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-config.private-service-connect-config.unreachable-cidr-block" => Some(("networkConfig.privateServiceConnectConfig.unreachableCidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "options" => Some(("options", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "p4-service-account" => Some(("p4ServiceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "patch-revision" => Some(("patchRevision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-instance" => Some(("privateInstance", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-endpoint" => Some(("serviceEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -154,9 +161,10 @@ where
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "workforce-identity-service-endpoint" => Some(("workforceIdentityServiceEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-endpoint", "create-time", "crypto-key-config", "dataproc-service-account", "description", "disabled-reason", "display-name", "enable-rbac", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "enable-zone-separation", "enabled", "event-publish-config", "gcs-bucket", "ip-allocation", "key-reference", "labels", "name", "network", "network-config", "options", "p4-service-account", "private-instance", "service-account", "service-endpoint", "state", "state-message", "tenant-project-id", "topic", "type", "update-time", "version", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-endpoint", "connection-type", "create-time", "crypto-key-config", "dataplex-data-lineage-integration-enabled", "dataproc-service-account", "description", "disabled-reason", "display-name", "effective-unreachable-cidr-block", "enable-rbac", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "enable-zone-separation", "enabled", "event-publish-config", "gcs-bucket", "ip-allocation", "key-reference", "labels", "name", "network", "network-attachment", "network-config", "options", "p4-service-account", "patch-revision", "private-instance", "private-service-connect-config", "satisfies-pzs", "service-account", "service-endpoint", "state", "state-message", "tenant-project-id", "topic", "type", "unreachable-cidr-block", "update-time", "version", "workforce-identity-service-endpoint", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -965,6 +973,7 @@ where
                     "api-endpoint" => Some(("apiEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "crypto-key-config.key-reference" => Some(("cryptoKeyConfig.keyReference", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "dataplex-data-lineage-integration-enabled" => Some(("dataplexDataLineageIntegrationEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dataproc-service-account" => Some(("dataprocServiceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "disabled-reason" => Some(("disabledReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -978,11 +987,17 @@ where
                     "gcs-bucket" => Some(("gcsBucket", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-config.connection-type" => Some(("networkConfig.connectionType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-config.ip-allocation" => Some(("networkConfig.ipAllocation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "network-config.network" => Some(("networkConfig.network", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-config.private-service-connect-config.effective-unreachable-cidr-block" => Some(("networkConfig.privateServiceConnectConfig.effectiveUnreachableCidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-config.private-service-connect-config.network-attachment" => Some(("networkConfig.privateServiceConnectConfig.networkAttachment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "network-config.private-service-connect-config.unreachable-cidr-block" => Some(("networkConfig.privateServiceConnectConfig.unreachableCidrBlock", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "options" => Some(("options", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "p4-service-account" => Some(("p4ServiceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "patch-revision" => Some(("patchRevision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-instance" => Some(("privateInstance", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "service-endpoint" => Some(("serviceEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -991,9 +1006,10 @@ where
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "version" => Some(("version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "workforce-identity-service-endpoint" => Some(("workforceIdentityServiceEndpoint", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zone" => Some(("zone", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-endpoint", "create-time", "crypto-key-config", "dataproc-service-account", "description", "disabled-reason", "display-name", "enable-rbac", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "enable-zone-separation", "enabled", "event-publish-config", "gcs-bucket", "ip-allocation", "key-reference", "labels", "name", "network", "network-config", "options", "p4-service-account", "private-instance", "service-account", "service-endpoint", "state", "state-message", "tenant-project-id", "topic", "type", "update-time", "version", "zone"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["api-endpoint", "connection-type", "create-time", "crypto-key-config", "dataplex-data-lineage-integration-enabled", "dataproc-service-account", "description", "disabled-reason", "display-name", "effective-unreachable-cidr-block", "enable-rbac", "enable-stackdriver-logging", "enable-stackdriver-monitoring", "enable-zone-separation", "enabled", "event-publish-config", "gcs-bucket", "ip-allocation", "key-reference", "labels", "name", "network", "network-attachment", "network-config", "options", "p4-service-account", "patch-revision", "private-instance", "private-service-connect-config", "satisfies-pzs", "service-account", "service-endpoint", "state", "state-message", "tenant-project-id", "topic", "type", "unreachable-cidr-block", "update-time", "version", "workforce-identity-service-endpoint", "zone"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2565,7 +2581,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datafusion1_beta1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -2642,7 +2658,7 @@ async fn main() {
     
     let mut app = App::new("datafusion1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20221213")
+           .version("5.0.4+20240111")
            .about("Cloud Data Fusion is a fully-managed, cloud native, enterprise data integration service for quickly building and managing data pipelines. It provides a graphical interface to increase time efficiency and reduce complexity, and allows business users, developers, and data scientists to easily and reliably build scalable data integration solutions to cleanse, prepare, blend, transfer and transform data without having to wrestle with infrastructure.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datafusion1_beta1_cli")
            .arg(Arg::with_name("url")

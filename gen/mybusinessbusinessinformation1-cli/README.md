@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *My Business Business Information* API at revision *20230124*. The CLI is at version *5.0.3*.
+This documentation was generated from the *My Business Business Information* API at revision *20240304*. The CLI is at version *5.0.4*.
 
 ```bash
 mybusinessbusinessinformation1 [options]
@@ -43,9 +43,7 @@ mybusinessbusinessinformation1 [options]
         google-locations
                 search (-r <kv>)... [-p <v>]... [-o <out>]
         locations
-                associate <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 attributes-get-google-updated <name> [-p <v>]... [-o <out>]
-                clear-location-association <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 delete <name> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 get-attributes <name> [-p <v>]... [-o <out>]

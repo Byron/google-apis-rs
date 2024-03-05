@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *AnalyticsData* crate version *5.0.3+20230123*, where *20230123* is the exact revision of the *analyticsdata:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *AnalyticsData* crate version *5.0.4+20240304*, where *20240304* is the exact revision of the *analyticsdata:v1beta* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *AnalyticsData* *v1_beta* API can be found at the
 //! [official documentation site](https://developers.google.com/analytics/devguides/reporting/data/v1/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](AnalyticsData) ... 
 //! 
 //! * properties
-//!  * [*batch run pivot reports*](api::PropertyBatchRunPivotReportCall), [*batch run reports*](api::PropertyBatchRunReportCall), [*check compatibility*](api::PropertyCheckCompatibilityCall), [*get metadata*](api::PropertyGetMetadataCall), [*run pivot report*](api::PropertyRunPivotReportCall), [*run realtime report*](api::PropertyRunRealtimeReportCall) and [*run report*](api::PropertyRunReportCall)
+//!  * [*audience exports create*](api::PropertyAudienceExportCreateCall), [*audience exports get*](api::PropertyAudienceExportGetCall), [*audience exports list*](api::PropertyAudienceExportListCall), [*audience exports query*](api::PropertyAudienceExportQueryCall), [*batch run pivot reports*](api::PropertyBatchRunPivotReportCall), [*batch run reports*](api::PropertyBatchRunReportCall), [*check compatibility*](api::PropertyCheckCompatibilityCall), [*get metadata*](api::PropertyGetMetadataCall), [*run pivot report*](api::PropertyRunPivotReportCall), [*run realtime report*](api::PropertyRunRealtimeReportCall) and [*run report*](api::PropertyRunReportCall)
 //! 
 //! 
 //! 
@@ -47,7 +47,8 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.properties().run_report(...).doit().await
+//! let r = hub.properties().audience_exports_create(...).doit().await
+//! let r = hub.properties().audience_exports_get(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -74,7 +75,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_analyticsdata1_beta as analyticsdata1_beta;
-//! use analyticsdata1_beta::api::RunReportRequest;
+//! use analyticsdata1_beta::api::AudienceExport;
 //! use analyticsdata1_beta::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -96,12 +97,12 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = RunReportRequest::default();
+//! let mut req = AudienceExport::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.properties().run_report(req, "property")
+//! let result = hub.properties().audience_exports_create(req, "parent")
 //!              .doit().await;
 //! 
 //! match result {

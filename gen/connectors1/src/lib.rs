@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Connectors* crate version *5.0.3+20230103*, where *20230103* is the exact revision of the *connectors:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Connectors* crate version *5.0.4+20240221*, where *20240221* is the exact revision of the *connectors:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Connectors* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/apigee/docs/api-platform/connectors/about-connectors).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Connectors) ... 
 //! 
 //! * projects
-//!  * [*locations connections connection schema metadata refresh*](api::ProjectLocationConnectionConnectionSchemaMetadataRefreshCall), [*locations connections create*](api::ProjectLocationConnectionCreateCall), [*locations connections delete*](api::ProjectLocationConnectionDeleteCall), [*locations connections get*](api::ProjectLocationConnectionGetCall), [*locations connections get connection schema metadata*](api::ProjectLocationConnectionGetConnectionSchemaMetadataCall), [*locations connections get iam policy*](api::ProjectLocationConnectionGetIamPolicyCall), [*locations connections list*](api::ProjectLocationConnectionListCall), [*locations connections patch*](api::ProjectLocationConnectionPatchCall), [*locations connections runtime action schemas list*](api::ProjectLocationConnectionRuntimeActionSchemaListCall), [*locations connections runtime entity schemas list*](api::ProjectLocationConnectionRuntimeEntitySchemaListCall), [*locations connections set iam policy*](api::ProjectLocationConnectionSetIamPolicyCall), [*locations connections test iam permissions*](api::ProjectLocationConnectionTestIamPermissionCall), [*locations get*](api::ProjectLocationGetCall), [*locations get runtime config*](api::ProjectLocationGetRuntimeConfigCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations providers connectors get*](api::ProjectLocationProviderConnectorGetCall), [*locations providers connectors list*](api::ProjectLocationProviderConnectorListCall), [*locations providers connectors versions get*](api::ProjectLocationProviderConnectorVersionGetCall), [*locations providers connectors versions list*](api::ProjectLocationProviderConnectorVersionListCall), [*locations providers get*](api::ProjectLocationProviderGetCall), [*locations providers get iam policy*](api::ProjectLocationProviderGetIamPolicyCall), [*locations providers list*](api::ProjectLocationProviderListCall), [*locations providers set iam policy*](api::ProjectLocationProviderSetIamPolicyCall) and [*locations providers test iam permissions*](api::ProjectLocationProviderTestIamPermissionCall)
+//!  * [*locations connections connection schema metadata get action*](api::ProjectLocationConnectionConnectionSchemaMetadataGetActionCall), [*locations connections connection schema metadata get entity type*](api::ProjectLocationConnectionConnectionSchemaMetadataGetEntityTypeCall), [*locations connections connection schema metadata list actions*](api::ProjectLocationConnectionConnectionSchemaMetadataListActionCall), [*locations connections connection schema metadata list entity types*](api::ProjectLocationConnectionConnectionSchemaMetadataListEntityTypeCall), [*locations connections connection schema metadata refresh*](api::ProjectLocationConnectionConnectionSchemaMetadataRefreshCall), [*locations connections create*](api::ProjectLocationConnectionCreateCall), [*locations connections delete*](api::ProjectLocationConnectionDeleteCall), [*locations connections event subscriptions create*](api::ProjectLocationConnectionEventSubscriptionCreateCall), [*locations connections event subscriptions delete*](api::ProjectLocationConnectionEventSubscriptionDeleteCall), [*locations connections event subscriptions get*](api::ProjectLocationConnectionEventSubscriptionGetCall), [*locations connections event subscriptions list*](api::ProjectLocationConnectionEventSubscriptionListCall), [*locations connections event subscriptions patch*](api::ProjectLocationConnectionEventSubscriptionPatchCall), [*locations connections event subscriptions retry*](api::ProjectLocationConnectionEventSubscriptionRetryCall), [*locations connections get*](api::ProjectLocationConnectionGetCall), [*locations connections get connection schema metadata*](api::ProjectLocationConnectionGetConnectionSchemaMetadataCall), [*locations connections get iam policy*](api::ProjectLocationConnectionGetIamPolicyCall), [*locations connections list*](api::ProjectLocationConnectionListCall), [*locations connections listen event*](api::ProjectLocationConnectionListenEventCall), [*locations connections patch*](api::ProjectLocationConnectionPatchCall), [*locations connections repair eventing*](api::ProjectLocationConnectionRepairEventingCall), [*locations connections runtime action schemas list*](api::ProjectLocationConnectionRuntimeActionSchemaListCall), [*locations connections runtime entity schemas list*](api::ProjectLocationConnectionRuntimeEntitySchemaListCall), [*locations connections set iam policy*](api::ProjectLocationConnectionSetIamPolicyCall), [*locations connections test iam permissions*](api::ProjectLocationConnectionTestIamPermissionCall), [*locations endpoint attachments create*](api::ProjectLocationEndpointAttachmentCreateCall), [*locations endpoint attachments delete*](api::ProjectLocationEndpointAttachmentDeleteCall), [*locations endpoint attachments get*](api::ProjectLocationEndpointAttachmentGetCall), [*locations endpoint attachments list*](api::ProjectLocationEndpointAttachmentListCall), [*locations endpoint attachments patch*](api::ProjectLocationEndpointAttachmentPatchCall), [*locations get*](api::ProjectLocationGetCall), [*locations get regional settings*](api::ProjectLocationGetRegionalSettingCall), [*locations get runtime config*](api::ProjectLocationGetRuntimeConfigCall), [*locations global custom connectors create*](api::ProjectLocationGlobalCustomConnectorCreateCall), [*locations global custom connectors custom connector versions create*](api::ProjectLocationGlobalCustomConnectorCustomConnectorVersionCreateCall), [*locations global custom connectors custom connector versions delete*](api::ProjectLocationGlobalCustomConnectorCustomConnectorVersionDeleteCall), [*locations global custom connectors custom connector versions get*](api::ProjectLocationGlobalCustomConnectorCustomConnectorVersionGetCall), [*locations global custom connectors custom connector versions list*](api::ProjectLocationGlobalCustomConnectorCustomConnectorVersionListCall), [*locations global custom connectors custom connector versions patch*](api::ProjectLocationGlobalCustomConnectorCustomConnectorVersionPatchCall), [*locations global custom connectors delete*](api::ProjectLocationGlobalCustomConnectorDeleteCall), [*locations global custom connectors get*](api::ProjectLocationGlobalCustomConnectorGetCall), [*locations global custom connectors list*](api::ProjectLocationGlobalCustomConnectorListCall), [*locations global custom connectors patch*](api::ProjectLocationGlobalCustomConnectorPatchCall), [*locations global get settings*](api::ProjectLocationGlobalGetSettingCall), [*locations global managed zones create*](api::ProjectLocationGlobalManagedZoneCreateCall), [*locations global managed zones delete*](api::ProjectLocationGlobalManagedZoneDeleteCall), [*locations global managed zones get*](api::ProjectLocationGlobalManagedZoneGetCall), [*locations global managed zones list*](api::ProjectLocationGlobalManagedZoneListCall), [*locations global managed zones patch*](api::ProjectLocationGlobalManagedZonePatchCall), [*locations global update settings*](api::ProjectLocationGlobalUpdateSettingCall), [*locations list*](api::ProjectLocationListCall), [*locations operations cancel*](api::ProjectLocationOperationCancelCall), [*locations operations delete*](api::ProjectLocationOperationDeleteCall), [*locations operations get*](api::ProjectLocationOperationGetCall), [*locations operations list*](api::ProjectLocationOperationListCall), [*locations providers connectors get*](api::ProjectLocationProviderConnectorGetCall), [*locations providers connectors list*](api::ProjectLocationProviderConnectorListCall), [*locations providers connectors versions eventtypes get*](api::ProjectLocationProviderConnectorVersionEventtypeGetCall), [*locations providers connectors versions eventtypes list*](api::ProjectLocationProviderConnectorVersionEventtypeListCall), [*locations providers connectors versions get*](api::ProjectLocationProviderConnectorVersionGetCall), [*locations providers connectors versions list*](api::ProjectLocationProviderConnectorVersionListCall), [*locations providers get*](api::ProjectLocationProviderGetCall), [*locations providers get iam policy*](api::ProjectLocationProviderGetIamPolicyCall), [*locations providers list*](api::ProjectLocationProviderListCall), [*locations providers set iam policy*](api::ProjectLocationProviderSetIamPolicyCall), [*locations providers test iam permissions*](api::ProjectLocationProviderTestIamPermissionCall) and [*locations update regional settings*](api::ProjectLocationUpdateRegionalSettingCall)
 //! 
 //! 
 //! 
@@ -47,11 +47,32 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.projects().locations_connections_connection_schema_metadata_get_action(...).doit().await
+//! let r = hub.projects().locations_connections_connection_schema_metadata_get_entity_type(...).doit().await
 //! let r = hub.projects().locations_connections_connection_schema_metadata_refresh(...).doit().await
+//! let r = hub.projects().locations_connections_event_subscriptions_create(...).doit().await
+//! let r = hub.projects().locations_connections_event_subscriptions_delete(...).doit().await
+//! let r = hub.projects().locations_connections_event_subscriptions_patch(...).doit().await
+//! let r = hub.projects().locations_connections_event_subscriptions_retry(...).doit().await
 //! let r = hub.projects().locations_connections_create(...).doit().await
 //! let r = hub.projects().locations_connections_delete(...).doit().await
 //! let r = hub.projects().locations_connections_patch(...).doit().await
+//! let r = hub.projects().locations_connections_repair_eventing(...).doit().await
+//! let r = hub.projects().locations_endpoint_attachments_create(...).doit().await
+//! let r = hub.projects().locations_endpoint_attachments_delete(...).doit().await
+//! let r = hub.projects().locations_endpoint_attachments_patch(...).doit().await
+//! let r = hub.projects().locations_global_custom_connectors_custom_connector_versions_create(...).doit().await
+//! let r = hub.projects().locations_global_custom_connectors_custom_connector_versions_delete(...).doit().await
+//! let r = hub.projects().locations_global_custom_connectors_custom_connector_versions_patch(...).doit().await
+//! let r = hub.projects().locations_global_custom_connectors_create(...).doit().await
+//! let r = hub.projects().locations_global_custom_connectors_delete(...).doit().await
+//! let r = hub.projects().locations_global_custom_connectors_patch(...).doit().await
+//! let r = hub.projects().locations_global_managed_zones_create(...).doit().await
+//! let r = hub.projects().locations_global_managed_zones_delete(...).doit().await
+//! let r = hub.projects().locations_global_managed_zones_patch(...).doit().await
+//! let r = hub.projects().locations_global_update_settings(...).doit().await
 //! let r = hub.projects().locations_operations_get(...).doit().await
+//! let r = hub.projects().locations_update_regional_settings(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -78,7 +99,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_connectors1 as connectors1;
-//! use connectors1::api::Connection;
+//! use connectors1::api::EventSubscription;
 //! use connectors1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -100,13 +121,13 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = Connection::default();
+//! let mut req = EventSubscription::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().locations_connections_create(req, "parent")
-//!              .connection_id("ipsum")
+//! let result = hub.projects().locations_connections_event_subscriptions_create(req, "parent")
+//!              .event_subscription_id("ipsum")
 //!              .doit().await;
 //! 
 //! match result {

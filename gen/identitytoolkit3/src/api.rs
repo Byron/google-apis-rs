@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// View and manage your data across Google Cloud Platform services
     CloudPlatform,
@@ -129,7 +129,7 @@ impl<'a, S> IdentityToolkit<S> {
         IdentityToolkit {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://www.googleapis.com/identitytoolkit/v3/relyingparty/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -140,7 +140,7 @@ impl<'a, S> IdentityToolkit<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -1132,7 +1132,7 @@ pub struct IdentitytoolkitRelyingpartyUploadAccountRequest {
     /// The salt separator.
     #[serde(rename="saltSeparator")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub salt_separator: Option<Vec<u8>>,
     /// If true, backend will do sanity check(including duplicate email and federated id) when uploading account.
     #[serde(rename="sanityCheck")]
@@ -1141,7 +1141,7 @@ pub struct IdentitytoolkitRelyingpartyUploadAccountRequest {
     /// The key for to hash the password.
     #[serde(rename="signerKey")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub signer_key: Option<Vec<u8>>,
     /// Specify which project (field value is actually project id) to operate. Only used when provided credential.
     #[serde(rename="targetProjectId")]
@@ -1599,7 +1599,7 @@ pub struct SetAccountInfoResponse {
     /// The user's hashed password.
     #[serde(rename="passwordHash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub password_hash: Option<Vec<u8>>,
     /// The photo url of the user.
     #[serde(rename="photoUrl")]
@@ -1729,7 +1729,7 @@ pub struct UserInfo {
     /// The user's hashed password.
     #[serde(rename="passwordHash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub password_hash: Option<Vec<u8>>,
     /// The timestamp when the password was last updated.
     #[serde(rename="passwordUpdatedAt")]
@@ -1753,7 +1753,7 @@ pub struct UserInfo {
     pub raw_password: Option<String>,
     /// The user's password salt.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub salt: Option<Vec<u8>>,
     /// User's screen name at Twitter or login name at Github.
     #[serde(rename="screenName")]

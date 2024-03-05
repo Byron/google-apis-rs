@@ -1,4 +1,4 @@
-site_name: Cloud IAP v5.0.3+20230118
+site_name: Cloud IAP v5.0.4+20240224
 site_url: http://byron.github.io/google-apis-rs/google-iap1-cli
 site_description: A complete library to interact with Cloud IAP (protocol v1)
 
@@ -15,6 +15,7 @@ nav:
     - 'Set Iam Policy': 'methods_set-iam-policy.md'
     - 'Test Iam Permissions': 'methods_test-iam-permissions.md'
     - 'Update Iap Settings': 'methods_update-iap-settings.md'
+    - 'Validate Attribute Expression': 'methods_validate-attribute-expression.md'
 - 'Projects':
     - 'Brands Create': 'projects_brands-create.md'
     - 'Brands Get': 'projects_brands-get.md'

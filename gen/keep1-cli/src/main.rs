@@ -827,7 +827,7 @@ async fn main() {
     
     let mut app = App::new("keep1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230117")
+           .version("5.0.4+20240227")
            .about("The Google Keep API is used in an enterprise environment to manage Google Keep content and resolve issues identified by cloud security software.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_keep1_cli")
            .arg(Arg::with_name("url")

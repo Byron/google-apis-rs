@@ -190,11 +190,21 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "custom-class.annotations" => Some(("customClass.annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "custom-class.custom-class-id" => Some(("customClass.customClassId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-class.delete-time" => Some(("customClass.deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-class.display-name" => Some(("customClass.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-class.etag" => Some(("customClass.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-class.expire-time" => Some(("customClass.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-class.kms-key-name" => Some(("customClass.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-class.kms-key-version-name" => Some(("customClass.kmsKeyVersionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "custom-class.name" => Some(("customClass.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-class.reconciling" => Some(("customClass.reconciling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "custom-class.state" => Some(("customClass.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-class.uid" => Some(("customClass.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "custom-class-id" => Some(("customClassId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["custom-class", "custom-class-id", "name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "custom-class", "custom-class-id", "delete-time", "display-name", "etag", "expire-time", "kms-key-name", "kms-key-version-name", "name", "reconciling", "state", "uid"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -440,10 +450,20 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "custom-class-id" => Some(("customClassId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "delete-time" => Some(("deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kms-key-version-name" => Some(("kmsKeyVersionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reconciling" => Some(("reconciling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["custom-class-id", "name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "custom-class-id", "delete-time", "display-name", "etag", "expire-time", "kms-key-name", "kms-key-version-name", "name", "reconciling", "state", "uid"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -530,11 +550,21 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "phrase-set.annotations" => Some(("phraseSet.annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "phrase-set.boost" => Some(("phraseSet.boost", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "phrase-set.delete-time" => Some(("phraseSet.deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "phrase-set.display-name" => Some(("phraseSet.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "phrase-set.etag" => Some(("phraseSet.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "phrase-set.expire-time" => Some(("phraseSet.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "phrase-set.kms-key-name" => Some(("phraseSet.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "phrase-set.kms-key-version-name" => Some(("phraseSet.kmsKeyVersionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "phrase-set.name" => Some(("phraseSet.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "phrase-set.reconciling" => Some(("phraseSet.reconciling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "phrase-set.state" => Some(("phraseSet.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "phrase-set.uid" => Some(("phraseSet.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "phrase-set-id" => Some(("phraseSetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost", "name", "phrase-set", "phrase-set-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "boost", "delete-time", "display-name", "etag", "expire-time", "kms-key-name", "kms-key-version-name", "name", "phrase-set", "phrase-set-id", "reconciling", "state", "uid"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -780,10 +810,20 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "boost" => Some(("boost", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "delete-time" => Some(("deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "kms-key-version-name" => Some(("kmsKeyVersionName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "reconciling" => Some(("reconciling", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["boost", "name"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "boost", "delete-time", "display-name", "etag", "expire-time", "kms-key-name", "kms-key-version-name", "name", "reconciling", "state", "uid"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1246,7 +1286,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_speech1_cli/operations_list",
                   vec![
                     (Some(r##"v"##),
@@ -1392,7 +1432,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent resource where this phrase set will be created. Format: `projects/{project}/locations/{location}/phraseSets` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](https://cloud.google.com/speech-to-text/docs/endpoints) with matching `us` or `eu` location value."##),
+                     Some(r##"Required. The parent resource where this phrase set will be created. Format: `projects/{project}/locations/{location}` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](https://cloud.google.com/speech-to-text/docs/endpoints) with matching `us` or `eu` location value."##),
                      Some(true),
                      Some(false)),
         
@@ -1561,7 +1601,7 @@ async fn main() {
     
     let mut app = App::new("speech1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230119")
+           .version("5.0.4+20240222")
            .about("Converts audio to text by applying powerful neural network models.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_speech1_cli")
            .arg(Arg::with_name("url")

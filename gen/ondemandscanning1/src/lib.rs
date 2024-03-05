@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *On-Demand Scanning* crate version *5.0.3+20230109*, where *20230109* is the exact revision of the *ondemandscanning:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *On-Demand Scanning* crate version *5.0.4+20240226*, where *20240226* is the exact revision of the *ondemandscanning:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *On-Demand Scanning* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/container-analysis/docs/on-demand-scanning/).

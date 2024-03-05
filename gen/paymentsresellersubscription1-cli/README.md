@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Payments Reseller Subscription* API at revision *20230123*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Payments Reseller Subscription* API at revision *20240303*. The CLI is at version *5.0.4*.
 
 ```bash
 paymentsresellersubscription1 [options]
@@ -43,6 +43,10 @@ paymentsresellersubscription1 [options]
   paymentsresellersubscription1 --help
 
 Configuration:
+  [--scope <url>]...
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
+            If unset, it defaults to the shortest scope url for a particular method.
   --config-dir <folder>
             A directory into which we will store our persistent data. Defaults to
             a user-writable directory that we will create during the first invocation.

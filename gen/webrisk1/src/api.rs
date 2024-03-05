@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -59,7 +59,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_webrisk1 as webrisk1;
-/// use webrisk1::api::GoogleCloudWebriskV1SubmitUriRequest;
+/// use webrisk1::api::GoogleLongrunningCancelOperationRequest;
 /// use webrisk1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
@@ -81,12 +81,12 @@ impl Default for Scope {
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
-/// let mut req = GoogleCloudWebriskV1SubmitUriRequest::default();
+/// let mut req = GoogleLongrunningCancelOperationRequest::default();
 /// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().uris_submit(req, "parent")
+/// let result = hub.projects().operations_cancel(req, "name")
 ///              .doit().await;
 /// 
 /// match result {
@@ -125,7 +125,7 @@ impl<'a, S> WebRisk<S> {
         WebRisk {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://webrisk.googleapis.com/".to_string(),
             _root_url: "https://webrisk.googleapis.com/".to_string(),
         }
@@ -145,7 +145,7 @@ impl<'a, S> WebRisk<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -193,7 +193,7 @@ pub struct GoogleCloudWebriskV1ComputeThreatListDiffResponse {
     /// The new opaque client version token. This should be retained by the client and passed into the next call of ComputeThreatListDiff as 'version_token'. A separate version token should be stored and used for each threatList.
     #[serde(rename="newVersionToken")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub new_version_token: Option<Vec<u8>>,
     /// The soonest the client should wait before issuing any diff request. Querying sooner is unlikely to produce a meaningful diff. Waiting longer is acceptable considering the use case. If this field is not set clients may update as soon as they want.
     #[serde(rename="recommendedNextDiff")]
@@ -220,7 +220,7 @@ impl client::ResponseResult for GoogleCloudWebriskV1ComputeThreatListDiffRespons
 pub struct GoogleCloudWebriskV1ComputeThreatListDiffResponseChecksum {
     /// The SHA256 hash of the client state; that is, of the sorted list of all hashes present in the database.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub sha256: Option<Vec<u8>>,
 }
 
@@ -241,7 +241,7 @@ pub struct GoogleCloudWebriskV1RawHashes {
     /// The hashes, in binary format, concatenated into one long string. Hashes are sorted in lexicographic order. For JSON API users, hashes are base64-encoded.
     #[serde(rename="rawHashes")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub raw_hashes: Option<Vec<u8>>,
 }
 
@@ -273,7 +273,7 @@ pub struct GoogleCloudWebriskV1RiceDeltaEncoding {
     /// The encoded deltas that are encoded using the Golomb-Rice coder.
     #[serde(rename="encodedData")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub encoded_data: Option<Vec<u8>>,
     /// The number of entries that are delta encoded in the encoded data. If only a single integer was encoded, this will be zero and the single value will be stored in `first_value`.
     #[serde(rename="entryCount")]
@@ -329,7 +329,7 @@ pub struct GoogleCloudWebriskV1SearchHashesResponseThreatHash {
     pub expire_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// A 32 byte SHA256 hash. This field is in binary format. For JSON requests, hashes are base64-encoded.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub hash: Option<Vec<u8>>,
     /// The ThreatList this threat belongs to. This must contain at least one entry.
     #[serde(rename="threatTypes")]
@@ -390,10 +390,6 @@ impl client::Part for GoogleCloudWebriskV1SearchUrisResponseThreatUri {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudWebriskV1Submission {
-    /// ThreatTypes found to be associated with the submitted URI after reviewing it. This might be empty if the URI was not added to any list.
-    #[serde(rename="threatTypes")]
-    
-    pub threat_types: Option<Vec<String>>,
     /// Required. The URI that is being reported for malicious content to be analyzed.
     
     pub uri: Option<String>,
@@ -401,25 +397,6 @@ pub struct GoogleCloudWebriskV1Submission {
 
 impl client::RequestValue for GoogleCloudWebriskV1Submission {}
 impl client::ResponseResult for GoogleCloudWebriskV1Submission {}
-
-
-/// Request to send a potentially malicious URI to WebRisk.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [uris submit projects](ProjectUriSubmitCall) (request)
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GoogleCloudWebriskV1SubmitUriRequest {
-    /// Required. The submission that contains the URI to be scanned.
-    
-    pub submission: Option<GoogleCloudWebriskV1Submission>,
-}
-
-impl client::RequestValue for GoogleCloudWebriskV1SubmitUriRequest {}
 
 
 /// Contains the set of entries to add to a local database. May contain a combination of compressed and raw data in a single response.
@@ -508,7 +485,6 @@ impl client::ResponseResult for GoogleLongrunningListOperationsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [operations get projects](ProjectOperationGetCall) (response)
-/// * [uris submit projects](ProjectUriSubmitCall) (response)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleLongrunningOperation {
@@ -524,7 +500,7 @@ pub struct GoogleLongrunningOperation {
     /// Matches the `/v1/{project-name}/operations/{operation-id}` pattern.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -652,7 +628,7 @@ impl<'a, S> HashMethods<'a, S> {
 ///     ).build().await.unwrap();
 /// let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `operations_cancel(...)`, `operations_delete(...)`, `operations_get(...)`, `operations_list(...)`, `submissions_create(...)` and `uris_submit(...)`
+/// // like `operations_cancel(...)`, `operations_delete(...)`, `operations_get(...)`, `operations_list(...)` and `submissions_create(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -720,7 +696,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
     /// 
     /// # Arguments
     ///
@@ -747,25 +723,6 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// * `parent` - Required. The name of the project that is making the submission. This string is in the format "projects/{project_number}".
     pub fn submissions_create(&self, request: GoogleCloudWebriskV1Submission, parent: &str) -> ProjectSubmissionCreateCall<'a, S> {
         ProjectSubmissionCreateCall {
-            hub: self.hub,
-            _request: request,
-            _parent: parent.to_string(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-            _scopes: Default::default(),
-        }
-    }
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Submits a URI suspected of containing malicious content to be reviewed. Returns a google.longrunning.Operation which, once the review is complete, is updated with its result. You can use the [Pub/Sub API] (https://cloud.google.com/pubsub) to receive notifications for the returned Operation. If the result verifies the existence of malicious content, the site will be added to the [Google's Social Engineering lists] (https://support.google.com/webmasters/answer/6350487/) in order to protect users that could get exposed to this threat in the future. Only allowlisted projects can use this method during Early Access. Please reach out to Sales or your customer engineer to obtain access.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    /// * `parent` - Required. The name of the project that is making the submission. This string is in the format "projects/{project_number}".
-    pub fn uris_submit(&self, request: GoogleCloudWebriskV1SubmitUriRequest, parent: &str) -> ProjectUriSubmitCall<'a, S> {
-        ProjectUriSubmitCall {
             hub: self.hub,
             _request: request,
             _parent: parent.to_string(),
@@ -977,7 +934,7 @@ where
             }
         }
         if let Some(value) = self._hash_prefix.as_ref() {
-            params.push("hashPrefix", ::client::serde::urlsafe_base64::to_string(&value));
+            params.push("hashPrefix", ::client::serde::standard_base64::to_string(&value));
         }
 
         params.extend(self._additional_params.iter());
@@ -1893,7 +1850,7 @@ where
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *operations.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -2438,298 +2395,6 @@ where
 }
 
 
-/// Submits a URI suspected of containing malicious content to be reviewed. Returns a google.longrunning.Operation which, once the review is complete, is updated with its result. You can use the [Pub/Sub API] (https://cloud.google.com/pubsub) to receive notifications for the returned Operation. If the result verifies the existence of malicious content, the site will be added to the [Google's Social Engineering lists] (https://support.google.com/webmasters/answer/6350487/) in order to protect users that could get exposed to this threat in the future. Only allowlisted projects can use this method during Early Access. Please reach out to Sales or your customer engineer to obtain access.
-///
-/// A builder for the *uris.submit* method supported by a *project* resource.
-/// It is not used directly, but through a [`ProjectMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_webrisk1 as webrisk1;
-/// use webrisk1::api::GoogleCloudWebriskV1SubmitUriRequest;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use webrisk1::{WebRisk, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = WebRisk::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = GoogleCloudWebriskV1SubmitUriRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.projects().uris_submit(req, "parent")
-///              .doit().await;
-/// # }
-/// ```
-pub struct ProjectUriSubmitCall<'a, S>
-    where S: 'a {
-
-    hub: &'a WebRisk<S>,
-    _request: GoogleCloudWebriskV1SubmitUriRequest,
-    _parent: String,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-    _scopes: BTreeSet<String>
-}
-
-impl<'a, S> client::CallBuilder for ProjectUriSubmitCall<'a, S> {}
-
-impl<'a, S> ProjectUriSubmitCall<'a, S>
-where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
-{
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleLongrunningOperation)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
-        use std::borrow::Cow;
-
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "webrisk.projects.uris.submit",
-                               http_method: hyper::Method::POST });
-
-        for &field in ["alt", "parent"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(4 + self._additional_params.len());
-        params.push("parent", self._parent);
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/{+parent}/uris:submit";
-        if self._scopes.is_empty() {
-            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
-        }
-
-        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
-            url = params.uri_replacement(url, param_name, find_this, true);
-        }
-        {
-            let to_remove = ["parent"];
-            params.remove_params(&to_remove);
-        }
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
-                Ok(token) => token,
-                Err(e) => {
-                    match dlg.token(e) {
-                        Ok(token) => token,
-                        Err(e) => {
-                            dlg.finished(false);
-                            return Err(client::Error::MissingToken(e));
-                        }
-                    }
-                }
-            };
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-                if let Some(token) = token.as_ref() {
-                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
-                }
-
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
-
-                client.request(request.unwrap()).await
-
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
-
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GoogleCloudWebriskV1SubmitUriRequest) -> ProjectUriSubmitCall<'a, S> {
-        self._request = new_value;
-        self
-    }
-    /// Required. The name of the project that is making the submission. This string is in the format "projects/{project_number}".
-    ///
-    /// Sets the *parent* path property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn parent(mut self, new_value: &str) -> ProjectUriSubmitCall<'a, S> {
-        self._parent = new_value.to_string();
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectUriSubmitCall<'a, S> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> ProjectUriSubmitCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-    /// Identifies the authorization scope for the method you are building.
-    ///
-    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
-    /// [`Scope::CloudPlatform`].
-    ///
-    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
-    /// tokens for more than one scope.
-    ///
-    /// Usually there is more than one suitable scope to authorize an operation, some of which may
-    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
-    /// sufficient, a read-write scope will do as well.
-    pub fn add_scope<St>(mut self, scope: St) -> ProjectUriSubmitCall<'a, S>
-                                                        where St: AsRef<str> {
-        self._scopes.insert(String::from(scope.as_ref()));
-        self
-    }
-    /// Identifies the authorization scope(s) for the method you are building.
-    ///
-    /// See [`Self::add_scope()`] for details.
-    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectUriSubmitCall<'a, S>
-                                                        where I: IntoIterator<Item = St>,
-                                                         St: AsRef<str> {
-        self._scopes
-            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
-        self
-    }
-
-    /// Removes all scopes, and no default scope will be used either.
-    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
-    /// for details).
-    pub fn clear_scopes(mut self) -> ProjectUriSubmitCall<'a, S> {
-        self._scopes.clear();
-        self
-    }
-}
-
-
 /// Gets the most recent threat list diffs. These diffs should be applied to a local database of hashes to keep it up-to-date. If the local database is empty or excessively out-of-date, a complete snapshot of the database will be returned. This Method only updates a single ThreatList at a time. To update multiple ThreatList databases, this method needs to be called once for each list.
 ///
 /// A builder for the *computeDiff* method supported by a *threatList* resource.
@@ -2758,10 +2423,10 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.threat_lists().compute_diff()
 ///              .version_token(vec![0, 1, 2, 3])
-///              .threat_type("gubergren")
-///              .add_constraints_supported_compressions("Lorem")
-///              .constraints_max_diff_entries(-12)
-///              .constraints_max_database_entries(-75)
+///              .threat_type("ipsum")
+///              .add_constraints_supported_compressions("gubergren")
+///              .constraints_max_diff_entries(-51)
+///              .constraints_max_database_entries(-12)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2811,7 +2476,7 @@ where
 
         let mut params = Params::with_capacity(7 + self._additional_params.len());
         if let Some(value) = self._version_token.as_ref() {
-            params.push("versionToken", ::client::serde::urlsafe_base64::to_string(&value));
+            params.push("versionToken", ::client::serde::standard_base64::to_string(&value));
         }
         if let Some(value) = self._threat_type.as_ref() {
             params.push("threatType", value);
@@ -3063,8 +2728,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.uris().search()
-///              .uri("dolor")
-///              .add_threat_types("ea")
+///              .uri("eos")
+///              .add_threat_types("dolor")
 ///              .doit().await;
 /// # }
 /// ```

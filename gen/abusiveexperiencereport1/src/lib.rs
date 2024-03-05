@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Abusive Experience Report* crate version *5.0.3+20230114*, where *20230114* is the exact revision of the *abusiveexperiencereport:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Abusive Experience Report* crate version *5.0.4+20240207*, where *20240207* is the exact revision of the *abusiveexperiencereport:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Abusive Experience Report* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/abusive-experience-report/).

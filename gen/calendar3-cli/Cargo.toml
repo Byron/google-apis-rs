@@ -4,7 +4,7 @@
 [package]
 
 name = "google-calendar3-cli"
-version = "5.0.3+20221229"
+version = "5.0.4+20240223"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with calendar (protocol v3)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/calendar3-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-calendar3]
 path = "../calendar3"
-version = "5.0.3+20221229"
+version = "5.0.4+20240223"
 

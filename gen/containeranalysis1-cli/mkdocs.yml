@@ -1,4 +1,4 @@
-site_name: Container Analysis v5.0.3+20230106
+site_name: Container Analysis v5.0.4+20240223
 site_url: http://byron.github.io/google-apis-rs/google-containeranalysis1-cli
 site_description: A complete library to interact with Container Analysis (protocol v1)
 
@@ -31,6 +31,7 @@ nav:
     - 'Occurrences Patch': 'projects_occurrences-patch.md'
     - 'Occurrences Set Iam Policy': 'projects_occurrences-set-iam-policy.md'
     - 'Occurrences Test Iam Permissions': 'projects_occurrences-test-iam-permissions.md'
+    - 'Resources Export Sbom': 'projects_resources-export-sbom.md'
 
 theme: readthedocs
 

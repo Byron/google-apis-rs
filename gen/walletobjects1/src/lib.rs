@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Walletobjects* crate version *5.0.3+20230124*, where *20230124* is the exact revision of the *walletobjects:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Walletobjects* crate version *5.0.4+20240304*, where *20240304* is the exact revision of the *walletobjects:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Walletobjects* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/pay/passes).
@@ -20,9 +20,9 @@
 //! * flightobject
 //!  * [*addmessage*](api::FlightobjectAddmessageCall), [*get*](api::FlightobjectGetCall), [*insert*](api::FlightobjectInsertCall), [*list*](api::FlightobjectListCall), [*patch*](api::FlightobjectPatchCall) and [*update*](api::FlightobjectUpdateCall)
 //! * genericclass
-//!  * [*get*](api::GenericclasGetCall), [*insert*](api::GenericclasInsertCall), [*list*](api::GenericclasListCall), [*patch*](api::GenericclasPatchCall) and [*update*](api::GenericclasUpdateCall)
+//!  * [*addmessage*](api::GenericclasAddmessageCall), [*get*](api::GenericclasGetCall), [*insert*](api::GenericclasInsertCall), [*list*](api::GenericclasListCall), [*patch*](api::GenericclasPatchCall) and [*update*](api::GenericclasUpdateCall)
 //! * genericobject
-//!  * [*get*](api::GenericobjectGetCall), [*insert*](api::GenericobjectInsertCall), [*list*](api::GenericobjectListCall), [*patch*](api::GenericobjectPatchCall) and [*update*](api::GenericobjectUpdateCall)
+//!  * [*addmessage*](api::GenericobjectAddmessageCall), [*get*](api::GenericobjectGetCall), [*insert*](api::GenericobjectInsertCall), [*list*](api::GenericobjectListCall), [*patch*](api::GenericobjectPatchCall) and [*update*](api::GenericobjectUpdateCall)
 //! * giftcardclass
 //!  * [*addmessage*](api::GiftcardclasAddmessageCall), [*get*](api::GiftcardclasGetCall), [*insert*](api::GiftcardclasInsertCall), [*list*](api::GiftcardclasListCall), [*patch*](api::GiftcardclasPatchCall) and [*update*](api::GiftcardclasUpdateCall)
 //! * giftcardobject
@@ -36,7 +36,7 @@
 //! * loyaltyobject
 //!  * [*addmessage*](api::LoyaltyobjectAddmessageCall), [*get*](api::LoyaltyobjectGetCall), [*insert*](api::LoyaltyobjectInsertCall), [*list*](api::LoyaltyobjectListCall), [*modifylinkedofferobjects*](api::LoyaltyobjectModifylinkedofferobjectCall), [*patch*](api::LoyaltyobjectPatchCall) and [*update*](api::LoyaltyobjectUpdateCall)
 //! * [media](api::Media)
-//!  * [*upload*](api::MediaUploadCall)
+//!  * [*download*](api::MediaDownloadCall) and [*upload*](api::MediaUploadCall)
 //! * offerclass
 //!  * [*addmessage*](api::OfferclasAddmessageCall), [*get*](api::OfferclasGetCall), [*insert*](api::OfferclasInsertCall), [*list*](api::OfferclasListCall), [*patch*](api::OfferclasPatchCall) and [*update*](api::OfferclasUpdateCall)
 //! * offerobject
@@ -49,13 +49,15 @@
 //!  * [*addmessage*](api::TransitclasAddmessageCall), [*get*](api::TransitclasGetCall), [*insert*](api::TransitclasInsertCall), [*list*](api::TransitclasListCall), [*patch*](api::TransitclasPatchCall) and [*update*](api::TransitclasUpdateCall)
 //! * transitobject
 //!  * [*addmessage*](api::TransitobjectAddmessageCall), [*get*](api::TransitobjectGetCall), [*insert*](api::TransitobjectInsertCall), [*list*](api::TransitobjectListCall), [*patch*](api::TransitobjectPatchCall) and [*update*](api::TransitobjectUpdateCall)
-//! * walletobjects
-//!  * [*v1 private content upload private data*](api::WalletobjectV1PrivateContentUploadPrivateDataCall)
 //! 
 //! 
 //! Upload supported by ...
 //! 
 //! * [*upload media*](api::MediaUploadCall)
+//! 
+//! Download supported by ...
+//! 
+//! * [*download media*](api::MediaDownloadCall)
 //! 
 //! 
 //! 
@@ -93,6 +95,8 @@
 //! let r = hub.eventticketobject().addmessage(...).doit().await
 //! let r = hub.flightclass().addmessage(...).doit().await
 //! let r = hub.flightobject().addmessage(...).doit().await
+//! let r = hub.genericclass().addmessage(...).doit().await
+//! let r = hub.genericobject().addmessage(...).doit().await
 //! let r = hub.giftcardclass().addmessage(...).doit().await
 //! let r = hub.giftcardobject().addmessage(...).doit().await
 //! let r = hub.loyaltyclass().addmessage(...).doit().await

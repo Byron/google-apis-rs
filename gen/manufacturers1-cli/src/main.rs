@@ -50,6 +50,264 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
+    async fn _accounts_languages_product_certifications_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().languages_product_certifications_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accounts_languages_product_certifications_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().languages_product_certifications_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accounts_languages_product_certifications_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.accounts().languages_product_certifications_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _accounts_languages_product_certifications_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "brand" => Some(("brand", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "country-code" => Some(("countryCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "mpn" => Some(("mpn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "product-code" => Some(("productCode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "product-type" => Some(("productType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["brand", "country-code", "mpn", "name", "product-code", "product-type", "title"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ProductCertification = json::value::from_value(object).unwrap();
+        let mut call = self.hub.accounts().languages_product_certifications_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _accounts_products_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.accounts().products_delete(opt.value_of("parent").unwrap_or(""), opt.value_of("name").unwrap_or(""));
@@ -355,8 +613,9 @@ where
                     "theme" => Some(("theme", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "title" => Some(("title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "video-link" => Some(("videoLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "virtual-model-link" => Some(("virtualModelLink", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-ingredients", "added-sugars", "added-sugars-daily-percentage", "age-group", "alcohol-by-volume", "allergens", "amount", "brand", "calcium", "calcium-daily-percentage", "capacity", "cholesterol", "cholesterol-daily-percentage", "color", "count", "currency", "derived-nutrition-claim", "description", "dietary-fiber", "dietary-fiber-daily-percentage", "directions", "disclosure-date", "energy", "energy-from-fat", "excluded-destination", "flavor", "folate-daily-percentage", "folate-folic-acid", "folate-mcg-dfe", "format", "gender", "grocery", "gtin", "image-link", "image-url", "included-destination", "indications", "ingredients", "iron", "iron-daily-percentage", "item-group-id", "material", "monounsaturated-fat", "mpn", "nutrition", "nutrition-claim", "nutrition-fact-measure", "pattern", "polyols", "polyunsaturated-fat", "potassium", "potassium-daily-percentage", "prepared-size-description", "product-highlight", "product-line", "product-name", "product-page-url", "product-type", "protein", "protein-daily-percentage", "release-date", "rich-product-content", "saturated-fat", "saturated-fat-daily-percentage", "scent", "serving-size-description", "serving-size-measure", "servings-per-container", "size", "size-system", "size-type", "sodium", "sodium-daily-percentage", "starch", "status", "storage-instructions", "suggested-retail-price", "target-client-id", "theme", "title", "total-carbohydrate", "total-carbohydrate-daily-percentage", "total-fat", "total-fat-daily-percentage", "total-sugars", "total-sugars-daily-percentage", "trans-fat", "trans-fat-daily-percentage", "type", "unit", "value", "video-link", "vitamin-d", "vitamin-d-daily-percentage"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-ingredients", "added-sugars", "added-sugars-daily-percentage", "age-group", "alcohol-by-volume", "allergens", "amount", "brand", "calcium", "calcium-daily-percentage", "capacity", "cholesterol", "cholesterol-daily-percentage", "color", "count", "currency", "derived-nutrition-claim", "description", "dietary-fiber", "dietary-fiber-daily-percentage", "directions", "disclosure-date", "energy", "energy-from-fat", "excluded-destination", "flavor", "folate-daily-percentage", "folate-folic-acid", "folate-mcg-dfe", "format", "gender", "grocery", "gtin", "image-link", "image-url", "included-destination", "indications", "ingredients", "iron", "iron-daily-percentage", "item-group-id", "material", "monounsaturated-fat", "mpn", "nutrition", "nutrition-claim", "nutrition-fact-measure", "pattern", "polyols", "polyunsaturated-fat", "potassium", "potassium-daily-percentage", "prepared-size-description", "product-highlight", "product-line", "product-name", "product-page-url", "product-type", "protein", "protein-daily-percentage", "release-date", "rich-product-content", "saturated-fat", "saturated-fat-daily-percentage", "scent", "serving-size-description", "serving-size-measure", "servings-per-container", "size", "size-system", "size-type", "sodium", "sodium-daily-percentage", "starch", "status", "storage-instructions", "suggested-retail-price", "target-client-id", "theme", "title", "total-carbohydrate", "total-carbohydrate-daily-percentage", "total-fat", "total-fat-daily-percentage", "total-sugars", "total-sugars-daily-percentage", "trans-fat", "trans-fat-daily-percentage", "type", "unit", "value", "video-link", "virtual-model-link", "vitamin-d", "vitamin-d-daily-percentage"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -423,6 +682,18 @@ where
         match self.opt.subcommand() {
             ("accounts", Some(opt)) => {
                 match opt.subcommand() {
+                    ("languages-product-certifications-delete", Some(opt)) => {
+                        call_result = self._accounts_languages_product_certifications_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("languages-product-certifications-get", Some(opt)) => {
+                        call_result = self._accounts_languages_product_certifications_get(opt, dry_run, &mut err).await;
+                    },
+                    ("languages-product-certifications-list", Some(opt)) => {
+                        call_result = self._accounts_languages_product_certifications_list(opt, dry_run, &mut err).await;
+                    },
+                    ("languages-product-certifications-patch", Some(opt)) => {
+                        call_result = self._accounts_languages_product_certifications_patch(opt, dry_run, &mut err).await;
+                    },
                     ("products-delete", Some(opt)) => {
                         call_result = self._accounts_products_delete(opt, dry_run, &mut err).await;
                     },
@@ -514,7 +785,101 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("accounts", "methods: 'products-delete', 'products-get', 'products-list' and 'products-update'", vec![
+        ("accounts", "methods: 'languages-product-certifications-delete', 'languages-product-certifications-get', 'languages-product-certifications-list', 'languages-product-certifications-patch', 'products-delete', 'products-get', 'products-list' and 'products-update'", vec![
+            ("languages-product-certifications-delete",
+                    Some(r##"Deletes a product certification by its name. This method can only be called by certification bodies."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_manufacturers1_cli/accounts_languages-product-certifications-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the product certification to delete. Format: accounts/{account}/languages/{language_code}/productCertifications/{id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("languages-product-certifications-get",
+                    Some(r##"Gets a product certification by its name. This method can only be called by certification bodies."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_manufacturers1_cli/accounts_languages-product-certifications-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the product certification to get. Format: accounts/{account}/languages/{language_code}/productCertifications/{id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("languages-product-certifications-list",
+                    Some(r##"Lists product certifications from a specified certification body. This method can only be called by certification bodies."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_manufacturers1_cli/accounts_languages-product-certifications-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent, which owns this collection of product certifications. Format: accounts/{account}/languages/{language_code}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("languages-product-certifications-patch",
+                    Some(r##"Updates (or creates if allow_missing = true) a product certification which links certifications with products. This method can only be called by certification bodies."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_manufacturers1_cli/accounts_languages-product-certifications-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The unique name identifier of a product certification Format: accounts/{account}/languages/{language_code}/productCertifications/{id} Where `id` is a some unique identifier and `language_code` is a 2-letter ISO 639-1 code of a Shopping supported language according to https://support.google.com/merchants/answer/160637."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("products-delete",
                     Some(r##"Deletes the product from a Manufacturer Center account."##),
                     "Details at http://byron.github.io/google-apis-rs/google_manufacturers1_cli/accounts_products-delete",
@@ -633,7 +998,7 @@ async fn main() {
     
     let mut app = App::new("manufacturers1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
+           .version("5.0.4+20240205")
            .about("Public API for managing Manufacturer Center related data.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_manufacturers1_cli")
            .arg(Arg::with_name("url")

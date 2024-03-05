@@ -89,6 +89,9 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -173,6 +176,9 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -232,6 +238,9 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -315,6 +324,9 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -418,6 +430,9 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -499,6 +514,9 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -584,6 +602,9 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -633,6 +654,9 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -736,6 +760,9 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -817,6 +844,9 @@ where
             Ok(())
         } else {
             assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
             let mut ostream = match writer_from_opts(opt.value_of("out")) {
                 Ok(mut f) => f,
                 Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
@@ -977,7 +1007,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("promotions-find-eligible",
-                    Some(r##"To find eligible promotions for the current user. The API requires user authorization via OAuth. The user is inferred from the authenticated OAuth credential."##),
+                    Some(r##"To find eligible promotions for the current user. The API requires user authorization via OAuth. The bare minimum oauth scope `openid` is sufficient, which will skip the consent screen."##),
                     "Details at http://byron.github.io/google-apis-rs/google_paymentsresellersubscription1_cli/partners_promotions-find-eligible",
                   vec![
                     (Some(r##"parent"##),
@@ -1111,7 +1141,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("subscriptions-extend",
-                    Some(r##"[Deprecated] New partners should be on auto-extend by default. Used by partners to extend a subscription service for their customers on an ongoing basis for the subscription to remain active and renewable. It should be called directly by the partner using service accounts."##),
+                    Some(r##"[Opt-in only] Most partners should be on auto-extend by default. Used by partners to extend a subscription service for their customers on an ongoing basis for the subscription to remain active and renewable. It should be called directly by the partner using service accounts."##),
                     "Details at http://byron.github.io/google-apis-rs/google_paymentsresellersubscription1_cli/partners_subscriptions-extend",
                   vec![
                     (Some(r##"name"##),
@@ -1222,9 +1252,14 @@ async fn main() {
     
     let mut app = App::new("paymentsresellersubscription1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
+           .version("5.0.4+20240303")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_paymentsresellersubscription1_cli")
+           .arg(Arg::with_name("url")
+                   .long("scope")
+                   .help("Specify the authentication a method should be executed in. Each scope requires the user to grant this application permission to use it.If unset, it defaults to the shortest scope url for a particular method.")
+                   .multiple(true)
+                   .takes_value(true))
            .arg(Arg::with_name("folder")
                    .long("config-dir")
                    .help("A directory into which we will store our persistent data. Defaults to a user-writable directory that we will create during the first invocation.[default: ~/.google-service-cli")

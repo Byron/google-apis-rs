@@ -25,11 +25,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Dataplex* API at revision *20230120*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud Dataplex* API at revision *20240224*. The CLI is at version *5.0.4*.
 
 ```bash
 dataplex1 [options]
         projects
+                locations-aspect-types-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-aspect-types-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-aspect-types-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-data-attribute-bindings-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-data-attribute-bindings-delete <name> [-p <v>]... [-o <out>]
                 locations-data-attribute-bindings-get <name> [-p <v>]... [-o <out>]
@@ -65,7 +68,16 @@ dataplex1 [options]
                 locations-data-taxonomies-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-data-taxonomies-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-data-taxonomies-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-entry-groups-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-entry-groups-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-entry-groups-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-entry-types-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-entry-types-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-entry-types-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
+                locations-governance-rules-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-governance-rules-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-governance-rules-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-lakes-actions-list <parent> [-p <v>]... [-o <out>]
                 locations-lakes-content-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-lakes-content-delete <name> [-p <v>]... [-o <out>]

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudtrace2-cli"
-version = "5.0.3+20230112"
+version = "5.0.4+20240223"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Trace (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudtrace2-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-cloudtrace2]
 path = "../cloudtrace2"
-version = "5.0.3+20230112"
+version = "5.0.4+20240223"
 

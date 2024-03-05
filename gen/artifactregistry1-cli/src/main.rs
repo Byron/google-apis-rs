@@ -154,6 +154,58 @@ where
         }
     }
 
+    async fn _projects_locations_get_vpcsc_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_get_vpcsc_config(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_list(opt.value_of("name").unwrap_or(""));
@@ -464,19 +516,34 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "cleanup-policy-dry-run" => Some(("cleanupPolicyDryRun", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disallow-unspecified-mode" => Some(("disallowUnspecifiedMode", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "docker-config.immutable-tags" => Some(("dockerConfig.immutableTags", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "maven-config.allow-snapshot-overwrites" => Some(("mavenConfig.allowSnapshotOverwrites", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "maven-config.version-policy" => Some(("mavenConfig.versionPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mode" => Some(("mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.apt-repository.public-repository.repository-base" => Some(("remoteRepositoryConfig.aptRepository.publicRepository.repositoryBase", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.apt-repository.public-repository.repository-path" => Some(("remoteRepositoryConfig.aptRepository.publicRepository.repositoryPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.description" => Some(("remoteRepositoryConfig.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.docker-repository.public-repository" => Some(("remoteRepositoryConfig.dockerRepository.publicRepository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.maven-repository.public-repository" => Some(("remoteRepositoryConfig.mavenRepository.publicRepository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.npm-repository.public-repository" => Some(("remoteRepositoryConfig.npmRepository.publicRepository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.python-repository.public-repository" => Some(("remoteRepositoryConfig.pythonRepository.publicRepository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.upstream-credentials.username-password-credentials.password-secret-version" => Some(("remoteRepositoryConfig.upstreamCredentials.usernamePasswordCredentials.passwordSecretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.upstream-credentials.username-password-credentials.username" => Some(("remoteRepositoryConfig.upstreamCredentials.usernamePasswordCredentials.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.yum-repository.public-repository.repository-base" => Some(("remoteRepositoryConfig.yumRepository.publicRepository.repositoryBase", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.yum-repository.public-repository.repository-path" => Some(("remoteRepositoryConfig.yumRepository.publicRepository.repositoryPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "size-bytes" => Some(("sizeBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-snapshot-overwrites", "create-time", "description", "format", "kms-key-name", "labels", "maven-config", "name", "satisfies-pzs", "size-bytes", "update-time", "version-policy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-snapshot-overwrites", "apt-repository", "cleanup-policy-dry-run", "create-time", "description", "disallow-unspecified-mode", "docker-config", "docker-repository", "format", "immutable-tags", "kms-key-name", "labels", "maven-config", "maven-repository", "mode", "name", "npm-repository", "password-secret-version", "public-repository", "python-repository", "remote-repository-config", "repository-base", "repository-path", "satisfies-pzs", "size-bytes", "update-time", "upstream-credentials", "username", "username-password-credentials", "version-policy", "yum-repository"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -918,6 +985,266 @@ where
             match match protocol {
                 CallType::Standard => call.doit().await,
                 _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_repositories_go_modules_upload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::UploadGoModuleRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_repositories_go_modules_upload(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
+        let mut input_file = input_file_from_opts(vals[1], err);
+        let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()).await,
+                CallType::Standard => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_repositories_googet_artifacts_import(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "gcs-source.uris" => Some(("gcsSource.uris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "gcs-source.use-wildcards" => Some(("gcsSource.useWildcards", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["gcs-source", "uris", "use-wildcards"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ImportGoogetArtifactsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_repositories_googet_artifacts_import(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_repositories_googet_artifacts_upload(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::UploadGoogetArtifactRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_repositories_googet_artifacts_upload(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let vals = opt.values_of("mode").unwrap().collect::<Vec<&str>>();
+        let protocol = calltype_from_str(vals[0], ["simple"].iter().map(|&v| v.to_string()).collect(), err);
+        let mut input_file = input_file_from_opts(vals[1], err);
+        let mime_type = input_mime_from_opts(opt.value_of("mime").unwrap_or("application/octet-stream"), err);
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Upload(UploadProtocol::Simple) => call.upload(input_file.unwrap(), mime_type.unwrap()).await,
+                CallType::Standard => unreachable!()
             } {
                 Err(api_err) => Err(DoitError::ApiError(api_err)),
                 Ok((mut response, output_schema)) => {
@@ -1810,6 +2137,92 @@ where
         }
     }
 
+    async fn _projects_locations_repositories_packages_versions_batch_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "names" => Some(("names", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "validate-only" => Some(("validateOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["names", "validate-only"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchDeleteVersionsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_repositories_packages_versions_batch_delete(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_repositories_packages_versions_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_repositories_packages_versions_delete(opt.value_of("name").unwrap_or(""));
@@ -2010,19 +2423,34 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "cleanup-policy-dry-run" => Some(("cleanupPolicyDryRun", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disallow-unspecified-mode" => Some(("disallowUnspecifiedMode", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "docker-config.immutable-tags" => Some(("dockerConfig.immutableTags", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "format" => Some(("format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "maven-config.allow-snapshot-overwrites" => Some(("mavenConfig.allowSnapshotOverwrites", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "maven-config.version-policy" => Some(("mavenConfig.versionPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "mode" => Some(("mode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.apt-repository.public-repository.repository-base" => Some(("remoteRepositoryConfig.aptRepository.publicRepository.repositoryBase", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.apt-repository.public-repository.repository-path" => Some(("remoteRepositoryConfig.aptRepository.publicRepository.repositoryPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.description" => Some(("remoteRepositoryConfig.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.docker-repository.public-repository" => Some(("remoteRepositoryConfig.dockerRepository.publicRepository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.maven-repository.public-repository" => Some(("remoteRepositoryConfig.mavenRepository.publicRepository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.npm-repository.public-repository" => Some(("remoteRepositoryConfig.npmRepository.publicRepository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.python-repository.public-repository" => Some(("remoteRepositoryConfig.pythonRepository.publicRepository", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.upstream-credentials.username-password-credentials.password-secret-version" => Some(("remoteRepositoryConfig.upstreamCredentials.usernamePasswordCredentials.passwordSecretVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.upstream-credentials.username-password-credentials.username" => Some(("remoteRepositoryConfig.upstreamCredentials.usernamePasswordCredentials.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.yum-repository.public-repository.repository-base" => Some(("remoteRepositoryConfig.yumRepository.publicRepository.repositoryBase", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "remote-repository-config.yum-repository.public-repository.repository-path" => Some(("remoteRepositoryConfig.yumRepository.publicRepository.repositoryPath", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "size-bytes" => Some(("sizeBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-snapshot-overwrites", "create-time", "description", "format", "kms-key-name", "labels", "maven-config", "name", "satisfies-pzs", "size-bytes", "update-time", "version-policy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["allow-snapshot-overwrites", "apt-repository", "cleanup-policy-dry-run", "create-time", "description", "disallow-unspecified-mode", "docker-config", "docker-repository", "format", "immutable-tags", "kms-key-name", "labels", "maven-config", "maven-repository", "mode", "name", "npm-repository", "password-secret-version", "public-repository", "python-repository", "remote-repository-config", "repository-base", "repository-path", "satisfies-pzs", "size-bytes", "update-time", "upstream-credentials", "username", "username-password-credentials", "version-policy", "yum-repository"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2541,6 +2969,96 @@ where
         }
     }
 
+    async fn _projects_locations_update_vpcsc_config(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vpcsc-policy" => Some(("vpcscPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["name", "vpcsc-policy"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::VPCSCConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_update_vpcsc_config(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_update_project_settings(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2644,6 +3162,9 @@ where
                     ("locations-get", Some(opt)) => {
                         call_result = self._projects_locations_get(opt, dry_run, &mut err).await;
                     },
+                    ("locations-get-vpcsc-config", Some(opt)) => {
+                        call_result = self._projects_locations_get_vpcsc_config(opt, dry_run, &mut err).await;
+                    },
                     ("locations-list", Some(opt)) => {
                         call_result = self._projects_locations_list(opt, dry_run, &mut err).await;
                     },
@@ -2679,6 +3200,15 @@ where
                     },
                     ("locations-repositories-get-iam-policy", Some(opt)) => {
                         call_result = self._projects_locations_repositories_get_iam_policy(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-repositories-go-modules-upload", Some(opt)) => {
+                        call_result = self._projects_locations_repositories_go_modules_upload(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-repositories-googet-artifacts-import", Some(opt)) => {
+                        call_result = self._projects_locations_repositories_googet_artifacts_import(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-repositories-googet-artifacts-upload", Some(opt)) => {
+                        call_result = self._projects_locations_repositories_googet_artifacts_upload(opt, dry_run, &mut err).await;
                     },
                     ("locations-repositories-kfp-artifacts-upload", Some(opt)) => {
                         call_result = self._projects_locations_repositories_kfp_artifacts_upload(opt, dry_run, &mut err).await;
@@ -2722,6 +3252,9 @@ where
                     ("locations-repositories-packages-tags-patch", Some(opt)) => {
                         call_result = self._projects_locations_repositories_packages_tags_patch(opt, dry_run, &mut err).await;
                     },
+                    ("locations-repositories-packages-versions-batch-delete", Some(opt)) => {
+                        call_result = self._projects_locations_repositories_packages_versions_batch_delete(opt, dry_run, &mut err).await;
+                    },
                     ("locations-repositories-packages-versions-delete", Some(opt)) => {
                         call_result = self._projects_locations_repositories_packages_versions_delete(opt, dry_run, &mut err).await;
                     },
@@ -2751,6 +3284,9 @@ where
                     },
                     ("locations-repositories-yum-artifacts-upload", Some(opt)) => {
                         call_result = self._projects_locations_repositories_yum_artifacts_upload(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-update-vpcsc-config", Some(opt)) => {
+                        call_result = self._projects_locations_update_vpcsc_config(opt, dry_run, &mut err).await;
                     },
                     ("update-project-settings", Some(opt)) => {
                         call_result = self._projects_update_project_settings(opt, dry_run, &mut err).await;
@@ -2835,7 +3371,7 @@ async fn main() {
     let mut exit_status = 0i32;
     let upload_value_names = ["mode", "file"];
     let arg_data = [
-        ("projects", "methods: 'get-project-settings', 'locations-get', 'locations-list', 'locations-operations-get', 'locations-repositories-apt-artifacts-import', 'locations-repositories-apt-artifacts-upload', 'locations-repositories-create', 'locations-repositories-delete', 'locations-repositories-docker-images-get', 'locations-repositories-docker-images-list', 'locations-repositories-files-get', 'locations-repositories-files-list', 'locations-repositories-get', 'locations-repositories-get-iam-policy', 'locations-repositories-kfp-artifacts-upload', 'locations-repositories-list', 'locations-repositories-maven-artifacts-get', 'locations-repositories-maven-artifacts-list', 'locations-repositories-npm-packages-get', 'locations-repositories-npm-packages-list', 'locations-repositories-packages-delete', 'locations-repositories-packages-get', 'locations-repositories-packages-list', 'locations-repositories-packages-tags-create', 'locations-repositories-packages-tags-delete', 'locations-repositories-packages-tags-get', 'locations-repositories-packages-tags-list', 'locations-repositories-packages-tags-patch', 'locations-repositories-packages-versions-delete', 'locations-repositories-packages-versions-get', 'locations-repositories-packages-versions-list', 'locations-repositories-patch', 'locations-repositories-python-packages-get', 'locations-repositories-python-packages-list', 'locations-repositories-set-iam-policy', 'locations-repositories-test-iam-permissions', 'locations-repositories-yum-artifacts-import', 'locations-repositories-yum-artifacts-upload' and 'update-project-settings'", vec![
+        ("projects", "methods: 'get-project-settings', 'locations-get', 'locations-get-vpcsc-config', 'locations-list', 'locations-operations-get', 'locations-repositories-apt-artifacts-import', 'locations-repositories-apt-artifacts-upload', 'locations-repositories-create', 'locations-repositories-delete', 'locations-repositories-docker-images-get', 'locations-repositories-docker-images-list', 'locations-repositories-files-get', 'locations-repositories-files-list', 'locations-repositories-get', 'locations-repositories-get-iam-policy', 'locations-repositories-go-modules-upload', 'locations-repositories-googet-artifacts-import', 'locations-repositories-googet-artifacts-upload', 'locations-repositories-kfp-artifacts-upload', 'locations-repositories-list', 'locations-repositories-maven-artifacts-get', 'locations-repositories-maven-artifacts-list', 'locations-repositories-npm-packages-get', 'locations-repositories-npm-packages-list', 'locations-repositories-packages-delete', 'locations-repositories-packages-get', 'locations-repositories-packages-list', 'locations-repositories-packages-tags-create', 'locations-repositories-packages-tags-delete', 'locations-repositories-packages-tags-get', 'locations-repositories-packages-tags-list', 'locations-repositories-packages-tags-patch', 'locations-repositories-packages-versions-batch-delete', 'locations-repositories-packages-versions-delete', 'locations-repositories-packages-versions-get', 'locations-repositories-packages-versions-list', 'locations-repositories-patch', 'locations-repositories-python-packages-get', 'locations-repositories-python-packages-list', 'locations-repositories-set-iam-policy', 'locations-repositories-test-iam-permissions', 'locations-repositories-yum-artifacts-import', 'locations-repositories-yum-artifacts-upload', 'locations-update-vpcsc-config' and 'update-project-settings'", vec![
             ("get-project-settings",
                     Some(r##"Retrieves the Settings for the Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_artifactregistry1_cli/projects_get-project-settings",
@@ -2865,6 +3401,28 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"Resource name for the location."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-get-vpcsc-config",
+                    Some(r##"Retrieves the VPCSC Config for the Project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_artifactregistry1_cli/projects_locations-get-vpcsc-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the VPCSCConfig resource."##),
                      Some(true),
                      Some(false)),
         
@@ -3086,7 +3644,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the file to retrieve."##),
+                     Some(r##"Required. The name of the file to retrieve."##),
                      Some(true),
                      Some(false)),
         
@@ -3108,7 +3666,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the repository whose files will be listed. For example: "projects/p1/locations/us-central1/repositories/repo1"##),
+                     Some(r##"Required. The name of the repository whose files will be listed. For example: "projects/p1/locations/us-central1/repositories/repo1"##),
                      Some(true),
                      Some(false)),
         
@@ -3155,6 +3713,102 @@ async fn main() {
                      Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-repositories-go-modules-upload",
+                    Some(r##"Directly uploads a Go module. The returned Operation will complete once the Go module is uploaded. Package, Version, and File resources are created based on the uploaded Go module."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_artifactregistry1_cli/projects_locations-repositories-go-modules-upload",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The resource name of the repository where the Go module will be uploaded."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-repositories-googet-artifacts-import",
+                    Some(r##"Imports GooGet artifacts. The returned Operation will complete once the resources are imported. Package, Version, and File resources are created based on the imported artifacts. Imported artifacts that conflict with existing resources are ignored."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_artifactregistry1_cli/projects_locations-repositories-googet-artifacts-import",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The name of the parent resource where the artifacts will be imported."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-repositories-googet-artifacts-upload",
+                    Some(r##"Directly uploads a GooGet artifact. The returned Operation will complete once the resources are uploaded. Package, Version, and File resources are created based on the imported artifact. Imported artifacts that conflict with existing resources are ignored."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_artifactregistry1_cli/projects_locations-repositories-googet-artifacts-upload",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The name of the parent resource where the artifacts will be uploaded."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"mode"##),
+                     Some(r##"u"##),
+                     Some(r##"Specify the upload protocol (simple) and the file to upload"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -3456,7 +4110,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"The name of the parent resource whose tags will be listed."##),
+                     Some(r##"The name of the parent package whose tags will be listed. For example: `projects/p1/locations/us-central1/repositories/repo1/packages/pkg1`."##),
                      Some(true),
                      Some(false)),
         
@@ -3479,6 +4133,34 @@ async fn main() {
                     (Some(r##"name"##),
                      None,
                      Some(r##"The name of the tag, for example: "projects/p1/locations/us-central1/repositories/repo1/packages/pkg1/tags/tag1". If the package part contains slashes, the slashes are escaped. The tag part can only have characters in [a-zA-Z0-9\-._~:@], anything else must be URL encoded."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-repositories-packages-versions-batch-delete",
+                    Some(r##"Deletes multiple versions across a repository. The returned operation will complete once the versions have been deleted."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_artifactregistry1_cli/projects_locations-repositories-packages-versions-batch-delete",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"The name of the repository holding all requested versions."##),
                      Some(true),
                      Some(false)),
         
@@ -3572,7 +4254,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The name of the repository, for example: "projects/p1/locations/us-central1/repositories/repo1"."##),
+                     Some(r##"The name of the repository, for example: `projects/p1/locations/us-central1/repositories/repo1`."##),
                      Some(true),
                      Some(false)),
         
@@ -3756,6 +4438,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-update-vpcsc-config",
+                    Some(r##"Updates the VPCSC Config for the Project."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_artifactregistry1_cli/projects_locations-update-vpcsc-config",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the project's VPC SC Config. Always of the form: projects/{projectID}/locations/{location}/vpcscConfig In update request: never set In response: always set"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("update-project-settings",
                     Some(r##"Updates the Settings for the Project."##),
                     "Details at http://byron.github.io/google-apis-rs/google_artifactregistry1_cli/projects_update-project-settings",
@@ -3790,7 +4500,7 @@ async fn main() {
     
     let mut app = App::new("artifactregistry1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230113")
+           .version("5.0.4+20240213")
            .about("Store and manage build artifacts in a scalable and integrated service built on Google infrastructure.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_artifactregistry1_cli")
            .arg(Arg::with_name("url")

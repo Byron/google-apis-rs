@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Docs* crate version *5.0.3+20230119*, where *20230119* is the exact revision of the *docs:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Docs* crate version *5.0.4+20240229*, where *20240229* is the exact revision of the *docs:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Docs* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/docs/).

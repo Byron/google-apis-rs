@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -130,7 +130,7 @@ impl<'a, S> Dialogflow<S> {
         Dialogflow {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://dialogflow.googleapis.com/".to_string(),
             _root_url: "https://dialogflow.googleapis.com/".to_string(),
         }
@@ -141,7 +141,7 @@ impl<'a, S> Dialogflow<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -176,6 +176,14 @@ impl<'a, S> Dialogflow<S> {
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3AdvancedSettings {
+    /// If present, incoming audio is exported by Dialogflow to the configured Google Cloud Storage destination. Exposed at the following levels: - Agent level - Flow level
+    #[serde(rename="audioExportGcsDestination")]
+    
+    pub audio_export_gcs_destination: Option<GoogleCloudDialogflowCxV3GcsDestination>,
+    /// Settings for DTMF. Exposed at the following levels: - Agent level - Flow level - Page level - Parameter level.
+    #[serde(rename="dtmfSettings")]
+    
+    pub dtmf_settings: Option<GoogleCloudDialogflowCxV3AdvancedSettingsDtmfSettings>,
     /// Settings for logging. Settings for Dialogflow History, Contact Center messages, StackDriver logs, and speech logging. Exposed at the following levels: - Agent level.
     #[serde(rename="loggingSettings")]
     
@@ -183,6 +191,29 @@ pub struct GoogleCloudDialogflowCxV3AdvancedSettings {
 }
 
 impl client::Part for GoogleCloudDialogflowCxV3AdvancedSettings {}
+
+
+/// Define behaviors for DTMF (dual tone multi frequency).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3AdvancedSettingsDtmfSettings {
+    /// If true, incoming audio is processed for DTMF (dual tone multi frequency) events. For example, if the caller presses a button on their telephone keypad and DTMF processing is enabled, Dialogflow will detect the event (e.g. a "3" was pressed) in the incoming audio and pass the event to the bot to drive business logic (e.g. when 3 is pressed, return the account balance).
+    
+    pub enabled: Option<bool>,
+    /// The digit that terminates a DTMF digit sequence.
+    #[serde(rename="finishDigit")]
+    
+    pub finish_digit: Option<String>,
+    /// Max length of DTMF digits.
+    #[serde(rename="maxDigits")]
+    
+    pub max_digits: Option<i32>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3AdvancedSettingsDtmfSettings {}
 
 
 /// Define behaviors on logging.
@@ -205,7 +236,7 @@ pub struct GoogleCloudDialogflowCxV3AdvancedSettingsLoggingSettings {
 impl client::Part for GoogleCloudDialogflowCxV3AdvancedSettingsLoggingSettings {}
 
 
-/// Agents are best described as Natural Language Understanding (NLU) modules that transform user requests into actionable data. You can include agents in your app, product, or service to determine user intent and respond to the user in a natural way. After you create an agent, you can add Intents, Entity Types, Flows, Fulfillments, Webhooks, and so on to manage the conversation flows..
+/// Agents are best described as Natural Language Understanding (NLU) modules that transform user requests into actionable data. You can include agents in your app, product, or service to determine user intent and respond to the user in a natural way. After you create an agent, you can add Intents, Entity Types, Flows, Fulfillments, Webhooks, TransitionRouteGroups and so on to manage the conversation flows.
 /// 
 /// # Activities
 /// 
@@ -222,6 +253,10 @@ pub struct GoogleCloudDialogflowCxV3Agent {
     #[serde(rename="advancedSettings")]
     
     pub advanced_settings: Option<GoogleCloudDialogflowCxV3AdvancedSettings>,
+    /// Optional. Answer feedback collection settings.
+    #[serde(rename="answerFeedbackSettings")]
+    
+    pub answer_feedback_settings: Option<GoogleCloudDialogflowCxV3AgentAnswerFeedbackSettings>,
     /// The URI of the agent's avatar. Avatars are used throughout the Dialogflow console and in the self-hosted [Web Demo](https://cloud.google.com/dialogflow/docs/integrations/web-demo) integration.
     #[serde(rename="avatarUri")]
     
@@ -245,6 +280,14 @@ pub struct GoogleCloudDialogflowCxV3Agent {
     #[serde(rename="enableStackdriverLogging")]
     
     pub enable_stackdriver_logging: Option<bool>,
+    /// Gen App Builder-related agent-level settings.
+    #[serde(rename="genAppBuilderSettings")]
+    
+    pub gen_app_builder_settings: Option<GoogleCloudDialogflowCxV3AgentGenAppBuilderSettings>,
+    /// Git integration settings for this agent.
+    #[serde(rename="gitIntegrationSettings")]
+    
+    pub git_integration_settings: Option<GoogleCloudDialogflowCxV3AgentGitIntegrationSettings>,
     /// Indicates whether the agent is locked for changes. If the agent is locked, modifications to the agent will be rejected except for RestoreAgent.
     
     pub locked: Option<bool>,
@@ -267,6 +310,10 @@ pub struct GoogleCloudDialogflowCxV3Agent {
     #[serde(rename="supportedLanguageCodes")]
     
     pub supported_language_codes: Option<Vec<String>>,
+    /// Settings on instructing the speech synthesizer on how to generate the output audio content.
+    #[serde(rename="textToSpeechSettings")]
+    
+    pub text_to_speech_settings: Option<GoogleCloudDialogflowCxV3TextToSpeechSettings>,
     /// Required. The time zone of the agent from the [time zone database](https://www.iana.org/time-zones), e.g., America/New_York, Europe/Paris.
     #[serde(rename="timeZone")]
     
@@ -275,6 +322,84 @@ pub struct GoogleCloudDialogflowCxV3Agent {
 
 impl client::RequestValue for GoogleCloudDialogflowCxV3Agent {}
 impl client::ResponseResult for GoogleCloudDialogflowCxV3Agent {}
+
+
+/// Settings for answer feedback collection.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3AgentAnswerFeedbackSettings {
+    /// Optional. If enabled, end users will be able to provide answer feedback to Dialogflow responses. Feature works only if interaction logging is enabled in the Dialogflow agent.
+    #[serde(rename="enableAnswerFeedback")]
+    
+    pub enable_answer_feedback: Option<bool>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3AgentAnswerFeedbackSettings {}
+
+
+/// Settings for Gen App Builder.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3AgentGenAppBuilderSettings {
+    /// Required. The full name of the Gen App Builder engine related to this agent if there is one. Format: `projects/{Project ID}/locations/{Location ID}/collections/{Collection ID}/engines/{Engine ID}`
+    
+    pub engine: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3AgentGenAppBuilderSettings {}
+
+
+/// Settings for connecting to Git repository for an agent.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3AgentGitIntegrationSettings {
+    /// GitHub settings.
+    #[serde(rename="githubSettings")]
+    
+    pub github_settings: Option<GoogleCloudDialogflowCxV3AgentGitIntegrationSettingsGithubSettings>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3AgentGitIntegrationSettings {}
+
+
+/// Settings of integration with GitHub.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3AgentGitIntegrationSettingsGithubSettings {
+    /// The access token used to authenticate the access to the GitHub repository.
+    #[serde(rename="accessToken")]
+    
+    pub access_token: Option<String>,
+    /// A list of branches configured to be used from Dialogflow.
+    
+    pub branches: Option<Vec<String>>,
+    /// The unique repository display name for the GitHub repository.
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
+    /// The GitHub repository URI related to the agent.
+    #[serde(rename="repositoryUri")]
+    
+    pub repository_uri: Option<String>,
+    /// The branch of the GitHub repository tracked for this agent.
+    #[serde(rename="trackingBranch")]
+    
+    pub tracking_branch: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3AgentGitIntegrationSettingsGithubSettings {}
 
 
 /// The response message for Agents.GetAgentValidationResult.
@@ -301,6 +426,52 @@ pub struct GoogleCloudDialogflowCxV3AgentValidationResult {
 impl client::ResponseResult for GoogleCloudDialogflowCxV3AgentValidationResult {}
 
 
+/// Stores information about feedback provided by users about a response.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations agents sessions submit answer feedback projects](ProjectLocationAgentSessionSubmitAnswerFeedbackCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3AnswerFeedback {
+    /// Optional. Custom rating from the user about the provided answer, with maximum length of 1024 characters. For example, client could use a customized JSON object to indicate the rating.
+    #[serde(rename="customRating")]
+    
+    pub custom_rating: Option<String>,
+    /// Optional. Rating from user for the specific Dialogflow response.
+    
+    pub rating: Option<String>,
+    /// Optional. In case of thumbs down rating provided, users can optionally provide context about the rating.
+    #[serde(rename="ratingReason")]
+    
+    pub rating_reason: Option<GoogleCloudDialogflowCxV3AnswerFeedbackRatingReason>,
+}
+
+impl client::ResponseResult for GoogleCloudDialogflowCxV3AnswerFeedback {}
+
+
+/// Stores extra information about why users provided thumbs down rating.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3AnswerFeedbackRatingReason {
+    /// Optional. Additional feedback about the rating. This field can be populated without choosing a predefined `reason`.
+    
+    pub feedback: Option<String>,
+    /// Optional. Custom reason labels for thumbs down rating provided by the user. The maximum number of labels allowed is 10 and the maximum length of a single label is 128 characters.
+    #[serde(rename="reasonLabels")]
+    
+    pub reason_labels: Option<Vec<String>>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3AnswerFeedbackRatingReason {}
+
+
 /// Represents the natural speech audio to be processed.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -308,9 +479,9 @@ impl client::ResponseResult for GoogleCloudDialogflowCxV3AgentValidationResult {
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3AudioInput {
-    /// The natural language speech audio to be processed. A single request can contain up to 1 minute of speech audio data. The transcribed text cannot contain more than 256 bytes. For non-streaming audio detect intent, both `config` and `audio` must be provided. For streaming audio detect intent, `config` must be provided in the first request and `audio` must be provided in all following requests.
+    /// The natural language speech audio to be processed. A single request can contain up to 2 minutes of speech audio data. The transcribed text cannot contain more than 256 bytes. For non-streaming audio detect intent, both `config` and `audio` must be provided. For streaming audio detect intent, `config` must be provided in the first request and `audio` must be provided in all following requests.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub audio: Option<Vec<u8>>,
     /// Required. Instructs the speech recognizer how to process the speech audio.
     
@@ -318,6 +489,28 @@ pub struct GoogleCloudDialogflowCxV3AudioInput {
 }
 
 impl client::Part for GoogleCloudDialogflowCxV3AudioInput {}
+
+
+/// Configuration of the barge-in behavior. Barge-in instructs the API to return a detected utterance at a proper time while the client is playing back the response audio from a previous request. When the client sees the utterance, it should stop the playback and immediately get ready for receiving the responses for the current request. The barge-in handling requires the client to start streaming audio input as soon as it starts playing back the audio from the previous response. The playback is modeled into two phases: * No barge-in phase: which goes first and during which speech detection should not be carried out. * Barge-in phase: which follows the no barge-in phase and during which the API starts speech detection and may inform the client that an utterance has been detected. Note that no-speech event is not expected in this phase. The client provides this configuration in terms of the durations of those two phases. The durations are measured in terms of the audio length from the the start of the input audio. No-speech event is a response with END_OF_UTTERANCE without any transcript following up.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3BargeInConfig {
+    /// Duration that is not eligible for barge-in at the beginning of the input audio.
+    #[serde(rename="noBargeInDuration")]
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub no_barge_in_duration: Option<client::chrono::Duration>,
+    /// Total duration for the playback at the beginning of the input audio.
+    #[serde(rename="totalDuration")]
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub total_duration: Option<client::chrono::Duration>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3BargeInConfig {}
 
 
 /// The request message for TestCases.BatchDeleteTestCases.
@@ -360,6 +553,59 @@ pub struct GoogleCloudDialogflowCxV3BatchRunTestCasesRequest {
 }
 
 impl client::RequestValue for GoogleCloudDialogflowCxV3BatchRunTestCasesRequest {}
+
+
+/// Boost specification to boost certain documents. A copy of google.cloud.discoveryengine.v1main.BoostSpec, field documentation is available at https://cloud.google.com/generative-ai-app-builder/docs/reference/rest/v1alpha/BoostSpec
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3BoostSpec {
+    /// Optional. Condition boost specifications. If a document matches multiple conditions in the specifictions, boost scores from these specifications are all applied and combined in a non-linear way. Maximum number of specifications is 20.
+    #[serde(rename="conditionBoostSpecs")]
+    
+    pub condition_boost_specs: Option<Vec<GoogleCloudDialogflowCxV3BoostSpecConditionBoostSpec>>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3BoostSpec {}
+
+
+/// Boost applies to documents which match a condition.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3BoostSpecConditionBoostSpec {
+    /// Optional. Strength of the condition boost, which should be in [-1, 1]. Negative boost means demotion. Default is 0.0. Setting to 1.0 gives the document a big promotion. However, it does not necessarily mean that the boosted document will be the top result at all times, nor that other documents will be excluded. Results could still be shown even when none of them matches the condition. And results that are significantly more relevant to the search query can still trump your heavily favored but irrelevant documents. Setting to -1.0 gives the document a big demotion. However, results that are deeply relevant might still be shown. The document will have an upstream battle to get a fairly high ranking, but it is not blocked out completely. Setting to 0.0 means no boost applied. The boosting condition is ignored.
+    
+    pub boost: Option<f32>,
+    /// Optional. An expression which specifies a boost condition. The syntax and supported fields are the same as a filter expression. Examples: * To boost documents with document ID "doc_1" or "doc_2", and color "Red" or "Blue": * (id: ANY("doc_1", "doc_2")) AND (color: ANY("Red","Blue"))
+    
+    pub condition: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3BoostSpecConditionBoostSpec {}
+
+
+/// Boost specifications for data stores.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3BoostSpecs {
+    /// Optional. Data Stores where the boosting configuration is applied. The full names of the referenced data stores. Formats: `projects/{project}/locations/{location}/collections/{collection}/dataStores/{data_store}` `projects/{project}/locations/{location}/dataStores/{data_store}`
+    #[serde(rename="dataStores")]
+    
+    pub data_stores: Option<Vec<String>>,
+    /// Optional. A list of boosting specifications.
+    
+    pub spec: Option<Vec<GoogleCloudDialogflowCxV3BoostSpec>>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3BoostSpecs {}
 
 
 /// The response message for TestCases.CalculateCoverage.
@@ -415,6 +661,10 @@ pub struct GoogleCloudDialogflowCxV3Changelog {
     #[serde(rename="displayName")]
     
     pub display_name: Option<String>,
+    /// The affected language code of the change.
+    #[serde(rename="languageCode")]
+    
+    pub language_code: Option<String>,
     /// The unique identifier of the changelog. Format: `projects//locations//agents//changelogs/`.
     
     pub name: Option<String>,
@@ -597,6 +847,26 @@ pub struct GoogleCloudDialogflowCxV3ConversationTurnVirtualAgentOutput {
 impl client::Part for GoogleCloudDialogflowCxV3ConversationTurnVirtualAgentOutput {}
 
 
+/// A data store connection. It represents a data store in Discovery Engine and the type of the contents it contains.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3DataStoreConnection {
+    /// The full name of the referenced data store. Formats: `projects/{project}/locations/{location}/collections/{collection}/dataStores/{data_store}` `projects/{project}/locations/{location}/dataStores/{data_store}`
+    #[serde(rename="dataStore")]
+    
+    pub data_store: Option<String>,
+    /// The type of the connected data store.
+    #[serde(rename="dataStoreType")]
+    
+    pub data_store_type: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3DataStoreConnection {}
+
+
 /// The request message for Environments.DeployFlow.
 /// 
 /// # Activities
@@ -617,7 +887,7 @@ pub struct GoogleCloudDialogflowCxV3DeployFlowRequest {
 impl client::RequestValue for GoogleCloudDialogflowCxV3DeployFlowRequest {}
 
 
-/// Represents an deployment in an environment. A deployment happens when a flow version configured to be active in the environment. You can configure running pre-deployment steps, e.g. running validation test cases, experiment auto-rollout, etc.
+/// Represents a deployment in an environment. A deployment happens when a flow version configured to be active in the environment. You can configure running pre-deployment steps, e.g. running validation test cases, experiment auto-rollout, etc.
 /// 
 /// # Activities
 /// 
@@ -681,7 +951,9 @@ impl client::Part for GoogleCloudDialogflowCxV3DeploymentResult {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations agents environments sessions detect intent projects](ProjectLocationAgentEnvironmentSessionDetectIntentCall) (request)
+/// * [locations agents environments sessions server streaming detect intent projects](ProjectLocationAgentEnvironmentSessionServerStreamingDetectIntentCall) (request)
 /// * [locations agents sessions detect intent projects](ProjectLocationAgentSessionDetectIntentCall) (request)
+/// * [locations agents sessions server streaming detect intent projects](ProjectLocationAgentSessionServerStreamingDetectIntentCall) (request)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3DetectIntentRequest {
@@ -710,7 +982,9 @@ impl client::RequestValue for GoogleCloudDialogflowCxV3DetectIntentRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations agents environments sessions detect intent projects](ProjectLocationAgentEnvironmentSessionDetectIntentCall) (response)
+/// * [locations agents environments sessions server streaming detect intent projects](ProjectLocationAgentEnvironmentSessionServerStreamingDetectIntentCall) (response)
 /// * [locations agents sessions detect intent projects](ProjectLocationAgentSessionDetectIntentCall) (response)
+/// * [locations agents sessions server streaming detect intent projects](ProjectLocationAgentSessionServerStreamingDetectIntentCall) (response)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3DetectIntentResponse {
@@ -721,7 +995,7 @@ pub struct GoogleCloudDialogflowCxV3DetectIntentResponse {
     /// The audio data bytes encoded as specified in the request. Note: The output audio is generated based on the values of default platform text responses found in the `query_result.response_messages` field. If multiple default text responses exist, they will be concatenated when generating audio. If no default platform text responses exist, the generated audio content will be empty. In some scenarios, multiple output audio fields may be present in the response structure. In these cases, only the top-most-level audio output has content.
     #[serde(rename="outputAudio")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub output_audio: Option<Vec<u8>>,
     /// The config used by the speech synthesizer to generate the output audio.
     #[serde(rename="outputAudioConfig")]
@@ -874,7 +1148,7 @@ pub struct GoogleCloudDialogflowCxV3Environment {
     #[serde(rename="updateTime")]
     
     pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
-    /// Required. A list of configurations for flow versions. You should include version configs for all flows that are reachable from `Start Flow` in the agent. Otherwise, an error will be returned.
+    /// A list of configurations for flow versions. You should include version configs for all flows that are reachable from `Start Flow` in the agent. Otherwise, an error will be returned.
     #[serde(rename="versionConfigs")]
     
     pub version_configs: Option<Vec<GoogleCloudDialogflowCxV3EnvironmentVersionConfig>>,
@@ -1205,9 +1479,73 @@ pub struct GoogleCloudDialogflowCxV3ExportAgentRequest {
     /// Optional. Environment name. If not set, draft environment is assumed. Format: `projects//locations//agents//environments/`.
     
     pub environment: Option<String>,
+    /// Optional. The Git branch to export the agent to.
+    #[serde(rename="gitDestination")]
+    
+    pub git_destination: Option<GoogleCloudDialogflowCxV3ExportAgentRequestGitDestination>,
+    /// Optional. Whether to include BigQuery Export setting.
+    #[serde(rename="includeBigqueryExportSettings")]
+    
+    pub include_bigquery_export_settings: Option<bool>,
 }
 
 impl client::RequestValue for GoogleCloudDialogflowCxV3ExportAgentRequest {}
+
+
+/// Settings for exporting to a git branch.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3ExportAgentRequestGitDestination {
+    /// Commit message for the git push.
+    #[serde(rename="commitMessage")]
+    
+    pub commit_message: Option<String>,
+    /// Tracking branch for the git push.
+    #[serde(rename="trackingBranch")]
+    
+    pub tracking_branch: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3ExportAgentRequestGitDestination {}
+
+
+/// The request message for EntityTypes.ExportEntityTypes.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations agents entity types export projects](ProjectLocationAgentEntityTypeExportCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3ExportEntityTypesRequest {
+    /// Optional. The data format of the exported entity types. If not specified, `BLOB` is assumed.
+    #[serde(rename="dataFormat")]
+    
+    pub data_format: Option<String>,
+    /// Required. The name of the entity types to export. Format: `projects//locations//agents//entityTypes/`.
+    #[serde(rename="entityTypes")]
+    
+    pub entity_types: Option<Vec<String>>,
+    /// Optional. The option to return the serialized entity types inline.
+    #[serde(rename="entityTypesContentInline")]
+    
+    pub entity_types_content_inline: Option<bool>,
+    /// Optional. The [Google Cloud Storage](https://cloud.google.com/storage/docs/) URI to export the entity types to. The format of this URI must be `gs:///`. Dialogflow performs a write operation for the Cloud Storage object on the caller's behalf, so your request authentication must have write permissions for the object. For more information, see [Dialogflow access control](https://cloud.google.com/dialogflow/cx/docs/concept/access-control#storage).
+    #[serde(rename="entityTypesUri")]
+    
+    pub entity_types_uri: Option<String>,
+    /// Optional. The language to retrieve the entity type for. The following fields are language dependent: * `EntityType.entities.value` * `EntityType.entities.synonyms` * `EntityType.excluded_phrases.value` If not specified, all language dependent fields will be retrieved. [Many languages](https://cloud.google.com/dialogflow/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
+    #[serde(rename="languageCode")]
+    
+    pub language_code: Option<String>,
+}
+
+impl client::RequestValue for GoogleCloudDialogflowCxV3ExportEntityTypesRequest {}
 
 
 /// The request message for Flows.ExportFlow.
@@ -1232,6 +1570,37 @@ pub struct GoogleCloudDialogflowCxV3ExportFlowRequest {
 }
 
 impl client::RequestValue for GoogleCloudDialogflowCxV3ExportFlowRequest {}
+
+
+/// The request message for Intents.ExportIntents.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations agents intents export projects](ProjectLocationAgentIntentExportCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3ExportIntentsRequest {
+    /// Optional. The data format of the exported intents. If not specified, `BLOB` is assumed.
+    #[serde(rename="dataFormat")]
+    
+    pub data_format: Option<String>,
+    /// Required. The name of the intents to export. Format: `projects//locations//agents//intents/`.
+    
+    pub intents: Option<Vec<String>>,
+    /// Optional. The option to return the serialized intents inline.
+    #[serde(rename="intentsContentInline")]
+    
+    pub intents_content_inline: Option<bool>,
+    /// Optional. The [Google Cloud Storage](https://cloud.google.com/storage/docs/) URI to export the intents to. The format of this URI must be `gs:///`. Dialogflow performs a write operation for the Cloud Storage object on the caller's behalf, so your request authentication must have write permissions for the object. For more information, see [Dialogflow access control](https://cloud.google.com/dialogflow/cx/docs/concept/access-control#storage).
+    #[serde(rename="intentsUri")]
+    
+    pub intents_uri: Option<String>,
+}
+
+impl client::RequestValue for GoogleCloudDialogflowCxV3ExportIntentsRequest {}
 
 
 /// The request message for TestCases.ExportTestCases.
@@ -1261,6 +1630,25 @@ pub struct GoogleCloudDialogflowCxV3ExportTestCasesRequest {
 impl client::RequestValue for GoogleCloudDialogflowCxV3ExportTestCasesRequest {}
 
 
+/// Filter specifications for data stores.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3FilterSpecs {
+    /// Optional. Data Stores where the boosting configuration is applied. The full names of the referenced data stores. Formats: `projects/{project}/locations/{location}/collections/{collection}/dataStores/{data_store}` `projects/{project}/locations/{location}/dataStores/{data_store}`
+    #[serde(rename="dataStores")]
+    
+    pub data_stores: Option<Vec<String>>,
+    /// Optional. The filter expression to be applied. Expression syntax is documented at https://cloud.google.com/generative-ai-app-builder/docs/filter-search-metadata#filter-expression-syntax
+    
+    pub filter: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3FilterSpecs {}
+
+
 /// Flows represents the conversation flows when you build your chatbot agent. A flow consists of many pages connected by the transition routes. Conversations always start with the built-in Start Flow (with an all-0 ID). Transition routes can direct the conversation session from the current flow (parent flow) to another flow (sub flow). When the sub flow is finished, Dialogflow will bring the session back to the parent flow, where the sub flow is started. Usually, when a transition route is followed by a matched intent, the intent will be “consumed”. This means the intent won’t activate more transition routes. However, when the followed transition route moves the conversation session into a different flow, the matched intent can be carried over and to be consumed in the target flow.
 /// 
 /// # Activities
@@ -1274,6 +1662,10 @@ impl client::RequestValue for GoogleCloudDialogflowCxV3ExportTestCasesRequest {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3Flow {
+    /// Hierarchical advanced settings for this flow. The settings exposed at the lower level overrides the settings exposed at the higher level.
+    #[serde(rename="advancedSettings")]
+    
+    pub advanced_settings: Option<GoogleCloudDialogflowCxV3AdvancedSettings>,
     /// The description of the flow. The maximum length is 500 characters. If exceeded, the request is rejected.
     
     pub description: Option<String>,
@@ -1285,6 +1677,10 @@ pub struct GoogleCloudDialogflowCxV3Flow {
     #[serde(rename="eventHandlers")]
     
     pub event_handlers: Option<Vec<GoogleCloudDialogflowCxV3EventHandler>>,
+    /// Optional. Knowledge connector configuration.
+    #[serde(rename="knowledgeConnectorSettings")]
+    
+    pub knowledge_connector_settings: Option<GoogleCloudDialogflowCxV3KnowledgeConnectorSettings>,
     /// The unique identifier of the flow. Format: `projects//locations//agents//flows/`.
     
     pub name: Option<String>,
@@ -1292,7 +1688,7 @@ pub struct GoogleCloudDialogflowCxV3Flow {
     #[serde(rename="nluSettings")]
     
     pub nlu_settings: Option<GoogleCloudDialogflowCxV3NluSettings>,
-    /// A flow's transition route group serve two purposes: * They are responsible for matching the user's first utterances in the flow. * They are inherited by every page's transition route groups. Transition route groups defined in the page have higher priority than those defined in the flow. Format:`projects//locations//agents//flows//transitionRouteGroups/`.
+    /// A flow's transition route group serve two purposes: * They are responsible for matching the user's first utterances in the flow. * They are inherited by every page's transition route groups. Transition route groups defined in the page have higher priority than those defined in the flow. Format:`projects//locations//agents//flows//transitionRouteGroups/` or `projects//locations//agents//transitionRouteGroups/` for agent-level groups.
     #[serde(rename="transitionRouteGroups")]
     
     pub transition_route_groups: Option<Vec<String>>,
@@ -1304,6 +1700,22 @@ pub struct GoogleCloudDialogflowCxV3Flow {
 
 impl client::RequestValue for GoogleCloudDialogflowCxV3Flow {}
 impl client::ResponseResult for GoogleCloudDialogflowCxV3Flow {}
+
+
+/// The flow import strategy used for resource conflict resolution associated with an ImportFlowRequest.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3FlowImportStrategy {
+    /// Optional. Import strategy for resource conflict resolution, applied globally throughout the flow. It will be applied for all display name conflicts in the imported content. If not specified, 'CREATE_NEW' is assumed.
+    #[serde(rename="globalImportStrategy")]
+    
+    pub global_import_strategy: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3FlowImportStrategy {}
 
 
 /// The response message for Flows.GetFlowValidationResult.
@@ -1356,6 +1768,10 @@ impl client::Part for GoogleCloudDialogflowCxV3Form {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3FormParameter {
+    /// Hierarchical advanced settings for this parameter. The settings exposed at the lower level overrides the settings exposed at the higher level.
+    #[serde(rename="advancedSettings")]
+    
+    pub advanced_settings: Option<GoogleCloudDialogflowCxV3AdvancedSettings>,
     /// The default value of an optional parameter. If the parameter is required, the default value will be ignored.
     #[serde(rename="defaultValue")]
     
@@ -1451,7 +1867,7 @@ pub struct GoogleCloudDialogflowCxV3FulfillIntentResponse {
     /// The audio data bytes encoded as specified in the request. Note: The output audio is generated based on the values of default platform text responses found in the `query_result.response_messages` field. If multiple default text responses exist, they will be concatenated when generating audio. If no default platform text responses exist, the generated audio content will be empty. In some scenarios, multiple output audio fields may be present in the response structure. In these cases, only the top-most-level audio output has content.
     #[serde(rename="outputAudio")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub output_audio: Option<Vec<u8>>,
     /// The config used by the speech synthesizer to generate the output audio.
     #[serde(rename="outputAudioConfig")]
@@ -1477,10 +1893,18 @@ impl client::ResponseResult for GoogleCloudDialogflowCxV3FulfillIntentResponse {
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3Fulfillment {
+    /// Hierarchical advanced settings for this fulfillment. The settings exposed at the lower level overrides the settings exposed at the higher level.
+    #[serde(rename="advancedSettings")]
+    
+    pub advanced_settings: Option<GoogleCloudDialogflowCxV3AdvancedSettings>,
     /// Conditional cases for this fulfillment.
     #[serde(rename="conditionalCases")]
     
     pub conditional_cases: Option<Vec<GoogleCloudDialogflowCxV3FulfillmentConditionalCases>>,
+    /// If the flag is true, the agent will utilize LLM to generate a text response. If LLM generation fails, the defined responses in the fulfillment will be respected. This flag is only useful for fulfillments associated with no-match event handlers.
+    #[serde(rename="enableGenerativeFallback")]
+    
+    pub enable_generative_fallback: Option<bool>,
     /// The list of rich message responses to present to the user.
     
     pub messages: Option<Vec<GoogleCloudDialogflowCxV3ResponseMessage>>,
@@ -1574,6 +1998,218 @@ pub struct GoogleCloudDialogflowCxV3FulfillmentSetParameterAction {
 impl client::Part for GoogleCloudDialogflowCxV3FulfillmentSetParameterAction {}
 
 
+/// Google Cloud Storage location for a Dialogflow operation that writes or exports objects (e.g. exported agent or transcripts) outside of Dialogflow.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3GcsDestination {
+    /// Required. The Google Cloud Storage URI for the exported objects. A URI is of the form: `gs://bucket/object-name-or-prefix` Whether a full object name, or just a prefix, its usage depends on the Dialogflow operation.
+    
+    pub uri: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3GcsDestination {}
+
+
+/// Settings for Generative AI.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations agents get generative settings projects](ProjectLocationAgentGetGenerativeSettingCall) (response)
+/// * [locations agents update generative settings projects](ProjectLocationAgentUpdateGenerativeSettingCall) (request|response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3GenerativeSettings {
+    /// Settings for Generative Fallback.
+    #[serde(rename="fallbackSettings")]
+    
+    pub fallback_settings: Option<GoogleCloudDialogflowCxV3GenerativeSettingsFallbackSettings>,
+    /// Settings for Generative Safety.
+    #[serde(rename="generativeSafetySettings")]
+    
+    pub generative_safety_settings: Option<GoogleCloudDialogflowCxV3SafetySettings>,
+    /// Settings for knowledge connector.
+    #[serde(rename="knowledgeConnectorSettings")]
+    
+    pub knowledge_connector_settings: Option<GoogleCloudDialogflowCxV3GenerativeSettingsKnowledgeConnectorSettings>,
+    /// Language for this settings.
+    #[serde(rename="languageCode")]
+    
+    pub language_code: Option<String>,
+    /// Format: `projects//locations//agents//generativeSettings`.
+    
+    pub name: Option<String>,
+}
+
+impl client::RequestValue for GoogleCloudDialogflowCxV3GenerativeSettings {}
+impl client::ResponseResult for GoogleCloudDialogflowCxV3GenerativeSettings {}
+
+
+/// Settings for Generative Fallback.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3GenerativeSettingsFallbackSettings {
+    /// Stored prompts that can be selected, for example default templates like "conservative" or "chatty", or user defined ones.
+    #[serde(rename="promptTemplates")]
+    
+    pub prompt_templates: Option<Vec<GoogleCloudDialogflowCxV3GenerativeSettingsFallbackSettingsPromptTemplate>>,
+    /// Display name of the selected prompt.
+    #[serde(rename="selectedPrompt")]
+    
+    pub selected_prompt: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3GenerativeSettingsFallbackSettings {}
+
+
+/// Prompt template.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3GenerativeSettingsFallbackSettingsPromptTemplate {
+    /// Prompt name.
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
+    /// If the flag is true, the prompt is frozen and cannot be modified by users.
+    
+    pub frozen: Option<bool>,
+    /// Prompt text that is sent to a LLM on no-match default, placeholders are filled downstream. For example: "Here is a conversation $conversation, a response is: "
+    #[serde(rename="promptText")]
+    
+    pub prompt_text: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3GenerativeSettingsFallbackSettingsPromptTemplate {}
+
+
+/// Settings for knowledge connector. These parameters are used for LLM prompt like "You are . You are a helpful and verbose at , . Your task is to help humans on ".
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3GenerativeSettingsKnowledgeConnectorSettings {
+    /// Name of the virtual agent. Used for LLM prompt. Can be left empty.
+    
+    pub agent: Option<String>,
+    /// Identity of the agent, e.g. "virtual agent", "AI assistant".
+    #[serde(rename="agentIdentity")]
+    
+    pub agent_identity: Option<String>,
+    /// Agent scope, e.g. "Example company website", "internal Example company website for employees", "manual of car owner".
+    #[serde(rename="agentScope")]
+    
+    pub agent_scope: Option<String>,
+    /// Name of the company, organization or other entity that the agent represents. Used for knowledge connector LLM prompt and for knowledge search.
+    
+    pub business: Option<String>,
+    /// Company description, used for LLM prompt, e.g. "a family company selling freshly roasted coffee beans".
+    #[serde(rename="businessDescription")]
+    
+    pub business_description: Option<String>,
+    /// Whether to disable fallback to Data Store search results (in case the LLM couldn't pick a proper answer). Per default the feature is enabled.
+    #[serde(rename="disableDataStoreFallback")]
+    
+    pub disable_data_store_fallback: Option<bool>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3GenerativeSettingsKnowledgeConnectorSettings {}
+
+
+/// Generators contain prompt to be sent to the LLM model to generate text. The prompt can contain parameters which will be resolved before calling the model. It can optionally contain banned phrases to ensure the model responses are safe.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations agents generators create projects](ProjectLocationAgentGeneratorCreateCall) (request|response)
+/// * [locations agents generators get projects](ProjectLocationAgentGeneratorGetCall) (response)
+/// * [locations agents generators patch projects](ProjectLocationAgentGeneratorPatchCall) (request|response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3Generator {
+    /// Required. The human-readable name of the generator, unique within the agent. The prompt contains pre-defined parameters such as $conversation, $last-user-utterance, etc. populated by Dialogflow. It can also contain custom placeholders which will be resolved during fulfillment.
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
+    /// The unique identifier of the generator. Must be set for the Generators.UpdateGenerator method. Generators.CreateGenerate populates the name automatically. Format: `projects//locations//agents//generators/`.
+    
+    pub name: Option<String>,
+    /// Optional. List of custom placeholders in the prompt text.
+    
+    pub placeholders: Option<Vec<GoogleCloudDialogflowCxV3GeneratorPlaceholder>>,
+    /// Required. Prompt for the LLM model.
+    #[serde(rename="promptText")]
+    
+    pub prompt_text: Option<GoogleCloudDialogflowCxV3Phrase>,
+}
+
+impl client::RequestValue for GoogleCloudDialogflowCxV3Generator {}
+impl client::ResponseResult for GoogleCloudDialogflowCxV3Generator {}
+
+
+/// Represents a custom placeholder in the prompt text.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3GeneratorPlaceholder {
+    /// Unique ID used to map custom placeholder to parameters in fulfillment.
+    
+    pub id: Option<String>,
+    /// Custom placeholder value in the prompt text.
+    
+    pub name: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3GeneratorPlaceholder {}
+
+
+/// The request message for EntityTypes.ImportEntityTypes.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations agents entity types import projects](ProjectLocationAgentEntityTypeImportCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3ImportEntityTypesRequest {
+    /// Uncompressed byte content of entity types.
+    #[serde(rename="entityTypesContent")]
+    
+    pub entity_types_content: Option<GoogleCloudDialogflowCxV3InlineSource>,
+    /// The [Google Cloud Storage](https://cloud.google.com/storage/docs/) URI to import entity types from. The format of this URI must be `gs:///`. Dialogflow performs a read operation for the Cloud Storage object on the caller's behalf, so your request authentication must have read permissions for the object. For more information, see [Dialogflow access control](https://cloud.google.com/dialogflow/cx/docs/concept/access-control#storage).
+    #[serde(rename="entityTypesUri")]
+    
+    pub entity_types_uri: Option<String>,
+    /// Required. Merge option for importing entity types.
+    #[serde(rename="mergeOption")]
+    
+    pub merge_option: Option<String>,
+    /// Optional. The target entity type to import into. Format: `projects//locations//agents//entity_types/`. If set, there should be only one entity type included in entity_types, of which the type should match the type of the target entity type. All entities in the imported entity type will be added to the target entity type.
+    #[serde(rename="targetEntityType")]
+    
+    pub target_entity_type: Option<String>,
+}
+
+impl client::RequestValue for GoogleCloudDialogflowCxV3ImportEntityTypesRequest {}
+
+
 /// The request message for Flows.ImportFlow.
 /// 
 /// # Activities
@@ -1588,8 +2224,12 @@ pub struct GoogleCloudDialogflowCxV3ImportFlowRequest {
     /// Uncompressed raw byte content for flow.
     #[serde(rename="flowContent")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub flow_content: Option<Vec<u8>>,
+    /// Optional. Specifies the import strategy used when resolving resource conflicts.
+    #[serde(rename="flowImportStrategy")]
+    
+    pub flow_import_strategy: Option<GoogleCloudDialogflowCxV3FlowImportStrategy>,
     /// The [Google Cloud Storage](https://cloud.google.com/storage/docs/) URI to import flow from. The format of this URI must be `gs:///`. Dialogflow performs a read operation for the Cloud Storage object on the caller's behalf, so your request authentication must have read permissions for the object. For more information, see [Dialogflow access control](https://cloud.google.com/dialogflow/cx/docs/concept/access-control#storage).
     #[serde(rename="flowUri")]
     
@@ -1601,6 +2241,34 @@ pub struct GoogleCloudDialogflowCxV3ImportFlowRequest {
 }
 
 impl client::RequestValue for GoogleCloudDialogflowCxV3ImportFlowRequest {}
+
+
+/// The request message for Intents.ImportIntents.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations agents intents import projects](ProjectLocationAgentIntentImportCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3ImportIntentsRequest {
+    /// Uncompressed byte content of intents.
+    #[serde(rename="intentsContent")]
+    
+    pub intents_content: Option<GoogleCloudDialogflowCxV3InlineSource>,
+    /// The [Google Cloud Storage](https://cloud.google.com/storage/docs/) URI to import intents from. The format of this URI must be `gs:///`. Dialogflow performs a read operation for the Cloud Storage object on the caller's behalf, so your request authentication must have read permissions for the object. For more information, see [Dialogflow access control](https://cloud.google.com/dialogflow/cx/docs/concept/access-control#storage).
+    #[serde(rename="intentsUri")]
+    
+    pub intents_uri: Option<String>,
+    /// Merge option for importing intents. If not specified, `REJECT` is assumed.
+    #[serde(rename="mergeOption")]
+    
+    pub merge_option: Option<String>,
+}
+
+impl client::RequestValue for GoogleCloudDialogflowCxV3ImportIntentsRequest {}
 
 
 /// The request message for TestCases.ImportTestCases.
@@ -1616,7 +2284,7 @@ impl client::RequestValue for GoogleCloudDialogflowCxV3ImportFlowRequest {}
 pub struct GoogleCloudDialogflowCxV3ImportTestCasesRequest {
     /// Uncompressed raw byte content for test cases.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub content: Option<Vec<u8>>,
     /// The [Google Cloud Storage](https://cloud.google.com/storage/docs/) URI to import test cases from. The format of this URI must be `gs:///`. Dialogflow performs a read operation for the Cloud Storage object on the caller's behalf, so your request authentication must have read permissions for the object. For more information, see [Dialogflow access control](https://cloud.google.com/dialogflow/cx/docs/concept/access-control#storage).
     #[serde(rename="gcsUri")]
@@ -1625,6 +2293,22 @@ pub struct GoogleCloudDialogflowCxV3ImportTestCasesRequest {
 }
 
 impl client::RequestValue for GoogleCloudDialogflowCxV3ImportTestCasesRequest {}
+
+
+/// Inline source for a Dialogflow operation that reads or imports objects (e.g. intents) into Dialogflow.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3InlineSource {
+    /// The uncompressed byte content for the objects.
+    
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
+    pub content: Option<Vec<u8>>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3InlineSource {}
 
 
 /// Instructs the speech recognizer on how to process the audio content.
@@ -1638,17 +2322,25 @@ pub struct GoogleCloudDialogflowCxV3InputAudioConfig {
     #[serde(rename="audioEncoding")]
     
     pub audio_encoding: Option<String>,
+    /// Configuration of barge-in behavior during the streaming of input audio.
+    #[serde(rename="bargeInConfig")]
+    
+    pub barge_in_config: Option<GoogleCloudDialogflowCxV3BargeInConfig>,
     /// Optional. If `true`, Dialogflow returns SpeechWordInfo in StreamingRecognitionResult with information about the recognized speech words, e.g. start and end time offsets. If false or unspecified, Speech doesn't return any word-level information.
     #[serde(rename="enableWordInfo")]
     
     pub enable_word_info: Option<bool>,
-    /// Optional. Which Speech model to select for the given request. Select the model best suited to your domain to get best results. If a model is not explicitly specified, then we auto-select a model based on the parameters in the InputAudioConfig. If enhanced speech model is enabled for the agent and an enhanced version of the specified model for the language does not exist, then the speech is recognized using the standard version of the specified model. Refer to [Cloud Speech API documentation](https://cloud.google.com/speech-to-text/docs/basics#select-model) for more details.
+    /// Optional. Which Speech model to select for the given request. For more information, see [Speech models](https://cloud.google.com/dialogflow/cx/docs/concept/speech-models).
     
     pub model: Option<String>,
     /// Optional. Which variant of the Speech model to use.
     #[serde(rename="modelVariant")]
     
     pub model_variant: Option<String>,
+    /// If `true`, the request will opt out for STT conformer model migration. This field will be deprecated once force migration takes place in June 2024. Please refer to [Dialogflow CX Speech model migration](https://cloud.google.com/dialogflow/cx/docs/concept/speech-model-migration).
+    #[serde(rename="optOutConformerModelMigration")]
+    
+    pub opt_out_conformer_model_migration: Option<bool>,
     /// Optional. A list of strings containing words and phrases that the speech recognizer should recognize with higher likelihood. See [the Cloud Speech documentation](https://cloud.google.com/speech-to-text/docs/basics#phrase-hints) for more details.
     #[serde(rename="phraseHints")]
     
@@ -1738,7 +2430,7 @@ impl client::Part for GoogleCloudDialogflowCxV3IntentCoverage {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3IntentCoverageIntent {
-    /// Whether or not the intent is covered by at least one of the agent's test cases.
+    /// Whether the intent is covered by at least one of the agent's test cases.
     
     pub covered: Option<bool>,
     /// The intent full resource name
@@ -1829,6 +2521,37 @@ pub struct GoogleCloudDialogflowCxV3IntentTrainingPhrasePart {
 }
 
 impl client::Part for GoogleCloudDialogflowCxV3IntentTrainingPhrasePart {}
+
+
+/// The Knowledge Connector settings for this page or flow. This includes information such as the attached Knowledge Bases, and the way to execute fulfillment.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3KnowledgeConnectorSettings {
+    /// Optional. List of related data store connections.
+    #[serde(rename="dataStoreConnections")]
+    
+    pub data_store_connections: Option<Vec<GoogleCloudDialogflowCxV3DataStoreConnection>>,
+    /// Whether Knowledge Connector is enabled or not.
+    
+    pub enabled: Option<bool>,
+    /// The target flow to transition to. Format: `projects//locations//agents//flows/`.
+    #[serde(rename="targetFlow")]
+    
+    pub target_flow: Option<String>,
+    /// The target page to transition to. Format: `projects//locations//agents//flows//pages/`.
+    #[serde(rename="targetPage")]
+    
+    pub target_page: Option<String>,
+    /// The fulfillment to be triggered. When the answers from the Knowledge Connector are selected by Dialogflow, you can utitlize the request scoped parameter `$request.knowledge.answers` (contains up to the 5 highest confidence answers) and `$request.knowledge.questions` (contains the corresponding questions) to construct the fulfillment.
+    #[serde(rename="triggerFulfillment")]
+    
+    pub trigger_fulfillment: Option<GoogleCloudDialogflowCxV3Fulfillment>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3KnowledgeConnectorSettings {}
 
 
 /// The response message for Agents.ListAgents.
@@ -2017,6 +2740,29 @@ pub struct GoogleCloudDialogflowCxV3ListFlowsResponse {
 impl client::ResponseResult for GoogleCloudDialogflowCxV3ListFlowsResponse {}
 
 
+/// The response message for Generators.ListGenerators.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations agents generators list projects](ProjectLocationAgentGeneratorListCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3ListGeneratorsResponse {
+    /// The list of generators. There will be a maximum number of items returned based on the page_size field in the request.
+    
+    pub generators: Option<Vec<GoogleCloudDialogflowCxV3Generator>>,
+    /// Token to retrieve the next page of results, or empty if there are no more results in the list.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+}
+
+impl client::ResponseResult for GoogleCloudDialogflowCxV3ListGeneratorsResponse {}
+
+
 /// The response message for Intents.ListIntents.
 /// 
 /// # Activities
@@ -2168,6 +2914,7 @@ impl client::ResponseResult for GoogleCloudDialogflowCxV3ListTestCasesResponse {
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [locations agents flows transition route groups list projects](ProjectLocationAgentFlowTransitionRouteGroupListCall) (response)
+/// * [locations agents transition route groups list projects](ProjectLocationAgentTransitionRouteGroupListCall) (response)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3ListTransitionRouteGroupsResponse {
@@ -2317,6 +3064,10 @@ impl client::Part for GoogleCloudDialogflowCxV3Match {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3MatchIntentRequest {
+    /// Persist session parameter changes from `query_params`.
+    #[serde(rename="persistParameterChanges")]
+    
+    pub persist_parameter_changes: Option<bool>,
     /// Required. The input specification.
     #[serde(rename="queryInput")]
     
@@ -2407,7 +3158,7 @@ pub struct GoogleCloudDialogflowCxV3OutputAudioConfig {
     #[serde(rename="sampleRateHertz")]
     
     pub sample_rate_hertz: Option<i32>,
-    /// Optional. Configuration of how speech should be synthesized.
+    /// Optional. Configuration of how speech should be synthesized. If not specified, Agent.text_to_speech_settings is applied.
     #[serde(rename="synthesizeSpeechConfig")]
     
     pub synthesize_speech_config: Option<GoogleCloudDialogflowCxV3SynthesizeSpeechConfig>,
@@ -2429,6 +3180,13 @@ impl client::Part for GoogleCloudDialogflowCxV3OutputAudioConfig {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3Page {
+    /// Hierarchical advanced settings for this page. The settings exposed at the lower level overrides the settings exposed at the higher level.
+    #[serde(rename="advancedSettings")]
+    
+    pub advanced_settings: Option<GoogleCloudDialogflowCxV3AdvancedSettings>,
+    /// The description of the page. The maximum length is 500 characters.
+    
+    pub description: Option<String>,
     /// Required. The human-readable name of the page, unique within the flow.
     #[serde(rename="displayName")]
     
@@ -2444,10 +3202,14 @@ pub struct GoogleCloudDialogflowCxV3Page {
     /// The form associated with the page, used for collecting parameters relevant to the page.
     
     pub form: Option<GoogleCloudDialogflowCxV3Form>,
+    /// Optional. Knowledge connector configuration.
+    #[serde(rename="knowledgeConnectorSettings")]
+    
+    pub knowledge_connector_settings: Option<GoogleCloudDialogflowCxV3KnowledgeConnectorSettings>,
     /// The unique identifier of the page. Required for the Pages.UpdatePage method. Pages.CreatePage populates the name automatically. Format: `projects//locations//agents//flows//pages/`.
     
     pub name: Option<String>,
-    /// Ordered list of `TransitionRouteGroups` associated with the page. Transition route groups must be unique within a page. * If multiple transition routes within a page scope refer to the same intent, then the precedence order is: page's transition route -> page's transition route group -> flow's transition routes. * If multiple transition route groups within a page contain the same intent, then the first group in the ordered list takes precedence. Format:`projects//locations//agents//flows//transitionRouteGroups/`.
+    /// Ordered list of `TransitionRouteGroups` added to the page. Transition route groups must be unique within a page. If the page links both flow-level transition route groups and agent-level transition route groups, the flow-level ones will have higher priority and will be put before the agent-level ones. * If multiple transition routes within a page scope refer to the same intent, then the precedence order is: page's transition route -> page's transition route group -> flow's transition routes. * If multiple transition route groups within a page contain the same intent, then the first group in the ordered list takes precedence. Format:`projects//locations//agents//flows//transitionRouteGroups/` or `projects//locations//agents//transitionRouteGroups/` for agent-level groups.
     #[serde(rename="transitionRouteGroups")]
     
     pub transition_route_groups: Option<Vec<String>>,
@@ -2461,7 +3223,22 @@ impl client::RequestValue for GoogleCloudDialogflowCxV3Page {}
 impl client::ResponseResult for GoogleCloudDialogflowCxV3Page {}
 
 
-/// Represents the query input. It can contain one of: 1. A conversational query in the form of text. 2. An intent query that specifies which intent to trigger. 3. Natural language speech audio to be processed. 4. An event to be triggered. 
+/// Text input which can be used for prompt or banned phrases.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3Phrase {
+    /// Required. Text input which can be used for prompt or banned phrases.
+    
+    pub text: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3Phrase {}
+
+
+/// Represents the query input. It can contain one of: 1. A conversational query in the form of text. 2. An intent query that specifies which intent to trigger. 3. Natural language speech audio to be processed. 4. An event to be triggered. 5. DTMF digits to invoke an intent and fill in parameter value. 6. The results of a tool executed by the client.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2514,6 +3291,10 @@ pub struct GoogleCloudDialogflowCxV3QueryParameters {
     #[serde(rename="disableWebhook")]
     
     pub disable_webhook: Option<bool>,
+    /// Optional. Information about the end-user to improve the relevance and accuracy of generative answers. This will be interpreted and used by a language model, so, for good results, the data should be self-descriptive, and in a simple structure. Example: ```json { "subscription plan": "Business Premium Plus", "devices owned": [ {"model": "Google Pixel 7"}, {"model": "Google Pixel Tablet"} ] } ```
+    #[serde(rename="endUserMetadata")]
+    
+    pub end_user_metadata: Option<HashMap<String, json::Value>>,
     /// A list of flow versions to override for the request. Format: `projects//locations//agents//flows//versions/`. If version 1 of flow X is included in this list, the traffic of flow X will go through version 1 regardless of the version configuration in the environment. Each flow can have at most one version specified in this list.
     #[serde(rename="flowVersions")]
     
@@ -2528,10 +3309,19 @@ pub struct GoogleCloudDialogflowCxV3QueryParameters {
     /// This field can be used to pass custom data into the webhook associated with the agent. Arbitrary JSON objects are supported. Some integrations that query a Dialogflow agent may provide additional information in the payload. In particular, for the Dialogflow Phone Gateway integration, this field has the form: ``` { "telephony": { "caller_id": "+18558363987" } } ```
     
     pub payload: Option<HashMap<String, json::Value>>,
+    /// Optional. Search configuration for UCS search queries.
+    #[serde(rename="searchConfig")]
+    
+    pub search_config: Option<GoogleCloudDialogflowCxV3SearchConfig>,
     /// Additional session entity types to replace or extend developer entity types with. The entity synonyms apply to all languages and persist for the session of this query.
     #[serde(rename="sessionEntityTypes")]
     
     pub session_entity_types: Option<Vec<GoogleCloudDialogflowCxV3SessionEntityType>>,
+    /// Optional. Configure lifetime of the Dialogflow session. By default, a Dialogflow session remains active and its data is stored for 30 minutes after the last request is sent for the session. This value should be no longer than 1 day.
+    #[serde(rename="sessionTtl")]
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub session_ttl: Option<client::chrono::Duration>,
     /// The time zone of this conversational query from the [time zone database](https://www.iana.org/time-zones), e.g., America/New_York, Europe/Paris. If not provided, the time zone specified in the agent is used.
     #[serde(rename="timeZone")]
     
@@ -2552,6 +3342,14 @@ impl client::Part for GoogleCloudDialogflowCxV3QueryParameters {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3QueryResult {
+    /// Returns the current advanced settings including IVR settings. Even though the operations configured by these settings are performed by Dialogflow, the client may need to perform special logic at the moment. For example, if Dialogflow exports audio to Google Cloud Storage, then the client may need to wait for the resulting object to appear in the bucket before proceeding.
+    #[serde(rename="advancedSettings")]
+    
+    pub advanced_settings: Option<GoogleCloudDialogflowCxV3AdvancedSettings>,
+    /// Indicates whether the Thumbs up/Thumbs down rating controls are need to be shown for the response in the Dialogflow Messenger widget.
+    #[serde(rename="allowAnswerFeedback")]
+    
+    pub allow_answer_feedback: Option<bool>,
     /// The current Page. Some, not all fields are filled in this message, including but not limited to `name` and `display_name`.
     #[serde(rename="currentPage")]
     
@@ -2560,7 +3358,7 @@ pub struct GoogleCloudDialogflowCxV3QueryResult {
     #[serde(rename="diagnosticInfo")]
     
     pub diagnostic_info: Option<HashMap<String, json::Value>>,
-    /// If a DTMF was provided as input, this field will contain a copy of the DTMFInput.
+    /// If a DTMF was provided as input, this field will contain a copy of the DtmfInput.
     
     pub dtmf: Option<GoogleCloudDialogflowCxV3DtmfInput>,
     /// The Intent that matched the conversational query. Some, not all fields are filled in this message, including but not limited to: `name` and `display_name`. This field is deprecated, please use QueryResult.match instead.
@@ -2653,6 +3451,10 @@ pub struct GoogleCloudDialogflowCxV3ResponseMessage {
     #[serde(rename="endInteraction")]
     
     pub end_interaction: Option<GoogleCloudDialogflowCxV3ResponseMessageEndInteraction>,
+    /// Represents info card for knowledge answers, to be better rendered in Dialogflow Messenger.
+    #[serde(rename="knowledgeInfoCard")]
+    
+    pub knowledge_info_card: Option<GoogleCloudDialogflowCxV3ResponseMessageKnowledgeInfoCard>,
     /// Hands off conversation to a human agent.
     #[serde(rename="liveAgentHandoff")]
     
@@ -2672,6 +3474,10 @@ pub struct GoogleCloudDialogflowCxV3ResponseMessage {
     #[serde(rename="playAudio")]
     
     pub play_audio: Option<GoogleCloudDialogflowCxV3ResponseMessagePlayAudio>,
+    /// Response type.
+    #[serde(rename="responseType")]
+    
+    pub response_type: Option<String>,
     /// A signal that the client should transfer the phone call connected to this agent to a third-party endpoint.
     #[serde(rename="telephonyTransferCall")]
     
@@ -2708,6 +3514,17 @@ impl client::Part for GoogleCloudDialogflowCxV3ResponseMessageConversationSucces
 pub struct GoogleCloudDialogflowCxV3ResponseMessageEndInteraction { _never_set: Option<bool> }
 
 impl client::Part for GoogleCloudDialogflowCxV3ResponseMessageEndInteraction {}
+
+
+/// Represents info card response. If the response contains generative knowledge prediction, Dialogflow will return a payload with Infobot Messenger compatible info card. Otherwise, the info card response is skipped.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3ResponseMessageKnowledgeInfoCard { _never_set: Option<bool> }
+
+impl client::Part for GoogleCloudDialogflowCxV3ResponseMessageKnowledgeInfoCard {}
 
 
 /// Indicates that the conversation should be handed off to a live agent. Dialogflow only uses this to determine which conversations were handed off to a human agent for measurement purposes. What else to do with this signal is up to you and your handoff procedures. You may set this, for example: * In the entry_fulfillment of a Page if entering the page indicates something went extremely wrong in the conversation. * In a webhook response when you determine that the customer issue can only be handled by a human.
@@ -2753,7 +3570,7 @@ pub struct GoogleCloudDialogflowCxV3ResponseMessageMixedAudioSegment {
     pub allow_playback_interruption: Option<bool>,
     /// Raw audio synthesized from the Dialogflow agent's response using the output config specified in the request.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub audio: Option<Vec<u8>>,
     /// Client-specific URI that points to an audio clip accessible to the client. Dialogflow does not impose any validation on it.
     
@@ -2854,12 +3671,16 @@ pub struct GoogleCloudDialogflowCxV3RestoreAgentRequest {
     /// Uncompressed raw byte content for agent.
     #[serde(rename="agentContent")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub agent_content: Option<Vec<u8>>,
     /// The [Google Cloud Storage](https://cloud.google.com/storage/docs/) URI to restore agent from. The format of this URI must be `gs:///`. Dialogflow performs a read operation for the Cloud Storage object on the caller's behalf, so your request authentication must have read permissions for the object. For more information, see [Dialogflow access control](https://cloud.google.com/dialogflow/cx/docs/concept/access-control#storage).
     #[serde(rename="agentUri")]
     
     pub agent_uri: Option<String>,
+    /// Setting for restoring from a git branch
+    #[serde(rename="gitSource")]
+    
+    pub git_source: Option<GoogleCloudDialogflowCxV3RestoreAgentRequestGitSource>,
     /// Agent restore mode. If not specified, `KEEP` is assumed.
     #[serde(rename="restoreOption")]
     
@@ -2867,6 +3688,22 @@ pub struct GoogleCloudDialogflowCxV3RestoreAgentRequest {
 }
 
 impl client::RequestValue for GoogleCloudDialogflowCxV3RestoreAgentRequest {}
+
+
+/// Settings for restoring from a git branch
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3RestoreAgentRequestGitSource {
+    /// tracking branch for the git pull
+    #[serde(rename="trackingBranch")]
+    
+    pub tracking_branch: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3RestoreAgentRequestGitSource {}
 
 
 /// The configuration for auto rollout.
@@ -2975,6 +3812,61 @@ pub struct GoogleCloudDialogflowCxV3RunTestCaseRequest {
 impl client::RequestValue for GoogleCloudDialogflowCxV3RunTestCaseRequest {}
 
 
+/// Settings for Generative Safety.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3SafetySettings {
+    /// Banned phrases for generated text.
+    #[serde(rename="bannedPhrases")]
+    
+    pub banned_phrases: Option<Vec<GoogleCloudDialogflowCxV3SafetySettingsPhrase>>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3SafetySettings {}
+
+
+/// Text input which can be used for prompt or banned phrases.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3SafetySettingsPhrase {
+    /// Required. Language code of the phrase.
+    #[serde(rename="languageCode")]
+    
+    pub language_code: Option<String>,
+    /// Required. Text input which can be used for prompt or banned phrases.
+    
+    pub text: Option<String>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3SafetySettingsPhrase {}
+
+
+/// Search configuration for UCS search queries.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3SearchConfig {
+    /// Optional. Boosting configuration for the datastores.
+    #[serde(rename="boostSpecs")]
+    
+    pub boost_specs: Option<Vec<GoogleCloudDialogflowCxV3BoostSpecs>>,
+    /// Optional. Filter configuration for the datastores.
+    #[serde(rename="filterSpecs")]
+    
+    pub filter_specs: Option<Vec<GoogleCloudDialogflowCxV3FilterSpecs>>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3SearchConfig {}
+
+
 /// Represents the settings related to security issues, such as data redaction and data retention. It may take hours for updates on the settings to propagate to all the related components and take effect.
 /// 
 /// # Activities
@@ -3023,6 +3915,10 @@ pub struct GoogleCloudDialogflowCxV3SecuritySettings {
     #[serde(rename="redactionStrategy")]
     
     pub redaction_strategy: Option<String>,
+    /// Specifies the retention behavior defined by SecuritySettings.RetentionStrategy.
+    #[serde(rename="retentionStrategy")]
+    
+    pub retention_strategy: Option<String>,
     /// Retains the data for the specified number of days. User must set a value lower than Dialogflow's default 365d TTL (30 days for Agent Assist traffic), higher value will be ignored and use default. Setting a value higher than that has no effect. A missing value or setting to 0 also means we use default TTL.
     #[serde(rename="retentionWindowDays")]
     
@@ -3173,6 +4069,34 @@ pub struct GoogleCloudDialogflowCxV3StopExperimentRequest { _never_set: Option<b
 impl client::RequestValue for GoogleCloudDialogflowCxV3StopExperimentRequest {}
 
 
+/// The request to set the feedback for a bot answer.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations agents sessions submit answer feedback projects](ProjectLocationAgentSessionSubmitAnswerFeedbackCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3SubmitAnswerFeedbackRequest {
+    /// Required. Feedback provided for a bot answer.
+    #[serde(rename="answerFeedback")]
+    
+    pub answer_feedback: Option<GoogleCloudDialogflowCxV3AnswerFeedback>,
+    /// Required. ID of the response to update its feedback. This is the same as DetectIntentResponse.response_id.
+    #[serde(rename="responseId")]
+    
+    pub response_id: Option<String>,
+    /// Optional. The mask to control which fields to update. If the mask is not present, all fields will be updated.
+    #[serde(rename="updateMask")]
+    
+    pub update_mask: Option<client::FieldMask>,
+}
+
+impl client::RequestValue for GoogleCloudDialogflowCxV3SubmitAnswerFeedbackRequest {}
+
+
 /// Configuration of how speech should be synthesized.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3314,7 +4238,7 @@ impl client::Part for GoogleCloudDialogflowCxV3TestConfig {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3TestRunDifference {
-    /// A description of the diff, showing the actual output vs expected output.
+    /// A human readable description of the diff, showing the actual output vs expected output.
     
     pub description: Option<String>,
     /// The type of diff.
@@ -3333,12 +4257,28 @@ impl client::Part for GoogleCloudDialogflowCxV3TestRunDifference {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3TextInput {
-    /// Required. The UTF-8 encoded natural language text to be processed. Text length must not exceed 256 characters.
+    /// Required. The UTF-8 encoded natural language text to be processed.
     
     pub text: Option<String>,
 }
 
 impl client::Part for GoogleCloudDialogflowCxV3TextInput {}
+
+
+/// Settings related to speech synthesizing.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDialogflowCxV3TextToSpeechSettings {
+    /// Configuration of how speech should be synthesized, mapping from language (https://cloud.google.com/dialogflow/cx/docs/reference/language) to SynthesizeSpeechConfig. These settings affect: - The [phone gateway](https://cloud.google.com/dialogflow/cx/docs/concept/integration/phone-gateway) synthesize configuration set via Agent.text_to_speech_settings. - How speech is synthesized when invoking session APIs. Agent.text_to_speech_settings only applies if OutputAudioConfig.synthesize_speech_config is not specified.
+    #[serde(rename="synthesizeSpeechConfigs")]
+    
+    pub synthesize_speech_configs: Option<HashMap<String, GoogleCloudDialogflowCxV3SynthesizeSpeechConfig>>,
+}
+
+impl client::Part for GoogleCloudDialogflowCxV3TextToSpeechSettings {}
 
 
 /// The request message for Flows.TrainFlow.
@@ -3382,7 +4322,7 @@ impl client::Part for GoogleCloudDialogflowCxV3TransitionCoverage {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3TransitionCoverageTransition {
-    /// Whether or not the transition is covered by at least one of the agent's test cases.
+    /// Whether the transition is covered by at least one of the agent's test cases.
     
     pub covered: Option<bool>,
     /// Event handler.
@@ -3435,6 +4375,9 @@ pub struct GoogleCloudDialogflowCxV3TransitionRoute {
     /// The condition to evaluate against form parameters or session parameters. See the [conditions reference](https://cloud.google.com/dialogflow/cx/docs/reference/condition). At least one of `intent` or `condition` must be specified. When both `intent` and `condition` are specified, the transition can only happen when both are fulfilled.
     
     pub condition: Option<String>,
+    /// Optional. The description of the transition route. The maximum length is 500 characters.
+    
+    pub description: Option<String>,
     /// The unique identifier of an Intent. Format: `projects//locations//agents//intents/`. Indicates that the transition can only happen when the given intent is matched. At least one of `intent` or `condition` must be specified. When both `intent` and `condition` are specified, the transition can only happen when both are fulfilled.
     
     pub intent: Option<String>,
@@ -3458,7 +4401,7 @@ pub struct GoogleCloudDialogflowCxV3TransitionRoute {
 impl client::Part for GoogleCloudDialogflowCxV3TransitionRoute {}
 
 
-/// An TransitionRouteGroup represents a group of `TransitionRoutes` to be used by a Page.
+/// A TransitionRouteGroup represents a group of `TransitionRoutes` to be used by a Page.
 /// 
 /// # Activities
 /// 
@@ -3468,6 +4411,9 @@ impl client::Part for GoogleCloudDialogflowCxV3TransitionRoute {}
 /// * [locations agents flows transition route groups create projects](ProjectLocationAgentFlowTransitionRouteGroupCreateCall) (request|response)
 /// * [locations agents flows transition route groups get projects](ProjectLocationAgentFlowTransitionRouteGroupGetCall) (response)
 /// * [locations agents flows transition route groups patch projects](ProjectLocationAgentFlowTransitionRouteGroupPatchCall) (request|response)
+/// * [locations agents transition route groups create projects](ProjectLocationAgentTransitionRouteGroupCreateCall) (request|response)
+/// * [locations agents transition route groups get projects](ProjectLocationAgentTransitionRouteGroupGetCall) (response)
+/// * [locations agents transition route groups patch projects](ProjectLocationAgentTransitionRouteGroupPatchCall) (request|response)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3TransitionRouteGroup {
@@ -3475,7 +4421,7 @@ pub struct GoogleCloudDialogflowCxV3TransitionRouteGroup {
     #[serde(rename="displayName")]
     
     pub display_name: Option<String>,
-    /// The unique identifier of the transition route group. TransitionRouteGroups.CreateTransitionRouteGroup populates the name automatically. Format: `projects//locations//agents//flows//transitionRouteGroups/`.
+    /// The unique identifier of the transition route group. TransitionRouteGroups.CreateTransitionRouteGroup populates the name automatically. Format: `projects//locations//agents//flows//transitionRouteGroups/` .
     
     pub name: Option<String>,
     /// Transition routes associated with the TransitionRouteGroup.
@@ -3537,7 +4483,7 @@ impl client::Part for GoogleCloudDialogflowCxV3TransitionRouteGroupCoverageCover
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDialogflowCxV3TransitionRouteGroupCoverageCoverageTransition {
-    /// Whether or not the transition route is covered by at least one of the agent's test cases.
+    /// Whether the transition route is covered by at least one of the agent's test cases.
     
     pub covered: Option<bool>,
     /// Intent route or condition route.
@@ -3786,11 +4732,23 @@ pub struct GoogleCloudDialogflowCxV3WebhookGenericWebService {
     /// Optional. Specifies a list of allowed custom CA certificates (in DER format) for HTTPS verification. This overrides the default SSL trust store. If this is empty or unspecified, Dialogflow will use Google's default trust store to verify certificates. N.B. Make sure the HTTPS server certificates are signed with "subject alt name". For instance a certificate can be self-signed using the following command, ``` openssl x509 -req -days 200 -in example.com.csr \ -signkey example.com.key \ -out example.com.crt \ -extfile <(printf "\nsubjectAltName='DNS:www.example.com'") ```
     #[serde(rename="allowedCaCerts")]
     
-    #[serde_as(as = "Option<Vec<::client::serde::urlsafe_base64::Wrapper>>")]
+    #[serde_as(as = "Option<Vec<::client::serde::standard_base64::Wrapper>>")]
     pub allowed_ca_certs: Option<Vec<Vec<u8>>>,
+    /// Optional. HTTP method for the flexible webhook calls. Standard webhook always uses POST.
+    #[serde(rename="httpMethod")]
+    
+    pub http_method: Option<String>,
+    /// Optional. Maps the values extracted from specific fields of the flexible webhook response into session parameters. - Key: session parameter name - Value: field path in the webhook response
+    #[serde(rename="parameterMapping")]
+    
+    pub parameter_mapping: Option<HashMap<String, String>>,
     /// The password for HTTP Basic authentication.
     
     pub password: Option<String>,
+    /// Optional. Defines a custom JSON object as request body to send to flexible webhook.
+    #[serde(rename="requestBody")]
+    
+    pub request_body: Option<String>,
     /// The HTTP request headers to send together with webhook requests.
     #[serde(rename="requestHeaders")]
     
@@ -3801,6 +4759,10 @@ pub struct GoogleCloudDialogflowCxV3WebhookGenericWebService {
     /// The user name for HTTP Basic authentication.
     
     pub username: Option<String>,
+    /// Optional. Type of the webhook.
+    #[serde(rename="webhookType")]
+    
+    pub webhook_type: Option<String>,
 }
 
 impl client::Part for GoogleCloudDialogflowCxV3WebhookGenericWebService {}
@@ -3848,7 +4810,7 @@ pub struct GoogleCloudLocationListLocationsResponse {
 impl client::ResponseResult for GoogleCloudLocationListLocationsResponse {}
 
 
-/// A resource that represents Google Cloud Platform location.
+/// A resource that represents a Google Cloud location.
 /// 
 /// # Activities
 /// 
@@ -3912,6 +4874,8 @@ impl client::ResponseResult for GoogleLongrunningListOperationsResponse {}
 /// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
+/// * [locations agents entity types export projects](ProjectLocationAgentEntityTypeExportCall) (response)
+/// * [locations agents entity types import projects](ProjectLocationAgentEntityTypeImportCall) (response)
 /// * [locations agents environments create projects](ProjectLocationAgentEnvironmentCreateCall) (response)
 /// * [locations agents environments deploy flow projects](ProjectLocationAgentEnvironmentDeployFlowCall) (response)
 /// * [locations agents environments patch projects](ProjectLocationAgentEnvironmentPatchCall) (response)
@@ -3921,6 +4885,8 @@ impl client::ResponseResult for GoogleLongrunningListOperationsResponse {}
 /// * [locations agents flows export projects](ProjectLocationAgentFlowExportCall) (response)
 /// * [locations agents flows import projects](ProjectLocationAgentFlowImportCall) (response)
 /// * [locations agents flows train projects](ProjectLocationAgentFlowTrainCall) (response)
+/// * [locations agents intents export projects](ProjectLocationAgentIntentExportCall) (response)
+/// * [locations agents intents import projects](ProjectLocationAgentIntentImportCall) (response)
 /// * [locations agents test cases batch run projects](ProjectLocationAgentTestCaseBatchRunCall) (response)
 /// * [locations agents test cases export projects](ProjectLocationAgentTestCaseExportCall) (response)
 /// * [locations agents test cases import projects](ProjectLocationAgentTestCaseImportCall) (response)
@@ -3944,7 +4910,7 @@ pub struct GoogleLongrunningOperation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -3967,9 +4933,11 @@ impl client::ResponseResult for GoogleLongrunningOperation {}
 /// * [locations agents flows transition route groups delete projects](ProjectLocationAgentFlowTransitionRouteGroupDeleteCall) (response)
 /// * [locations agents flows versions delete projects](ProjectLocationAgentFlowVersionDeleteCall) (response)
 /// * [locations agents flows delete projects](ProjectLocationAgentFlowDeleteCall) (response)
+/// * [locations agents generators delete projects](ProjectLocationAgentGeneratorDeleteCall) (response)
 /// * [locations agents intents delete projects](ProjectLocationAgentIntentDeleteCall) (response)
 /// * [locations agents sessions entity types delete projects](ProjectLocationAgentSessionEntityTypeDeleteCall) (response)
 /// * [locations agents test cases batch delete projects](ProjectLocationAgentTestCaseBatchDeleteCall) (response)
+/// * [locations agents transition route groups delete projects](ProjectLocationAgentTransitionRouteGroupDeleteCall) (response)
 /// * [locations agents webhooks delete projects](ProjectLocationAgentWebhookDeleteCall) (response)
 /// * [locations agents delete projects](ProjectLocationAgentDeleteCall) (response)
 /// * [locations operations cancel projects](ProjectLocationOperationCancelCall) (response)
@@ -4049,7 +5017,7 @@ impl client::Part for GoogleTypeLatLng {}
 ///     ).build().await.unwrap();
 /// let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `locations_agents_changelogs_get(...)`, `locations_agents_changelogs_list(...)`, `locations_agents_create(...)`, `locations_agents_delete(...)`, `locations_agents_entity_types_create(...)`, `locations_agents_entity_types_delete(...)`, `locations_agents_entity_types_get(...)`, `locations_agents_entity_types_list(...)`, `locations_agents_entity_types_patch(...)`, `locations_agents_environments_continuous_test_results_list(...)`, `locations_agents_environments_create(...)`, `locations_agents_environments_delete(...)`, `locations_agents_environments_deploy_flow(...)`, `locations_agents_environments_deployments_get(...)`, `locations_agents_environments_deployments_list(...)`, `locations_agents_environments_experiments_create(...)`, `locations_agents_environments_experiments_delete(...)`, `locations_agents_environments_experiments_get(...)`, `locations_agents_environments_experiments_list(...)`, `locations_agents_environments_experiments_patch(...)`, `locations_agents_environments_experiments_start(...)`, `locations_agents_environments_experiments_stop(...)`, `locations_agents_environments_get(...)`, `locations_agents_environments_list(...)`, `locations_agents_environments_lookup_environment_history(...)`, `locations_agents_environments_patch(...)`, `locations_agents_environments_run_continuous_test(...)`, `locations_agents_environments_sessions_detect_intent(...)`, `locations_agents_environments_sessions_entity_types_create(...)`, `locations_agents_environments_sessions_entity_types_delete(...)`, `locations_agents_environments_sessions_entity_types_get(...)`, `locations_agents_environments_sessions_entity_types_list(...)`, `locations_agents_environments_sessions_entity_types_patch(...)`, `locations_agents_environments_sessions_fulfill_intent(...)`, `locations_agents_environments_sessions_match_intent(...)`, `locations_agents_export(...)`, `locations_agents_flows_create(...)`, `locations_agents_flows_delete(...)`, `locations_agents_flows_export(...)`, `locations_agents_flows_get(...)`, `locations_agents_flows_get_validation_result(...)`, `locations_agents_flows_import(...)`, `locations_agents_flows_list(...)`, `locations_agents_flows_pages_create(...)`, `locations_agents_flows_pages_delete(...)`, `locations_agents_flows_pages_get(...)`, `locations_agents_flows_pages_list(...)`, `locations_agents_flows_pages_patch(...)`, `locations_agents_flows_patch(...)`, `locations_agents_flows_train(...)`, `locations_agents_flows_transition_route_groups_create(...)`, `locations_agents_flows_transition_route_groups_delete(...)`, `locations_agents_flows_transition_route_groups_get(...)`, `locations_agents_flows_transition_route_groups_list(...)`, `locations_agents_flows_transition_route_groups_patch(...)`, `locations_agents_flows_validate(...)`, `locations_agents_flows_versions_compare_versions(...)`, `locations_agents_flows_versions_create(...)`, `locations_agents_flows_versions_delete(...)`, `locations_agents_flows_versions_get(...)`, `locations_agents_flows_versions_list(...)`, `locations_agents_flows_versions_load(...)`, `locations_agents_flows_versions_patch(...)`, `locations_agents_get(...)`, `locations_agents_get_validation_result(...)`, `locations_agents_intents_create(...)`, `locations_agents_intents_delete(...)`, `locations_agents_intents_get(...)`, `locations_agents_intents_list(...)`, `locations_agents_intents_patch(...)`, `locations_agents_list(...)`, `locations_agents_patch(...)`, `locations_agents_restore(...)`, `locations_agents_sessions_detect_intent(...)`, `locations_agents_sessions_entity_types_create(...)`, `locations_agents_sessions_entity_types_delete(...)`, `locations_agents_sessions_entity_types_get(...)`, `locations_agents_sessions_entity_types_list(...)`, `locations_agents_sessions_entity_types_patch(...)`, `locations_agents_sessions_fulfill_intent(...)`, `locations_agents_sessions_match_intent(...)`, `locations_agents_test_cases_batch_delete(...)`, `locations_agents_test_cases_batch_run(...)`, `locations_agents_test_cases_calculate_coverage(...)`, `locations_agents_test_cases_create(...)`, `locations_agents_test_cases_export(...)`, `locations_agents_test_cases_get(...)`, `locations_agents_test_cases_import(...)`, `locations_agents_test_cases_list(...)`, `locations_agents_test_cases_patch(...)`, `locations_agents_test_cases_results_get(...)`, `locations_agents_test_cases_results_list(...)`, `locations_agents_test_cases_run(...)`, `locations_agents_validate(...)`, `locations_agents_webhooks_create(...)`, `locations_agents_webhooks_delete(...)`, `locations_agents_webhooks_get(...)`, `locations_agents_webhooks_list(...)`, `locations_agents_webhooks_patch(...)`, `locations_get(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_security_settings_create(...)`, `locations_security_settings_delete(...)`, `locations_security_settings_get(...)`, `locations_security_settings_list(...)`, `locations_security_settings_patch(...)`, `operations_cancel(...)`, `operations_get(...)` and `operations_list(...)`
+/// // like `locations_agents_changelogs_get(...)`, `locations_agents_changelogs_list(...)`, `locations_agents_create(...)`, `locations_agents_delete(...)`, `locations_agents_entity_types_create(...)`, `locations_agents_entity_types_delete(...)`, `locations_agents_entity_types_export(...)`, `locations_agents_entity_types_get(...)`, `locations_agents_entity_types_import(...)`, `locations_agents_entity_types_list(...)`, `locations_agents_entity_types_patch(...)`, `locations_agents_environments_continuous_test_results_list(...)`, `locations_agents_environments_create(...)`, `locations_agents_environments_delete(...)`, `locations_agents_environments_deploy_flow(...)`, `locations_agents_environments_deployments_get(...)`, `locations_agents_environments_deployments_list(...)`, `locations_agents_environments_experiments_create(...)`, `locations_agents_environments_experiments_delete(...)`, `locations_agents_environments_experiments_get(...)`, `locations_agents_environments_experiments_list(...)`, `locations_agents_environments_experiments_patch(...)`, `locations_agents_environments_experiments_start(...)`, `locations_agents_environments_experiments_stop(...)`, `locations_agents_environments_get(...)`, `locations_agents_environments_list(...)`, `locations_agents_environments_lookup_environment_history(...)`, `locations_agents_environments_patch(...)`, `locations_agents_environments_run_continuous_test(...)`, `locations_agents_environments_sessions_detect_intent(...)`, `locations_agents_environments_sessions_entity_types_create(...)`, `locations_agents_environments_sessions_entity_types_delete(...)`, `locations_agents_environments_sessions_entity_types_get(...)`, `locations_agents_environments_sessions_entity_types_list(...)`, `locations_agents_environments_sessions_entity_types_patch(...)`, `locations_agents_environments_sessions_fulfill_intent(...)`, `locations_agents_environments_sessions_match_intent(...)`, `locations_agents_environments_sessions_server_streaming_detect_intent(...)`, `locations_agents_export(...)`, `locations_agents_flows_create(...)`, `locations_agents_flows_delete(...)`, `locations_agents_flows_export(...)`, `locations_agents_flows_get(...)`, `locations_agents_flows_get_validation_result(...)`, `locations_agents_flows_import(...)`, `locations_agents_flows_list(...)`, `locations_agents_flows_pages_create(...)`, `locations_agents_flows_pages_delete(...)`, `locations_agents_flows_pages_get(...)`, `locations_agents_flows_pages_list(...)`, `locations_agents_flows_pages_patch(...)`, `locations_agents_flows_patch(...)`, `locations_agents_flows_train(...)`, `locations_agents_flows_transition_route_groups_create(...)`, `locations_agents_flows_transition_route_groups_delete(...)`, `locations_agents_flows_transition_route_groups_get(...)`, `locations_agents_flows_transition_route_groups_list(...)`, `locations_agents_flows_transition_route_groups_patch(...)`, `locations_agents_flows_validate(...)`, `locations_agents_flows_versions_compare_versions(...)`, `locations_agents_flows_versions_create(...)`, `locations_agents_flows_versions_delete(...)`, `locations_agents_flows_versions_get(...)`, `locations_agents_flows_versions_list(...)`, `locations_agents_flows_versions_load(...)`, `locations_agents_flows_versions_patch(...)`, `locations_agents_generators_create(...)`, `locations_agents_generators_delete(...)`, `locations_agents_generators_get(...)`, `locations_agents_generators_list(...)`, `locations_agents_generators_patch(...)`, `locations_agents_get(...)`, `locations_agents_get_generative_settings(...)`, `locations_agents_get_validation_result(...)`, `locations_agents_intents_create(...)`, `locations_agents_intents_delete(...)`, `locations_agents_intents_export(...)`, `locations_agents_intents_get(...)`, `locations_agents_intents_import(...)`, `locations_agents_intents_list(...)`, `locations_agents_intents_patch(...)`, `locations_agents_list(...)`, `locations_agents_patch(...)`, `locations_agents_restore(...)`, `locations_agents_sessions_detect_intent(...)`, `locations_agents_sessions_entity_types_create(...)`, `locations_agents_sessions_entity_types_delete(...)`, `locations_agents_sessions_entity_types_get(...)`, `locations_agents_sessions_entity_types_list(...)`, `locations_agents_sessions_entity_types_patch(...)`, `locations_agents_sessions_fulfill_intent(...)`, `locations_agents_sessions_match_intent(...)`, `locations_agents_sessions_server_streaming_detect_intent(...)`, `locations_agents_sessions_submit_answer_feedback(...)`, `locations_agents_test_cases_batch_delete(...)`, `locations_agents_test_cases_batch_run(...)`, `locations_agents_test_cases_calculate_coverage(...)`, `locations_agents_test_cases_create(...)`, `locations_agents_test_cases_export(...)`, `locations_agents_test_cases_get(...)`, `locations_agents_test_cases_import(...)`, `locations_agents_test_cases_list(...)`, `locations_agents_test_cases_patch(...)`, `locations_agents_test_cases_results_get(...)`, `locations_agents_test_cases_results_list(...)`, `locations_agents_test_cases_run(...)`, `locations_agents_transition_route_groups_create(...)`, `locations_agents_transition_route_groups_delete(...)`, `locations_agents_transition_route_groups_get(...)`, `locations_agents_transition_route_groups_list(...)`, `locations_agents_transition_route_groups_patch(...)`, `locations_agents_update_generative_settings(...)`, `locations_agents_validate(...)`, `locations_agents_webhooks_create(...)`, `locations_agents_webhooks_delete(...)`, `locations_agents_webhooks_get(...)`, `locations_agents_webhooks_list(...)`, `locations_agents_webhooks_patch(...)`, `locations_get(...)`, `locations_list(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `locations_security_settings_create(...)`, `locations_security_settings_delete(...)`, `locations_security_settings_get(...)`, `locations_security_settings_list(...)`, `locations_security_settings_patch(...)`, `operations_cancel(...)`, `operations_get(...)` and `operations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -4141,6 +5109,25 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Exports the selected entity types.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The name of the parent agent to export entity types. Format: `projects//locations//agents/`.
+    pub fn locations_agents_entity_types_export(&self, request: GoogleCloudDialogflowCxV3ExportEntityTypesRequest, parent: &str) -> ProjectLocationAgentEntityTypeExportCall<'a, S> {
+        ProjectLocationAgentEntityTypeExportCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Retrieves the specified entity type.
     /// 
     /// # Arguments
@@ -4151,6 +5138,25 @@ impl<'a, S> ProjectMethods<'a, S> {
             hub: self.hub,
             _name: name.to_string(),
             _language_code: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Imports the specified entitytypes into the agent.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The agent to import the entity types into. Format: `projects//locations//agents/`.
+    pub fn locations_agents_entity_types_import(&self, request: GoogleCloudDialogflowCxV3ImportEntityTypesRequest, parent: &str) -> ProjectLocationAgentEntityTypeImportCall<'a, S> {
+        ProjectLocationAgentEntityTypeImportCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -4534,6 +5540,25 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Processes a natural language query and returns structured, actionable data as a result through server-side streaming. Server-side streaming allows Dialogflow to send [partial responses](https://cloud.google.com/dialogflow/cx/docs/concept/fulfillment#partial-response) earlier in a single request.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `session` - Required. The name of the session this query is sent to. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment. It's up to the API caller to choose an appropriate `Session ID`. It can be a random number or some type of session identifiers (preferably hashed). The length of the `Session ID` must not exceed 36 characters. For more information, see the [sessions guide](https://cloud.google.com/dialogflow/cx/docs/concept/session). Note: Always use agent versions for production traffic. See [Versions and environments](https://cloud.google.com/dialogflow/cx/docs/concept/version).
+    pub fn locations_agents_environments_sessions_server_streaming_detect_intent(&self, request: GoogleCloudDialogflowCxV3DetectIntentRequest, session: &str) -> ProjectLocationAgentEnvironmentSessionServerStreamingDetectIntentCall<'a, S> {
+        ProjectLocationAgentEnvironmentSessionServerStreamingDetectIntentCall {
+            hub: self.hub,
+            _request: request,
+            _session: session.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Creates an Environment in the specified Agent. This method is a [long-running operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation). The returned `Operation` type has the following method-specific fields: - `metadata`: An empty [Struct message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct) - `response`: Environment
     /// 
     /// # Arguments
@@ -4785,7 +5810,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The flow to create an TransitionRouteGroup for. Format: `projects//locations//agents//flows/`.
+    /// * `parent` - Required. The flow to create an TransitionRouteGroup for. Format: `projects//locations//agents//flows/` or `projects//locations//agents/` for agent-level groups.
     pub fn locations_agents_flows_transition_route_groups_create(&self, request: GoogleCloudDialogflowCxV3TransitionRouteGroup, parent: &str) -> ProjectLocationAgentFlowTransitionRouteGroupCreateCall<'a, S> {
         ProjectLocationAgentFlowTransitionRouteGroupCreateCall {
             hub: self.hub,
@@ -4804,7 +5829,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The name of the TransitionRouteGroup to delete. Format: `projects//locations//agents//flows//transitionRouteGroups/`.
+    /// * `name` - Required. The name of the TransitionRouteGroup to delete. Format: `projects//locations//agents//flows//transitionRouteGroups/` or `projects//locations//agents//transitionRouteGroups/`.
     pub fn locations_agents_flows_transition_route_groups_delete(&self, name: &str) -> ProjectLocationAgentFlowTransitionRouteGroupDeleteCall<'a, S> {
         ProjectLocationAgentFlowTransitionRouteGroupDeleteCall {
             hub: self.hub,
@@ -4822,7 +5847,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. The name of the TransitionRouteGroup. Format: `projects//locations//agents//flows//transitionRouteGroups/`.
+    /// * `name` - Required. The name of the TransitionRouteGroup. Format: `projects//locations//agents//flows//transitionRouteGroups/` or `projects//locations//agents//transitionRouteGroups/`.
     pub fn locations_agents_flows_transition_route_groups_get(&self, name: &str) -> ProjectLocationAgentFlowTransitionRouteGroupGetCall<'a, S> {
         ProjectLocationAgentFlowTransitionRouteGroupGetCall {
             hub: self.hub,
@@ -4840,7 +5865,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The flow to list all transition route groups for. Format: `projects//locations//agents//flows/`.
+    /// * `parent` - Required. The flow to list all transition route groups for. Format: `projects//locations//agents//flows/` or `projects//locations//agents/.
     pub fn locations_agents_flows_transition_route_groups_list(&self, parent: &str) -> ProjectLocationAgentFlowTransitionRouteGroupListCall<'a, S> {
         ProjectLocationAgentFlowTransitionRouteGroupListCall {
             hub: self.hub,
@@ -4861,7 +5886,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The unique identifier of the transition route group. TransitionRouteGroups.CreateTransitionRouteGroup populates the name automatically. Format: `projects//locations//agents//flows//transitionRouteGroups/`.
+    /// * `name` - The unique identifier of the transition route group. TransitionRouteGroups.CreateTransitionRouteGroup populates the name automatically. Format: `projects//locations//agents//flows//transitionRouteGroups/` .
     pub fn locations_agents_flows_transition_route_groups_patch(&self, request: GoogleCloudDialogflowCxV3TransitionRouteGroup, name: &str) -> ProjectLocationAgentFlowTransitionRouteGroupPatchCall<'a, S> {
         ProjectLocationAgentFlowTransitionRouteGroupPatchCall {
             hub: self.hub,
@@ -5198,6 +6223,103 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Creates a generator in the specified agent.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The agent to create a generator for. Format: `projects//locations//agents/`.
+    pub fn locations_agents_generators_create(&self, request: GoogleCloudDialogflowCxV3Generator, parent: &str) -> ProjectLocationAgentGeneratorCreateCall<'a, S> {
+        ProjectLocationAgentGeneratorCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _language_code: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the specified generators.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the generator to delete. Format: `projects//locations//agents//generators/`.
+    pub fn locations_agents_generators_delete(&self, name: &str) -> ProjectLocationAgentGeneratorDeleteCall<'a, S> {
+        ProjectLocationAgentGeneratorDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _force: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves the specified generator.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the generator. Format: `projects//locations//agents//generators/`.
+    pub fn locations_agents_generators_get(&self, name: &str) -> ProjectLocationAgentGeneratorGetCall<'a, S> {
+        ProjectLocationAgentGeneratorGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _language_code: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns the list of all generators in the specified agent.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The agent to list all generators for. Format: `projects//locations//agents/`.
+    pub fn locations_agents_generators_list(&self, parent: &str) -> ProjectLocationAgentGeneratorListCall<'a, S> {
+        ProjectLocationAgentGeneratorListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _language_code: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Update the specified generator.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The unique identifier of the generator. Must be set for the Generators.UpdateGenerator method. Generators.CreateGenerate populates the name automatically. Format: `projects//locations//agents//generators/`.
+    pub fn locations_agents_generators_patch(&self, request: GoogleCloudDialogflowCxV3Generator, name: &str) -> ProjectLocationAgentGeneratorPatchCall<'a, S> {
+        ProjectLocationAgentGeneratorPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _language_code: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Creates an intent in the specified agent. Note: You should always train a flow prior to sending it queries. See the [training documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training).
     /// 
     /// # Arguments
@@ -5235,6 +6357,25 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Exports the selected intents. This method is a [long-running operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation). The returned `Operation` type has the following method-specific fields: - `metadata`: ExportIntentsMetadata - `response`: ExportIntentsResponse
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The name of the parent agent to export intents. Format: `projects//locations//agents/`.
+    pub fn locations_agents_intents_export(&self, request: GoogleCloudDialogflowCxV3ExportIntentsRequest, parent: &str) -> ProjectLocationAgentIntentExportCall<'a, S> {
+        ProjectLocationAgentIntentExportCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Retrieves the specified intent.
     /// 
     /// # Arguments
@@ -5245,6 +6386,25 @@ impl<'a, S> ProjectMethods<'a, S> {
             hub: self.hub,
             _name: name.to_string(),
             _language_code: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Imports the specified intents into the agent. This method is a [long-running operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation). The returned `Operation` type has the following method-specific fields: - `metadata`: ImportIntentsMetadata - `response`: ImportIntentsResponse
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The agent to import the intents into. Format: `projects//locations//agents/`.
+    pub fn locations_agents_intents_import(&self, request: GoogleCloudDialogflowCxV3ImportIntentsRequest, parent: &str) -> ProjectLocationAgentIntentImportCall<'a, S> {
+        ProjectLocationAgentIntentImportCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -5444,6 +6604,44 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Processes a natural language query and returns structured, actionable data as a result through server-side streaming. Server-side streaming allows Dialogflow to send [partial responses](https://cloud.google.com/dialogflow/cx/docs/concept/fulfillment#partial-response) earlier in a single request.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `session` - Required. The name of the session this query is sent to. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment. It's up to the API caller to choose an appropriate `Session ID`. It can be a random number or some type of session identifiers (preferably hashed). The length of the `Session ID` must not exceed 36 characters. For more information, see the [sessions guide](https://cloud.google.com/dialogflow/cx/docs/concept/session). Note: Always use agent versions for production traffic. See [Versions and environments](https://cloud.google.com/dialogflow/cx/docs/concept/version).
+    pub fn locations_agents_sessions_server_streaming_detect_intent(&self, request: GoogleCloudDialogflowCxV3DetectIntentRequest, session: &str) -> ProjectLocationAgentSessionServerStreamingDetectIntentCall<'a, S> {
+        ProjectLocationAgentSessionServerStreamingDetectIntentCall {
+            hub: self.hub,
+            _request: request,
+            _session: session.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates the feedback received from the user for a single turn of the bot response.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `session` - Required. The name of the session the feedback was sent to.
+    pub fn locations_agents_sessions_submit_answer_feedback(&self, request: GoogleCloudDialogflowCxV3SubmitAnswerFeedbackRequest, session: &str) -> ProjectLocationAgentSessionSubmitAnswerFeedbackCall<'a, S> {
+        ProjectLocationAgentSessionSubmitAnswerFeedbackCall {
+            hub: self.hub,
+            _request: request,
+            _session: session.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets a test case result.
     /// 
     /// # Arguments
@@ -5461,7 +6659,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetches a list of results for a given test case.
+    /// Fetches the list of run results for the given test case. A maximum of 100 results are kept for each test case.
     /// 
     /// # Arguments
     ///
@@ -5670,6 +6868,103 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Creates an TransitionRouteGroup in the specified flow. Note: You should always train a flow prior to sending it queries. See the [training documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training).
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - Required. The flow to create an TransitionRouteGroup for. Format: `projects//locations//agents//flows/` or `projects//locations//agents/` for agent-level groups.
+    pub fn locations_agents_transition_route_groups_create(&self, request: GoogleCloudDialogflowCxV3TransitionRouteGroup, parent: &str) -> ProjectLocationAgentTransitionRouteGroupCreateCall<'a, S> {
+        ProjectLocationAgentTransitionRouteGroupCreateCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _language_code: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes the specified TransitionRouteGroup. Note: You should always train a flow prior to sending it queries. See the [training documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training).
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the TransitionRouteGroup to delete. Format: `projects//locations//agents//flows//transitionRouteGroups/` or `projects//locations//agents//transitionRouteGroups/`.
+    pub fn locations_agents_transition_route_groups_delete(&self, name: &str) -> ProjectLocationAgentTransitionRouteGroupDeleteCall<'a, S> {
+        ProjectLocationAgentTransitionRouteGroupDeleteCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _force: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Retrieves the specified TransitionRouteGroup.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the TransitionRouteGroup. Format: `projects//locations//agents//flows//transitionRouteGroups/` or `projects//locations//agents//transitionRouteGroups/`.
+    pub fn locations_agents_transition_route_groups_get(&self, name: &str) -> ProjectLocationAgentTransitionRouteGroupGetCall<'a, S> {
+        ProjectLocationAgentTransitionRouteGroupGetCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _language_code: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns the list of all transition route groups in the specified flow.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - Required. The flow to list all transition route groups for. Format: `projects//locations//agents//flows/` or `projects//locations//agents/.
+    pub fn locations_agents_transition_route_groups_list(&self, parent: &str) -> ProjectLocationAgentTransitionRouteGroupListCall<'a, S> {
+        ProjectLocationAgentTransitionRouteGroupListCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _language_code: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates the specified TransitionRouteGroup. Note: You should always train a flow prior to sending it queries. See the [training documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training).
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The unique identifier of the transition route group. TransitionRouteGroups.CreateTransitionRouteGroup populates the name automatically. Format: `projects//locations//agents//flows//transitionRouteGroups/` .
+    pub fn locations_agents_transition_route_groups_patch(&self, request: GoogleCloudDialogflowCxV3TransitionRouteGroup, name: &str) -> ProjectLocationAgentTransitionRouteGroupPatchCall<'a, S> {
+        ProjectLocationAgentTransitionRouteGroupPatchCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _language_code: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Creates a webhook in the specified agent.
     /// 
     /// # Arguments
@@ -5835,6 +7130,24 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Gets the generative settings for the agent.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. Format: `projects//locations//agents//generativeSettings`.
+    pub fn locations_agents_get_generative_settings(&self, name: &str) -> ProjectLocationAgentGetGenerativeSettingCall<'a, S> {
+        ProjectLocationAgentGetGenerativeSettingCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _language_code: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Gets the latest agent validation result. Agent validation is performed when ValidateAgent is called.
     /// 
     /// # Arguments
@@ -5911,6 +7224,26 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Updates the generative settings for the agent.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - Format: `projects//locations//agents//generativeSettings`.
+    pub fn locations_agents_update_generative_settings(&self, request: GoogleCloudDialogflowCxV3GenerativeSettings, name: &str) -> ProjectLocationAgentUpdateGenerativeSettingCall<'a, S> {
+        ProjectLocationAgentUpdateGenerativeSettingCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Validates the specified agent and creates or updates validation results. The agent in draft version is validated. Please call this API after the training is completed to get the complete validation results.
     /// 
     /// # Arguments
@@ -5964,7 +7297,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
     /// 
     /// # Arguments
     ///
@@ -6147,7 +7480,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
     /// 
     /// # Arguments
     ///
@@ -7312,6 +8645,298 @@ where
 }
 
 
+/// Exports the selected entity types.
+///
+/// A builder for the *locations.agents.entityTypes.export* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// use dialogflow3::api::GoogleCloudDialogflowCxV3ExportEntityTypesRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowCxV3ExportEntityTypesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_entity_types_export(req, "parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentEntityTypeExportCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowCxV3ExportEntityTypesRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEntityTypeExportCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentEntityTypeExportCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleLongrunningOperation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.entityTypes.export",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+parent}/entityTypes:export";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ExportEntityTypesRequest) -> ProjectLocationAgentEntityTypeExportCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the parent agent to export entity types. Format: `projects//locations//agents/`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeExportCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEntityTypeExportCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEntityTypeExportCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentEntityTypeExportCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentEntityTypeExportCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentEntityTypeExportCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Retrieves the specified entity type.
 ///
 /// A builder for the *locations.agents.entityTypes.get* method supported by a *project* resource.
@@ -7339,7 +8964,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_entity_types_get("name")
-///              .language_code("Lorem")
+///              .language_code("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7586,6 +9211,298 @@ where
 }
 
 
+/// Imports the specified entitytypes into the agent.
+///
+/// A builder for the *locations.agents.entityTypes.import* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// use dialogflow3::api::GoogleCloudDialogflowCxV3ImportEntityTypesRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowCxV3ImportEntityTypesRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_entity_types_import(req, "parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentEntityTypeImportCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowCxV3ImportEntityTypesRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEntityTypeImportCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentEntityTypeImportCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleLongrunningOperation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.entityTypes.import",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+parent}/entityTypes:import";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ImportEntityTypesRequest) -> ProjectLocationAgentEntityTypeImportCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The agent to import the entity types into. Format: `projects//locations//agents/`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentEntityTypeImportCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEntityTypeImportCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEntityTypeImportCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentEntityTypeImportCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentEntityTypeImportCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentEntityTypeImportCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Returns the list of all entity types in the specified agent.
 ///
 /// A builder for the *locations.agents.entityTypes.list* method supported by a *project* resource.
@@ -7613,9 +9530,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_entity_types_list("parent")
-///              .page_token("eos")
-///              .page_size(-4)
-///              .language_code("ea")
+///              .page_token("ea")
+///              .page_size(-55)
+///              .language_code("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7918,7 +9835,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_entity_types_patch(req, "name")
 ///              .update_mask(&Default::default())
-///              .language_code("invidunt")
+///              .language_code("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8227,8 +10144,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_environments_continuous_test_results_list("parent")
-///              .page_token("duo")
-///              .page_size(-50)
+///              .page_token("sed")
+///              .page_size(-37)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8775,8 +10692,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_environments_deployments_list("parent")
-///              .page_token("gubergren")
-///              .page_size(-16)
+///              .page_token("est")
+///              .page_size(-50)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9877,8 +11794,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_environments_experiments_list("parent")
-///              .page_token("gubergren")
-///              .page_size(-17)
+///              .page_token("dolor")
+///              .page_size(-56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11867,8 +13784,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_environments_sessions_entity_types_list("parent")
-///              .page_token("no")
-///              .page_size(-15)
+///              .page_token("kasd")
+///              .page_size(-24)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13306,6 +15223,298 @@ where
 }
 
 
+/// Processes a natural language query and returns structured, actionable data as a result through server-side streaming. Server-side streaming allows Dialogflow to send [partial responses](https://cloud.google.com/dialogflow/cx/docs/concept/fulfillment#partial-response) earlier in a single request.
+///
+/// A builder for the *locations.agents.environments.sessions.serverStreamingDetectIntent* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// use dialogflow3::api::GoogleCloudDialogflowCxV3DetectIntentRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowCxV3DetectIntentRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_environments_sessions_server_streaming_detect_intent(req, "session")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentEnvironmentSessionServerStreamingDetectIntentCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowCxV3DetectIntentRequest,
+    _session: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentEnvironmentSessionServerStreamingDetectIntentCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentEnvironmentSessionServerStreamingDetectIntentCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowCxV3DetectIntentResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.environments.sessions.serverStreamingDetectIntent",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "session"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("session", self._session);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+session}:serverStreamingDetectIntent";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+session}", "session")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["session"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3DetectIntentRequest) -> ProjectLocationAgentEnvironmentSessionServerStreamingDetectIntentCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the session this query is sent to. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment. It's up to the API caller to choose an appropriate `Session ID`. It can be a random number or some type of session identifiers (preferably hashed). The length of the `Session ID` must not exceed 36 characters. For more information, see the [sessions guide](https://cloud.google.com/dialogflow/cx/docs/concept/session). Note: Always use agent versions for production traffic. See [Versions and environments](https://cloud.google.com/dialogflow/cx/docs/concept/version).
+    ///
+    /// Sets the *session* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn session(mut self, new_value: &str) -> ProjectLocationAgentEnvironmentSessionServerStreamingDetectIntentCall<'a, S> {
+        self._session = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentEnvironmentSessionServerStreamingDetectIntentCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentEnvironmentSessionServerStreamingDetectIntentCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentEnvironmentSessionServerStreamingDetectIntentCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentEnvironmentSessionServerStreamingDetectIntentCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentEnvironmentSessionServerStreamingDetectIntentCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Creates an Environment in the specified Agent. This method is a [long-running operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation). The returned `Operation` type has the following method-specific fields: - `metadata`: An empty [Struct message](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#struct) - `response`: Environment
 ///
 /// A builder for the *locations.agents.environments.create* method supported by a *project* resource.
@@ -14441,8 +16650,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_environments_list("parent")
-///              .page_token("dolore")
-///              .page_size(-22)
+///              .page_token("amet.")
+///              .page_size(-96)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14727,8 +16936,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_environments_lookup_environment_history("name")
-///              .page_token("amet.")
-///              .page_size(-96)
+///              .page_token("dolor")
+///              .page_size(-18)
 ///              .doit().await;
 /// # }
 /// ```
@@ -15615,7 +17824,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_flows_pages_create(req, "parent")
-///              .language_code("et")
+///              .language_code("dolor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16187,7 +18396,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_flows_pages_get("name")
-///              .language_code("vero")
+///              .language_code("invidunt")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16461,9 +18670,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_flows_pages_list("parent")
-///              .page_token("invidunt")
-///              .page_size(-65)
-///              .language_code("vero")
+///              .page_token("vero")
+///              .page_size(-44)
+///              .language_code("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16766,7 +18975,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_flows_pages_patch(req, "name")
 ///              .update_mask(&Default::default())
-///              .language_code("Lorem")
+///              .language_code("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17081,7 +19290,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_flows_transition_route_groups_create(req, "parent")
-///              .language_code("no")
+///              .language_code("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17259,7 +19468,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The flow to create an TransitionRouteGroup for. Format: `projects//locations//agents//flows/`.
+    /// Required. The flow to create an TransitionRouteGroup for. Format: `projects//locations//agents//flows/` or `projects//locations//agents/` for agent-level groups.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -17533,7 +19742,7 @@ where
     }
 
 
-    /// Required. The name of the TransitionRouteGroup to delete. Format: `projects//locations//agents//flows//transitionRouteGroups/`.
+    /// Required. The name of the TransitionRouteGroup to delete. Format: `projects//locations//agents//flows//transitionRouteGroups/` or `projects//locations//agents//transitionRouteGroups/`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -17653,7 +19862,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_flows_transition_route_groups_get("name")
-///              .language_code("voluptua.")
+///              .language_code("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -17807,7 +20016,7 @@ where
     }
 
 
-    /// Required. The name of the TransitionRouteGroup. Format: `projects//locations//agents//flows//transitionRouteGroups/`.
+    /// Required. The name of the TransitionRouteGroup. Format: `projects//locations//agents//flows//transitionRouteGroups/` or `projects//locations//agents//transitionRouteGroups/`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -17927,9 +20136,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_flows_transition_route_groups_list("parent")
-///              .page_token("erat")
-///              .page_size(-96)
-///              .language_code("amet.")
+///              .page_token("consetetur")
+///              .page_size(-2)
+///              .language_code("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18091,7 +20300,7 @@ where
     }
 
 
-    /// Required. The flow to list all transition route groups for. Format: `projects//locations//agents//flows/`.
+    /// Required. The flow to list all transition route groups for. Format: `projects//locations//agents//flows/` or `projects//locations//agents/.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -18232,7 +20441,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_flows_transition_route_groups_patch(req, "name")
 ///              .update_mask(&Default::default())
-///              .language_code("takimata")
+///              .language_code("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18414,7 +20623,7 @@ where
         self._request = new_value;
         self
     }
-    /// The unique identifier of the transition route group. TransitionRouteGroups.CreateTransitionRouteGroup populates the name automatically. Format: `projects//locations//agents//flows//transitionRouteGroups/`.
+    /// The unique identifier of the transition route group. TransitionRouteGroups.CreateTransitionRouteGroup populates the name automatically. Format: `projects//locations//agents//flows//transitionRouteGroups/` .
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -20537,7 +22746,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_flows_create(req, "parent")
-///              .language_code("ea")
+///              .language_code("sadipscing")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23412,6 +25621,1472 @@ where
 }
 
 
+/// Creates a generator in the specified agent.
+///
+/// A builder for the *locations.agents.generators.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// use dialogflow3::api::GoogleCloudDialogflowCxV3Generator;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowCxV3Generator::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_generators_create(req, "parent")
+///              .language_code("dolores")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentGeneratorCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowCxV3Generator,
+    _parent: String,
+    _language_code: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentGeneratorCreateCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentGeneratorCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowCxV3Generator)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.generators.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent", "languageCode"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._language_code.as_ref() {
+            params.push("languageCode", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+parent}/generators";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Generator) -> ProjectLocationAgentGeneratorCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The agent to create a generator for. Format: `projects//locations//agents/`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentGeneratorCreateCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The language to create generators for the following fields: * `Generator.prompt_text.text` If not specified, the agent's default language is used.
+    ///
+    /// Sets the *language code* query property to the given value.
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentGeneratorCreateCall<'a, S> {
+        self._language_code = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentGeneratorCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentGeneratorCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentGeneratorCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentGeneratorCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentGeneratorCreateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Deletes the specified generators.
+///
+/// A builder for the *locations.agents.generators.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_generators_delete("name")
+///              .force(true)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentGeneratorDeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _name: String,
+    _force: Option<bool>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentGeneratorDeleteCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentGeneratorDeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.generators.delete",
+                               http_method: hyper::Method::DELETE });
+
+        for &field in ["alt", "name", "force"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._force.as_ref() {
+            params.push("force", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the generator to delete. Format: `projects//locations//agents//generators/`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentGeneratorDeleteCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// This field has no effect for generators not being used. For generators that are used by pages/flows/transition route groups: * If `force` is set to false, an error will be returned with message indicating the referenced resources. * If `force` is set to true, Dialogflow will remove the generator, as well as any references to the generator (i.e. Generator) in fulfillments.
+    ///
+    /// Sets the *force* query property to the given value.
+    pub fn force(mut self, new_value: bool) -> ProjectLocationAgentGeneratorDeleteCall<'a, S> {
+        self._force = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentGeneratorDeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentGeneratorDeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentGeneratorDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentGeneratorDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentGeneratorDeleteCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Retrieves the specified generator.
+///
+/// A builder for the *locations.agents.generators.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_generators_get("name")
+///              .language_code("no")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentGeneratorGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _name: String,
+    _language_code: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentGeneratorGetCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentGeneratorGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowCxV3Generator)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.generators.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name", "languageCode"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._language_code.as_ref() {
+            params.push("languageCode", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the generator. Format: `projects//locations//agents//generators/`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentGeneratorGetCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The language to list generators for.
+    ///
+    /// Sets the *language code* query property to the given value.
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentGeneratorGetCall<'a, S> {
+        self._language_code = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentGeneratorGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentGeneratorGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentGeneratorGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentGeneratorGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentGeneratorGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Returns the list of all generators in the specified agent.
+///
+/// A builder for the *locations.agents.generators.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_generators_list("parent")
+///              .page_token("elitr")
+///              .page_size(-80)
+///              .language_code("no")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentGeneratorListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _language_code: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentGeneratorListCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentGeneratorListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowCxV3ListGeneratorsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.generators.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize", "languageCode"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._language_code.as_ref() {
+            params.push("languageCode", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+parent}/generators";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The agent to list all generators for. Format: `projects//locations//agents/`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentGeneratorListCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The next_page_token value returned from a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentGeneratorListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of items to return in a single page. By default 100 and at most 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentGeneratorListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The language to list generators for.
+    ///
+    /// Sets the *language code* query property to the given value.
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentGeneratorListCall<'a, S> {
+        self._language_code = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentGeneratorListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentGeneratorListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentGeneratorListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentGeneratorListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentGeneratorListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Update the specified generator.
+///
+/// A builder for the *locations.agents.generators.patch* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// use dialogflow3::api::GoogleCloudDialogflowCxV3Generator;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowCxV3Generator::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_generators_patch(req, "name")
+///              .update_mask(&Default::default())
+///              .language_code("At")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentGeneratorPatchCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowCxV3Generator,
+    _name: String,
+    _update_mask: Option<client::FieldMask>,
+    _language_code: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentGeneratorPatchCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentGeneratorPatchCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowCxV3Generator)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.generators.patch",
+                               http_method: hyper::Method::PATCH });
+
+        for &field in ["alt", "name", "updateMask", "languageCode"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+        if let Some(value) = self._language_code.as_ref() {
+            params.push("languageCode", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3Generator) -> ProjectLocationAgentGeneratorPatchCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// The unique identifier of the generator. Must be set for the Generators.UpdateGenerator method. Generators.CreateGenerate populates the name automatically. Format: `projects//locations//agents//generators/`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentGeneratorPatchCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The mask to control which fields get updated. If the mask is not present, all fields will be updated.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectLocationAgentGeneratorPatchCall<'a, S> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// The language to list generators for.
+    ///
+    /// Sets the *language code* query property to the given value.
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentGeneratorPatchCall<'a, S> {
+        self._language_code = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentGeneratorPatchCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentGeneratorPatchCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentGeneratorPatchCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentGeneratorPatchCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentGeneratorPatchCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Creates an intent in the specified agent. Note: You should always train a flow prior to sending it queries. See the [training documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training).
 ///
 /// A builder for the *locations.agents.intents.create* method supported by a *project* resource.
@@ -23445,7 +27120,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_intents_create(req, "parent")
-///              .language_code("dolores")
+///              .language_code("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23978,6 +27653,298 @@ where
 }
 
 
+/// Exports the selected intents. This method is a [long-running operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation). The returned `Operation` type has the following method-specific fields: - `metadata`: ExportIntentsMetadata - `response`: ExportIntentsResponse
+///
+/// A builder for the *locations.agents.intents.export* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// use dialogflow3::api::GoogleCloudDialogflowCxV3ExportIntentsRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowCxV3ExportIntentsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_intents_export(req, "parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentIntentExportCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowCxV3ExportIntentsRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentIntentExportCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentIntentExportCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleLongrunningOperation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.intents.export",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+parent}/intents:export";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ExportIntentsRequest) -> ProjectLocationAgentIntentExportCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the parent agent to export intents. Format: `projects//locations//agents/`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentIntentExportCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentIntentExportCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentIntentExportCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentIntentExportCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentIntentExportCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentIntentExportCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Retrieves the specified intent.
 ///
 /// A builder for the *locations.agents.intents.get* method supported by a *project* resource.
@@ -24005,7 +27972,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_intents_get("name")
-///              .language_code("sed")
+///              .language_code("aliquyam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24252,6 +28219,298 @@ where
 }
 
 
+/// Imports the specified intents into the agent. This method is a [long-running operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-operation). The returned `Operation` type has the following method-specific fields: - `metadata`: ImportIntentsMetadata - `response`: ImportIntentsResponse
+///
+/// A builder for the *locations.agents.intents.import* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// use dialogflow3::api::GoogleCloudDialogflowCxV3ImportIntentsRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowCxV3ImportIntentsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_intents_import(req, "parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentIntentImportCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowCxV3ImportIntentsRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentIntentImportCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentIntentImportCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleLongrunningOperation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.intents.import",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+parent}/intents:import";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3ImportIntentsRequest) -> ProjectLocationAgentIntentImportCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The agent to import the intents into. Format: `projects//locations//agents/`.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentIntentImportCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentIntentImportCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentIntentImportCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentIntentImportCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentIntentImportCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentIntentImportCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Returns the list of all intents in the specified agent.
 ///
 /// A builder for the *locations.agents.intents.list* method supported by a *project* resource.
@@ -24280,9 +28539,9 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_intents_list("parent")
 ///              .page_token("et")
-///              .page_size(-94)
-///              .language_code("sed")
-///              .intent_view("no")
+///              .page_size(-10)
+///              .language_code("consetetur")
+///              .intent_view("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24596,7 +28855,7 @@ where
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_intents_patch(req, "name")
 ///              .update_mask(&Default::default())
-///              .language_code("At")
+///              .language_code("est")
 ///              .doit().await;
 /// # }
 /// ```
@@ -25721,8 +29980,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_sessions_entity_types_list("parent")
-///              .page_token("erat")
-///              .page_size(-82)
+///              .page_token("est")
+///              .page_size(-53)
 ///              .doit().await;
 /// # }
 /// ```
@@ -27160,6 +31419,590 @@ where
 }
 
 
+/// Processes a natural language query and returns structured, actionable data as a result through server-side streaming. Server-side streaming allows Dialogflow to send [partial responses](https://cloud.google.com/dialogflow/cx/docs/concept/fulfillment#partial-response) earlier in a single request.
+///
+/// A builder for the *locations.agents.sessions.serverStreamingDetectIntent* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// use dialogflow3::api::GoogleCloudDialogflowCxV3DetectIntentRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowCxV3DetectIntentRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_sessions_server_streaming_detect_intent(req, "session")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentSessionServerStreamingDetectIntentCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowCxV3DetectIntentRequest,
+    _session: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentSessionServerStreamingDetectIntentCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentSessionServerStreamingDetectIntentCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowCxV3DetectIntentResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.sessions.serverStreamingDetectIntent",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "session"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("session", self._session);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+session}:serverStreamingDetectIntent";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+session}", "session")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["session"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3DetectIntentRequest) -> ProjectLocationAgentSessionServerStreamingDetectIntentCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the session this query is sent to. Format: `projects//locations//agents//sessions/` or `projects//locations//agents//environments//sessions/`. If `Environment ID` is not specified, we assume default 'draft' environment. It's up to the API caller to choose an appropriate `Session ID`. It can be a random number or some type of session identifiers (preferably hashed). The length of the `Session ID` must not exceed 36 characters. For more information, see the [sessions guide](https://cloud.google.com/dialogflow/cx/docs/concept/session). Note: Always use agent versions for production traffic. See [Versions and environments](https://cloud.google.com/dialogflow/cx/docs/concept/version).
+    ///
+    /// Sets the *session* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn session(mut self, new_value: &str) -> ProjectLocationAgentSessionServerStreamingDetectIntentCall<'a, S> {
+        self._session = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionServerStreamingDetectIntentCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionServerStreamingDetectIntentCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentSessionServerStreamingDetectIntentCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentSessionServerStreamingDetectIntentCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentSessionServerStreamingDetectIntentCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Updates the feedback received from the user for a single turn of the bot response.
+///
+/// A builder for the *locations.agents.sessions.submitAnswerFeedback* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// use dialogflow3::api::GoogleCloudDialogflowCxV3SubmitAnswerFeedbackRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowCxV3SubmitAnswerFeedbackRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_sessions_submit_answer_feedback(req, "session")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentSessionSubmitAnswerFeedbackCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowCxV3SubmitAnswerFeedbackRequest,
+    _session: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentSessionSubmitAnswerFeedbackCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentSessionSubmitAnswerFeedbackCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowCxV3AnswerFeedback)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.sessions.submitAnswerFeedback",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "session"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("session", self._session);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+session}:submitAnswerFeedback";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+session}", "session")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["session"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3SubmitAnswerFeedbackRequest) -> ProjectLocationAgentSessionSubmitAnswerFeedbackCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The name of the session the feedback was sent to.
+    ///
+    /// Sets the *session* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn session(mut self, new_value: &str) -> ProjectLocationAgentSessionSubmitAnswerFeedbackCall<'a, S> {
+        self._session = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentSessionSubmitAnswerFeedbackCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentSessionSubmitAnswerFeedbackCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentSessionSubmitAnswerFeedbackCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentSessionSubmitAnswerFeedbackCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentSessionSubmitAnswerFeedbackCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Gets a test case result.
 ///
 /// A builder for the *locations.agents.testCases.results.get* method supported by a *project* resource.
@@ -27422,7 +32265,7 @@ where
 }
 
 
-/// Fetches a list of results for a given test case.
+/// Fetches the list of run results for the given test case. A maximum of 100 results are kept for each test case.
 ///
 /// A builder for the *locations.agents.testCases.results.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -27449,9 +32292,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_test_cases_results_list("parent")
-///              .page_token("Stet")
-///              .page_size(-7)
-///              .filter("aliquyam")
+///              .page_token("sea")
+///              .page_size(-74)
+///              .filter("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -28331,7 +33174,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_test_cases_calculate_coverage("agent")
-///              .type_("est")
+///              .type_("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -29743,9 +34586,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_test_cases_list("parent")
-///              .view("Stet")
-///              .page_token("dolores")
-///              .page_size(-25)
+///              .view("sea")
+///              .page_token("takimata")
+///              .page_size(-51)
 ///              .doit().await;
 /// # }
 /// ```
@@ -30610,6 +35453,1472 @@ where
 }
 
 
+/// Creates an TransitionRouteGroup in the specified flow. Note: You should always train a flow prior to sending it queries. See the [training documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training).
+///
+/// A builder for the *locations.agents.transitionRouteGroups.create* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// use dialogflow3::api::GoogleCloudDialogflowCxV3TransitionRouteGroup;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowCxV3TransitionRouteGroup::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_transition_route_groups_create(req, "parent")
+///              .language_code("et")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentTransitionRouteGroupCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowCxV3TransitionRouteGroup,
+    _parent: String,
+    _language_code: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTransitionRouteGroupCreateCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentTransitionRouteGroupCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowCxV3TransitionRouteGroup)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.transitionRouteGroups.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent", "languageCode"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._language_code.as_ref() {
+            params.push("languageCode", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+parent}/transitionRouteGroups";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3TransitionRouteGroup) -> ProjectLocationAgentTransitionRouteGroupCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. The flow to create an TransitionRouteGroup for. Format: `projects//locations//agents//flows/` or `projects//locations//agents/` for agent-level groups.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTransitionRouteGroupCreateCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The language of the following fields in `TransitionRouteGroup`: * `TransitionRouteGroup.transition_routes.trigger_fulfillment.messages` * `TransitionRouteGroup.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
+    ///
+    /// Sets the *language code* query property to the given value.
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentTransitionRouteGroupCreateCall<'a, S> {
+        self._language_code = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTransitionRouteGroupCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTransitionRouteGroupCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentTransitionRouteGroupCreateCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentTransitionRouteGroupCreateCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentTransitionRouteGroupCreateCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Deletes the specified TransitionRouteGroup. Note: You should always train a flow prior to sending it queries. See the [training documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training).
+///
+/// A builder for the *locations.agents.transitionRouteGroups.delete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_transition_route_groups_delete("name")
+///              .force(false)
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentTransitionRouteGroupDeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _name: String,
+    _force: Option<bool>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTransitionRouteGroupDeleteCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentTransitionRouteGroupDeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleProtobufEmpty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.transitionRouteGroups.delete",
+                               http_method: hyper::Method::DELETE });
+
+        for &field in ["alt", "name", "force"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._force.as_ref() {
+            params.push("force", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the TransitionRouteGroup to delete. Format: `projects//locations//agents//flows//transitionRouteGroups/` or `projects//locations//agents//transitionRouteGroups/`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentTransitionRouteGroupDeleteCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// This field has no effect for transition route group that no page is using. If the transition route group is referenced by any page: * If `force` is set to false, an error will be returned with message indicating pages that reference the transition route group. * If `force` is set to true, Dialogflow will remove the transition route group, as well as any reference to it.
+    ///
+    /// Sets the *force* query property to the given value.
+    pub fn force(mut self, new_value: bool) -> ProjectLocationAgentTransitionRouteGroupDeleteCall<'a, S> {
+        self._force = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTransitionRouteGroupDeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTransitionRouteGroupDeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentTransitionRouteGroupDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentTransitionRouteGroupDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentTransitionRouteGroupDeleteCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Retrieves the specified TransitionRouteGroup.
+///
+/// A builder for the *locations.agents.transitionRouteGroups.get* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_transition_route_groups_get("name")
+///              .language_code("nonumy")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentTransitionRouteGroupGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _name: String,
+    _language_code: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTransitionRouteGroupGetCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentTransitionRouteGroupGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowCxV3TransitionRouteGroup)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.transitionRouteGroups.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name", "languageCode"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._language_code.as_ref() {
+            params.push("languageCode", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the TransitionRouteGroup. Format: `projects//locations//agents//flows//transitionRouteGroups/` or `projects//locations//agents//transitionRouteGroups/`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentTransitionRouteGroupGetCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The language to retrieve the transition route group for. The following fields are language dependent: * `TransitionRouteGroup.transition_routes.trigger_fulfillment.messages` * `TransitionRouteGroup.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
+    ///
+    /// Sets the *language code* query property to the given value.
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentTransitionRouteGroupGetCall<'a, S> {
+        self._language_code = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTransitionRouteGroupGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTransitionRouteGroupGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentTransitionRouteGroupGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentTransitionRouteGroupGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentTransitionRouteGroupGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Returns the list of all transition route groups in the specified flow.
+///
+/// A builder for the *locations.agents.transitionRouteGroups.list* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_transition_route_groups_list("parent")
+///              .page_token("gubergren")
+///              .page_size(-21)
+///              .language_code("sea")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentTransitionRouteGroupListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _parent: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _language_code: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTransitionRouteGroupListCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentTransitionRouteGroupListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowCxV3ListTransitionRouteGroupsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.transitionRouteGroups.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "parent", "pageToken", "pageSize", "languageCode"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._language_code.as_ref() {
+            params.push("languageCode", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+parent}/transitionRouteGroups";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The flow to list all transition route groups for. Format: `projects//locations//agents//flows/` or `projects//locations//agents/.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationAgentTransitionRouteGroupListCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The next_page_token value returned from a previous list request.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> ProjectLocationAgentTransitionRouteGroupListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of items to return in a single page. By default 100 and at most 1000.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> ProjectLocationAgentTransitionRouteGroupListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The language to list transition route groups for. The following fields are language dependent: * `TransitionRouteGroup.transition_routes.trigger_fulfillment.messages` * `TransitionRouteGroup.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
+    ///
+    /// Sets the *language code* query property to the given value.
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentTransitionRouteGroupListCall<'a, S> {
+        self._language_code = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTransitionRouteGroupListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTransitionRouteGroupListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentTransitionRouteGroupListCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentTransitionRouteGroupListCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentTransitionRouteGroupListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Updates the specified TransitionRouteGroup. Note: You should always train a flow prior to sending it queries. See the [training documentation](https://cloud.google.com/dialogflow/cx/docs/concept/training).
+///
+/// A builder for the *locations.agents.transitionRouteGroups.patch* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// use dialogflow3::api::GoogleCloudDialogflowCxV3TransitionRouteGroup;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowCxV3TransitionRouteGroup::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_transition_route_groups_patch(req, "name")
+///              .update_mask(&Default::default())
+///              .language_code("sit")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentTransitionRouteGroupPatchCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowCxV3TransitionRouteGroup,
+    _name: String,
+    _update_mask: Option<client::FieldMask>,
+    _language_code: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentTransitionRouteGroupPatchCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentTransitionRouteGroupPatchCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowCxV3TransitionRouteGroup)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.transitionRouteGroups.patch",
+                               http_method: hyper::Method::PATCH });
+
+        for &field in ["alt", "name", "updateMask", "languageCode"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+        if let Some(value) = self._language_code.as_ref() {
+            params.push("languageCode", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3TransitionRouteGroup) -> ProjectLocationAgentTransitionRouteGroupPatchCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// The unique identifier of the transition route group. TransitionRouteGroups.CreateTransitionRouteGroup populates the name automatically. Format: `projects//locations//agents//flows//transitionRouteGroups/` .
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentTransitionRouteGroupPatchCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The mask to control which fields get updated.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectLocationAgentTransitionRouteGroupPatchCall<'a, S> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// The language of the following fields in `TransitionRouteGroup`: * `TransitionRouteGroup.transition_routes.trigger_fulfillment.messages` * `TransitionRouteGroup.transition_routes.trigger_fulfillment.conditional_cases` If not specified, the agent's default language is used. [Many languages](https://cloud.google.com/dialogflow/cx/docs/reference/language) are supported. Note: languages must be enabled in the agent before they can be used.
+    ///
+    /// Sets the *language code* query property to the given value.
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentTransitionRouteGroupPatchCall<'a, S> {
+        self._language_code = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentTransitionRouteGroupPatchCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentTransitionRouteGroupPatchCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentTransitionRouteGroupPatchCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentTransitionRouteGroupPatchCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentTransitionRouteGroupPatchCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Creates a webhook in the specified agent.
 ///
 /// A builder for the *locations.agents.webhooks.create* method supported by a *project* resource.
@@ -31465,8 +37774,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_webhooks_list("parent")
-///              .page_token("accusam")
-///              .page_size(-47)
+///              .page_token("gubergren")
+///              .page_size(-4)
 ///              .doit().await;
 /// # }
 /// ```
@@ -33136,6 +39445,280 @@ where
 }
 
 
+/// Gets the generative settings for the agent.
+///
+/// A builder for the *locations.agents.getGenerativeSettings* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_get_generative_settings("name")
+///              .language_code("gubergren")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentGetGenerativeSettingCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _name: String,
+    _language_code: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentGetGenerativeSettingCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentGetGenerativeSettingCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowCxV3GenerativeSettings)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.getGenerativeSettings",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name", "languageCode"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._language_code.as_ref() {
+            params.push("languageCode", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Format: `projects//locations//agents//generativeSettings`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentGetGenerativeSettingCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Required. Language code of the generative settings.
+    ///
+    /// Sets the *language code* query property to the given value.
+    pub fn language_code(mut self, new_value: &str) -> ProjectLocationAgentGetGenerativeSettingCall<'a, S> {
+        self._language_code = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentGetGenerativeSettingCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentGetGenerativeSettingCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentGetGenerativeSettingCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentGetGenerativeSettingCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentGetGenerativeSettingCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Gets the latest agent validation result. Agent validation is performed when ValidateAgent is called.
 ///
 /// A builder for the *locations.agents.getValidationResult* method supported by a *project* resource.
@@ -33163,7 +39746,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_get_validation_result("name")
-///              .language_code("Lorem")
+///              .language_code("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -33437,8 +40020,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_agents_list("parent")
-///              .page_token("At")
-///              .page_size(-4)
+///              .page_token("duo")
+///              .page_size(-53)
 ///              .doit().await;
 /// # }
 /// ```
@@ -34292,6 +40875,310 @@ where
 }
 
 
+/// Updates the generative settings for the agent.
+///
+/// A builder for the *locations.agents.updateGenerativeSettings* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_dialogflow3 as dialogflow3;
+/// use dialogflow3::api::GoogleCloudDialogflowCxV3GenerativeSettings;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use dialogflow3::{Dialogflow, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Dialogflow::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = GoogleCloudDialogflowCxV3GenerativeSettings::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_agents_update_generative_settings(req, "name")
+///              .update_mask(&Default::default())
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationAgentUpdateGenerativeSettingCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Dialogflow<S>,
+    _request: GoogleCloudDialogflowCxV3GenerativeSettings,
+    _name: String,
+    _update_mask: Option<client::FieldMask>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationAgentUpdateGenerativeSettingCall<'a, S> {}
+
+impl<'a, S> ProjectLocationAgentUpdateGenerativeSettingCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GoogleCloudDialogflowCxV3GenerativeSettings)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "dialogflow.projects.locations.agents.updateGenerativeSettings",
+                               http_method: hyper::Method::PATCH });
+
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v3/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: GoogleCloudDialogflowCxV3GenerativeSettings) -> ProjectLocationAgentUpdateGenerativeSettingCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Format: `projects//locations//agents//generativeSettings`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationAgentUpdateGenerativeSettingCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Optional. The mask to control which fields get updated. If the mask is not present, all fields will be updated.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectLocationAgentUpdateGenerativeSettingCall<'a, S> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationAgentUpdateGenerativeSettingCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationAgentUpdateGenerativeSettingCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationAgentUpdateGenerativeSettingCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationAgentUpdateGenerativeSettingCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationAgentUpdateGenerativeSettingCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Validates the specified agent and creates or updates validation results. The agent in draft version is validated. Please call this API after the training is completed to get the complete validation results.
 ///
 /// A builder for the *locations.agents.validate* method supported by a *project* resource.
@@ -35108,7 +41995,7 @@ where
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *locations.operations.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -35135,9 +42022,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("name")
-///              .page_token("gubergren")
-///              .page_size(-21)
-///              .filter("sea")
+///              .page_token("no")
+///              .page_size(-91)
+///              .filter("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -36249,8 +43136,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_security_settings_list("parent")
-///              .page_token("At")
-///              .page_size(-19)
+///              .page_token("rebum.")
+///              .page_size(-39)
 ///              .doit().await;
 /// # }
 /// ```
@@ -37101,9 +43988,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("aliquyam")
-///              .page_size(-61)
-///              .filter("amet.")
+///              .page_token("dolore")
+///              .page_size(-97)
+///              .filter("ut")
 ///              .doit().await;
 /// # }
 /// ```
@@ -37896,7 +44783,7 @@ where
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *operations.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -37923,9 +44810,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().operations_list("name")
-///              .page_token("gubergren")
+///              .page_token("duo")
 ///              .page_size(-45)
-///              .filter("At")
+///              .filter("ut")
 ///              .doit().await;
 /// # }
 /// ```

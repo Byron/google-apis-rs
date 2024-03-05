@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *My Business Verifications* API at revision *20230124*. The CLI is at version *5.0.3*.
+This documentation was generated from the *My Business Verifications* API at revision *20240304*. The CLI is at version *5.0.4*.
 
 ```bash
 mybusinessverifications1 [options]
@@ -35,8 +35,6 @@ mybusinessverifications1 [options]
                 verifications-complete <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 verifications-list <parent> [-p <v>]... [-o <out>]
                 verify <name> (-r <kv>)... [-p <v>]... [-o <out>]
-        verification-tokens
-                generate (-r <kv>)... [-p <v>]... [-o <out>]
   mybusinessverifications1 --help
 
 Configuration:

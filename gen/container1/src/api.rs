@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -123,7 +123,7 @@ impl<'a, S> Container<S> {
         Container {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://container.googleapis.com/".to_string(),
             _root_url: "https://container.googleapis.com/".to_string(),
         }
@@ -134,7 +134,7 @@ impl<'a, S> Container<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -178,6 +178,10 @@ pub struct AcceleratorConfig {
     #[serde(rename="acceleratorType")]
     
     pub accelerator_type: Option<String>,
+    /// The configuration for auto installation of GPU driver.
+    #[serde(rename="gpuDriverInstallationConfig")]
+    
+    pub gpu_driver_installation_config: Option<GPUDriverInstallationConfig>,
     /// Size of partitions to create on the GPU. Valid values are described in the NVIDIA [mig user guide](https://docs.nvidia.com/datacenter/tesla/mig-user-guide/#partitioning).
     #[serde(rename="gpuPartitionSize")]
     
@@ -189,6 +193,67 @@ pub struct AcceleratorConfig {
 }
 
 impl client::Part for AcceleratorConfig {}
+
+
+/// AdditionalNodeNetworkConfig is the configuration for additional node networks within the NodeNetworkConfig message
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AdditionalNodeNetworkConfig {
+    /// Name of the VPC where the additional interface belongs
+    
+    pub network: Option<String>,
+    /// Name of the subnetwork where the additional interface belongs
+    
+    pub subnetwork: Option<String>,
+}
+
+impl client::Part for AdditionalNodeNetworkConfig {}
+
+
+/// AdditionalPodNetworkConfig is the configuration for additional pod networks within the NodeNetworkConfig message
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AdditionalPodNetworkConfig {
+    /// The maximum number of pods per node which use this pod network
+    #[serde(rename="maxPodsPerNode")]
+    
+    pub max_pods_per_node: Option<MaxPodsConstraint>,
+    /// The name of the secondary range on the subnet which provides IP address for this pod range
+    #[serde(rename="secondaryPodRange")]
+    
+    pub secondary_pod_range: Option<String>,
+    /// Name of the subnetwork where the additional pod network belongs
+    
+    pub subnetwork: Option<String>,
+}
+
+impl client::Part for AdditionalPodNetworkConfig {}
+
+
+/// AdditionalPodRangesConfig is the configuration for additional pod secondary ranges supporting the ClusterUpdate message.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AdditionalPodRangesConfig {
+    /// Output only. [Output only] Information for additional pod range.
+    #[serde(rename="podRangeInfo")]
+    
+    pub pod_range_info: Option<Vec<RangeInfo>>,
+    /// Name for pod secondary ipv4 range which has the actual range defined ahead.
+    #[serde(rename="podRangeNames")]
+    
+    pub pod_range_names: Option<Vec<String>>,
+}
+
+impl client::Part for AdditionalPodRangesConfig {}
 
 
 /// Configuration for the addons that can be automatically spun up in the cluster, enabling additional functionality.
@@ -218,6 +283,10 @@ pub struct AddonsConfig {
     #[serde(rename="gcpFilestoreCsiDriverConfig")]
     
     pub gcp_filestore_csi_driver_config: Option<GcpFilestoreCsiDriverConfig>,
+    /// Configuration for the Cloud Storage Fuse CSI driver.
+    #[serde(rename="gcsFuseCsiDriverConfig")]
+    
+    pub gcs_fuse_csi_driver_config: Option<GcsFuseCsiDriverConfig>,
     /// Configuration for the Backup for GKE agent addon.
     #[serde(rename="gkeBackupAgentConfig")]
     
@@ -238,9 +307,37 @@ pub struct AddonsConfig {
     #[serde(rename="networkPolicyConfig")]
     
     pub network_policy_config: Option<NetworkPolicyConfig>,
+    /// Optional. Configuration for the StatefulHA add-on.
+    #[serde(rename="statefulHaConfig")]
+    
+    pub stateful_ha_config: Option<StatefulHAConfig>,
 }
 
 impl client::Part for AddonsConfig {}
+
+
+/// AdvancedDatapathObservabilityConfig specifies configuration of observability features of advanced datapath.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AdvancedDatapathObservabilityConfig {
+    /// Expose flow metrics on nodes
+    #[serde(rename="enableMetrics")]
+    
+    pub enable_metrics: Option<bool>,
+    /// Enable Relay component
+    #[serde(rename="enableRelay")]
+    
+    pub enable_relay: Option<bool>,
+    /// Method used to make Relay available
+    #[serde(rename="relayMode")]
+    
+    pub relay_mode: Option<String>,
+}
+
+impl client::Part for AdvancedDatapathObservabilityConfig {}
 
 
 /// Specifies options for controlling advanced machine features.
@@ -308,9 +405,47 @@ pub struct Autopilot {
     /// Enable Autopilot
     
     pub enabled: Option<bool>,
+    /// Workload policy configuration for Autopilot.
+    #[serde(rename="workloadPolicyConfig")]
+    
+    pub workload_policy_config: Option<WorkloadPolicyConfig>,
 }
 
 impl client::Part for Autopilot {}
+
+
+/// AutopilotCompatibilityIssue contains information about a specific compatibility issue with Autopilot mode.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AutopilotCompatibilityIssue {
+    /// The constraint type of the issue.
+    #[serde(rename="constraintType")]
+    
+    pub constraint_type: Option<String>,
+    /// The description of the issue.
+    
+    pub description: Option<String>,
+    /// A URL to a public documnetation, which addresses resolving this issue.
+    #[serde(rename="documentationUrl")]
+    
+    pub documentation_url: Option<String>,
+    /// The incompatibility type of this issue.
+    #[serde(rename="incompatibilityType")]
+    
+    pub incompatibility_type: Option<String>,
+    /// The last time when this issue was observed.
+    #[serde(rename="lastObservation")]
+    
+    pub last_observation: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// The name of the resources which are subject to this issue.
+    
+    pub subjects: Option<Vec<String>>,
+}
+
+impl client::Part for AutopilotCompatibilityIssue {}
 
 
 /// AutoprovisioningNodePoolDefaults contains defaults for a node pool created by NAP.
@@ -332,14 +467,18 @@ pub struct AutoprovisioningNodePoolDefaults {
     #[serde(rename="diskType")]
     
     pub disk_type: Option<String>,
-    /// The image type to use for NAP created node.
+    /// The image type to use for NAP created node. Please see https://cloud.google.com/kubernetes-engine/docs/concepts/node-images for available image types.
     #[serde(rename="imageType")]
     
     pub image_type: Option<String>,
+    /// Enable or disable Kubelet read only port.
+    #[serde(rename="insecureKubeletReadonlyPortEnabled")]
+    
+    pub insecure_kubelet_readonly_port_enabled: Option<bool>,
     /// Specifies the node management options for NAP created node-pools.
     
     pub management: Option<NodeManagement>,
-    /// Deprecated. Minimum CPU platform to be used for NAP created node pools. The instance may be scheduled on the specified or newer CPU platform. Applicable values are the friendly names of CPU platforms, such as minCpuPlatform: Intel Haswell or minCpuPlatform: Intel Sandy Bridge. For more information, read [how to specify min CPU platform](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform). This field is deprecated, min_cpu_platform should be specified using https://cloud.google.com/requested-min-cpu-platform label selector on the pod. To unset the min cpu platform field pass "automatic" as field value.
+    /// Deprecated. Minimum CPU platform to be used for NAP created node pools. The instance may be scheduled on the specified or newer CPU platform. Applicable values are the friendly names of CPU platforms, such as minCpuPlatform: Intel Haswell or minCpuPlatform: Intel Sandy Bridge. For more information, read [how to specify min CPU platform](https://cloud.google.com/compute/docs/instances/specify-min-cpu-platform). This field is deprecated, min_cpu_platform should be specified using `cloud.google.com/requested-min-cpu-platform` label selector on the pod. To unset the min cpu platform field pass "automatic" as field value.
     #[serde(rename="minCpuPlatform")]
     
     pub min_cpu_platform: Option<String>,
@@ -362,6 +501,25 @@ pub struct AutoprovisioningNodePoolDefaults {
 }
 
 impl client::Part for AutoprovisioningNodePoolDefaults {}
+
+
+/// Best effort provisioning.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BestEffortProvisioning {
+    /// When this is enabled, cluster/node pool creations will ignore non-fatal errors like stockout to best provision as many nodes as possible right now and eventually bring up all target number of nodes
+    
+    pub enabled: Option<bool>,
+    /// Minimum number of nodes to be provisioned to be considered as succeeded, and the rest of nodes will be provisioned gradually and eventually when stockout issue has been resolved.
+    #[serde(rename="minProvisionNodes")]
+    
+    pub min_provision_nodes: Option<i32>,
+}
+
+impl client::Part for BestEffortProvisioning {}
 
 
 /// Parameters for using BigQuery as the destination of resource usage export.
@@ -480,6 +638,28 @@ pub struct CancelOperationRequest {
 }
 
 impl client::RequestValue for CancelOperationRequest {}
+
+
+/// CheckAutopilotCompatibilityResponse has a list of compatibility issues.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations clusters check autopilot compatibility projects](ProjectLocationClusterCheckAutopilotCompatibilityCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CheckAutopilotCompatibilityResponse {
+    /// The list of issues for the given operation.
+    
+    pub issues: Option<Vec<AutopilotCompatibilityIssue>>,
+    /// The summary of the autopilot compatibility response.
+    
+    pub summary: Option<String>,
+}
+
+impl client::ResponseResult for CheckAutopilotCompatibilityResponse {}
 
 
 /// CidrBlock contains an optional name and one CIDR block.
@@ -609,6 +789,10 @@ pub struct Cluster {
     /// An optional description of this cluster.
     
     pub description: Option<String>,
+    /// Beta APIs Config
+    #[serde(rename="enableK8sBetaApis")]
+    
+    pub enable_k8s_beta_apis: Option<K8sBetaAPIConfig>,
     /// Kubernetes alpha features are enabled on this cluster. This includes alpha API groups (e.g. v1alpha1) and features that may not be production ready in the kubernetes version of the master and nodes. The cluster has no SLA for uptime and master/node upgrades are disabled. Alpha enabled clusters are automatically deleted thirty days after creation.
     #[serde(rename="enableKubernetesAlpha")]
     
@@ -620,6 +804,10 @@ pub struct Cluster {
     /// [Output only] The IP address of this cluster's master endpoint. The endpoint can be accessed from the internet at `https://username:password@endpoint/`. See the `masterAuth` property of this resource for username and password information.
     
     pub endpoint: Option<String>,
+    /// GKE Enterprise Configuration.
+    #[serde(rename="enterpriseConfig")]
+    
+    pub enterprise_config: Option<EnterpriseConfig>,
     /// This checksum is computed by the server based on the value of cluster fields, and may be sent on update requests to ensure the client has an up-to-date value before proceeding.
     
     pub etag: Option<String>,
@@ -627,6 +815,9 @@ pub struct Cluster {
     #[serde(rename="expireTime")]
     
     pub expire_time: Option<String>,
+    /// Fleet information for the cluster.
+    
+    pub fleet: Option<Fleet>,
     /// Output only. Unique id for the cluster.
     
     pub id: Option<String>,
@@ -734,11 +925,15 @@ pub struct Cluster {
     #[serde(rename="notificationConfig")]
     
     pub notification_config: Option<NotificationConfig>,
+    /// The configuration of the parent product of the cluster. This field is used by Google internal products that are built on top of the GKE cluster and take the ownership of the cluster.
+    #[serde(rename="parentProductConfig")]
+    
+    pub parent_product_config: Option<ParentProductConfig>,
     /// Configuration for private cluster.
     #[serde(rename="privateClusterConfig")]
     
     pub private_cluster_config: Option<PrivateClusterConfig>,
-    /// Release channel configuration.
+    /// Release channel configuration. If left unspecified on cluster creation and a version is specified, the cluster is enrolled in the most mature release channel where the version is available (first checking STABLE, then REGULAR, and finally RAPID). Otherwise, if no release channel configuration and no version is specified, the cluster is enrolled in the REGULAR channel with its default version.
     #[serde(rename="releaseChannel")]
     
     pub release_channel: Option<ReleaseChannel>,
@@ -750,6 +945,10 @@ pub struct Cluster {
     #[serde(rename="resourceUsageExportConfig")]
     
     pub resource_usage_export_config: Option<ResourceUsageExportConfig>,
+    /// Enable/Disable Security Posture API features for the cluster.
+    #[serde(rename="securityPostureConfig")]
+    
+    pub security_posture_config: Option<SecurityPostureConfig>,
     /// [Output only] Server-defined URL for the resource.
     #[serde(rename="selfLink")]
     
@@ -824,6 +1023,22 @@ pub struct ClusterAutoscaling {
 impl client::Part for ClusterAutoscaling {}
 
 
+/// Configuration of network bandwidth tiers
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ClusterNetworkPerformanceConfig {
+    /// Specifies the total network bandwidth tier for NodePools in the cluster.
+    #[serde(rename="totalEgressBandwidthTier")]
+    
+    pub total_egress_bandwidth_tier: Option<String>,
+}
+
+impl client::Part for ClusterNetworkPerformanceConfig {}
+
+
 /// ClusterUpdate describes an update to the cluster. Exactly one update can be applied to a cluster with each request, so at most one field can be provided.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -831,6 +1046,10 @@ impl client::Part for ClusterAutoscaling {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ClusterUpdate {
+    /// The additional pod ranges to be added to the cluster. These pod ranges can be used by node pools to allocate pod IPs.
+    #[serde(rename="additionalPodRangesConfig")]
+    
+    pub additional_pod_ranges_config: Option<AdditionalPodRangesConfig>,
     /// Configurations for the various addons available to run in the cluster.
     #[serde(rename="desiredAddonsConfig")]
     
@@ -839,6 +1058,10 @@ pub struct ClusterUpdate {
     #[serde(rename="desiredAuthenticatorGroupsConfig")]
     
     pub desired_authenticator_groups_config: Option<AuthenticatorGroupsConfig>,
+    /// The desired workload policy configuration for the autopilot cluster.
+    #[serde(rename="desiredAutopilotWorkloadPolicyConfig")]
+    
+    pub desired_autopilot_workload_policy_config: Option<WorkloadPolicyConfig>,
     /// The desired configuration options for the Binary Authorization feature.
     #[serde(rename="desiredBinaryAuthorization")]
     
@@ -867,10 +1090,18 @@ pub struct ClusterUpdate {
     #[serde(rename="desiredDnsConfig")]
     
     pub desired_dns_config: Option<DNSConfig>,
+    /// Enable/Disable FQDN Network Policy for the cluster.
+    #[serde(rename="desiredEnableFqdnNetworkPolicy")]
+    
+    pub desired_enable_fqdn_network_policy: Option<bool>,
     /// Enable/Disable private endpoint for the cluster's master.
     #[serde(rename="desiredEnablePrivateEndpoint")]
     
     pub desired_enable_private_endpoint: Option<bool>,
+    /// The desired fleet configuration for the cluster.
+    #[serde(rename="desiredFleet")]
+    
+    pub desired_fleet: Option<Fleet>,
     /// The desired config of Gateway API on this cluster.
     #[serde(rename="desiredGatewayApiConfig")]
     
@@ -887,10 +1118,18 @@ pub struct ClusterUpdate {
     #[serde(rename="desiredImageType")]
     
     pub desired_image_type: Option<String>,
+    /// Specify the details of in-transit encryption.
+    #[serde(rename="desiredInTransitEncryptionConfig")]
+    
+    pub desired_in_transit_encryption_config: Option<String>,
     /// The desired config of Intra-node visibility.
     #[serde(rename="desiredIntraNodeVisibilityConfig")]
     
     pub desired_intra_node_visibility_config: Option<IntraNodeVisibilityConfig>,
+    /// Desired Beta APIs to be enabled for cluster.
+    #[serde(rename="desiredK8sBetaApis")]
+    
+    pub desired_k8s_beta_apis: Option<K8sBetaAPIConfig>,
     /// The desired L4 Internal Load Balancer Subsetting configuration.
     #[serde(rename="desiredL4ilbSubsettingConfig")]
     
@@ -927,10 +1166,18 @@ pub struct ClusterUpdate {
     #[serde(rename="desiredMonitoringService")]
     
     pub desired_monitoring_service: Option<String>,
+    /// The desired network performance config.
+    #[serde(rename="desiredNetworkPerformanceConfig")]
+    
+    pub desired_network_performance_config: Option<ClusterNetworkPerformanceConfig>,
     /// The desired network tags that apply to all auto-provisioned node pools in autopilot clusters and node auto-provisioning enabled clusters.
     #[serde(rename="desiredNodePoolAutoConfigNetworkTags")]
     
     pub desired_node_pool_auto_config_network_tags: Option<NetworkTags>,
+    /// The desired resource manager tags that apply to all auto-provisioned node pools in autopilot clusters and node auto-provisioning enabled clusters.
+    #[serde(rename="desiredNodePoolAutoConfigResourceManagerTags")]
+    
+    pub desired_node_pool_auto_config_resource_manager_tags: Option<ResourceManagerTags>,
     /// Autoscaler configuration for the node pool specified in desired_node_pool_id. If there is only one pool in the cluster and desired_node_pool_id is not provided then the change applies to that single node pool.
     #[serde(rename="desiredNodePoolAutoscaling")]
     
@@ -951,6 +1198,10 @@ pub struct ClusterUpdate {
     #[serde(rename="desiredNotificationConfig")]
     
     pub desired_notification_config: Option<NotificationConfig>,
+    /// The desired parent product config for the cluster.
+    #[serde(rename="desiredParentProductConfig")]
+    
+    pub desired_parent_product_config: Option<ParentProductConfig>,
     /// The desired private cluster configuration.
     #[serde(rename="desiredPrivateClusterConfig")]
     
@@ -967,6 +1218,10 @@ pub struct ClusterUpdate {
     #[serde(rename="desiredResourceUsageExportConfig")]
     
     pub desired_resource_usage_export_config: Option<ResourceUsageExportConfig>,
+    /// Enable/Disable Security Posture API features for the cluster.
+    #[serde(rename="desiredSecurityPostureConfig")]
+    
+    pub desired_security_posture_config: Option<SecurityPostureConfig>,
     /// ServiceExternalIPsConfig specifies the config for the use of Services with ExternalIPs field.
     #[serde(rename="desiredServiceExternalIpsConfig")]
     
@@ -987,9 +1242,17 @@ pub struct ClusterUpdate {
     #[serde(rename="desiredWorkloadIdentityConfig")]
     
     pub desired_workload_identity_config: Option<WorkloadIdentityConfig>,
+    /// Kubernetes open source beta apis enabled on the cluster. Only beta apis
+    #[serde(rename="enableK8sBetaApis")]
+    
+    pub enable_k8s_beta_apis: Option<K8sBetaAPIConfig>,
     /// The current etag of the cluster. If an etag is provided and does not match the current etag of the cluster, update will be blocked and an ABORTED error will be returned.
     
     pub etag: Option<String>,
+    /// The additional pod ranges that are to be removed from the cluster. The pod ranges specified here must have been specified earlier in the 'additional_pod_ranges_config' argument.
+    #[serde(rename="removedAdditionalPodRangesConfig")]
+    
+    pub removed_additional_pod_ranges_config: Option<AdditionalPodRangesConfig>,
 }
 
 impl client::Part for ClusterUpdate {}
@@ -1220,7 +1483,7 @@ pub struct DatabaseEncryption {
     #[serde(rename="keyName")]
     
     pub key_name: Option<String>,
-    /// Denotes the state of etcd encryption.
+    /// The desired state of etcd encryption.
     
     pub state: Option<String>,
 }
@@ -1275,14 +1538,30 @@ pub struct Empty { _never_set: Option<bool> }
 impl client::ResponseResult for Empty {}
 
 
-/// EphemeralStorageLocalSsdConfig contains configuration for the node ephemeral storage using Local SSD.
+/// EnterpriseConfig is the cluster enterprise configuration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EnterpriseConfig {
+    /// Output only. [Output only] cluster_tier specifies the premium tier of the cluster.
+    #[serde(rename="clusterTier")]
+    
+    pub cluster_tier: Option<String>,
+}
+
+impl client::Part for EnterpriseConfig {}
+
+
+/// EphemeralStorageLocalSsdConfig contains configuration for the node ephemeral storage using Local SSDs.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EphemeralStorageLocalSsdConfig {
-    /// Number of local SSDs to use to back ephemeral storage. Uses NVMe interfaces. Each local SSD is 375 GB in size. If zero, it means to disable using local SSDs as ephemeral storage. The limit for this value is dependent upon the maximum number of disks available on a machine per zone. See: https://cloud.google.com/compute/docs/disks/local-ssd for more information.
+    /// Number of local SSDs to use to back ephemeral storage. Uses NVMe interfaces. A zero (or unset) value has different meanings depending on machine type being used: 1. For pre-Gen3 machines, which support flexible numbers of local ssds, zero (or unset) means to disable using local SSDs as ephemeral storage. The limit for this value is dependent upon the maximum number of disk available on a machine per zone. See: https://cloud.google.com/compute/docs/disks/local-ssd for more information. 2. For Gen3 machines which dictate a specific number of local ssds, zero (or unset) means to use the default number of local ssds that goes with that machine type. For example, for a c3-standard-8-lssd machine, 2 local ssds would be provisioned. For c3-standard-8 (which doesn't support local ssds), 0 will be provisioned. See https://cloud.google.com/compute/docs/disks/local-ssd#choose_number_local_ssds for more info.
     #[serde(rename="localSsdCount")]
     
     pub local_ssd_count: Option<i32>,
@@ -1320,6 +1599,44 @@ pub struct Filter {
 }
 
 impl client::Part for Filter {}
+
+
+/// Fleet is the fleet configuration for the cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Fleet {
+    /// [Output only] The full resource name of the registered fleet membership of the cluster, in the format `//gkehub.googleapis.com/projects/*/locations/*/memberships/*`.
+    
+    pub membership: Option<String>,
+    /// [Output only] Whether the cluster has been registered through the fleet API.
+    #[serde(rename="preRegistered")]
+    
+    pub pre_registered: Option<bool>,
+    /// The Fleet host project(project ID or project number) where this cluster will be registered to. This field cannot be changed after the cluster has been registered.
+    
+    pub project: Option<String>,
+}
+
+impl client::Part for Fleet {}
+
+
+/// GPUDriverInstallationConfig specifies the version of GPU driver to be auto installed.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GPUDriverInstallationConfig {
+    /// Mode for how the GPU driver is installed.
+    #[serde(rename="gpuDriverVersion")]
+    
+    pub gpu_driver_version: Option<String>,
+}
+
+impl client::Part for GPUDriverInstallationConfig {}
 
 
 /// GPUSharingConfig represents the GPU sharing configuration for Hardware Accelerators.
@@ -1401,6 +1718,21 @@ pub struct GcpFilestoreCsiDriverConfig {
 }
 
 impl client::Part for GcpFilestoreCsiDriverConfig {}
+
+
+/// Configuration for the Cloud Storage Fuse CSI driver.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GcsFuseCsiDriverConfig {
+    /// Whether the Cloud Storage Fuse CSI driver is enabled for this cluster.
+    
+    pub enabled: Option<bool>,
+}
+
+impl client::Part for GcsFuseCsiDriverConfig {}
 
 
 /// GetJSONWebKeysResponse is a valid JSON Web Key Set as specififed in rfc 7517
@@ -1556,6 +1888,10 @@ impl client::Part for ILBSubsettingConfig {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IPAllocationPolicy {
+    /// Output only. [Output only] The additional pod ranges that are added to the cluster. These pod ranges can be used by new node pools to allocate pod IPs automatically. Once the range is removed it will not show up in IPAllocationPolicy.
+    #[serde(rename="additionalPodRangesConfig")]
+    
+    pub additional_pod_ranges_config: Option<AdditionalPodRangesConfig>,
     /// This field is deprecated, use cluster_ipv4_cidr_block.
     #[serde(rename="clusterIpv4Cidr")]
     
@@ -1572,6 +1908,10 @@ pub struct IPAllocationPolicy {
     #[serde(rename="createSubnetwork")]
     
     pub create_subnetwork: Option<bool>,
+    /// Output only. [Output only] The utilization of the cluster default IPv4 range for the pod. The ratio is Usage/[Total number of IPs in the secondary range], Usage=numNodes*numZones*podIPsPerNode.
+    #[serde(rename="defaultPodIpv4RangeUtilization")]
+    
+    pub default_pod_ipv4_range_utilization: Option<f64>,
     /// The ipv6 access type (internal or external) when create_subnetwork is true
     #[serde(rename="ipv6AccessType")]
     
@@ -1584,6 +1924,10 @@ pub struct IPAllocationPolicy {
     #[serde(rename="nodeIpv4CidrBlock")]
     
     pub node_ipv4_cidr_block: Option<String>,
+    /// [PRIVATE FIELD] Pod CIDR size overprovisioning config for the cluster. Pod CIDR size per node depends on max_pods_per_node. By default, the value of max_pods_per_node is doubled and then rounded off to next power of 2 to get the size of pod CIDR block per node. Example: max_pods_per_node of 30 would result in 64 IPs (/26). This config can disable the doubling of IPs (we still round off to next power of 2) Example: max_pods_per_node of 30 will result in 32 IPs (/27) when overprovisioning is disabled.
+    #[serde(rename="podCidrOverprovisionConfig")]
+    
+    pub pod_cidr_overprovision_config: Option<PodCIDROverprovisionConfig>,
     /// This field is deprecated, use services_ipv4_cidr_block.
     #[serde(rename="servicesIpv4Cidr")]
     
@@ -1592,6 +1936,10 @@ pub struct IPAllocationPolicy {
     #[serde(rename="servicesIpv4CidrBlock")]
     
     pub services_ipv4_cidr_block: Option<String>,
+    /// Output only. [Output only] The services IPv6 CIDR block for the cluster.
+    #[serde(rename="servicesIpv6CidrBlock")]
+    
+    pub services_ipv6_cidr_block: Option<String>,
     /// The name of the secondary range to be used as for the services CIDR block. The secondary range will be used for service ClusterIPs. This must be an existing secondary range associated with the cluster subnetwork. This field is only applicable with use_ip_aliases is true and create_subnetwork is false.
     #[serde(rename="servicesSecondaryRangeName")]
     
@@ -1600,6 +1948,10 @@ pub struct IPAllocationPolicy {
     #[serde(rename="stackType")]
     
     pub stack_type: Option<String>,
+    /// Output only. [Output only] The subnet's IPv6 CIDR block used by nodes and pods.
+    #[serde(rename="subnetIpv6CidrBlock")]
+    
+    pub subnet_ipv6_cidr_block: Option<String>,
     /// A custom subnetwork name to be used if `create_subnetwork` is true. If this field is empty, then an automatic name will be chosen for the new subnetwork.
     #[serde(rename="subnetworkName")]
     
@@ -1689,6 +2041,22 @@ pub struct Jwk {
 }
 
 impl client::Part for Jwk {}
+
+
+/// K8sBetaAPIConfig , configuration for beta APIs
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct K8sBetaAPIConfig {
+    /// Enabled k8s beta APIs.
+    #[serde(rename="enabledApis")]
+    
+    pub enabled_apis: Option<Vec<String>>,
+}
+
+impl client::Part for K8sBetaAPIConfig {}
 
 
 /// Configuration for the Kubernetes Dashboard.
@@ -1832,14 +2200,14 @@ pub struct ListUsableSubnetworksResponse {
 impl client::ResponseResult for ListUsableSubnetworksResponse {}
 
 
-/// LocalNvmeSsdBlockConfig contains configuration for using raw-block local NVMe SSD.
+/// LocalNvmeSsdBlockConfig contains configuration for using raw-block local NVMe SSDs
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct LocalNvmeSsdBlockConfig {
-    /// The number of raw-block local NVMe SSD disks to be attached to the node. Each local SSD is 375 GB in size. If zero, it means no raw-block local NVMe SSD disks to be attached to the node. The limit for this value is dependent upon the maximum number of disks available on a machine per zone. See: https://cloud.google.com/compute/docs/disks/local-ssd for more information.
+    /// Number of local NVMe SSDs to use. The limit for this value is dependent upon the maximum number of disk available on a machine per zone. See: https://cloud.google.com/compute/docs/disks/local-ssd for more information. A zero (or unset) value has different meanings depending on machine type being used: 1. For pre-Gen3 machines, which support flexible numbers of local ssds, zero (or unset) means to disable using local SSDs as ephemeral storage. 2. For Gen3 machines which dictate a specific number of local ssds, zero (or unset) means to use the default number of local ssds that goes with that machine type. For example, for a c3-standard-8-lssd machine, 2 local ssds would be provisioned. For c3-standard-8 (which doesn't support local ssds), 0 will be provisioned. See https://cloud.google.com/compute/docs/disks/local-ssd#choose_number_local_ssds for more info.
     #[serde(rename="localSsdCount")]
     
     pub local_ssd_count: Option<i32>,
@@ -2109,6 +2477,10 @@ impl client::Part for MonitoringComponentConfig {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MonitoringConfig {
+    /// Configuration of Advanced Datapath Observability features.
+    #[serde(rename="advancedDatapathObservabilityConfig")]
+    
+    pub advanced_datapath_observability_config: Option<AdvancedDatapathObservabilityConfig>,
     /// Monitoring components configuration
     #[serde(rename="componentConfig")]
     
@@ -2141,6 +2513,10 @@ pub struct NetworkConfig {
     #[serde(rename="dnsConfig")]
     
     pub dns_config: Option<DNSConfig>,
+    /// Whether FQDN Network Policy is enabled on this cluster.
+    #[serde(rename="enableFqdnNetworkPolicy")]
+    
+    pub enable_fqdn_network_policy: Option<bool>,
     /// Whether Intra-node visibility is enabled for this cluster. This makes same node pod to pod traffic visible for VPC network.
     #[serde(rename="enableIntraNodeVisibility")]
     
@@ -2149,13 +2525,25 @@ pub struct NetworkConfig {
     #[serde(rename="enableL4ilbSubsetting")]
     
     pub enable_l4ilb_subsetting: Option<bool>,
+    /// Whether multi-networking is enabled for this cluster.
+    #[serde(rename="enableMultiNetworking")]
+    
+    pub enable_multi_networking: Option<bool>,
     /// GatewayAPIConfig contains the desired config of Gateway API on this cluster.
     #[serde(rename="gatewayApiConfig")]
     
     pub gateway_api_config: Option<GatewayAPIConfig>,
+    /// Specify the details of in-transit encryption.
+    #[serde(rename="inTransitEncryptionConfig")]
+    
+    pub in_transit_encryption_config: Option<String>,
     /// Output only. The relative name of the Google Compute Engine network(https://cloud.google.com/compute/docs/networks-and-firewalls#networks) to which the cluster is connected. Example: projects/my-project/global/networks/my-network
     
     pub network: Option<String>,
+    /// Network bandwidth tier configuration.
+    #[serde(rename="networkPerformanceConfig")]
+    
+    pub network_performance_config: Option<ClusterNetworkPerformanceConfig>,
     /// The desired state of IPv6 connectivity to Google Services. By default, no private IPv6 access to or from Google Services (all access will be via IPv4)
     #[serde(rename="privateIpv6GoogleAccess")]
     
@@ -2236,6 +2624,27 @@ pub struct NetworkTags {
 impl client::Part for NetworkTags {}
 
 
+/// Specifies the NodeAffinity key, values, and affinity operator according to [shared sole tenant node group affinities](https://cloud.google.com/compute/docs/nodes/sole-tenant-nodes#node_affinity_and_anti-affinity).
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NodeAffinity {
+    /// Key for NodeAffinity.
+    
+    pub key: Option<String>,
+    /// Operator for NodeAffinity.
+    
+    pub operator: Option<String>,
+    /// Values for NodeAffinity.
+    
+    pub values: Option<Vec<String>>,
+}
+
+impl client::Part for NodeAffinity {}
+
+
 /// Parameters that describe the nodes in a cluster. GKE Autopilot clusters do not recognize parameters in `NodeConfig`. Use AutoprovisioningNodePoolDefaults instead.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2266,6 +2675,10 @@ pub struct NodeConfig {
     #[serde(rename="diskType")]
     
     pub disk_type: Option<String>,
+    /// Optional. Reserved for future use.
+    #[serde(rename="enableConfidentialStorage")]
+    
+    pub enable_confidential_storage: Option<bool>,
     /// Parameters for the node ephemeral storage using Local SSDs. If unspecified, ephemeral storage is backed by the boot disk.
     #[serde(rename="ephemeralStorageLocalSsdConfig")]
     
@@ -2281,7 +2694,7 @@ pub struct NodeConfig {
     /// Enable or disable gvnic in the node pool.
     
     pub gvnic: Option<VirtualNIC>,
-    /// The image type to use for this node. Note that for a given image type, the latest version of it will be used.
+    /// The image type to use for this node. Note that for a given image type, the latest version of it will be used. Please see https://cloud.google.com/kubernetes-engine/docs/concepts/node-images for available image types.
     #[serde(rename="imageType")]
     
     pub image_type: Option<String>,
@@ -2338,10 +2751,18 @@ pub struct NodeConfig {
     #[serde(rename="resourceLabels")]
     
     pub resource_labels: Option<HashMap<String, String>>,
+    /// A map of resource manager tag keys and values to be attached to the nodes.
+    #[serde(rename="resourceManagerTags")]
+    
+    pub resource_manager_tags: Option<ResourceManagerTags>,
     /// Sandbox configuration for this node.
     #[serde(rename="sandboxConfig")]
     
     pub sandbox_config: Option<SandboxConfig>,
+    /// List of secondary boot disks attached to the nodes.
+    #[serde(rename="secondaryBootDisks")]
+    
+    pub secondary_boot_disks: Option<Vec<SecondaryBootDisk>>,
     /// The Google Cloud Platform Service Account to be used by the node VMs. Specify the email address of the Service Account; otherwise, if no Service Account is specified, the "default" service account is used.
     #[serde(rename="serviceAccount")]
     
@@ -2350,6 +2771,10 @@ pub struct NodeConfig {
     #[serde(rename="shieldedInstanceConfig")]
     
     pub shielded_instance_config: Option<ShieldedInstanceConfig>,
+    /// Parameters for node pools to be backed by shared sole tenant node groups.
+    #[serde(rename="soleTenantConfig")]
+    
+    pub sole_tenant_config: Option<SoleTenantConfig>,
     /// Spot flag for enabling Spot VM, which is a rebrand of the existing preemptible flag.
     
     pub spot: Option<bool>,
@@ -2411,6 +2836,10 @@ pub struct NodeKubeletConfig {
     #[serde(rename="cpuManagerPolicy")]
     
     pub cpu_manager_policy: Option<String>,
+    /// Enable or disable Kubelet read only port.
+    #[serde(rename="insecureKubeletReadonlyPortEnabled")]
+    
+    pub insecure_kubelet_readonly_port_enabled: Option<bool>,
     /// Set the Pod PID limits. See https://kubernetes.io/docs/concepts/policy/pid-limiting/#pod-pid-limits Controls the maximum number of processes allowed to run in a pod. The value must be greater than or equal to 1024 and less than 4194304.
     #[serde(rename="podPidsLimit")]
     
@@ -2467,6 +2896,14 @@ impl client::Part for NodeManagement {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct NodeNetworkConfig {
+    /// We specify the additional node networks for this node pool using this list. Each node network corresponds to an additional interface
+    #[serde(rename="additionalNodeNetworkConfigs")]
+    
+    pub additional_node_network_configs: Option<Vec<AdditionalNodeNetworkConfig>>,
+    /// We specify the additional pod networks for this node pool using this list. Each pod network corresponds to an additional alias IP range for the node
+    #[serde(rename="additionalPodNetworkConfigs")]
+    
+    pub additional_pod_network_configs: Option<Vec<AdditionalPodNetworkConfig>>,
     /// Input only. Whether to create a new range for pod IPs in this node pool. Defaults are provided for `pod_range` and `pod_ipv4_cidr_block` if they are not specified. If neither `create_pod_range` or `pod_range` are specified, the cluster-level default (`ip_allocation_policy.cluster_ipv4_cidr_block`) is used. Only applicable if `ip_allocation_policy.use_ip_aliases` is true. This field cannot be changed after the node pool has been created.
     #[serde(rename="createPodRange")]
     
@@ -2479,10 +2916,18 @@ pub struct NodeNetworkConfig {
     #[serde(rename="networkPerformanceConfig")]
     
     pub network_performance_config: Option<NetworkPerformanceConfig>,
+    /// [PRIVATE FIELD] Pod CIDR size overprovisioning config for the nodepool. Pod CIDR size per node depends on max_pods_per_node. By default, the value of max_pods_per_node is rounded off to next power of 2 and we then double that to get the size of pod CIDR block per node. Example: max_pods_per_node of 30 would result in 64 IPs (/26). This config can disable the doubling of IPs (we still round off to next power of 2) Example: max_pods_per_node of 30 will result in 32 IPs (/27) when overprovisioning is disabled.
+    #[serde(rename="podCidrOverprovisionConfig")]
+    
+    pub pod_cidr_overprovision_config: Option<PodCIDROverprovisionConfig>,
     /// The IP address range for pod IPs in this node pool. Only applicable if `create_pod_range` is true. Set to blank to have a range chosen with the default size. Set to /netmask (e.g. `/14`) to have a range chosen with a specific netmask. Set to a [CIDR](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing) notation (e.g. `10.96.0.0/14`) to pick a specific range to use. Only applicable if `ip_allocation_policy.use_ip_aliases` is true. This field cannot be changed after the node pool has been created.
     #[serde(rename="podIpv4CidrBlock")]
     
     pub pod_ipv4_cidr_block: Option<String>,
+    /// Output only. [Output only] The utilization of the IPv4 range for the pod. The ratio is Usage/[Total number of IPs in the secondary range], Usage=numNodes*numZones*podIPsPerNode.
+    #[serde(rename="podIpv4RangeUtilization")]
+    
+    pub pod_ipv4_range_utilization: Option<f64>,
     /// The ID of the secondary range for pod IPs. If `create_pod_range` is true, this ID is used for the new range. If `create_pod_range` is false, uses an existing secondary range with this ID. Only applicable if `ip_allocation_policy.use_ip_aliases` is true. This field cannot be changed after the node pool has been created.
     #[serde(rename="podRange")]
     
@@ -2507,6 +2952,10 @@ pub struct NodePool {
     /// Autoscaler configuration for this NodePool. Autoscaler is enabled only if a valid configuration is present.
     
     pub autoscaling: Option<NodePoolAutoscaling>,
+    /// Enable best effort provisioning for nodes
+    #[serde(rename="bestEffortProvisioning")]
+    
+    pub best_effort_provisioning: Option<BestEffortProvisioning>,
     /// Which conditions caused the current node pool state.
     
     pub conditions: Option<Vec<StatusCondition>>,
@@ -2549,6 +2998,10 @@ pub struct NodePool {
     #[serde(rename="podIpv4CidrSize")]
     
     pub pod_ipv4_cidr_size: Option<i32>,
+    /// Specifies the configuration of queued provisioning.
+    #[serde(rename="queuedProvisioning")]
+    
+    pub queued_provisioning: Option<QueuedProvisioning>,
     /// [Output only] Server-defined URL for the resource.
     #[serde(rename="selfLink")]
     
@@ -2568,7 +3021,7 @@ pub struct NodePool {
     #[serde(rename="upgradeSettings")]
     
     pub upgrade_settings: Option<UpgradeSettings>,
-    /// The version of the Kubernetes of this node.
+    /// The version of Kubernetes running on this NodePool's nodes. If unspecified, it defaults as described [here](https://cloud.google.com/kubernetes-engine/versioning#specifying_node_version).
     
     pub version: Option<String>,
 }
@@ -2587,6 +3040,10 @@ pub struct NodePoolAutoConfig {
     #[serde(rename="networkTags")]
     
     pub network_tags: Option<NetworkTags>,
+    /// Resource manager tag keys and values to be attached to the nodes for managing Compute Engine firewalls using Network Firewall Policies.
+    #[serde(rename="resourceManagerTags")]
+    
+    pub resource_manager_tags: Option<ResourceManagerTags>,
 }
 
 impl client::Part for NodePoolAutoConfig {}
@@ -2662,7 +3119,7 @@ pub struct NodePoolLoggingConfig {
 impl client::Part for NodePoolLoggingConfig {}
 
 
-/// Kubernetes taint is comprised of three fields: key, value, and effect. Effect can only be one of three types: NoSchedule, PreferNoSchedule or NoExecute. See [here](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration) for more information, including usage and the valid values.
+/// Kubernetes taint is composed of three fields: key, value, and effect. Effect can only be one of three types: NoSchedule, PreferNoSchedule or NoExecute. See [here](https://kubernetes.io/docs/concepts/configuration/taint-and-toleration) for more information, including usage and the valid values.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2800,7 +3257,7 @@ pub struct Operation {
     /// Output only. [Output only] Progress information for an operation.
     
     pub progress: Option<OperationProgress>,
-    /// Server-defined URL for the resource.
+    /// Server-defined URI for the operation. Example: `https://container.googleapis.com/v1alpha1/projects/123/locations/us-central1/operations/operation-123`.
     #[serde(rename="selfLink")]
     
     pub self_link: Option<String>,
@@ -2815,7 +3272,7 @@ pub struct Operation {
     #[serde(rename="statusMessage")]
     
     pub status_message: Option<String>,
-    /// Server-defined URL for the target of the operation.
+    /// Server-defined URI for the target of the operation. The format of this is a URI to the resource being modified (such as a cluster, node pool, or node). For node pool repairs, there may be multiple nodes being repaired, but only one will be the target. Examples: - ## `https://container.googleapis.com/v1/projects/123/locations/us-central1/clusters/my-cluster` ## `https://container.googleapis.com/v1/projects/123/zones/us-central1-c/clusters/my-cluster/nodePools/my-np` `https://container.googleapis.com/v1/projects/123/zones/us-central1-c/clusters/my-cluster/nodePools/my-np/node/my-node`
     #[serde(rename="targetLink")]
     
     pub target_link: Option<String>,
@@ -2851,6 +3308,25 @@ pub struct OperationProgress {
 impl client::Part for OperationProgress {}
 
 
+/// ParentProductConfig is the configuration of the parent product of the cluster. This field is used by Google internal products that are built on top of a GKE cluster and take the ownership of the cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ParentProductConfig {
+    /// Labels contain the configuration of the parent product.
+    
+    pub labels: Option<HashMap<String, String>>,
+    /// Name of the parent product associated with the cluster.
+    #[serde(rename="productName")]
+    
+    pub product_name: Option<String>,
+}
+
+impl client::Part for ParentProductConfig {}
+
+
 /// PlacementPolicy defines the placement policy used by the node pool.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -2858,6 +3334,14 @@ impl client::Part for OperationProgress {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PlacementPolicy {
+    /// If set, refers to the name of a custom resource policy supplied by the user. The resource policy must be in the same project and region as the node pool. If not found, InvalidArgument error is returned.
+    #[serde(rename="policyName")]
+    
+    pub policy_name: Option<String>,
+    /// Optional. TPU placement topology for pod slice node pool. https://cloud.google.com/tpu/docs/types-topologies#tpu_topologies
+    #[serde(rename="tpuTopology")]
+    
+    pub tpu_topology: Option<String>,
     /// The type of placement.
     #[serde(rename="type")]
     
@@ -2865,6 +3349,21 @@ pub struct PlacementPolicy {
 }
 
 impl client::Part for PlacementPolicy {}
+
+
+/// [PRIVATE FIELD] Config for pod CIDR size overprovisioning.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PodCIDROverprovisionConfig {
+    /// Whether Pod CIDR overprovisioning is disabled. Note: Pod CIDR overprovisioning is enabled by default.
+    
+    pub disable: Option<bool>,
+}
+
+impl client::Part for PodCIDROverprovisionConfig {}
 
 
 /// Configuration options for private clusters.
@@ -2945,6 +3444,40 @@ pub struct PubSub {
 }
 
 impl client::Part for PubSub {}
+
+
+/// QueuedProvisioning defines the queued provisioning used by the node pool.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct QueuedProvisioning {
+    /// Denotes that this nodepool is QRM specific, meaning nodes can be only obtained through queuing via the Cluster Autoscaler ProvisioningRequest API.
+    
+    pub enabled: Option<bool>,
+}
+
+impl client::Part for QueuedProvisioning {}
+
+
+/// RangeInfo contains the range name and the range utilization by this cluster.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RangeInfo {
+    /// Output only. [Output only] Name of a range.
+    #[serde(rename="rangeName")]
+    
+    pub range_name: Option<String>,
+    /// Output only. [Output only] The utilization of the range.
+    
+    pub utilization: Option<f64>,
+}
+
+impl client::Part for RangeInfo {}
 
 
 /// Represents an arbitrary window of time that recurs.
@@ -3064,6 +3597,21 @@ pub struct ResourceLimit {
 impl client::Part for ResourceLimit {}
 
 
+/// A map of resource manager tag keys and values to be attached to the nodes for managing Compute Engine firewalls using Network Firewall Policies. Tags must be according to specifications in https://cloud.google.com/vpc/docs/tags-firewalls-overview#specifications. A maximum of 5 tag key-value pairs can be specified. Existing tags will be replaced with new values.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ResourceManagerTags {
+    /// TagKeyValue must be in one of the following formats ([KEY]=[VALUE]) 1. `tagKeys/{tag_key_id}=tagValues/{tag_value_id}` 2. `{org_id}/{tag_key_name}={tag_value_name}` 3. `{project_id}/{tag_key_name}={tag_value_name}`
+    
+    pub tags: Option<HashMap<String, String>>,
+}
+
+impl client::Part for ResourceManagerTags {}
+
+
 /// Configuration for exporting cluster resource usages.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3141,6 +3689,44 @@ pub struct SandboxConfig {
 }
 
 impl client::Part for SandboxConfig {}
+
+
+/// SecondaryBootDisk represents a persistent disk attached to a node with special configurations based on its mode.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SecondaryBootDisk {
+    /// Fully-qualified resource ID for an existing disk image.
+    #[serde(rename="diskImage")]
+    
+    pub disk_image: Option<String>,
+    /// Disk mode (container image cache, etc.)
+    
+    pub mode: Option<String>,
+}
+
+impl client::Part for SecondaryBootDisk {}
+
+
+/// SecurityPostureConfig defines the flags needed to enable/disable features for the Security Posture API.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SecurityPostureConfig {
+    /// Sets which mode to use for Security Posture features.
+    
+    pub mode: Option<String>,
+    /// Sets which mode to use for vulnerability scanning.
+    #[serde(rename="vulnerabilityMode")]
+    
+    pub vulnerability_mode: Option<String>,
+}
+
+impl client::Part for SecurityPostureConfig {}
 
 
 /// Kubernetes Engine service configuration.
@@ -3667,6 +4253,22 @@ pub struct ShieldedNodes {
 impl client::Part for ShieldedNodes {}
 
 
+/// SoleTenantConfig contains the NodeAffinities to specify what shared sole tenant node groups should back the node pool.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SoleTenantConfig {
+    /// NodeAffinities used to match to a shared sole tenant node group.
+    #[serde(rename="nodeAffinities")]
+    
+    pub node_affinities: Option<Vec<NodeAffinity>>,
+}
+
+impl client::Part for SoleTenantConfig {}
+
+
 /// Standard rollout policy is the default policy for blue-green.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -3725,6 +4327,21 @@ pub struct StartIPRotationRequest {
 }
 
 impl client::RequestValue for StartIPRotationRequest {}
+
+
+/// Configuration for the Stateful HA add-on.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StatefulHAConfig {
+    /// Whether the Stateful HA add-on is enabled for this cluster.
+    
+    pub enabled: Option<bool>,
+}
+
+impl client::Part for StatefulHAConfig {}
 
 
 /// The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).
@@ -3899,6 +4516,15 @@ pub struct UpdateNodePoolRequest {
     #[serde(rename="confidentialNodes")]
     
     pub confidential_nodes: Option<ConfidentialNodes>,
+    /// Optional. The desired disk size for nodes in the node pool specified in GB. The smallest allowed disk size is 10GB. Initiates an upgrade operation that migrates the nodes in the node pool to the specified disk size.
+    #[serde(rename="diskSizeGb")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub disk_size_gb: Option<i64>,
+    /// Optional. The desired disk type (e.g. 'pd-standard', 'pd-ssd' or 'pd-balanced') for nodes in the node pool. Initiates an upgrade operation that migrates the nodes in the node pool to the specified disk type.
+    #[serde(rename="diskType")]
+    
+    pub disk_type: Option<String>,
     /// The current etag of the node pool. If an etag is provided and does not match the current etag of the node pool, update will be blocked and an ABORTED error will be returned.
     
     pub etag: Option<String>,
@@ -3913,7 +4539,7 @@ pub struct UpdateNodePoolRequest {
     /// Enable or disable gvnic on the node pool.
     
     pub gvnic: Option<VirtualNIC>,
-    /// Required. The desired image type for the node pool.
+    /// Required. The desired image type for the node pool. Please see https://cloud.google.com/kubernetes-engine/docs/concepts/node-images for available image types.
     #[serde(rename="imageType")]
     
     pub image_type: Option<String>,
@@ -3935,6 +4561,10 @@ pub struct UpdateNodePoolRequest {
     #[serde(rename="loggingConfig")]
     
     pub logging_config: Option<NodePoolLoggingConfig>,
+    /// Optional. The desired [Google Compute Engine machine type](https://cloud.google.com/compute/docs/machine-types) for nodes in the node pool. Initiates an upgrade operation that migrates the nodes in the node pool to the specified machine type.
+    #[serde(rename="machineType")]
+    
+    pub machine_type: Option<String>,
     /// The name (project, location, cluster, node pool) of the node pool to update. Specified in the format `projects/*/locations/*/clusters/*/nodePools/*`.
     
     pub name: Option<String>,
@@ -3954,10 +4584,18 @@ pub struct UpdateNodePoolRequest {
     #[serde(rename="projectId")]
     
     pub project_id: Option<String>,
+    /// Specifies the configuration of queued provisioning.
+    #[serde(rename="queuedProvisioning")]
+    
+    pub queued_provisioning: Option<QueuedProvisioning>,
     /// The resource labels for the node pool to use to annotate any related Google Compute Engine resources.
     #[serde(rename="resourceLabels")]
     
     pub resource_labels: Option<ResourceLabels>,
+    /// Desired resource manager tag keys and values to be attached to the nodes for managing Compute Engine firewalls using Network Firewall Policies. Existing tags will be replaced with new values.
+    #[serde(rename="resourceManagerTags")]
+    
+    pub resource_manager_tags: Option<ResourceManagerTags>,
     /// The desired network tags to be applied to all nodes in the node pool. If this field is not present, the tags will not be changed. Otherwise, the existing network tags will be *replaced* with the provided tags.
     
     pub tags: Option<NetworkTags>,
@@ -4141,6 +4779,22 @@ pub struct WorkloadMetadataConfig {
 impl client::Part for WorkloadMetadataConfig {}
 
 
+/// WorkloadPolicyConfig is the configuration of workload policy for autopilot clusters.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct WorkloadPolicyConfig {
+    /// If true, workloads can use NET_ADMIN capability.
+    #[serde(rename="allowNetAdmin")]
+    
+    pub allow_net_admin: Option<bool>,
+}
+
+impl client::Part for WorkloadPolicyConfig {}
+
+
 
 // ###################
 // MethodBuilders ###
@@ -4169,7 +4823,7 @@ impl client::Part for WorkloadMetadataConfig {}
 ///     ).build().await.unwrap();
 /// let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `aggregated_usable_subnetworks_list(...)`, `locations_clusters_complete_ip_rotation(...)`, `locations_clusters_create(...)`, `locations_clusters_delete(...)`, `locations_clusters_get(...)`, `locations_clusters_get_jwks(...)`, `locations_clusters_list(...)`, `locations_clusters_node_pools_complete_upgrade(...)`, `locations_clusters_node_pools_create(...)`, `locations_clusters_node_pools_delete(...)`, `locations_clusters_node_pools_get(...)`, `locations_clusters_node_pools_list(...)`, `locations_clusters_node_pools_rollback(...)`, `locations_clusters_node_pools_set_autoscaling(...)`, `locations_clusters_node_pools_set_management(...)`, `locations_clusters_node_pools_set_size(...)`, `locations_clusters_node_pools_update(...)`, `locations_clusters_set_addons(...)`, `locations_clusters_set_legacy_abac(...)`, `locations_clusters_set_locations(...)`, `locations_clusters_set_logging(...)`, `locations_clusters_set_maintenance_policy(...)`, `locations_clusters_set_master_auth(...)`, `locations_clusters_set_monitoring(...)`, `locations_clusters_set_network_policy(...)`, `locations_clusters_set_resource_labels(...)`, `locations_clusters_start_ip_rotation(...)`, `locations_clusters_update(...)`, `locations_clusters_update_master(...)`, `locations_clusters_well_known_get_openid_configuration(...)`, `locations_get_server_config(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `zones_clusters_addons(...)`, `zones_clusters_complete_ip_rotation(...)`, `zones_clusters_create(...)`, `zones_clusters_delete(...)`, `zones_clusters_get(...)`, `zones_clusters_legacy_abac(...)`, `zones_clusters_list(...)`, `zones_clusters_locations(...)`, `zones_clusters_logging(...)`, `zones_clusters_master(...)`, `zones_clusters_monitoring(...)`, `zones_clusters_node_pools_autoscaling(...)`, `zones_clusters_node_pools_create(...)`, `zones_clusters_node_pools_delete(...)`, `zones_clusters_node_pools_get(...)`, `zones_clusters_node_pools_list(...)`, `zones_clusters_node_pools_rollback(...)`, `zones_clusters_node_pools_set_management(...)`, `zones_clusters_node_pools_set_size(...)`, `zones_clusters_node_pools_update(...)`, `zones_clusters_resource_labels(...)`, `zones_clusters_set_maintenance_policy(...)`, `zones_clusters_set_master_auth(...)`, `zones_clusters_set_network_policy(...)`, `zones_clusters_start_ip_rotation(...)`, `zones_clusters_update(...)`, `zones_get_serverconfig(...)`, `zones_operations_cancel(...)`, `zones_operations_get(...)` and `zones_operations_list(...)`
+/// // like `aggregated_usable_subnetworks_list(...)`, `locations_clusters_check_autopilot_compatibility(...)`, `locations_clusters_complete_ip_rotation(...)`, `locations_clusters_create(...)`, `locations_clusters_delete(...)`, `locations_clusters_get(...)`, `locations_clusters_get_jwks(...)`, `locations_clusters_list(...)`, `locations_clusters_node_pools_complete_upgrade(...)`, `locations_clusters_node_pools_create(...)`, `locations_clusters_node_pools_delete(...)`, `locations_clusters_node_pools_get(...)`, `locations_clusters_node_pools_list(...)`, `locations_clusters_node_pools_rollback(...)`, `locations_clusters_node_pools_set_autoscaling(...)`, `locations_clusters_node_pools_set_management(...)`, `locations_clusters_node_pools_set_size(...)`, `locations_clusters_node_pools_update(...)`, `locations_clusters_set_addons(...)`, `locations_clusters_set_legacy_abac(...)`, `locations_clusters_set_locations(...)`, `locations_clusters_set_logging(...)`, `locations_clusters_set_maintenance_policy(...)`, `locations_clusters_set_master_auth(...)`, `locations_clusters_set_monitoring(...)`, `locations_clusters_set_network_policy(...)`, `locations_clusters_set_resource_labels(...)`, `locations_clusters_start_ip_rotation(...)`, `locations_clusters_update(...)`, `locations_clusters_update_master(...)`, `locations_clusters_well_known_get_openid_configuration(...)`, `locations_get_server_config(...)`, `locations_operations_cancel(...)`, `locations_operations_get(...)`, `locations_operations_list(...)`, `zones_clusters_addons(...)`, `zones_clusters_complete_ip_rotation(...)`, `zones_clusters_create(...)`, `zones_clusters_delete(...)`, `zones_clusters_get(...)`, `zones_clusters_legacy_abac(...)`, `zones_clusters_list(...)`, `zones_clusters_locations(...)`, `zones_clusters_logging(...)`, `zones_clusters_master(...)`, `zones_clusters_monitoring(...)`, `zones_clusters_node_pools_autoscaling(...)`, `zones_clusters_node_pools_create(...)`, `zones_clusters_node_pools_delete(...)`, `zones_clusters_node_pools_get(...)`, `zones_clusters_node_pools_list(...)`, `zones_clusters_node_pools_rollback(...)`, `zones_clusters_node_pools_set_management(...)`, `zones_clusters_node_pools_set_size(...)`, `zones_clusters_node_pools_update(...)`, `zones_clusters_resource_labels(...)`, `zones_clusters_set_maintenance_policy(...)`, `zones_clusters_set_master_auth(...)`, `zones_clusters_set_network_policy(...)`, `zones_clusters_start_ip_rotation(...)`, `zones_clusters_update(...)`, `zones_get_serverconfig(...)`, `zones_operations_cancel(...)`, `zones_operations_get(...)` and `zones_operations_list(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -4401,7 +5055,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the OIDC discovery document for the cluster. See the [OpenID Connect Discovery 1.0 specification](https://openid.net/specs/openid-connect-discovery-1_0.html) for details. This API is not yet intended for general use, and is not available for all clusters.
+    /// Gets the OIDC discovery document for the cluster. See the [OpenID Connect Discovery 1.0 specification](https://openid.net/specs/openid-connect-discovery-1_0.html) for details.
     /// 
     /// # Arguments
     ///
@@ -4412,6 +5066,23 @@ impl<'a, S> ProjectMethods<'a, S> {
             _parent: parent.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Checks the cluster compatibility with Autopilot mode, and returns a list of compatibility issues.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - The name (project, location, cluster) of the cluster to retrieve. Specified in the format `projects/*/locations/*/clusters/*`.
+    pub fn locations_clusters_check_autopilot_compatibility(&self, name: &str) -> ProjectLocationClusterCheckAutopilotCompatibilityCall<'a, S> {
+        ProjectLocationClusterCheckAutopilotCompatibilityCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
         }
     }
     
@@ -4495,7 +5166,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Gets the public component of the cluster signing keys in JSON Web Key format. This API is not yet intended for general use, and is not available for all clusters.
+    /// Gets the public component of the cluster signing keys in JSON Web Key format.
     /// 
     /// # Arguments
     ///
@@ -8789,7 +9460,7 @@ where
 }
 
 
-/// Gets the OIDC discovery document for the cluster. See the [OpenID Connect Discovery 1.0 specification](https://openid.net/specs/openid-connect-discovery-1_0.html) for details. This API is not yet intended for general use, and is not available for all clusters.
+/// Gets the OIDC discovery document for the cluster. See the [OpenID Connect Discovery 1.0 specification](https://openid.net/specs/openid-connect-discovery-1_0.html) for details.
 ///
 /// A builder for the *locations.clusters.well-known.getOpenid-configuration* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -9003,6 +9674,268 @@ where
         self
     }
 
+}
+
+
+/// Checks the cluster compatibility with Autopilot mode, and returns a list of compatibility issues.
+///
+/// A builder for the *locations.clusters.checkAutopilotCompatibility* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_container1 as container1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use container1::{Container, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Container::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_clusters_check_autopilot_compatibility("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationClusterCheckAutopilotCompatibilityCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Container<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationClusterCheckAutopilotCompatibilityCall<'a, S> {}
+
+impl<'a, S> ProjectLocationClusterCheckAutopilotCompatibilityCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, CheckAutopilotCompatibilityResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "container.projects.locations.clusters.checkAutopilotCompatibility",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}:checkAutopilotCompatibility";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// The name (project, location, cluster) of the cluster to retrieve. Specified in the format `projects/*/locations/*/clusters/*`.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationClusterCheckAutopilotCompatibilityCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationClusterCheckAutopilotCompatibilityCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationClusterCheckAutopilotCompatibilityCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationClusterCheckAutopilotCompatibilityCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationClusterCheckAutopilotCompatibilityCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationClusterCheckAutopilotCompatibilityCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
 }
 
 
@@ -9617,8 +10550,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_clusters_delete("name")
-///              .zone("et")
-///              .project_id("sed")
+///              .zone("sed")
+///              .project_id("et")
 ///              .cluster_id("et")
 ///              .doit().await;
 /// # }
@@ -9915,9 +10848,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_clusters_get("name")
-///              .zone("vero")
-///              .project_id("erat")
-///              .cluster_id("sed")
+///              .zone("erat")
+///              .project_id("sed")
+///              .cluster_id("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -10186,7 +11119,7 @@ where
 }
 
 
-/// Gets the public component of the cluster signing keys in JSON Web Key format. This API is not yet intended for general use, and is not available for all clusters.
+/// Gets the public component of the cluster signing keys in JSON Web Key format.
 ///
 /// A builder for the *locations.clusters.getJwks* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -10430,8 +11363,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_clusters_list("parent")
-///              .zone("et")
-///              .project_id("voluptua.")
+///              .zone("voluptua.")
+///              .project_id("amet.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14512,9 +15445,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_get("name")
-///              .zone("vero")
-///              .project_id("elitr")
-///              .operation_id("Lorem")
+///              .zone("elitr")
+///              .project_id("Lorem")
+///              .operation_id("diam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -14810,8 +15743,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_operations_list("parent")
-///              .zone("no")
-///              .project_id("ipsum")
+///              .zone("ipsum")
+///              .project_id("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -15096,8 +16029,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_get_server_config("name")
-///              .zone("takimata")
-///              .project_id("consetetur")
+///              .zone("consetetur")
+///              .project_id("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16026,7 +16959,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_node_pools_delete("projectId", "zone", "clusterId", "nodePoolId")
-///              .name("voluptua.")
+///              .name("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16336,7 +17269,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_node_pools_get("projectId", "zone", "clusterId", "nodePoolId")
-///              .name("amet.")
+///              .name("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16646,7 +17579,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_node_pools_list("projectId", "zone", "clusterId")
-///              .parent("invidunt")
+///              .parent("no")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19192,7 +20125,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_delete("projectId", "zone", "clusterId")
-///              .name("aliquyam")
+///              .name("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19490,7 +20423,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_get("projectId", "zone", "clusterId")
-///              .name("aliquyam")
+///              .name("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20104,7 +21037,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_clusters_list("projectId", "zone")
-///              .parent("consetetur")
+///              .parent("Stet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -23866,7 +24799,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_operations_get("projectId", "zone", "operationId")
-///              .name("erat")
+///              .name("sea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24164,7 +25097,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_operations_list("projectId", "zone")
-///              .parent("et")
+///              .parent("gubergren")
 ///              .doit().await;
 /// # }
 /// ```
@@ -24450,7 +25383,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().zones_get_serverconfig("projectId", "zone")
-///              .name("sea")
+///              .name("consetetur")
 ///              .doit().await;
 /// # }
 /// ```

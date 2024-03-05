@@ -1799,10 +1799,12 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routing-policy.geo.enable-fencing" => Some(("routingPolicy.geo.enableFencing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "routing-policy.geo.kind" => Some(("routingPolicy.geo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "routing-policy.health-check" => Some(("routingPolicy.healthCheck", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routing-policy.kind" => Some(("routingPolicy.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routing-policy.primary-backup.backup-geo-targets.enable-fencing" => Some(("routingPolicy.primaryBackup.backupGeoTargets.enableFencing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "routing-policy.primary-backup.backup-geo-targets.kind" => Some(("routingPolicy.primaryBackup.backupGeoTargets.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routing-policy.primary-backup.kind" => Some(("routingPolicy.primaryBackup.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "routing-policy.primary-backup.primary-targets.external-endpoints" => Some(("routingPolicy.primaryBackup.primaryTargets.externalEndpoints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "routing-policy.primary-backup.trickle-traffic" => Some(("routingPolicy.primaryBackup.trickleTraffic", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "routing-policy.wrr.kind" => Some(("routingPolicy.wrr.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rrdatas" => Some(("rrdatas", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -1810,7 +1812,7 @@ where
                     "ttl" => Some(("ttl", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-geo-targets", "enable-fencing", "geo", "kind", "name", "primary-backup", "routing-policy", "rrdatas", "signature-rrdatas", "trickle-traffic", "ttl", "type", "wrr"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-geo-targets", "enable-fencing", "external-endpoints", "geo", "health-check", "kind", "name", "primary-backup", "primary-targets", "routing-policy", "rrdatas", "signature-rrdatas", "trickle-traffic", "ttl", "type", "wrr"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2070,10 +2072,12 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routing-policy.geo.enable-fencing" => Some(("routingPolicy.geo.enableFencing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "routing-policy.geo.kind" => Some(("routingPolicy.geo.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "routing-policy.health-check" => Some(("routingPolicy.healthCheck", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routing-policy.kind" => Some(("routingPolicy.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routing-policy.primary-backup.backup-geo-targets.enable-fencing" => Some(("routingPolicy.primaryBackup.backupGeoTargets.enableFencing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "routing-policy.primary-backup.backup-geo-targets.kind" => Some(("routingPolicy.primaryBackup.backupGeoTargets.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "routing-policy.primary-backup.kind" => Some(("routingPolicy.primaryBackup.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "routing-policy.primary-backup.primary-targets.external-endpoints" => Some(("routingPolicy.primaryBackup.primaryTargets.externalEndpoints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "routing-policy.primary-backup.trickle-traffic" => Some(("routingPolicy.primaryBackup.trickleTraffic", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
                     "routing-policy.wrr.kind" => Some(("routingPolicy.wrr.kind", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "rrdatas" => Some(("rrdatas", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2081,7 +2085,7 @@ where
                     "ttl" => Some(("ttl", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-geo-targets", "enable-fencing", "geo", "kind", "name", "primary-backup", "routing-policy", "rrdatas", "signature-rrdatas", "trickle-traffic", "ttl", "type", "wrr"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup-geo-targets", "enable-fencing", "external-endpoints", "geo", "health-check", "kind", "name", "primary-backup", "primary-targets", "routing-policy", "rrdatas", "signature-rrdatas", "trickle-traffic", "ttl", "type", "wrr"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4109,7 +4113,7 @@ async fn main() {
         
                     (Some(r##"location"##),
                      None,
-                     Some(r##"Specifies the location of the resource. This information will be used for routing and will be part of the resource name."##),
+                     Some(r##"Specifies the location of the resource. This information is used for routing and is part of the resource name."##),
                      Some(true),
                      Some(false)),
         
@@ -4149,7 +4153,7 @@ async fn main() {
         
                     (Some(r##"location"##),
                      None,
-                     Some(r##"Specifies the location of the resource. This information will be used for routing and will be part of the resource name."##),
+                     Some(r##"Specifies the location of the resource. This information is used for routing and is part of the resource name."##),
                      Some(true),
                      Some(false)),
         
@@ -4189,7 +4193,7 @@ async fn main() {
         
                     (Some(r##"location"##),
                      None,
-                     Some(r##"Specifies the location of the resource. This information will be used for routing and will be part of the resource name."##),
+                     Some(r##"Specifies the location of the resource. This information is used for routing and is part of the resource name."##),
                      Some(true),
                      Some(false)),
         
@@ -4235,7 +4239,7 @@ async fn main() {
         
                     (Some(r##"location"##),
                      None,
-                     Some(r##"Specifies the location of the resource. This information will be used for routing and will be part of the resource name."##),
+                     Some(r##"Specifies the location of the resource. This information is used for routing and is part of the resource name."##),
                      Some(true),
                      Some(false)),
         
@@ -4765,7 +4769,7 @@ async fn main() {
     
     let mut app = App::new("dns2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230119")
+           .version("5.0.4+20240229")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_dns2_cli")
            .arg(Arg::with_name("url")

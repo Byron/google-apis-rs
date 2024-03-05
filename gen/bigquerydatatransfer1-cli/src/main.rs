@@ -754,6 +754,7 @@ where
                     "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "encryption-configuration.kms-key-name" => Some(("encryptionConfiguration.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -766,7 +767,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email", "email-preferences", "enable-failure-email", "end-time", "name", "next-run-time", "notification-pubsub-topic", "owner-info", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email", "email-preferences", "enable-failure-email", "encryption-configuration", "end-time", "kms-key-name", "name", "next-run-time", "notification-pubsub-topic", "owner-info", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1032,6 +1033,7 @@ where
                     "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "encryption-configuration.kms-key-name" => Some(("encryptionConfiguration.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1044,7 +1046,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email", "email-preferences", "enable-failure-email", "end-time", "name", "next-run-time", "notification-pubsub-topic", "owner-info", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email", "email-preferences", "enable-failure-email", "encryption-configuration", "end-time", "kms-key-name", "name", "next-run-time", "notification-pubsub-topic", "owner-info", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1521,6 +1523,91 @@ where
         }
     }
 
+    async fn _projects_locations_unenroll_data_sources(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "data-source-ids" => Some(("dataSourceIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-source-ids"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::UnenrollDataSourcesRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_unenroll_data_sources(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_transfer_configs_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1551,6 +1638,7 @@ where
                     "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "encryption-configuration.kms-key-name" => Some(("encryptionConfiguration.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1563,7 +1651,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email", "email-preferences", "enable-failure-email", "end-time", "name", "next-run-time", "notification-pubsub-topic", "owner-info", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email", "email-preferences", "enable-failure-email", "encryption-configuration", "end-time", "kms-key-name", "name", "next-run-time", "notification-pubsub-topic", "owner-info", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1829,6 +1917,7 @@ where
                     "disabled" => Some(("disabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "email-preferences.enable-failure-email" => Some(("emailPreferences.enableFailureEmail", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "encryption-configuration.kms-key-name" => Some(("encryptionConfiguration.kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "next-run-time" => Some(("nextRunTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1841,7 +1930,7 @@ where
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "user-id" => Some(("userId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email", "email-preferences", "enable-failure-email", "end-time", "name", "next-run-time", "notification-pubsub-topic", "owner-info", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-refresh-window-days", "data-source-id", "dataset-region", "destination-dataset-id", "disable-auto-scheduling", "disabled", "display-name", "email", "email-preferences", "enable-failure-email", "encryption-configuration", "end-time", "kms-key-name", "name", "next-run-time", "notification-pubsub-topic", "owner-info", "schedule", "schedule-options", "start-time", "state", "update-time", "user-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2388,6 +2477,9 @@ where
                     ("locations-transfer-configs-start-manual-runs", Some(opt)) => {
                         call_result = self._projects_locations_transfer_configs_start_manual_runs(opt, dry_run, &mut err).await;
                     },
+                    ("locations-unenroll-data-sources", Some(opt)) => {
+                        call_result = self._projects_locations_unenroll_data_sources(opt, dry_run, &mut err).await;
+                    },
                     ("transfer-configs-create", Some(opt)) => {
                         call_result = self._projects_transfer_configs_create(opt, dry_run, &mut err).await;
                     },
@@ -2500,7 +2592,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'data-sources-check-valid-creds', 'data-sources-get', 'data-sources-list', 'enroll-data-sources', 'locations-data-sources-check-valid-creds', 'locations-data-sources-get', 'locations-data-sources-list', 'locations-enroll-data-sources', 'locations-get', 'locations-list', 'locations-transfer-configs-create', 'locations-transfer-configs-delete', 'locations-transfer-configs-get', 'locations-transfer-configs-list', 'locations-transfer-configs-patch', 'locations-transfer-configs-runs-delete', 'locations-transfer-configs-runs-get', 'locations-transfer-configs-runs-list', 'locations-transfer-configs-runs-transfer-logs-list', 'locations-transfer-configs-schedule-runs', 'locations-transfer-configs-start-manual-runs', 'transfer-configs-create', 'transfer-configs-delete', 'transfer-configs-get', 'transfer-configs-list', 'transfer-configs-patch', 'transfer-configs-runs-delete', 'transfer-configs-runs-get', 'transfer-configs-runs-list', 'transfer-configs-runs-transfer-logs-list', 'transfer-configs-schedule-runs' and 'transfer-configs-start-manual-runs'", vec![
+        ("projects", "methods: 'data-sources-check-valid-creds', 'data-sources-get', 'data-sources-list', 'enroll-data-sources', 'locations-data-sources-check-valid-creds', 'locations-data-sources-get', 'locations-data-sources-list', 'locations-enroll-data-sources', 'locations-get', 'locations-list', 'locations-transfer-configs-create', 'locations-transfer-configs-delete', 'locations-transfer-configs-get', 'locations-transfer-configs-list', 'locations-transfer-configs-patch', 'locations-transfer-configs-runs-delete', 'locations-transfer-configs-runs-get', 'locations-transfer-configs-runs-list', 'locations-transfer-configs-runs-transfer-logs-list', 'locations-transfer-configs-schedule-runs', 'locations-transfer-configs-start-manual-runs', 'locations-unenroll-data-sources', 'transfer-configs-create', 'transfer-configs-delete', 'transfer-configs-get', 'transfer-configs-list', 'transfer-configs-patch', 'transfer-configs-runs-delete', 'transfer-configs-runs-get', 'transfer-configs-runs-list', 'transfer-configs-runs-transfer-logs-list', 'transfer-configs-schedule-runs' and 'transfer-configs-start-manual-runs'", vec![
             ("data-sources-check-valid-creds",
                     Some(r##"Returns true if valid credentials exist for the given data source and requesting user."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_data-sources-check-valid-creds",
@@ -2845,7 +2937,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the transfer config. Transfer config names have the form `projects/{project_id}/locations/{region}/transferConfigs/{config_id}`. Where `config_id` is usually a uuid, even though it is not guaranteed or required. The name is ignored when creating a transfer config."##),
+                     Some(r##"The resource name of the transfer config. Transfer config names have the form either `projects/{project_id}/locations/{region}/transferConfigs/{config_id}` or `projects/{project_id}/transferConfigs/{config_id}`, where `config_id` is usually a UUID, even though it is not guaranteed or required. The name is ignored when creating a transfer config."##),
                      Some(true),
                      Some(false)),
         
@@ -3011,6 +3103,34 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-unenroll-data-sources",
+                    Some(r##"Unenroll data sources in a user project. This allows users to remove transfer configurations for these data sources. They will no longer appear in the ListDataSources RPC and will also no longer appear in the [BigQuery UI](https://console.cloud.google.com/bigquery). Data transfers configurations of unenrolled data sources will not be scheduled."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_locations-unenroll-data-sources",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"The name of the project resource in the form: `projects/{project_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("transfer-configs-create",
                     Some(r##"Creates a new data transfer configuration."##),
                     "Details at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli/projects_transfer-configs-create",
@@ -3111,7 +3231,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the transfer config. Transfer config names have the form `projects/{project_id}/locations/{region}/transferConfigs/{config_id}`. Where `config_id` is usually a uuid, even though it is not guaranteed or required. The name is ignored when creating a transfer config."##),
+                     Some(r##"The resource name of the transfer config. Transfer config names have the form either `projects/{project_id}/locations/{region}/transferConfigs/{config_id}` or `projects/{project_id}/transferConfigs/{config_id}`, where `config_id` is usually a UUID, even though it is not guaranteed or required. The name is ignored when creating a transfer config."##),
                      Some(true),
                      Some(false)),
         
@@ -3283,7 +3403,7 @@ async fn main() {
     
     let mut app = App::new("bigquerydatatransfer1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230115")
+           .version("5.0.4+20240227")
            .about("Schedule queries or transfer external data from SaaS applications to Google BigQuery on a regular basis.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_bigquerydatatransfer1_cli")
            .arg(Arg::with_name("url")

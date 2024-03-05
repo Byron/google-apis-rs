@@ -4,12 +4,12 @@
 [package]
 
 name = "google-workflowexecutions1"
-version = "5.0.3+20230110"
+version = "5.0.4+20240220"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Workflow Executions (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/workflowexecutions1"
 homepage = "https://cloud.google.com/workflows"
-documentation = "https://docs.rs/google-workflowexecutions1/5.0.3+20230110"
+documentation = "https://docs.rs/google-workflowexecutions1/5.0.4+20240220"
 license = "MIT"
 keywords = ["workflowexecutions", "google", "protocol", "web", "api"]
 autobins = false

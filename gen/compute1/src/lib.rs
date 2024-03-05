@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *compute* crate version *5.0.3+20230103*, where *20230103* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *compute* crate version *5.0.4+20240218*, where *20240218* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *compute* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/compute/).
@@ -14,17 +14,17 @@
 //! * [accelerator types](api::AcceleratorType)
 //!  * [*aggregated list*](api::AcceleratorTypeAggregatedListCall), [*get*](api::AcceleratorTypeGetCall) and [*list*](api::AcceleratorTypeListCall)
 //! * [addresses](api::Address)
-//!  * [*aggregated list*](api::AddressAggregatedListCall), [*delete*](api::AddressDeleteCall), [*get*](api::AddressGetCall), [*insert*](api::AddressInsertCall), [*list*](api::AddressListCall) and [*set labels*](api::AddressSetLabelCall)
+//!  * [*aggregated list*](api::AddressAggregatedListCall), [*delete*](api::AddressDeleteCall), [*get*](api::AddressGetCall), [*insert*](api::AddressInsertCall), [*list*](api::AddressListCall), [*move*](api::AddressMoveCall) and [*set labels*](api::AddressSetLabelCall)
 //! * [autoscalers](api::Autoscaler)
 //!  * [*aggregated list*](api::AutoscalerAggregatedListCall), [*delete*](api::AutoscalerDeleteCall), [*get*](api::AutoscalerGetCall), [*insert*](api::AutoscalerInsertCall), [*list*](api::AutoscalerListCall), [*patch*](api::AutoscalerPatchCall) and [*update*](api::AutoscalerUpdateCall)
 //! * [backend buckets](api::BackendBucket)
-//!  * [*add signed url key*](api::BackendBucketAddSignedUrlKeyCall), [*delete*](api::BackendBucketDeleteCall), [*delete signed url key*](api::BackendBucketDeleteSignedUrlKeyCall), [*get*](api::BackendBucketGetCall), [*insert*](api::BackendBucketInsertCall), [*list*](api::BackendBucketListCall), [*patch*](api::BackendBucketPatchCall), [*set edge security policy*](api::BackendBucketSetEdgeSecurityPolicyCall) and [*update*](api::BackendBucketUpdateCall)
+//!  * [*add signed url key*](api::BackendBucketAddSignedUrlKeyCall), [*delete*](api::BackendBucketDeleteCall), [*delete signed url key*](api::BackendBucketDeleteSignedUrlKeyCall), [*get*](api::BackendBucketGetCall), [*get iam policy*](api::BackendBucketGetIamPolicyCall), [*insert*](api::BackendBucketInsertCall), [*list*](api::BackendBucketListCall), [*patch*](api::BackendBucketPatchCall), [*set edge security policy*](api::BackendBucketSetEdgeSecurityPolicyCall), [*set iam policy*](api::BackendBucketSetIamPolicyCall), [*test iam permissions*](api::BackendBucketTestIamPermissionCall) and [*update*](api::BackendBucketUpdateCall)
 //! * [backend services](api::BackendService)
-//!  * [*add signed url key*](api::BackendServiceAddSignedUrlKeyCall), [*aggregated list*](api::BackendServiceAggregatedListCall), [*delete*](api::BackendServiceDeleteCall), [*delete signed url key*](api::BackendServiceDeleteSignedUrlKeyCall), [*get*](api::BackendServiceGetCall), [*get health*](api::BackendServiceGetHealthCall), [*get iam policy*](api::BackendServiceGetIamPolicyCall), [*insert*](api::BackendServiceInsertCall), [*list*](api::BackendServiceListCall), [*patch*](api::BackendServicePatchCall), [*set edge security policy*](api::BackendServiceSetEdgeSecurityPolicyCall), [*set iam policy*](api::BackendServiceSetIamPolicyCall), [*set security policy*](api::BackendServiceSetSecurityPolicyCall) and [*update*](api::BackendServiceUpdateCall)
+//!  * [*add signed url key*](api::BackendServiceAddSignedUrlKeyCall), [*aggregated list*](api::BackendServiceAggregatedListCall), [*delete*](api::BackendServiceDeleteCall), [*delete signed url key*](api::BackendServiceDeleteSignedUrlKeyCall), [*get*](api::BackendServiceGetCall), [*get health*](api::BackendServiceGetHealthCall), [*get iam policy*](api::BackendServiceGetIamPolicyCall), [*insert*](api::BackendServiceInsertCall), [*list*](api::BackendServiceListCall), [*list usable*](api::BackendServiceListUsableCall), [*patch*](api::BackendServicePatchCall), [*set edge security policy*](api::BackendServiceSetEdgeSecurityPolicyCall), [*set iam policy*](api::BackendServiceSetIamPolicyCall), [*set security policy*](api::BackendServiceSetSecurityPolicyCall), [*test iam permissions*](api::BackendServiceTestIamPermissionCall) and [*update*](api::BackendServiceUpdateCall)
 //! * [disk types](api::DiskType)
 //!  * [*aggregated list*](api::DiskTypeAggregatedListCall), [*get*](api::DiskTypeGetCall) and [*list*](api::DiskTypeListCall)
 //! * [disks](api::Disk)
-//!  * [*add resource policies*](api::DiskAddResourcePolicyCall), [*aggregated list*](api::DiskAggregatedListCall), [*create snapshot*](api::DiskCreateSnapshotCall), [*delete*](api::DiskDeleteCall), [*get*](api::DiskGetCall), [*get iam policy*](api::DiskGetIamPolicyCall), [*insert*](api::DiskInsertCall), [*list*](api::DiskListCall), [*remove resource policies*](api::DiskRemoveResourcePolicyCall), [*resize*](api::DiskResizeCall), [*set iam policy*](api::DiskSetIamPolicyCall), [*set labels*](api::DiskSetLabelCall) and [*test iam permissions*](api::DiskTestIamPermissionCall)
+//!  * [*add resource policies*](api::DiskAddResourcePolicyCall), [*aggregated list*](api::DiskAggregatedListCall), [*bulk insert*](api::DiskBulkInsertCall), [*create snapshot*](api::DiskCreateSnapshotCall), [*delete*](api::DiskDeleteCall), [*get*](api::DiskGetCall), [*get iam policy*](api::DiskGetIamPolicyCall), [*insert*](api::DiskInsertCall), [*list*](api::DiskListCall), [*remove resource policies*](api::DiskRemoveResourcePolicyCall), [*resize*](api::DiskResizeCall), [*set iam policy*](api::DiskSetIamPolicyCall), [*set labels*](api::DiskSetLabelCall), [*start async replication*](api::DiskStartAsyncReplicationCall), [*stop async replication*](api::DiskStopAsyncReplicationCall), [*stop group async replication*](api::DiskStopGroupAsyncReplicationCall), [*test iam permissions*](api::DiskTestIamPermissionCall) and [*update*](api::DiskUpdateCall)
 //! * [external vpn gateways](api::ExternalVpnGateway)
 //!  * [*delete*](api::ExternalVpnGatewayDeleteCall), [*get*](api::ExternalVpnGatewayGetCall), [*insert*](api::ExternalVpnGatewayInsertCall), [*list*](api::ExternalVpnGatewayListCall), [*set labels*](api::ExternalVpnGatewaySetLabelCall) and [*test iam permissions*](api::ExternalVpnGatewayTestIamPermissionCall)
 //! * [firewall policies](api::FirewallPolicy)
@@ -34,7 +34,7 @@
 //! * [forwarding rules](api::ForwardingRule)
 //!  * [*aggregated list*](api::ForwardingRuleAggregatedListCall), [*delete*](api::ForwardingRuleDeleteCall), [*get*](api::ForwardingRuleGetCall), [*insert*](api::ForwardingRuleInsertCall), [*list*](api::ForwardingRuleListCall), [*patch*](api::ForwardingRulePatchCall), [*set labels*](api::ForwardingRuleSetLabelCall) and [*set target*](api::ForwardingRuleSetTargetCall)
 //! * global addresses
-//!  * [*delete*](api::GlobalAddressDeleteCall), [*get*](api::GlobalAddressGetCall), [*insert*](api::GlobalAddressInsertCall), [*list*](api::GlobalAddressListCall) and [*set labels*](api::GlobalAddressSetLabelCall)
+//!  * [*delete*](api::GlobalAddressDeleteCall), [*get*](api::GlobalAddressGetCall), [*insert*](api::GlobalAddressInsertCall), [*list*](api::GlobalAddressListCall), [*move*](api::GlobalAddressMoveCall) and [*set labels*](api::GlobalAddressSetLabelCall)
 //! * global forwarding rules
 //!  * [*delete*](api::GlobalForwardingRuleDeleteCall), [*get*](api::GlobalForwardingRuleGetCall), [*insert*](api::GlobalForwardingRuleInsertCall), [*list*](api::GlobalForwardingRuleListCall), [*patch*](api::GlobalForwardingRulePatchCall), [*set labels*](api::GlobalForwardingRuleSetLabelCall) and [*set target*](api::GlobalForwardingRuleSetTargetCall)
 //! * global network endpoint groups
@@ -60,15 +60,19 @@
 //! * [instance groups](api::InstanceGroup)
 //!  * [*add instances*](api::InstanceGroupAddInstanceCall), [*aggregated list*](api::InstanceGroupAggregatedListCall), [*delete*](api::InstanceGroupDeleteCall), [*get*](api::InstanceGroupGetCall), [*insert*](api::InstanceGroupInsertCall), [*list*](api::InstanceGroupListCall), [*list instances*](api::InstanceGroupListInstanceCall), [*remove instances*](api::InstanceGroupRemoveInstanceCall) and [*set named ports*](api::InstanceGroupSetNamedPortCall)
 //! * [instance templates](api::InstanceTemplate)
-//!  * [*delete*](api::InstanceTemplateDeleteCall), [*get*](api::InstanceTemplateGetCall), [*get iam policy*](api::InstanceTemplateGetIamPolicyCall), [*insert*](api::InstanceTemplateInsertCall), [*list*](api::InstanceTemplateListCall), [*set iam policy*](api::InstanceTemplateSetIamPolicyCall) and [*test iam permissions*](api::InstanceTemplateTestIamPermissionCall)
+//!  * [*aggregated list*](api::InstanceTemplateAggregatedListCall), [*delete*](api::InstanceTemplateDeleteCall), [*get*](api::InstanceTemplateGetCall), [*get iam policy*](api::InstanceTemplateGetIamPolicyCall), [*insert*](api::InstanceTemplateInsertCall), [*list*](api::InstanceTemplateListCall), [*set iam policy*](api::InstanceTemplateSetIamPolicyCall) and [*test iam permissions*](api::InstanceTemplateTestIamPermissionCall)
 //! * [instances](api::Instance)
-//!  * [*add access config*](api::InstanceAddAccessConfigCall), [*add resource policies*](api::InstanceAddResourcePolicyCall), [*aggregated list*](api::InstanceAggregatedListCall), [*attach disk*](api::InstanceAttachDiskCall), [*bulk insert*](api::InstanceBulkInsertCall), [*delete*](api::InstanceDeleteCall), [*delete access config*](api::InstanceDeleteAccessConfigCall), [*detach disk*](api::InstanceDetachDiskCall), [*get*](api::InstanceGetCall), [*get effective firewalls*](api::InstanceGetEffectiveFirewallCall), [*get guest attributes*](api::InstanceGetGuestAttributeCall), [*get iam policy*](api::InstanceGetIamPolicyCall), [*get screenshot*](api::InstanceGetScreenshotCall), [*get serial port output*](api::InstanceGetSerialPortOutputCall), [*get shielded instance identity*](api::InstanceGetShieldedInstanceIdentityCall), [*insert*](api::InstanceInsertCall), [*list*](api::InstanceListCall), [*list referrers*](api::InstanceListReferrerCall), [*remove resource policies*](api::InstanceRemoveResourcePolicyCall), [*reset*](api::InstanceResetCall), [*resume*](api::InstanceResumeCall), [*send diagnostic interrupt*](api::InstanceSendDiagnosticInterruptCall), [*set deletion protection*](api::InstanceSetDeletionProtectionCall), [*set disk auto delete*](api::InstanceSetDiskAutoDeleteCall), [*set iam policy*](api::InstanceSetIamPolicyCall), [*set labels*](api::InstanceSetLabelCall), [*set machine resources*](api::InstanceSetMachineResourceCall), [*set machine type*](api::InstanceSetMachineTypeCall), [*set metadata*](api::InstanceSetMetadataCall), [*set min cpu platform*](api::InstanceSetMinCpuPlatformCall), [*set scheduling*](api::InstanceSetSchedulingCall), [*set service account*](api::InstanceSetServiceAccountCall), [*set shielded instance integrity policy*](api::InstanceSetShieldedInstanceIntegrityPolicyCall), [*set tags*](api::InstanceSetTagCall), [*simulate maintenance event*](api::InstanceSimulateMaintenanceEventCall), [*start*](api::InstanceStartCall), [*start with encryption key*](api::InstanceStartWithEncryptionKeyCall), [*stop*](api::InstanceStopCall), [*suspend*](api::InstanceSuspendCall), [*test iam permissions*](api::InstanceTestIamPermissionCall), [*update*](api::InstanceUpdateCall), [*update access config*](api::InstanceUpdateAccessConfigCall), [*update display device*](api::InstanceUpdateDisplayDeviceCall), [*update network interface*](api::InstanceUpdateNetworkInterfaceCall) and [*update shielded instance config*](api::InstanceUpdateShieldedInstanceConfigCall)
+//!  * [*add access config*](api::InstanceAddAccessConfigCall), [*add resource policies*](api::InstanceAddResourcePolicyCall), [*aggregated list*](api::InstanceAggregatedListCall), [*attach disk*](api::InstanceAttachDiskCall), [*bulk insert*](api::InstanceBulkInsertCall), [*delete*](api::InstanceDeleteCall), [*delete access config*](api::InstanceDeleteAccessConfigCall), [*detach disk*](api::InstanceDetachDiskCall), [*get*](api::InstanceGetCall), [*get effective firewalls*](api::InstanceGetEffectiveFirewallCall), [*get guest attributes*](api::InstanceGetGuestAttributeCall), [*get iam policy*](api::InstanceGetIamPolicyCall), [*get screenshot*](api::InstanceGetScreenshotCall), [*get serial port output*](api::InstanceGetSerialPortOutputCall), [*get shielded instance identity*](api::InstanceGetShieldedInstanceIdentityCall), [*insert*](api::InstanceInsertCall), [*list*](api::InstanceListCall), [*list referrers*](api::InstanceListReferrerCall), [*perform maintenance*](api::InstancePerformMaintenanceCall), [*remove resource policies*](api::InstanceRemoveResourcePolicyCall), [*reset*](api::InstanceResetCall), [*resume*](api::InstanceResumeCall), [*send diagnostic interrupt*](api::InstanceSendDiagnosticInterruptCall), [*set deletion protection*](api::InstanceSetDeletionProtectionCall), [*set disk auto delete*](api::InstanceSetDiskAutoDeleteCall), [*set iam policy*](api::InstanceSetIamPolicyCall), [*set labels*](api::InstanceSetLabelCall), [*set machine resources*](api::InstanceSetMachineResourceCall), [*set machine type*](api::InstanceSetMachineTypeCall), [*set metadata*](api::InstanceSetMetadataCall), [*set min cpu platform*](api::InstanceSetMinCpuPlatformCall), [*set name*](api::InstanceSetNameCall), [*set scheduling*](api::InstanceSetSchedulingCall), [*set security policy*](api::InstanceSetSecurityPolicyCall), [*set service account*](api::InstanceSetServiceAccountCall), [*set shielded instance integrity policy*](api::InstanceSetShieldedInstanceIntegrityPolicyCall), [*set tags*](api::InstanceSetTagCall), [*simulate maintenance event*](api::InstanceSimulateMaintenanceEventCall), [*start*](api::InstanceStartCall), [*start with encryption key*](api::InstanceStartWithEncryptionKeyCall), [*stop*](api::InstanceStopCall), [*suspend*](api::InstanceSuspendCall), [*test iam permissions*](api::InstanceTestIamPermissionCall), [*update*](api::InstanceUpdateCall), [*update access config*](api::InstanceUpdateAccessConfigCall), [*update display device*](api::InstanceUpdateDisplayDeviceCall), [*update network interface*](api::InstanceUpdateNetworkInterfaceCall) and [*update shielded instance config*](api::InstanceUpdateShieldedInstanceConfigCall)
+//! * [instant snapshots](api::InstantSnapshot)
+//!  * [*aggregated list*](api::InstantSnapshotAggregatedListCall), [*delete*](api::InstantSnapshotDeleteCall), [*get*](api::InstantSnapshotGetCall), [*get iam policy*](api::InstantSnapshotGetIamPolicyCall), [*insert*](api::InstantSnapshotInsertCall), [*list*](api::InstantSnapshotListCall), [*set iam policy*](api::InstantSnapshotSetIamPolicyCall), [*set labels*](api::InstantSnapshotSetLabelCall) and [*test iam permissions*](api::InstantSnapshotTestIamPermissionCall)
 //! * [interconnect attachments](api::InterconnectAttachment)
 //!  * [*aggregated list*](api::InterconnectAttachmentAggregatedListCall), [*delete*](api::InterconnectAttachmentDeleteCall), [*get*](api::InterconnectAttachmentGetCall), [*insert*](api::InterconnectAttachmentInsertCall), [*list*](api::InterconnectAttachmentListCall), [*patch*](api::InterconnectAttachmentPatchCall) and [*set labels*](api::InterconnectAttachmentSetLabelCall)
 //! * [interconnect locations](api::InterconnectLocation)
 //!  * [*get*](api::InterconnectLocationGetCall) and [*list*](api::InterconnectLocationListCall)
+//! * [interconnect remote locations](api::InterconnectRemoteLocation)
+//!  * [*get*](api::InterconnectRemoteLocationGetCall) and [*list*](api::InterconnectRemoteLocationListCall)
 //! * [interconnects](api::Interconnect)
-//!  * [*delete*](api::InterconnectDeleteCall), [*get*](api::InterconnectGetCall), [*get diagnostics*](api::InterconnectGetDiagnosticCall), [*insert*](api::InterconnectInsertCall), [*list*](api::InterconnectListCall), [*patch*](api::InterconnectPatchCall) and [*set labels*](api::InterconnectSetLabelCall)
+//!  * [*delete*](api::InterconnectDeleteCall), [*get*](api::InterconnectGetCall), [*get diagnostics*](api::InterconnectGetDiagnosticCall), [*get macsec config*](api::InterconnectGetMacsecConfigCall), [*insert*](api::InterconnectInsertCall), [*list*](api::InterconnectListCall), [*patch*](api::InterconnectPatchCall) and [*set labels*](api::InterconnectSetLabelCall)
 //! * [license codes](api::LicenseCode)
 //!  * [*get*](api::LicenseCodeGetCall) and [*test iam permissions*](api::LicenseCodeTestIamPermissionCall)
 //! * [licenses](api::License)
@@ -78,7 +82,7 @@
 //! * [machine types](api::MachineType)
 //!  * [*aggregated list*](api::MachineTypeAggregatedListCall), [*get*](api::MachineTypeGetCall) and [*list*](api::MachineTypeListCall)
 //! * [network attachments](api::NetworkAttachment)
-//!  * [*aggregated list*](api::NetworkAttachmentAggregatedListCall), [*delete*](api::NetworkAttachmentDeleteCall), [*get*](api::NetworkAttachmentGetCall), [*get iam policy*](api::NetworkAttachmentGetIamPolicyCall), [*insert*](api::NetworkAttachmentInsertCall), [*list*](api::NetworkAttachmentListCall), [*set iam policy*](api::NetworkAttachmentSetIamPolicyCall) and [*test iam permissions*](api::NetworkAttachmentTestIamPermissionCall)
+//!  * [*aggregated list*](api::NetworkAttachmentAggregatedListCall), [*delete*](api::NetworkAttachmentDeleteCall), [*get*](api::NetworkAttachmentGetCall), [*get iam policy*](api::NetworkAttachmentGetIamPolicyCall), [*insert*](api::NetworkAttachmentInsertCall), [*list*](api::NetworkAttachmentListCall), [*patch*](api::NetworkAttachmentPatchCall), [*set iam policy*](api::NetworkAttachmentSetIamPolicyCall) and [*test iam permissions*](api::NetworkAttachmentTestIamPermissionCall)
 //! * [network edge security services](api::NetworkEdgeSecurityService)
 //!  * [*aggregated list*](api::NetworkEdgeSecurityServiceAggregatedListCall), [*delete*](api::NetworkEdgeSecurityServiceDeleteCall), [*get*](api::NetworkEdgeSecurityServiceGetCall), [*insert*](api::NetworkEdgeSecurityServiceInsertCall) and [*patch*](api::NetworkEdgeSecurityServicePatchCall)
 //! * [network endpoint groups](api::NetworkEndpointGroup)
@@ -88,7 +92,7 @@
 //! * [networks](api::Network)
 //!  * [*add peering*](api::NetworkAddPeeringCall), [*delete*](api::NetworkDeleteCall), [*get*](api::NetworkGetCall), [*get effective firewalls*](api::NetworkGetEffectiveFirewallCall), [*insert*](api::NetworkInsertCall), [*list*](api::NetworkListCall), [*list peering routes*](api::NetworkListPeeringRouteCall), [*patch*](api::NetworkPatchCall), [*remove peering*](api::NetworkRemovePeeringCall), [*switch to custom mode*](api::NetworkSwitchToCustomModeCall) and [*update peering*](api::NetworkUpdatePeeringCall)
 //! * [node groups](api::NodeGroup)
-//!  * [*add nodes*](api::NodeGroupAddNodeCall), [*aggregated list*](api::NodeGroupAggregatedListCall), [*delete*](api::NodeGroupDeleteCall), [*delete nodes*](api::NodeGroupDeleteNodeCall), [*get*](api::NodeGroupGetCall), [*get iam policy*](api::NodeGroupGetIamPolicyCall), [*insert*](api::NodeGroupInsertCall), [*list*](api::NodeGroupListCall), [*list nodes*](api::NodeGroupListNodeCall), [*patch*](api::NodeGroupPatchCall), [*set iam policy*](api::NodeGroupSetIamPolicyCall), [*set node template*](api::NodeGroupSetNodeTemplateCall) and [*test iam permissions*](api::NodeGroupTestIamPermissionCall)
+//!  * [*add nodes*](api::NodeGroupAddNodeCall), [*aggregated list*](api::NodeGroupAggregatedListCall), [*delete*](api::NodeGroupDeleteCall), [*delete nodes*](api::NodeGroupDeleteNodeCall), [*get*](api::NodeGroupGetCall), [*get iam policy*](api::NodeGroupGetIamPolicyCall), [*insert*](api::NodeGroupInsertCall), [*list*](api::NodeGroupListCall), [*list nodes*](api::NodeGroupListNodeCall), [*patch*](api::NodeGroupPatchCall), [*set iam policy*](api::NodeGroupSetIamPolicyCall), [*set node template*](api::NodeGroupSetNodeTemplateCall), [*simulate maintenance event*](api::NodeGroupSimulateMaintenanceEventCall) and [*test iam permissions*](api::NodeGroupTestIamPermissionCall)
 //! * [node templates](api::NodeTemplate)
 //!  * [*aggregated list*](api::NodeTemplateAggregatedListCall), [*delete*](api::NodeTemplateDeleteCall), [*get*](api::NodeTemplateGetCall), [*get iam policy*](api::NodeTemplateGetIamPolicyCall), [*insert*](api::NodeTemplateInsertCall), [*list*](api::NodeTemplateListCall), [*set iam policy*](api::NodeTemplateSetIamPolicyCall) and [*test iam permissions*](api::NodeTemplateTestIamPermissionCall)
 //! * [node types](api::NodeType)
@@ -96,21 +100,21 @@
 //! * [packet mirrorings](api::PacketMirroring)
 //!  * [*aggregated list*](api::PacketMirroringAggregatedListCall), [*delete*](api::PacketMirroringDeleteCall), [*get*](api::PacketMirroringGetCall), [*insert*](api::PacketMirroringInsertCall), [*list*](api::PacketMirroringListCall), [*patch*](api::PacketMirroringPatchCall) and [*test iam permissions*](api::PacketMirroringTestIamPermissionCall)
 //! * [projects](api::Project)
-//!  * [*disable xpn host*](api::ProjectDisableXpnHostCall), [*disable xpn resource*](api::ProjectDisableXpnResourceCall), [*enable xpn host*](api::ProjectEnableXpnHostCall), [*enable xpn resource*](api::ProjectEnableXpnResourceCall), [*get*](api::ProjectGetCall), [*get xpn host*](api::ProjectGetXpnHostCall), [*get xpn resources*](api::ProjectGetXpnResourceCall), [*list xpn hosts*](api::ProjectListXpnHostCall), [*move disk*](api::ProjectMoveDiskCall), [*move instance*](api::ProjectMoveInstanceCall), [*set common instance metadata*](api::ProjectSetCommonInstanceMetadataCall), [*set default network tier*](api::ProjectSetDefaultNetworkTierCall) and [*set usage export bucket*](api::ProjectSetUsageExportBucketCall)
+//!  * [*disable xpn host*](api::ProjectDisableXpnHostCall), [*disable xpn resource*](api::ProjectDisableXpnResourceCall), [*enable xpn host*](api::ProjectEnableXpnHostCall), [*enable xpn resource*](api::ProjectEnableXpnResourceCall), [*get*](api::ProjectGetCall), [*get xpn host*](api::ProjectGetXpnHostCall), [*get xpn resources*](api::ProjectGetXpnResourceCall), [*list xpn hosts*](api::ProjectListXpnHostCall), [*move disk*](api::ProjectMoveDiskCall), [*move instance*](api::ProjectMoveInstanceCall), [*set cloud armor tier*](api::ProjectSetCloudArmorTierCall), [*set common instance metadata*](api::ProjectSetCommonInstanceMetadataCall), [*set default network tier*](api::ProjectSetDefaultNetworkTierCall) and [*set usage export bucket*](api::ProjectSetUsageExportBucketCall)
 //! * [public advertised prefixes](api::PublicAdvertisedPrefix)
-//!  * [*delete*](api::PublicAdvertisedPrefixDeleteCall), [*get*](api::PublicAdvertisedPrefixGetCall), [*insert*](api::PublicAdvertisedPrefixInsertCall), [*list*](api::PublicAdvertisedPrefixListCall) and [*patch*](api::PublicAdvertisedPrefixPatchCall)
+//!  * [*announce*](api::PublicAdvertisedPrefixAnnounceCall), [*delete*](api::PublicAdvertisedPrefixDeleteCall), [*get*](api::PublicAdvertisedPrefixGetCall), [*insert*](api::PublicAdvertisedPrefixInsertCall), [*list*](api::PublicAdvertisedPrefixListCall), [*patch*](api::PublicAdvertisedPrefixPatchCall) and [*withdraw*](api::PublicAdvertisedPrefixWithdrawCall)
 //! * [public delegated prefixes](api::PublicDelegatedPrefix)
-//!  * [*aggregated list*](api::PublicDelegatedPrefixAggregatedListCall), [*delete*](api::PublicDelegatedPrefixDeleteCall), [*get*](api::PublicDelegatedPrefixGetCall), [*insert*](api::PublicDelegatedPrefixInsertCall), [*list*](api::PublicDelegatedPrefixListCall) and [*patch*](api::PublicDelegatedPrefixPatchCall)
+//!  * [*aggregated list*](api::PublicDelegatedPrefixAggregatedListCall), [*announce*](api::PublicDelegatedPrefixAnnounceCall), [*delete*](api::PublicDelegatedPrefixDeleteCall), [*get*](api::PublicDelegatedPrefixGetCall), [*insert*](api::PublicDelegatedPrefixInsertCall), [*list*](api::PublicDelegatedPrefixListCall), [*patch*](api::PublicDelegatedPrefixPatchCall) and [*withdraw*](api::PublicDelegatedPrefixWithdrawCall)
 //! * region autoscalers
 //!  * [*delete*](api::RegionAutoscalerDeleteCall), [*get*](api::RegionAutoscalerGetCall), [*insert*](api::RegionAutoscalerInsertCall), [*list*](api::RegionAutoscalerListCall), [*patch*](api::RegionAutoscalerPatchCall) and [*update*](api::RegionAutoscalerUpdateCall)
 //! * region backend services
-//!  * [*delete*](api::RegionBackendServiceDeleteCall), [*get*](api::RegionBackendServiceGetCall), [*get health*](api::RegionBackendServiceGetHealthCall), [*get iam policy*](api::RegionBackendServiceGetIamPolicyCall), [*insert*](api::RegionBackendServiceInsertCall), [*list*](api::RegionBackendServiceListCall), [*patch*](api::RegionBackendServicePatchCall), [*set iam policy*](api::RegionBackendServiceSetIamPolicyCall) and [*update*](api::RegionBackendServiceUpdateCall)
+//!  * [*delete*](api::RegionBackendServiceDeleteCall), [*get*](api::RegionBackendServiceGetCall), [*get health*](api::RegionBackendServiceGetHealthCall), [*get iam policy*](api::RegionBackendServiceGetIamPolicyCall), [*insert*](api::RegionBackendServiceInsertCall), [*list*](api::RegionBackendServiceListCall), [*list usable*](api::RegionBackendServiceListUsableCall), [*patch*](api::RegionBackendServicePatchCall), [*set iam policy*](api::RegionBackendServiceSetIamPolicyCall), [*set security policy*](api::RegionBackendServiceSetSecurityPolicyCall), [*test iam permissions*](api::RegionBackendServiceTestIamPermissionCall) and [*update*](api::RegionBackendServiceUpdateCall)
 //! * region commitments
 //!  * [*aggregated list*](api::RegionCommitmentAggregatedListCall), [*get*](api::RegionCommitmentGetCall), [*insert*](api::RegionCommitmentInsertCall), [*list*](api::RegionCommitmentListCall) and [*update*](api::RegionCommitmentUpdateCall)
 //! * region disk types
 //!  * [*get*](api::RegionDiskTypeGetCall) and [*list*](api::RegionDiskTypeListCall)
 //! * region disks
-//!  * [*add resource policies*](api::RegionDiskAddResourcePolicyCall), [*create snapshot*](api::RegionDiskCreateSnapshotCall), [*delete*](api::RegionDiskDeleteCall), [*get*](api::RegionDiskGetCall), [*get iam policy*](api::RegionDiskGetIamPolicyCall), [*insert*](api::RegionDiskInsertCall), [*list*](api::RegionDiskListCall), [*remove resource policies*](api::RegionDiskRemoveResourcePolicyCall), [*resize*](api::RegionDiskResizeCall), [*set iam policy*](api::RegionDiskSetIamPolicyCall), [*set labels*](api::RegionDiskSetLabelCall) and [*test iam permissions*](api::RegionDiskTestIamPermissionCall)
+//!  * [*add resource policies*](api::RegionDiskAddResourcePolicyCall), [*bulk insert*](api::RegionDiskBulkInsertCall), [*create snapshot*](api::RegionDiskCreateSnapshotCall), [*delete*](api::RegionDiskDeleteCall), [*get*](api::RegionDiskGetCall), [*get iam policy*](api::RegionDiskGetIamPolicyCall), [*insert*](api::RegionDiskInsertCall), [*list*](api::RegionDiskListCall), [*remove resource policies*](api::RegionDiskRemoveResourcePolicyCall), [*resize*](api::RegionDiskResizeCall), [*set iam policy*](api::RegionDiskSetIamPolicyCall), [*set labels*](api::RegionDiskSetLabelCall), [*start async replication*](api::RegionDiskStartAsyncReplicationCall), [*stop async replication*](api::RegionDiskStopAsyncReplicationCall), [*stop group async replication*](api::RegionDiskStopGroupAsyncReplicationCall), [*test iam permissions*](api::RegionDiskTestIamPermissionCall) and [*update*](api::RegionDiskUpdateCall)
 //! * region health check services
 //!  * [*delete*](api::RegionHealthCheckServiceDeleteCall), [*get*](api::RegionHealthCheckServiceGetCall), [*insert*](api::RegionHealthCheckServiceInsertCall), [*list*](api::RegionHealthCheckServiceListCall) and [*patch*](api::RegionHealthCheckServicePatchCall)
 //! * region health checks
@@ -119,10 +123,14 @@
 //!  * [*abandon instances*](api::RegionInstanceGroupManagerAbandonInstanceCall), [*apply updates to instances*](api::RegionInstanceGroupManagerApplyUpdatesToInstanceCall), [*create instances*](api::RegionInstanceGroupManagerCreateInstanceCall), [*delete*](api::RegionInstanceGroupManagerDeleteCall), [*delete instances*](api::RegionInstanceGroupManagerDeleteInstanceCall), [*delete per instance configs*](api::RegionInstanceGroupManagerDeletePerInstanceConfigCall), [*get*](api::RegionInstanceGroupManagerGetCall), [*insert*](api::RegionInstanceGroupManagerInsertCall), [*list*](api::RegionInstanceGroupManagerListCall), [*list errors*](api::RegionInstanceGroupManagerListErrorCall), [*list managed instances*](api::RegionInstanceGroupManagerListManagedInstanceCall), [*list per instance configs*](api::RegionInstanceGroupManagerListPerInstanceConfigCall), [*patch*](api::RegionInstanceGroupManagerPatchCall), [*patch per instance configs*](api::RegionInstanceGroupManagerPatchPerInstanceConfigCall), [*recreate instances*](api::RegionInstanceGroupManagerRecreateInstanceCall), [*resize*](api::RegionInstanceGroupManagerResizeCall), [*set instance template*](api::RegionInstanceGroupManagerSetInstanceTemplateCall), [*set target pools*](api::RegionInstanceGroupManagerSetTargetPoolCall) and [*update per instance configs*](api::RegionInstanceGroupManagerUpdatePerInstanceConfigCall)
 //! * region instance groups
 //!  * [*get*](api::RegionInstanceGroupGetCall), [*list*](api::RegionInstanceGroupListCall), [*list instances*](api::RegionInstanceGroupListInstanceCall) and [*set named ports*](api::RegionInstanceGroupSetNamedPortCall)
+//! * region instance templates
+//!  * [*delete*](api::RegionInstanceTemplateDeleteCall), [*get*](api::RegionInstanceTemplateGetCall), [*insert*](api::RegionInstanceTemplateInsertCall) and [*list*](api::RegionInstanceTemplateListCall)
 //! * region instances
 //!  * [*bulk insert*](api::RegionInstanceBulkInsertCall)
+//! * region instant snapshots
+//!  * [*delete*](api::RegionInstantSnapshotDeleteCall), [*get*](api::RegionInstantSnapshotGetCall), [*get iam policy*](api::RegionInstantSnapshotGetIamPolicyCall), [*insert*](api::RegionInstantSnapshotInsertCall), [*list*](api::RegionInstantSnapshotListCall), [*set iam policy*](api::RegionInstantSnapshotSetIamPolicyCall), [*set labels*](api::RegionInstantSnapshotSetLabelCall) and [*test iam permissions*](api::RegionInstantSnapshotTestIamPermissionCall)
 //! * region network endpoint groups
-//!  * [*delete*](api::RegionNetworkEndpointGroupDeleteCall), [*get*](api::RegionNetworkEndpointGroupGetCall), [*insert*](api::RegionNetworkEndpointGroupInsertCall) and [*list*](api::RegionNetworkEndpointGroupListCall)
+//!  * [*attach network endpoints*](api::RegionNetworkEndpointGroupAttachNetworkEndpointCall), [*delete*](api::RegionNetworkEndpointGroupDeleteCall), [*detach network endpoints*](api::RegionNetworkEndpointGroupDetachNetworkEndpointCall), [*get*](api::RegionNetworkEndpointGroupGetCall), [*insert*](api::RegionNetworkEndpointGroupInsertCall), [*list*](api::RegionNetworkEndpointGroupListCall) and [*list network endpoints*](api::RegionNetworkEndpointGroupListNetworkEndpointCall)
 //! * region network firewall policies
 //!  * [*add association*](api::RegionNetworkFirewallPolicyAddAssociationCall), [*add rule*](api::RegionNetworkFirewallPolicyAddRuleCall), [*clone rules*](api::RegionNetworkFirewallPolicyCloneRuleCall), [*delete*](api::RegionNetworkFirewallPolicyDeleteCall), [*get*](api::RegionNetworkFirewallPolicyGetCall), [*get association*](api::RegionNetworkFirewallPolicyGetAssociationCall), [*get effective firewalls*](api::RegionNetworkFirewallPolicyGetEffectiveFirewallCall), [*get iam policy*](api::RegionNetworkFirewallPolicyGetIamPolicyCall), [*get rule*](api::RegionNetworkFirewallPolicyGetRuleCall), [*insert*](api::RegionNetworkFirewallPolicyInsertCall), [*list*](api::RegionNetworkFirewallPolicyListCall), [*patch*](api::RegionNetworkFirewallPolicyPatchCall), [*patch rule*](api::RegionNetworkFirewallPolicyPatchRuleCall), [*remove association*](api::RegionNetworkFirewallPolicyRemoveAssociationCall), [*remove rule*](api::RegionNetworkFirewallPolicyRemoveRuleCall), [*set iam policy*](api::RegionNetworkFirewallPolicySetIamPolicyCall) and [*test iam permissions*](api::RegionNetworkFirewallPolicyTestIamPermissionCall)
 //! * region notification endpoints
@@ -130,7 +138,7 @@
 //! * region operations
 //!  * [*delete*](api::RegionOperationDeleteCall), [*get*](api::RegionOperationGetCall), [*list*](api::RegionOperationListCall) and [*wait*](api::RegionOperationWaitCall)
 //! * region security policies
-//!  * [*delete*](api::RegionSecurityPolicyDeleteCall), [*get*](api::RegionSecurityPolicyGetCall), [*insert*](api::RegionSecurityPolicyInsertCall), [*list*](api::RegionSecurityPolicyListCall) and [*patch*](api::RegionSecurityPolicyPatchCall)
+//!  * [*add rule*](api::RegionSecurityPolicyAddRuleCall), [*delete*](api::RegionSecurityPolicyDeleteCall), [*get*](api::RegionSecurityPolicyGetCall), [*get rule*](api::RegionSecurityPolicyGetRuleCall), [*insert*](api::RegionSecurityPolicyInsertCall), [*list*](api::RegionSecurityPolicyListCall), [*patch*](api::RegionSecurityPolicyPatchCall), [*patch rule*](api::RegionSecurityPolicyPatchRuleCall) and [*remove rule*](api::RegionSecurityPolicyRemoveRuleCall)
 //! * region ssl certificates
 //!  * [*delete*](api::RegionSslCertificateDeleteCall), [*get*](api::RegionSslCertificateGetCall), [*insert*](api::RegionSslCertificateInsertCall) and [*list*](api::RegionSslCertificateListCall)
 //! * region ssl policies
@@ -143,20 +151,24 @@
 //!  * [*delete*](api::RegionTargetTcpProxyDeleteCall), [*get*](api::RegionTargetTcpProxyGetCall), [*insert*](api::RegionTargetTcpProxyInsertCall) and [*list*](api::RegionTargetTcpProxyListCall)
 //! * region url maps
 //!  * [*delete*](api::RegionUrlMapDeleteCall), [*get*](api::RegionUrlMapGetCall), [*insert*](api::RegionUrlMapInsertCall), [*list*](api::RegionUrlMapListCall), [*patch*](api::RegionUrlMapPatchCall), [*update*](api::RegionUrlMapUpdateCall) and [*validate*](api::RegionUrlMapValidateCall)
+//! * region zones
+//!  * [*list*](api::RegionZoneListCall)
 //! * [regions](api::Region)
 //!  * [*get*](api::RegionGetCall) and [*list*](api::RegionListCall)
 //! * [reservations](api::Reservation)
 //!  * [*aggregated list*](api::ReservationAggregatedListCall), [*delete*](api::ReservationDeleteCall), [*get*](api::ReservationGetCall), [*get iam policy*](api::ReservationGetIamPolicyCall), [*insert*](api::ReservationInsertCall), [*list*](api::ReservationListCall), [*resize*](api::ReservationResizeCall), [*set iam policy*](api::ReservationSetIamPolicyCall), [*test iam permissions*](api::ReservationTestIamPermissionCall) and [*update*](api::ReservationUpdateCall)
 //! * [resource policies](api::ResourcePolicy)
-//!  * [*aggregated list*](api::ResourcePolicyAggregatedListCall), [*delete*](api::ResourcePolicyDeleteCall), [*get*](api::ResourcePolicyGetCall), [*get iam policy*](api::ResourcePolicyGetIamPolicyCall), [*insert*](api::ResourcePolicyInsertCall), [*list*](api::ResourcePolicyListCall), [*set iam policy*](api::ResourcePolicySetIamPolicyCall) and [*test iam permissions*](api::ResourcePolicyTestIamPermissionCall)
+//!  * [*aggregated list*](api::ResourcePolicyAggregatedListCall), [*delete*](api::ResourcePolicyDeleteCall), [*get*](api::ResourcePolicyGetCall), [*get iam policy*](api::ResourcePolicyGetIamPolicyCall), [*insert*](api::ResourcePolicyInsertCall), [*list*](api::ResourcePolicyListCall), [*patch*](api::ResourcePolicyPatchCall), [*set iam policy*](api::ResourcePolicySetIamPolicyCall) and [*test iam permissions*](api::ResourcePolicyTestIamPermissionCall)
 //! * [routers](api::Router)
-//!  * [*aggregated list*](api::RouterAggregatedListCall), [*delete*](api::RouterDeleteCall), [*get*](api::RouterGetCall), [*get nat mapping info*](api::RouterGetNatMappingInfoCall), [*get router status*](api::RouterGetRouterStatuCall), [*insert*](api::RouterInsertCall), [*list*](api::RouterListCall), [*patch*](api::RouterPatchCall), [*preview*](api::RouterPreviewCall) and [*update*](api::RouterUpdateCall)
+//!  * [*aggregated list*](api::RouterAggregatedListCall), [*delete*](api::RouterDeleteCall), [*get*](api::RouterGetCall), [*get nat ip info*](api::RouterGetNatIpInfoCall), [*get nat mapping info*](api::RouterGetNatMappingInfoCall), [*get router status*](api::RouterGetRouterStatuCall), [*insert*](api::RouterInsertCall), [*list*](api::RouterListCall), [*patch*](api::RouterPatchCall), [*preview*](api::RouterPreviewCall) and [*update*](api::RouterUpdateCall)
 //! * [routes](api::Route)
 //!  * [*delete*](api::RouteDeleteCall), [*get*](api::RouteGetCall), [*insert*](api::RouteInsertCall) and [*list*](api::RouteListCall)
 //! * [security policies](api::SecurityPolicy)
 //!  * [*add rule*](api::SecurityPolicyAddRuleCall), [*aggregated list*](api::SecurityPolicyAggregatedListCall), [*delete*](api::SecurityPolicyDeleteCall), [*get*](api::SecurityPolicyGetCall), [*get rule*](api::SecurityPolicyGetRuleCall), [*insert*](api::SecurityPolicyInsertCall), [*list*](api::SecurityPolicyListCall), [*list preconfigured expression sets*](api::SecurityPolicyListPreconfiguredExpressionSetCall), [*patch*](api::SecurityPolicyPatchCall), [*patch rule*](api::SecurityPolicyPatchRuleCall), [*remove rule*](api::SecurityPolicyRemoveRuleCall) and [*set labels*](api::SecurityPolicySetLabelCall)
 //! * [service attachments](api::ServiceAttachment)
 //!  * [*aggregated list*](api::ServiceAttachmentAggregatedListCall), [*delete*](api::ServiceAttachmentDeleteCall), [*get*](api::ServiceAttachmentGetCall), [*get iam policy*](api::ServiceAttachmentGetIamPolicyCall), [*insert*](api::ServiceAttachmentInsertCall), [*list*](api::ServiceAttachmentListCall), [*patch*](api::ServiceAttachmentPatchCall), [*set iam policy*](api::ServiceAttachmentSetIamPolicyCall) and [*test iam permissions*](api::ServiceAttachmentTestIamPermissionCall)
+//! * snapshot settings
+//!  * [*get*](api::SnapshotSettingGetCall) and [*patch*](api::SnapshotSettingPatchCall)
 //! * [snapshots](api::Snapshot)
 //!  * [*delete*](api::SnapshotDeleteCall), [*get*](api::SnapshotGetCall), [*get iam policy*](api::SnapshotGetIamPolicyCall), [*insert*](api::SnapshotInsertCall), [*list*](api::SnapshotListCall), [*set iam policy*](api::SnapshotSetIamPolicyCall), [*set labels*](api::SnapshotSetLabelCall) and [*test iam permissions*](api::SnapshotTestIamPermissionCall)
 //! * [ssl certificates](api::SslCertificate)
@@ -172,9 +184,9 @@
 //! * [target https proxies](api::TargetHttpsProxy)
 //!  * [*aggregated list*](api::TargetHttpsProxyAggregatedListCall), [*delete*](api::TargetHttpsProxyDeleteCall), [*get*](api::TargetHttpsProxyGetCall), [*insert*](api::TargetHttpsProxyInsertCall), [*list*](api::TargetHttpsProxyListCall), [*patch*](api::TargetHttpsProxyPatchCall), [*set certificate map*](api::TargetHttpsProxySetCertificateMapCall), [*set quic override*](api::TargetHttpsProxySetQuicOverrideCall), [*set ssl certificates*](api::TargetHttpsProxySetSslCertificateCall), [*set ssl policy*](api::TargetHttpsProxySetSslPolicyCall) and [*set url map*](api::TargetHttpsProxySetUrlMapCall)
 //! * [target instances](api::TargetInstance)
-//!  * [*aggregated list*](api::TargetInstanceAggregatedListCall), [*delete*](api::TargetInstanceDeleteCall), [*get*](api::TargetInstanceGetCall), [*insert*](api::TargetInstanceInsertCall) and [*list*](api::TargetInstanceListCall)
+//!  * [*aggregated list*](api::TargetInstanceAggregatedListCall), [*delete*](api::TargetInstanceDeleteCall), [*get*](api::TargetInstanceGetCall), [*insert*](api::TargetInstanceInsertCall), [*list*](api::TargetInstanceListCall) and [*set security policy*](api::TargetInstanceSetSecurityPolicyCall)
 //! * [target pools](api::TargetPool)
-//!  * [*add health check*](api::TargetPoolAddHealthCheckCall), [*add instance*](api::TargetPoolAddInstanceCall), [*aggregated list*](api::TargetPoolAggregatedListCall), [*delete*](api::TargetPoolDeleteCall), [*get*](api::TargetPoolGetCall), [*get health*](api::TargetPoolGetHealthCall), [*insert*](api::TargetPoolInsertCall), [*list*](api::TargetPoolListCall), [*remove health check*](api::TargetPoolRemoveHealthCheckCall), [*remove instance*](api::TargetPoolRemoveInstanceCall) and [*set backup*](api::TargetPoolSetBackupCall)
+//!  * [*add health check*](api::TargetPoolAddHealthCheckCall), [*add instance*](api::TargetPoolAddInstanceCall), [*aggregated list*](api::TargetPoolAggregatedListCall), [*delete*](api::TargetPoolDeleteCall), [*get*](api::TargetPoolGetCall), [*get health*](api::TargetPoolGetHealthCall), [*insert*](api::TargetPoolInsertCall), [*list*](api::TargetPoolListCall), [*remove health check*](api::TargetPoolRemoveHealthCheckCall), [*remove instance*](api::TargetPoolRemoveInstanceCall), [*set backup*](api::TargetPoolSetBackupCall) and [*set security policy*](api::TargetPoolSetSecurityPolicyCall)
 //! * [target ssl proxies](api::TargetSslProxy)
 //!  * [*delete*](api::TargetSslProxyDeleteCall), [*get*](api::TargetSslProxyGetCall), [*insert*](api::TargetSslProxyInsertCall), [*list*](api::TargetSslProxyListCall), [*set backend service*](api::TargetSslProxySetBackendServiceCall), [*set certificate map*](api::TargetSslProxySetCertificateMapCall), [*set proxy header*](api::TargetSslProxySetProxyHeaderCall), [*set ssl certificates*](api::TargetSslProxySetSslCertificateCall) and [*set ssl policy*](api::TargetSslProxySetSslPolicyCall)
 //! * [target tcp proxies](api::TargetTcpProxy)
@@ -227,6 +239,7 @@
 //! ```ignore
 //! let r = hub.addresses().delete(...).doit().await
 //! let r = hub.addresses().insert(...).doit().await
+//! let r = hub.addresses().move_(...).doit().await
 //! let r = hub.addresses().set_labels(...).doit().await
 //! let r = hub.autoscalers().delete(...).doit().await
 //! let r = hub.autoscalers().insert(...).doit().await
@@ -248,12 +261,17 @@
 //! let r = hub.backend_services().set_security_policy(...).doit().await
 //! let r = hub.backend_services().update(...).doit().await
 //! let r = hub.disks().add_resource_policies(...).doit().await
+//! let r = hub.disks().bulk_insert(...).doit().await
 //! let r = hub.disks().create_snapshot(...).doit().await
 //! let r = hub.disks().delete(...).doit().await
 //! let r = hub.disks().insert(...).doit().await
 //! let r = hub.disks().remove_resource_policies(...).doit().await
 //! let r = hub.disks().resize(...).doit().await
 //! let r = hub.disks().set_labels(...).doit().await
+//! let r = hub.disks().start_async_replication(...).doit().await
+//! let r = hub.disks().stop_async_replication(...).doit().await
+//! let r = hub.disks().stop_group_async_replication(...).doit().await
+//! let r = hub.disks().update(...).doit().await
 //! let r = hub.external_vpn_gateways().delete(...).doit().await
 //! let r = hub.external_vpn_gateways().insert(...).doit().await
 //! let r = hub.external_vpn_gateways().set_labels(...).doit().await
@@ -278,6 +296,7 @@
 //! let r = hub.forwarding_rules().set_target(...).doit().await
 //! let r = hub.global_addresses().delete(...).doit().await
 //! let r = hub.global_addresses().insert(...).doit().await
+//! let r = hub.global_addresses().move_(...).doit().await
 //! let r = hub.global_addresses().set_labels(...).doit().await
 //! let r = hub.global_forwarding_rules().delete(...).doit().await
 //! let r = hub.global_forwarding_rules().insert(...).doit().await
@@ -340,6 +359,7 @@
 //! let r = hub.instances().delete_access_config(...).doit().await
 //! let r = hub.instances().detach_disk(...).doit().await
 //! let r = hub.instances().insert(...).doit().await
+//! let r = hub.instances().perform_maintenance(...).doit().await
 //! let r = hub.instances().remove_resource_policies(...).doit().await
 //! let r = hub.instances().reset(...).doit().await
 //! let r = hub.instances().resume(...).doit().await
@@ -350,7 +370,9 @@
 //! let r = hub.instances().set_machine_type(...).doit().await
 //! let r = hub.instances().set_metadata(...).doit().await
 //! let r = hub.instances().set_min_cpu_platform(...).doit().await
+//! let r = hub.instances().set_name(...).doit().await
 //! let r = hub.instances().set_scheduling(...).doit().await
+//! let r = hub.instances().set_security_policy(...).doit().await
 //! let r = hub.instances().set_service_account(...).doit().await
 //! let r = hub.instances().set_shielded_instance_integrity_policy(...).doit().await
 //! let r = hub.instances().set_tags(...).doit().await
@@ -364,6 +386,9 @@
 //! let r = hub.instances().update_display_device(...).doit().await
 //! let r = hub.instances().update_network_interface(...).doit().await
 //! let r = hub.instances().update_shielded_instance_config(...).doit().await
+//! let r = hub.instant_snapshots().delete(...).doit().await
+//! let r = hub.instant_snapshots().insert(...).doit().await
+//! let r = hub.instant_snapshots().set_labels(...).doit().await
 //! let r = hub.interconnect_attachments().delete(...).doit().await
 //! let r = hub.interconnect_attachments().insert(...).doit().await
 //! let r = hub.interconnect_attachments().patch(...).doit().await
@@ -378,6 +403,7 @@
 //! let r = hub.machine_images().insert(...).doit().await
 //! let r = hub.network_attachments().delete(...).doit().await
 //! let r = hub.network_attachments().insert(...).doit().await
+//! let r = hub.network_attachments().patch(...).doit().await
 //! let r = hub.network_edge_security_services().delete(...).doit().await
 //! let r = hub.network_edge_security_services().insert(...).doit().await
 //! let r = hub.network_edge_security_services().patch(...).doit().await
@@ -407,6 +433,7 @@
 //! let r = hub.node_groups().insert(...).doit().await
 //! let r = hub.node_groups().patch(...).doit().await
 //! let r = hub.node_groups().set_node_template(...).doit().await
+//! let r = hub.node_groups().simulate_maintenance_event(...).doit().await
 //! let r = hub.node_templates().delete(...).doit().await
 //! let r = hub.node_templates().insert(...).doit().await
 //! let r = hub.packet_mirrorings().delete(...).doit().await
@@ -418,15 +445,20 @@
 //! let r = hub.projects().enable_xpn_resource(...).doit().await
 //! let r = hub.projects().move_disk(...).doit().await
 //! let r = hub.projects().move_instance(...).doit().await
+//! let r = hub.projects().set_cloud_armor_tier(...).doit().await
 //! let r = hub.projects().set_common_instance_metadata(...).doit().await
 //! let r = hub.projects().set_default_network_tier(...).doit().await
 //! let r = hub.projects().set_usage_export_bucket(...).doit().await
+//! let r = hub.public_advertised_prefixes().announce(...).doit().await
 //! let r = hub.public_advertised_prefixes().delete(...).doit().await
 //! let r = hub.public_advertised_prefixes().insert(...).doit().await
 //! let r = hub.public_advertised_prefixes().patch(...).doit().await
+//! let r = hub.public_advertised_prefixes().withdraw(...).doit().await
+//! let r = hub.public_delegated_prefixes().announce(...).doit().await
 //! let r = hub.public_delegated_prefixes().delete(...).doit().await
 //! let r = hub.public_delegated_prefixes().insert(...).doit().await
 //! let r = hub.public_delegated_prefixes().patch(...).doit().await
+//! let r = hub.public_delegated_prefixes().withdraw(...).doit().await
 //! let r = hub.region_autoscalers().delete(...).doit().await
 //! let r = hub.region_autoscalers().insert(...).doit().await
 //! let r = hub.region_autoscalers().patch(...).doit().await
@@ -434,16 +466,22 @@
 //! let r = hub.region_backend_services().delete(...).doit().await
 //! let r = hub.region_backend_services().insert(...).doit().await
 //! let r = hub.region_backend_services().patch(...).doit().await
+//! let r = hub.region_backend_services().set_security_policy(...).doit().await
 //! let r = hub.region_backend_services().update(...).doit().await
 //! let r = hub.region_commitments().insert(...).doit().await
 //! let r = hub.region_commitments().update(...).doit().await
 //! let r = hub.region_disks().add_resource_policies(...).doit().await
+//! let r = hub.region_disks().bulk_insert(...).doit().await
 //! let r = hub.region_disks().create_snapshot(...).doit().await
 //! let r = hub.region_disks().delete(...).doit().await
 //! let r = hub.region_disks().insert(...).doit().await
 //! let r = hub.region_disks().remove_resource_policies(...).doit().await
 //! let r = hub.region_disks().resize(...).doit().await
 //! let r = hub.region_disks().set_labels(...).doit().await
+//! let r = hub.region_disks().start_async_replication(...).doit().await
+//! let r = hub.region_disks().stop_async_replication(...).doit().await
+//! let r = hub.region_disks().stop_group_async_replication(...).doit().await
+//! let r = hub.region_disks().update(...).doit().await
 //! let r = hub.region_health_check_services().delete(...).doit().await
 //! let r = hub.region_health_check_services().insert(...).doit().await
 //! let r = hub.region_health_check_services().patch(...).doit().await
@@ -466,8 +504,15 @@
 //! let r = hub.region_instance_group_managers().set_target_pools(...).doit().await
 //! let r = hub.region_instance_group_managers().update_per_instance_configs(...).doit().await
 //! let r = hub.region_instance_groups().set_named_ports(...).doit().await
+//! let r = hub.region_instance_templates().delete(...).doit().await
+//! let r = hub.region_instance_templates().insert(...).doit().await
 //! let r = hub.region_instances().bulk_insert(...).doit().await
+//! let r = hub.region_instant_snapshots().delete(...).doit().await
+//! let r = hub.region_instant_snapshots().insert(...).doit().await
+//! let r = hub.region_instant_snapshots().set_labels(...).doit().await
+//! let r = hub.region_network_endpoint_groups().attach_network_endpoints(...).doit().await
 //! let r = hub.region_network_endpoint_groups().delete(...).doit().await
+//! let r = hub.region_network_endpoint_groups().detach_network_endpoints(...).doit().await
 //! let r = hub.region_network_endpoint_groups().insert(...).doit().await
 //! let r = hub.region_network_firewall_policies().add_association(...).doit().await
 //! let r = hub.region_network_firewall_policies().add_rule(...).doit().await
@@ -482,9 +527,12 @@
 //! let r = hub.region_notification_endpoints().insert(...).doit().await
 //! let r = hub.region_operations().get(...).doit().await
 //! let r = hub.region_operations().wait(...).doit().await
+//! let r = hub.region_security_policies().add_rule(...).doit().await
 //! let r = hub.region_security_policies().delete(...).doit().await
 //! let r = hub.region_security_policies().insert(...).doit().await
 //! let r = hub.region_security_policies().patch(...).doit().await
+//! let r = hub.region_security_policies().patch_rule(...).doit().await
+//! let r = hub.region_security_policies().remove_rule(...).doit().await
 //! let r = hub.region_ssl_certificates().delete(...).doit().await
 //! let r = hub.region_ssl_certificates().insert(...).doit().await
 //! let r = hub.region_ssl_policies().delete(...).doit().await
@@ -510,6 +558,7 @@
 //! let r = hub.reservations().update(...).doit().await
 //! let r = hub.resource_policies().delete(...).doit().await
 //! let r = hub.resource_policies().insert(...).doit().await
+//! let r = hub.resource_policies().patch(...).doit().await
 //! let r = hub.routers().delete(...).doit().await
 //! let r = hub.routers().insert(...).doit().await
 //! let r = hub.routers().patch(...).doit().await
@@ -526,6 +575,7 @@
 //! let r = hub.service_attachments().delete(...).doit().await
 //! let r = hub.service_attachments().insert(...).doit().await
 //! let r = hub.service_attachments().patch(...).doit().await
+//! let r = hub.snapshot_settings().patch(...).doit().await
 //! let r = hub.snapshots().delete(...).doit().await
 //! let r = hub.snapshots().insert(...).doit().await
 //! let r = hub.snapshots().set_labels(...).doit().await
@@ -556,6 +606,7 @@
 //! let r = hub.target_https_proxies().set_url_map(...).doit().await
 //! let r = hub.target_instances().delete(...).doit().await
 //! let r = hub.target_instances().insert(...).doit().await
+//! let r = hub.target_instances().set_security_policy(...).doit().await
 //! let r = hub.target_pools().add_health_check(...).doit().await
 //! let r = hub.target_pools().add_instance(...).doit().await
 //! let r = hub.target_pools().delete(...).doit().await
@@ -563,6 +614,7 @@
 //! let r = hub.target_pools().remove_health_check(...).doit().await
 //! let r = hub.target_pools().remove_instance(...).doit().await
 //! let r = hub.target_pools().set_backup(...).doit().await
+//! let r = hub.target_pools().set_security_policy(...).doit().await
 //! let r = hub.target_ssl_proxies().delete(...).doit().await
 //! let r = hub.target_ssl_proxies().insert(...).doit().await
 //! let r = hub.target_ssl_proxies().set_backend_service(...).doit().await
@@ -616,7 +668,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_compute1 as compute1;
-//! use compute1::api::Instance;
+//! use compute1::api::Disk;
 //! use compute1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -638,15 +690,15 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = Instance::default();
+//! let mut req = Disk::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.instances().update(req, "project", "zone", "instance")
-//!              .request_id("takimata")
-//!              .most_disruptive_allowed_action("amet.")
-//!              .minimal_action("duo")
+//! let result = hub.disks().update(req, "project", "zone", "disk")
+//!              .update_mask(&Default::default())
+//!              .request_id("amet.")
+//!              .add_paths("takimata")
 //!              .doit().await;
 //! 
 //! match result {

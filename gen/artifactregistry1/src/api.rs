@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -130,7 +130,7 @@ impl<'a, S> ArtifactRegistry<S> {
         ArtifactRegistry {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://artifactregistry.googleapis.com/".to_string(),
             _root_url: "https://artifactregistry.googleapis.com/".to_string(),
         }
@@ -141,7 +141,7 @@ impl<'a, S> ArtifactRegistry<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -169,6 +169,45 @@ impl<'a, S> ArtifactRegistry<S> {
 // ############
 // SCHEMAS ###
 // ##########
+/// Configuration for an Apt remote repository.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AptRepository {
+    /// One of the publicly available Apt repositories supported by Artifact Registry.
+    #[serde(rename="publicRepository")]
+    
+    pub public_repository: Option<GoogleDevtoolsArtifactregistryV1RemoteRepositoryConfigAptRepositoryPublicRepository>,
+}
+
+impl client::Part for AptRepository {}
+
+
+/// The request to delete multiple versions across a repository.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations repositories packages versions batch delete projects](ProjectLocationRepositoryPackageVersionBatchDeleteCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct BatchDeleteVersionsRequest {
+    /// Required. The names of the versions to delete. A maximum of 10000 versions can be deleted in a batch.
+    
+    pub names: Option<Vec<String>>,
+    /// If true, the request is performed without deleting data, following AIP-163.
+    #[serde(rename="validateOnly")]
+    
+    pub validate_only: Option<bool>,
+}
+
+impl client::RequestValue for BatchDeleteVersionsRequest {}
+
+
 /// Associates `members`, or principals, with a `role`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -179,15 +218,98 @@ pub struct Binding {
     /// The condition that is associated with this binding. If the condition evaluates to `true`, then this binding applies to the current request. If the condition evaluates to `false`, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the principals in this binding. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     
     pub condition: Option<Expr>,
-    /// Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. 
+    /// Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workforce identity pool. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/group/{group_id}`: All workforce identities in a group. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All workforce identities with a specific attribute value. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/*`: All identities in a workforce identity pool. * `principal://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workload identity pool. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/group/{group_id}`: A workload identity pool group. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All identities in a workload identity pool with a certain attribute. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/*`: All identities in a workload identity pool. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `deleted:principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: Deleted single identity in a workforce identity pool. For example, `deleted:principal://iam.googleapis.com/locations/global/workforcePools/my-pool-id/subject/my-subject-attribute-value`.
     
     pub members: Option<Vec<String>>,
-    /// Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`.
+    /// Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`. For an overview of the IAM roles and permissions, see the [IAM documentation](https://cloud.google.com/iam/docs/roles-overview). For a list of the available pre-defined roles, see [here](https://cloud.google.com/iam/docs/understanding-roles).
     
     pub role: Option<String>,
 }
 
 impl client::Part for Binding {}
+
+
+/// Artifact policy configuration for repository cleanup policies.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CleanupPolicy {
+    /// Policy action.
+    
+    pub action: Option<String>,
+    /// Policy condition for matching versions.
+    
+    pub condition: Option<CleanupPolicyCondition>,
+    /// The user-provided ID of the cleanup policy.
+    
+    pub id: Option<String>,
+    /// Policy condition for retaining a minimum number of versions. May only be specified with a Keep action.
+    #[serde(rename="mostRecentVersions")]
+    
+    pub most_recent_versions: Option<CleanupPolicyMostRecentVersions>,
+}
+
+impl client::Part for CleanupPolicy {}
+
+
+/// CleanupPolicyCondition is a set of conditions attached to a CleanupPolicy. If multiple entries are set, all must be satisfied for the condition to be satisfied.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CleanupPolicyCondition {
+    /// Match versions newer than a duration.
+    #[serde(rename="newerThan")]
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub newer_than: Option<client::chrono::Duration>,
+    /// Match versions older than a duration.
+    #[serde(rename="olderThan")]
+    
+    #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
+    pub older_than: Option<client::chrono::Duration>,
+    /// Match versions by package prefix. Applied on any prefix match.
+    #[serde(rename="packageNamePrefixes")]
+    
+    pub package_name_prefixes: Option<Vec<String>>,
+    /// Match versions by tag prefix. Applied on any prefix match.
+    #[serde(rename="tagPrefixes")]
+    
+    pub tag_prefixes: Option<Vec<String>>,
+    /// Match versions by tag status.
+    #[serde(rename="tagState")]
+    
+    pub tag_state: Option<String>,
+    /// Match versions by version name prefix. Applied on any prefix match.
+    #[serde(rename="versionNamePrefixes")]
+    
+    pub version_name_prefixes: Option<Vec<String>>,
+}
+
+impl client::Part for CleanupPolicyCondition {}
+
+
+/// CleanupPolicyMostRecentVersions is an alternate condition of a CleanupPolicy for retaining a minimum number of versions.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CleanupPolicyMostRecentVersions {
+    /// Minimum number of versions to keep.
+    #[serde(rename="keepCount")]
+    
+    pub keep_count: Option<i32>,
+    /// List of package name prefixes that will apply this rule.
+    #[serde(rename="packageNamePrefixes")]
+    
+    pub package_name_prefixes: Option<Vec<String>>,
+}
+
+impl client::Part for CleanupPolicyMostRecentVersions {}
 
 
 /// DockerImage represents a docker artifact. The following fields are returned as untyped metadata in the Version resource, using camelcase keys (i.e. metadata.imageSizeBytes): * imageSizeBytes * mediaType * buildTime
@@ -234,6 +356,38 @@ pub struct DockerImage {
 }
 
 impl client::ResponseResult for DockerImage {}
+
+
+/// Configuration for a Docker remote repository.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DockerRepository {
+    /// One of the publicly available Docker repositories supported by Artifact Registry.
+    #[serde(rename="publicRepository")]
+    
+    pub public_repository: Option<String>,
+}
+
+impl client::Part for DockerRepository {}
+
+
+/// DockerRepositoryConfig is docker related repository details. Provides additional configuration details for repositories of the docker format type.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct DockerRepositoryConfig {
+    /// The repository which enabled this flag prevents all tags from being modified, moved or deleted. This does not prevent tags from being created.
+    #[serde(rename="immutableTags")]
+    
+    pub immutable_tags: Option<bool>,
+}
+
+impl client::Part for DockerRepositoryConfig {}
 
 
 /// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
@@ -286,10 +440,14 @@ impl client::Part for Expr {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleDevtoolsArtifactregistryV1File {
-    /// The time when the File was created.
+    /// Output only. The time when the File was created.
     #[serde(rename="createTime")]
     
     pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Output only. The time when the last attempt to refresh the file's data was made. Only set when the repository is remote.
+    #[serde(rename="fetchTime")]
+    
+    pub fetch_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The hashes of the file content.
     
     pub hashes: Option<Vec<Hash>>,
@@ -304,13 +462,53 @@ pub struct GoogleDevtoolsArtifactregistryV1File {
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
     pub size_bytes: Option<i64>,
-    /// The time when the File was last updated.
+    /// Output only. The time when the File was last updated.
     #[serde(rename="updateTime")]
     
     pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
 }
 
 impl client::ResponseResult for GoogleDevtoolsArtifactregistryV1File {}
+
+
+/// Publicly available Apt repositories constructed from a common repository base and a custom repository path.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleDevtoolsArtifactregistryV1RemoteRepositoryConfigAptRepositoryPublicRepository {
+    /// A common public repository base for Apt.
+    #[serde(rename="repositoryBase")]
+    
+    pub repository_base: Option<String>,
+    /// A custom field to define a path to a specific repository from the base.
+    #[serde(rename="repositoryPath")]
+    
+    pub repository_path: Option<String>,
+}
+
+impl client::Part for GoogleDevtoolsArtifactregistryV1RemoteRepositoryConfigAptRepositoryPublicRepository {}
+
+
+/// Publicly available Yum repositories constructed from a common repository base and a custom repository path.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleDevtoolsArtifactregistryV1RemoteRepositoryConfigYumRepositoryPublicRepository {
+    /// A common public repository base for Yum.
+    #[serde(rename="repositoryBase")]
+    
+    pub repository_base: Option<String>,
+    /// A custom field to define a path to a specific repository from the base.
+    #[serde(rename="repositoryPath")]
+    
+    pub repository_path: Option<String>,
+}
+
+impl client::Part for GoogleDevtoolsArtifactregistryV1RemoteRepositoryConfigYumRepositoryPublicRepository {}
 
 
 /// A hash of file content.
@@ -326,7 +524,7 @@ pub struct Hash {
     pub type_: Option<String>,
     /// The hash value.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub value: Option<Vec<u8>>,
 }
 
@@ -370,6 +568,45 @@ pub struct ImportAptArtifactsRequest {
 }
 
 impl client::RequestValue for ImportAptArtifactsRequest {}
+
+
+/// Google Cloud Storage location where the artifacts currently reside.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ImportGoogetArtifactsGcsSource {
+    /// Cloud Storage paths URI (e.g., `gs://my_bucket/my_object`).
+    
+    pub uris: Option<Vec<String>>,
+    /// Supports URI wildcards for matching multiple objects from a single URI.
+    #[serde(rename="useWildcards")]
+    
+    pub use_wildcards: Option<bool>,
+}
+
+impl client::Part for ImportGoogetArtifactsGcsSource {}
+
+
+/// The request to import new googet artifacts.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations repositories googet artifacts import projects](ProjectLocationRepositoryGoogetArtifactImportCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ImportGoogetArtifactsRequest {
+    /// Google Cloud Storage location where input content is located.
+    #[serde(rename="gcsSource")]
+    
+    pub gcs_source: Option<ImportGoogetArtifactsGcsSource>,
+}
+
+impl client::RequestValue for ImportGoogetArtifactsRequest {}
 
 
 /// Google Cloud Storage location where the artifacts currently reside.
@@ -645,7 +882,7 @@ pub struct ListVersionsResponse {
 impl client::ResponseResult for ListVersionsResponse {}
 
 
-/// A resource that represents Google Cloud Platform location.
+/// A resource that represents a Google Cloud location.
 /// 
 /// # Activities
 /// 
@@ -720,6 +957,22 @@ pub struct MavenArtifact {
 impl client::ResponseResult for MavenArtifact {}
 
 
+/// Configuration for a Maven remote repository.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MavenRepository {
+    /// One of the publicly available Maven repositories supported by Artifact Registry.
+    #[serde(rename="publicRepository")]
+    
+    pub public_repository: Option<String>,
+}
+
+impl client::Part for MavenRepository {}
+
+
 /// MavenRepositoryConfig is maven related repository details. Provides additional configuration details for repositories of the maven format type.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -777,6 +1030,22 @@ pub struct NpmPackage {
 impl client::ResponseResult for NpmPackage {}
 
 
+/// Configuration for a Npm remote repository.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct NpmRepository {
+    /// One of the publicly available Npm repositories supported by Artifact Registry.
+    #[serde(rename="publicRepository")]
+    
+    pub public_repository: Option<String>,
+}
+
+impl client::Part for NpmRepository {}
+
+
 /// This resource represents a long-running operation that is the result of a network API call.
 /// 
 /// # Activities
@@ -786,6 +1055,8 @@ impl client::ResponseResult for NpmPackage {}
 /// 
 /// * [locations operations get projects](ProjectLocationOperationGetCall) (response)
 /// * [locations repositories apt artifacts import projects](ProjectLocationRepositoryAptArtifactImportCall) (response)
+/// * [locations repositories googet artifacts import projects](ProjectLocationRepositoryGoogetArtifactImportCall) (response)
+/// * [locations repositories packages versions batch delete projects](ProjectLocationRepositoryPackageVersionBatchDeleteCall) (response)
 /// * [locations repositories packages versions delete projects](ProjectLocationRepositoryPackageVersionDeleteCall) (response)
 /// * [locations repositories packages delete projects](ProjectLocationRepositoryPackageDeleteCall) (response)
 /// * [locations repositories yum artifacts import projects](ProjectLocationRepositoryYumArtifactImportCall) (response)
@@ -806,7 +1077,7 @@ pub struct Operation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -833,7 +1104,7 @@ pub struct Package {
     #[serde(rename="displayName")]
     
     pub display_name: Option<String>,
-    /// The name of the package, for example: "projects/p1/locations/us-central1/repositories/repo1/packages/pkg1". If the package ID part contains slashes, the slashes are escaped.
+    /// The name of the package, for example: `projects/p1/locations/us-central1/repositories/repo1/packages/pkg1`. If the package ID part contains slashes, the slashes are escaped.
     
     pub name: Option<String>,
     /// The time when the package was last updated. This includes publishing a new version of the package.
@@ -845,7 +1116,7 @@ pub struct Package {
 impl client::ResponseResult for Package {}
 
 
-/// An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** { “bindings”: \[ { “role”: “roles/resourcemanager.organizationAdmin”, “members”: \[ “user:mike@example.com”, “group:admins@example.com”, “domain:google.com”, “serviceAccount:my-project-id@appspot.gserviceaccount.com” \] }, { “role”: “roles/resourcemanager.organizationViewer”, “members”: \[ “user:eve@example.com” \], “condition”: { “title”: “expirable access”, “description”: “Does not grant access after Sep 2020”, “expression”: “request.time \< timestamp(‘2020-10-01T00:00:00.000Z’)”, } } \], “etag”: “BwWWja0YfJA=”, “version”: 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time \< timestamp(‘2020-10-01T00:00:00.000Z’) etag: BwWWja0YfJA= version: 3 For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).
+/// An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** `{ "bindings": [ { "role": "roles/resourcemanager.organizationAdmin", "members": [ "user:mike@example.com", "group:admins@example.com", "domain:google.com", "serviceAccount:my-project-id@appspot.gserviceaccount.com" ] }, { "role": "roles/resourcemanager.organizationViewer", "members": [ "user:eve@example.com" ], "condition": { "title": "expirable access", "description": "Does not grant access after Sep 2020", "expression": "request.time < timestamp('2020-10-01T00:00:00.000Z')", } } ], "etag": "BwWWja0YfJA=", "version": 3 }` **YAML example:** `bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3` For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).
 /// 
 /// # Activities
 /// 
@@ -862,7 +1133,7 @@ pub struct Policy {
     pub bindings: Option<Vec<Binding>>,
     /// `etag` is used for optimistic concurrency control as a way to help prevent simultaneous updates of a policy from overwriting each other. It is strongly suggested that systems make use of the `etag` in the read-modify-write cycle to perform policy updates in order to avoid race conditions: An `etag` is returned in the response to `getIamPolicy`, and systems are expected to put that etag in the request to `setIamPolicy` to ensure that their change will be applied to the same version of the policy. **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub etag: Option<Vec<u8>>,
     /// Specifies the format of the policy. Valid values are `0`, `1`, and `3`. Requests that specify an invalid value are rejected. Any operation that affects conditional role bindings must specify version `3`. This requirement applies to the following operations: * Getting a policy that includes a conditional role binding * Adding a conditional role binding to a policy * Changing a conditional role binding in a policy * Removing any role binding, with or without a condition, from a policy that includes conditions **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost. If a policy does not include any conditions, operations on that policy may specify any valid version or leave the field unset. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).
     
@@ -934,6 +1205,65 @@ pub struct PythonPackage {
 impl client::ResponseResult for PythonPackage {}
 
 
+/// Configuration for a Python remote repository.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct PythonRepository {
+    /// One of the publicly available Python repositories supported by Artifact Registry.
+    #[serde(rename="publicRepository")]
+    
+    pub public_repository: Option<String>,
+}
+
+impl client::Part for PythonRepository {}
+
+
+/// Remote repository configuration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RemoteRepositoryConfig {
+    /// Specific settings for an Apt remote repository.
+    #[serde(rename="aptRepository")]
+    
+    pub apt_repository: Option<AptRepository>,
+    /// The description of the remote source.
+    
+    pub description: Option<String>,
+    /// Specific settings for a Docker remote repository.
+    #[serde(rename="dockerRepository")]
+    
+    pub docker_repository: Option<DockerRepository>,
+    /// Specific settings for a Maven remote repository.
+    #[serde(rename="mavenRepository")]
+    
+    pub maven_repository: Option<MavenRepository>,
+    /// Specific settings for an Npm remote repository.
+    #[serde(rename="npmRepository")]
+    
+    pub npm_repository: Option<NpmRepository>,
+    /// Specific settings for a Python remote repository.
+    #[serde(rename="pythonRepository")]
+    
+    pub python_repository: Option<PythonRepository>,
+    /// Optional. The credentials used to access the remote repository.
+    #[serde(rename="upstreamCredentials")]
+    
+    pub upstream_credentials: Option<UpstreamCredentials>,
+    /// Specific settings for a Yum remote repository.
+    #[serde(rename="yumRepository")]
+    
+    pub yum_repository: Option<YumRepository>,
+}
+
+impl client::Part for RemoteRepositoryConfig {}
+
+
 /// A Repository for storing artifacts with a specific format.
 /// 
 /// # Activities
@@ -947,14 +1277,30 @@ impl client::ResponseResult for PythonPackage {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Repository {
-    /// The time when the repository was created.
+    /// Optional. Cleanup policies for this repository. Cleanup policies indicate when certain package versions can be automatically deleted. Map keys are policy IDs supplied by users during policy creation. They must unique within a repository and be under 128 characters in length.
+    #[serde(rename="cleanupPolicies")]
+    
+    pub cleanup_policies: Option<HashMap<String, CleanupPolicy>>,
+    /// Optional. If true, the cleanup pipeline is prevented from deleting versions in this repository.
+    #[serde(rename="cleanupPolicyDryRun")]
+    
+    pub cleanup_policy_dry_run: Option<bool>,
+    /// Output only. The time when the repository was created.
     #[serde(rename="createTime")]
     
     pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// The user-provided description of the repository.
     
     pub description: Option<String>,
-    /// The format of packages that are stored in the repository.
+    /// Optional. If this is true, aunspecified repo type will be treated as error. Is used for new repo types that don't have any specific fields. Right now is used by AOSS team when creating repos for customers.
+    #[serde(rename="disallowUnspecifiedMode")]
+    
+    pub disallow_unspecified_mode: Option<bool>,
+    /// Docker repository config contains repository level configuration for the repositories of docker type.
+    #[serde(rename="dockerConfig")]
+    
+    pub docker_config: Option<DockerRepositoryConfig>,
+    /// Optional. The format of packages that are stored in the repository.
     
     pub format: Option<String>,
     /// The Cloud KMS resource name of the customer managed encryption key that's used to encrypt the contents of the Repository. Has the form: `projects/my-project/locations/my-region/keyRings/my-kr/cryptoKeys/my-key`. This value may not be changed after the Repository has been created.
@@ -968,9 +1314,16 @@ pub struct Repository {
     #[serde(rename="mavenConfig")]
     
     pub maven_config: Option<MavenRepositoryConfig>,
-    /// The name of the repository, for example: "projects/p1/locations/us-central1/repositories/repo1".
+    /// Optional. The mode of the repository.
+    
+    pub mode: Option<String>,
+    /// The name of the repository, for example: `projects/p1/locations/us-central1/repositories/repo1`.
     
     pub name: Option<String>,
+    /// Configuration specific for a Remote Repository.
+    #[serde(rename="remoteRepositoryConfig")]
+    
+    pub remote_repository_config: Option<RemoteRepositoryConfig>,
     /// Output only. If set, the repository satisfies physical zone separation.
     #[serde(rename="satisfiesPzs")]
     
@@ -980,10 +1333,14 @@ pub struct Repository {
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
     pub size_bytes: Option<i64>,
-    /// The time when the repository was last updated.
+    /// Output only. The time when the repository was last updated.
     #[serde(rename="updateTime")]
     
     pub update_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Configuration specific for a Virtual Repository.
+    #[serde(rename="virtualRepositoryConfig")]
+    
+    pub virtual_repository_config: Option<VirtualRepositoryConfig>,
 }
 
 impl client::RequestValue for Repository {}
@@ -1127,6 +1484,74 @@ pub struct UploadAptArtifactRequest { _never_set: Option<bool> }
 impl client::RequestValue for UploadAptArtifactRequest {}
 
 
+/// The response to upload a Go module.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations repositories go modules upload projects](ProjectLocationRepositoryGoModuleUploadCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UploadGoModuleMediaResponse {
+    /// Operation to be returned to the user.
+    
+    pub operation: Option<Operation>,
+}
+
+impl client::ResponseResult for UploadGoModuleMediaResponse {}
+
+
+/// The request to upload a Go module.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations repositories go modules upload projects](ProjectLocationRepositoryGoModuleUploadCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UploadGoModuleRequest { _never_set: Option<bool> }
+
+impl client::RequestValue for UploadGoModuleRequest {}
+
+
+/// The response to upload an artifact.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations repositories googet artifacts upload projects](ProjectLocationRepositoryGoogetArtifactUploadCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UploadGoogetArtifactMediaResponse {
+    /// Operation to be returned to the user.
+    
+    pub operation: Option<Operation>,
+}
+
+impl client::ResponseResult for UploadGoogetArtifactMediaResponse {}
+
+
+/// The request to upload an artifact.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations repositories googet artifacts upload projects](ProjectLocationRepositoryGoogetArtifactUploadCall) (request)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UploadGoogetArtifactRequest { _never_set: Option<bool> }
+
+impl client::RequestValue for UploadGoogetArtifactRequest {}
+
+
 /// The response to upload an artifact.
 /// 
 /// # Activities
@@ -1202,6 +1627,87 @@ pub struct UploadYumArtifactRequest { _never_set: Option<bool> }
 impl client::RequestValue for UploadYumArtifactRequest {}
 
 
+/// The credentials to access the remote repository.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpstreamCredentials {
+    /// Use username and password to access the remote repository.
+    #[serde(rename="usernamePasswordCredentials")]
+    
+    pub username_password_credentials: Option<UsernamePasswordCredentials>,
+}
+
+impl client::Part for UpstreamCredentials {}
+
+
+/// Artifact policy configuration for the repository contents.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UpstreamPolicy {
+    /// The user-provided ID of the upstream policy.
+    
+    pub id: Option<String>,
+    /// Entries with a greater priority value take precedence in the pull order.
+    
+    pub priority: Option<i32>,
+    /// A reference to the repository resource, for example: `projects/p1/locations/us-central1/repositories/repo1`.
+    
+    pub repository: Option<String>,
+}
+
+impl client::Part for UpstreamPolicy {}
+
+
+/// Username and password credentials.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct UsernamePasswordCredentials {
+    /// The Secret Manager key version that holds the password to access the remote repository. Must be in the format of `projects/{project}/secrets/{secret}/versions/{version}`.
+    #[serde(rename="passwordSecretVersion")]
+    
+    pub password_secret_version: Option<String>,
+    /// The username to access the remote repository.
+    
+    pub username: Option<String>,
+}
+
+impl client::Part for UsernamePasswordCredentials {}
+
+
+/// The Artifact Registry VPC SC config that apply to a Project.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [locations get vpcsc config projects](ProjectLocationGetVpcscConfigCall) (response)
+/// * [locations update vpcsc config projects](ProjectLocationUpdateVpcscConfigCall) (request|response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VPCSCConfig {
+    /// The name of the project's VPC SC Config. Always of the form: projects/{projectID}/locations/{location}/vpcscConfig In update request: never set In response: always set
+    
+    pub name: Option<String>,
+    /// The project per location VPC SC policy that defines the VPC SC behavior for the Remote Repository (Allow/Deny).
+    #[serde(rename="vpcscPolicy")]
+    
+    pub vpcsc_policy: Option<String>,
+}
+
+impl client::RequestValue for VPCSCConfig {}
+impl client::ResponseResult for VPCSCConfig {}
+
+
 /// The body of a version resource. A version resource represents a collection of components, such as files and other data. This may correspond to a version in many package management schemes.
 /// 
 /// # Activities
@@ -1239,6 +1745,38 @@ pub struct Version {
 impl client::ResponseResult for Version {}
 
 
+/// Virtual repository configuration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct VirtualRepositoryConfig {
+    /// Policies that configure the upstream artifacts distributed by the Virtual Repository. Upstream policies cannot be set on a standard repository.
+    #[serde(rename="upstreamPolicies")]
+    
+    pub upstream_policies: Option<Vec<UpstreamPolicy>>,
+}
+
+impl client::Part for VirtualRepositoryConfig {}
+
+
+/// Configuration for a Yum remote repository.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct YumRepository {
+    /// One of the publicly available Yum repositories supported by Artifact Registry.
+    #[serde(rename="publicRepository")]
+    
+    pub public_repository: Option<GoogleDevtoolsArtifactregistryV1RemoteRepositoryConfigYumRepositoryPublicRepository>,
+}
+
+impl client::Part for YumRepository {}
+
+
 
 // ###################
 // MethodBuilders ###
@@ -1267,7 +1805,7 @@ impl client::ResponseResult for Version {}
 ///     ).build().await.unwrap();
 /// let mut hub = ArtifactRegistry::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `get_project_settings(...)`, `locations_get(...)`, `locations_list(...)`, `locations_operations_get(...)`, `locations_repositories_apt_artifacts_import(...)`, `locations_repositories_apt_artifacts_upload(...)`, `locations_repositories_create(...)`, `locations_repositories_delete(...)`, `locations_repositories_docker_images_get(...)`, `locations_repositories_docker_images_list(...)`, `locations_repositories_files_get(...)`, `locations_repositories_files_list(...)`, `locations_repositories_get(...)`, `locations_repositories_get_iam_policy(...)`, `locations_repositories_kfp_artifacts_upload(...)`, `locations_repositories_list(...)`, `locations_repositories_maven_artifacts_get(...)`, `locations_repositories_maven_artifacts_list(...)`, `locations_repositories_npm_packages_get(...)`, `locations_repositories_npm_packages_list(...)`, `locations_repositories_packages_delete(...)`, `locations_repositories_packages_get(...)`, `locations_repositories_packages_list(...)`, `locations_repositories_packages_tags_create(...)`, `locations_repositories_packages_tags_delete(...)`, `locations_repositories_packages_tags_get(...)`, `locations_repositories_packages_tags_list(...)`, `locations_repositories_packages_tags_patch(...)`, `locations_repositories_packages_versions_delete(...)`, `locations_repositories_packages_versions_get(...)`, `locations_repositories_packages_versions_list(...)`, `locations_repositories_patch(...)`, `locations_repositories_python_packages_get(...)`, `locations_repositories_python_packages_list(...)`, `locations_repositories_set_iam_policy(...)`, `locations_repositories_test_iam_permissions(...)`, `locations_repositories_yum_artifacts_import(...)`, `locations_repositories_yum_artifacts_upload(...)` and `update_project_settings(...)`
+/// // like `get_project_settings(...)`, `locations_get(...)`, `locations_get_vpcsc_config(...)`, `locations_list(...)`, `locations_operations_get(...)`, `locations_repositories_apt_artifacts_import(...)`, `locations_repositories_apt_artifacts_upload(...)`, `locations_repositories_create(...)`, `locations_repositories_delete(...)`, `locations_repositories_docker_images_get(...)`, `locations_repositories_docker_images_list(...)`, `locations_repositories_files_get(...)`, `locations_repositories_files_list(...)`, `locations_repositories_get(...)`, `locations_repositories_get_iam_policy(...)`, `locations_repositories_go_modules_upload(...)`, `locations_repositories_googet_artifacts_import(...)`, `locations_repositories_googet_artifacts_upload(...)`, `locations_repositories_kfp_artifacts_upload(...)`, `locations_repositories_list(...)`, `locations_repositories_maven_artifacts_get(...)`, `locations_repositories_maven_artifacts_list(...)`, `locations_repositories_npm_packages_get(...)`, `locations_repositories_npm_packages_list(...)`, `locations_repositories_packages_delete(...)`, `locations_repositories_packages_get(...)`, `locations_repositories_packages_list(...)`, `locations_repositories_packages_tags_create(...)`, `locations_repositories_packages_tags_delete(...)`, `locations_repositories_packages_tags_get(...)`, `locations_repositories_packages_tags_list(...)`, `locations_repositories_packages_tags_patch(...)`, `locations_repositories_packages_versions_batch_delete(...)`, `locations_repositories_packages_versions_delete(...)`, `locations_repositories_packages_versions_get(...)`, `locations_repositories_packages_versions_list(...)`, `locations_repositories_patch(...)`, `locations_repositories_python_packages_get(...)`, `locations_repositories_python_packages_list(...)`, `locations_repositories_set_iam_policy(...)`, `locations_repositories_test_iam_permissions(...)`, `locations_repositories_yum_artifacts_import(...)`, `locations_repositories_yum_artifacts_upload(...)`, `locations_update_vpcsc_config(...)` and `update_project_settings(...)`
 /// // to build up your call.
 /// let rb = hub.projects();
 /// # }
@@ -1380,7 +1918,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - The name of the file to retrieve.
+    /// * `name` - Required. The name of the file to retrieve.
     pub fn locations_repositories_files_get(&self, name: &str) -> ProjectLocationRepositoryFileGetCall<'a, S> {
         ProjectLocationRepositoryFileGetCall {
             hub: self.hub,
@@ -1397,7 +1935,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The name of the repository whose files will be listed. For example: "projects/p1/locations/us-central1/repositories/repo1
+    /// * `parent` - Required. The name of the repository whose files will be listed. For example: "projects/p1/locations/us-central1/repositories/repo1
     pub fn locations_repositories_files_list(&self, parent: &str) -> ProjectLocationRepositoryFileListCall<'a, S> {
         ProjectLocationRepositoryFileListCall {
             hub: self.hub,
@@ -1406,6 +1944,63 @@ impl<'a, S> ProjectMethods<'a, S> {
             _page_size: Default::default(),
             _order_by: Default::default(),
             _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Directly uploads a Go module. The returned Operation will complete once the Go module is uploaded. Package, Version, and File resources are created based on the uploaded Go module.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - The resource name of the repository where the Go module will be uploaded.
+    pub fn locations_repositories_go_modules_upload(&self, request: UploadGoModuleRequest, parent: &str) -> ProjectLocationRepositoryGoModuleUploadCall<'a, S> {
+        ProjectLocationRepositoryGoModuleUploadCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Imports GooGet artifacts. The returned Operation will complete once the resources are imported. Package, Version, and File resources are created based on the imported artifacts. Imported artifacts that conflict with existing resources are ignored.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - The name of the parent resource where the artifacts will be imported.
+    pub fn locations_repositories_googet_artifacts_import(&self, request: ImportGoogetArtifactsRequest, parent: &str) -> ProjectLocationRepositoryGoogetArtifactImportCall<'a, S> {
+        ProjectLocationRepositoryGoogetArtifactImportCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Directly uploads a GooGet artifact. The returned Operation will complete once the resources are uploaded. Package, Version, and File resources are created based on the imported artifact. Imported artifacts that conflict with existing resources are ignored.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - The name of the parent resource where the artifacts will be uploaded.
+    pub fn locations_repositories_googet_artifacts_upload(&self, request: UploadGoogetArtifactRequest, parent: &str) -> ProjectLocationRepositoryGoogetArtifactUploadCall<'a, S> {
+        ProjectLocationRepositoryGoogetArtifactUploadCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -1563,7 +2158,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - The name of the parent resource whose tags will be listed.
+    /// * `parent` - The name of the parent package whose tags will be listed. For example: `projects/p1/locations/us-central1/repositories/repo1/packages/pkg1`.
     pub fn locations_repositories_packages_tags_list(&self, parent: &str) -> ProjectLocationRepositoryPackageTagListCall<'a, S> {
         ProjectLocationRepositoryPackageTagListCall {
             hub: self.hub,
@@ -1591,6 +2186,25 @@ impl<'a, S> ProjectMethods<'a, S> {
             _request: request,
             _name: name.to_string(),
             _update_mask: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes multiple versions across a repository. The returned operation will complete once the versions have been deleted.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `parent` - The name of the repository holding all requested versions.
+    pub fn locations_repositories_packages_versions_batch_delete(&self, request: BatchDeleteVersionsRequest, parent: &str) -> ProjectLocationRepositoryPackageVersionBatchDeleteCall<'a, S> {
+        ProjectLocationRepositoryPackageVersionBatchDeleteCall {
+            hub: self.hub,
+            _request: request,
+            _parent: parent.to_string(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -1879,7 +2493,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `name` - The name of the repository, for example: "projects/p1/locations/us-central1/repositories/repo1".
+    /// * `name` - The name of the repository, for example: `projects/p1/locations/us-central1/repositories/repo1`.
     pub fn locations_repositories_patch(&self, request: Repository, name: &str) -> ProjectLocationRepositoryPatchCall<'a, S> {
         ProjectLocationRepositoryPatchCall {
             hub: self.hub,
@@ -1949,6 +2563,23 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Retrieves the VPCSC Config for the Project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `name` - Required. The name of the VPCSCConfig resource.
+    pub fn locations_get_vpcsc_config(&self, name: &str) -> ProjectLocationGetVpcscConfigCall<'a, S> {
+        ProjectLocationGetVpcscConfigCall {
+            hub: self.hub,
+            _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Lists information about the supported locations for this service.
     /// 
     /// # Arguments
@@ -1961,6 +2592,26 @@ impl<'a, S> ProjectMethods<'a, S> {
             _page_token: Default::default(),
             _page_size: Default::default(),
             _filter: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates the VPCSC Config for the Project.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `name` - The name of the project's VPC SC Config. Always of the form: projects/{projectID}/locations/{location}/vpcscConfig In update request: never set In response: always set
+    pub fn locations_update_vpcsc_config(&self, request: VPCSCConfig, name: &str) -> ProjectLocationUpdateVpcscConfigCall<'a, S> {
+        ProjectLocationUpdateVpcscConfigCall {
+            hub: self.hub,
+            _request: request,
+            _name: name.to_string(),
+            _update_mask: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -3627,7 +4278,7 @@ where
     }
 
 
-    /// The name of the file to retrieve.
+    /// Required. The name of the file to retrieve.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -3909,7 +4560,7 @@ where
     }
 
 
-    /// The name of the repository whose files will be listed. For example: "projects/p1/locations/us-central1/repositories/repo1
+    /// Required. The name of the repository whose files will be listed. For example: "projects/p1/locations/us-central1/repositories/repo1
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4017,6 +4668,946 @@ where
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
     pub fn clear_scopes(mut self) -> ProjectLocationRepositoryFileListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Directly uploads a Go module. The returned Operation will complete once the Go module is uploaded. Package, Version, and File resources are created based on the uploaded Go module.
+///
+/// A builder for the *locations.repositories.goModules.upload* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// use artifactregistry1::api::UploadGoModuleRequest;
+/// use std::fs;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use artifactregistry1::{ArtifactRegistry, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ArtifactRegistry::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = UploadGoModuleRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `upload(...)`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_go_modules_upload(req, "parent")
+///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryGoModuleUploadCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ArtifactRegistry<S>,
+    _request: UploadGoModuleRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationRepositoryGoModuleUploadCall<'a, S> {}
+
+impl<'a, S> ProjectLocationRepositoryGoModuleUploadCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    async fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: client::UploadProtocol) -> client::Result<(hyper::Response<hyper::body::Body>, UploadGoModuleMediaResponse)>
+		where RS: client::ReadSeek {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "artifactregistry.projects.locations.repositories.goModules.upload",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let (mut url, upload_type) =
+            if protocol == client::UploadProtocol::Simple {
+                (self.hub._root_url.clone() + "upload/v1/{+parent}/goModules:create", "multipart")
+            } else {
+                unreachable!()
+            };
+        params.push("uploadType", upload_type);
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut mp_reader: client::MultiPartReader = Default::default();
+                let (mut body_reader, content_type) = match protocol {
+                    client::UploadProtocol::Simple => {
+                        mp_reader.reserve_exact(2);
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                    reader.seek(io::SeekFrom::Start(0)).unwrap();
+                    
+                        mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
+                                 .add_part(&mut reader, size, reader_mime_type.clone());
+                        (&mut mp_reader as &mut (dyn io::Read + Send), client::MultiPartReader::mime_type())
+                    },
+                    _ => (&mut request_value_reader as &mut (dyn io::Read + Send), json_mime_type.clone()),
+                };
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let mut body_reader_bytes = vec![];
+                        body_reader.read_to_end(&mut body_reader_bytes).unwrap();
+                        let request = req_builder
+                            .header(CONTENT_TYPE, content_type.to_string())
+                            .body(hyper::body::Body::from(body_reader_bytes));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+    /// Upload media all at once.
+    /// If the upload fails for whichever reason, all progress is lost.
+    ///
+    /// * *multipart*: yes
+    /// * *max size*: 0kb
+    /// * *valid mime types*: '*/*'
+    pub async fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> client::Result<(hyper::Response<hyper::body::Body>, UploadGoModuleMediaResponse)>
+                where RS: client::ReadSeek {
+        self.doit(stream, mime_type, client::UploadProtocol::Simple).await
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: UploadGoModuleRequest) -> ProjectLocationRepositoryGoModuleUploadCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// The resource name of the repository where the Go module will be uploaded.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRepositoryGoModuleUploadCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRepositoryGoModuleUploadCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRepositoryGoModuleUploadCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRepositoryGoModuleUploadCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationRepositoryGoModuleUploadCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryGoModuleUploadCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Imports GooGet artifacts. The returned Operation will complete once the resources are imported. Package, Version, and File resources are created based on the imported artifacts. Imported artifacts that conflict with existing resources are ignored.
+///
+/// A builder for the *locations.repositories.googetArtifacts.import* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// use artifactregistry1::api::ImportGoogetArtifactsRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use artifactregistry1::{ArtifactRegistry, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ArtifactRegistry::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = ImportGoogetArtifactsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_googet_artifacts_import(req, "parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryGoogetArtifactImportCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ArtifactRegistry<S>,
+    _request: ImportGoogetArtifactsRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationRepositoryGoogetArtifactImportCall<'a, S> {}
+
+impl<'a, S> ProjectLocationRepositoryGoogetArtifactImportCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "artifactregistry.projects.locations.repositories.googetArtifacts.import",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/googetArtifacts:import";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: ImportGoogetArtifactsRequest) -> ProjectLocationRepositoryGoogetArtifactImportCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the parent resource where the artifacts will be imported.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRepositoryGoogetArtifactImportCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRepositoryGoogetArtifactImportCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRepositoryGoogetArtifactImportCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRepositoryGoogetArtifactImportCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationRepositoryGoogetArtifactImportCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryGoogetArtifactImportCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Directly uploads a GooGet artifact. The returned Operation will complete once the resources are uploaded. Package, Version, and File resources are created based on the imported artifact. Imported artifacts that conflict with existing resources are ignored.
+///
+/// A builder for the *locations.repositories.googetArtifacts.upload* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// use artifactregistry1::api::UploadGoogetArtifactRequest;
+/// use std::fs;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use artifactregistry1::{ArtifactRegistry, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ArtifactRegistry::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = UploadGoogetArtifactRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `upload(...)`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_googet_artifacts_upload(req, "parent")
+///              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryGoogetArtifactUploadCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ArtifactRegistry<S>,
+    _request: UploadGoogetArtifactRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationRepositoryGoogetArtifactUploadCall<'a, S> {}
+
+impl<'a, S> ProjectLocationRepositoryGoogetArtifactUploadCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    async fn doit<RS>(mut self, mut reader: RS, reader_mime_type: mime::Mime, protocol: client::UploadProtocol) -> client::Result<(hyper::Response<hyper::body::Body>, UploadGoogetArtifactMediaResponse)>
+		where RS: client::ReadSeek {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "artifactregistry.projects.locations.repositories.googetArtifacts.upload",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let (mut url, upload_type) =
+            if protocol == client::UploadProtocol::Simple {
+                (self.hub._root_url.clone() + "upload/v1/{+parent}/googetArtifacts:create", "multipart")
+            } else {
+                unreachable!()
+            };
+        params.push("uploadType", upload_type);
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let mut mp_reader: client::MultiPartReader = Default::default();
+                let (mut body_reader, content_type) = match protocol {
+                    client::UploadProtocol::Simple => {
+                        mp_reader.reserve_exact(2);
+                        let size = reader.seek(io::SeekFrom::End(0)).unwrap();
+                    reader.seek(io::SeekFrom::Start(0)).unwrap();
+                    
+                        mp_reader.add_part(&mut request_value_reader, request_size, json_mime_type.clone())
+                                 .add_part(&mut reader, size, reader_mime_type.clone());
+                        (&mut mp_reader as &mut (dyn io::Read + Send), client::MultiPartReader::mime_type())
+                    },
+                    _ => (&mut request_value_reader as &mut (dyn io::Read + Send), json_mime_type.clone()),
+                };
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let mut body_reader_bytes = vec![];
+                        body_reader.read_to_end(&mut body_reader_bytes).unwrap();
+                        let request = req_builder
+                            .header(CONTENT_TYPE, content_type.to_string())
+                            .body(hyper::body::Body::from(body_reader_bytes));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+    /// Upload media all at once.
+    /// If the upload fails for whichever reason, all progress is lost.
+    ///
+    /// * *multipart*: yes
+    /// * *max size*: 0kb
+    /// * *valid mime types*: '*/*'
+    pub async fn upload<RS>(self, stream: RS, mime_type: mime::Mime) -> client::Result<(hyper::Response<hyper::body::Body>, UploadGoogetArtifactMediaResponse)>
+                where RS: client::ReadSeek {
+        self.doit(stream, mime_type, client::UploadProtocol::Simple).await
+    }
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: UploadGoogetArtifactRequest) -> ProjectLocationRepositoryGoogetArtifactUploadCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the parent resource where the artifacts will be uploaded.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRepositoryGoogetArtifactUploadCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRepositoryGoogetArtifactUploadCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRepositoryGoogetArtifactUploadCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRepositoryGoogetArtifactUploadCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationRepositoryGoogetArtifactUploadCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryGoogetArtifactUploadCall<'a, S> {
         self._scopes.clear();
         self
     }
@@ -4636,8 +6227,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_maven_artifacts_list("parent")
-///              .page_token("ipsum")
-///              .page_size(-93)
+///              .page_token("gubergren")
+///              .page_size(-16)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5184,8 +6775,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_npm_packages_list("parent")
-///              .page_token("rebum.")
-///              .page_size(-57)
+///              .page_token("ipsum")
+///              .page_size(-7)
 ///              .doit().await;
 /// # }
 /// ```
@@ -5476,7 +7067,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_packages_tags_create(req, "parent")
-///              .tag_id("ipsum")
+///              .tag_id("ea")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6298,9 +7889,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_packages_tags_list("parent")
-///              .page_token("dolor")
-///              .page_size(-56)
-///              .filter("eos")
+///              .page_token("labore")
+///              .page_size(-43)
+///              .filter("duo")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6462,7 +8053,7 @@ where
     }
 
 
-    /// The name of the parent resource whose tags will be listed.
+    /// The name of the parent package whose tags will be listed. For example: `projects/p1/locations/us-central1/repositories/repo1/packages/pkg1`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -6873,6 +8464,298 @@ where
 }
 
 
+/// Deletes multiple versions across a repository. The returned operation will complete once the versions have been deleted.
+///
+/// A builder for the *locations.repositories.packages.versions.batchDelete* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// use artifactregistry1::api::BatchDeleteVersionsRequest;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use artifactregistry1::{ArtifactRegistry, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ArtifactRegistry::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = BatchDeleteVersionsRequest::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_repositories_packages_versions_batch_delete(req, "parent")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationRepositoryPackageVersionBatchDeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ArtifactRegistry<S>,
+    _request: BatchDeleteVersionsRequest,
+    _parent: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationRepositoryPackageVersionBatchDeleteCall<'a, S> {}
+
+impl<'a, S> ProjectLocationRepositoryPackageVersionBatchDeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Operation)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "artifactregistry.projects.locations.repositories.packages.versions.batchDelete",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "parent"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(4 + self._additional_params.len());
+        params.push("parent", self._parent);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/versions:batchDelete";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: BatchDeleteVersionsRequest) -> ProjectLocationRepositoryPackageVersionBatchDeleteCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the repository holding all requested versions.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> ProjectLocationRepositoryPackageVersionBatchDeleteCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationRepositoryPackageVersionBatchDeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationRepositoryPackageVersionBatchDeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationRepositoryPackageVersionBatchDeleteCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationRepositoryPackageVersionBatchDeleteCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationRepositoryPackageVersionBatchDeleteCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Deletes a version and all of its content. The returned operation will complete once the version has been deleted.
 ///
 /// A builder for the *locations.repositories.packages.versions.delete* method supported by a *project* resource.
@@ -6900,7 +8783,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_packages_versions_delete("name")
-///              .force(false)
+///              .force(true)
 ///              .doit().await;
 /// # }
 /// ```
@@ -7174,7 +9057,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_packages_versions_get("name")
-///              .view("no")
+///              .view("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -7448,10 +9331,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_packages_versions_list("parent")
-///              .view("kasd")
-///              .page_token("et")
-///              .page_size(-43)
-///              .order_by("et")
+///              .view("erat")
+///              .page_token("sed")
+///              .page_size(-20)
+///              .order_by("dolore")
 ///              .doit().await;
 /// # }
 /// ```
@@ -8282,8 +10165,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_packages_list("parent")
-///              .page_token("sed")
-///              .page_size(-20)
+///              .page_token("consetetur")
+///              .page_size(-92)
 ///              .doit().await;
 /// # }
 /// ```
@@ -8830,8 +10713,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_python_packages_list("parent")
-///              .page_token("voluptua.")
-///              .page_size(-2)
+///              .page_token("et")
+///              .page_size(-95)
 ///              .doit().await;
 /// # }
 /// ```
@@ -9738,7 +11621,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_create(req, "parent")
-///              .repository_id("et")
+///              .repository_id("vero")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9926,7 +11809,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// The repository id to use for this repository.
+    /// Required. The repository id to use for this repository.
     ///
     /// Sets the *repository id* query property to the given value.
     pub fn repository_id(mut self, new_value: &str) -> ProjectLocationRepositoryCreateCall<'a, S> {
@@ -10560,7 +12443,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_get_iam_policy("resource")
-///              .options_requested_policy_version(-99)
+///              .options_requested_policy_version(-76)
 ///              .doit().await;
 /// # }
 /// ```
@@ -10834,8 +12717,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_repositories_list("parent")
-///              .page_token("vero")
-///              .page_size(-76)
+///              .page_token("Lorem")
+///              .page_size(-29)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11304,7 +13187,7 @@ where
         self._request = new_value;
         self
     }
-    /// The name of the repository, for example: "projects/p1/locations/us-central1/repositories/repo1".
+    /// The name of the repository, for example: `projects/p1/locations/us-central1/repositories/repo1`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -12243,6 +14126,268 @@ where
 }
 
 
+/// Retrieves the VPCSC Config for the Project.
+///
+/// A builder for the *locations.getVpcscConfig* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use artifactregistry1::{ArtifactRegistry, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ArtifactRegistry::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_get_vpcsc_config("name")
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationGetVpcscConfigCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ArtifactRegistry<S>,
+    _name: String,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationGetVpcscConfigCall<'a, S> {}
+
+impl<'a, S> ProjectLocationGetVpcscConfigCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, VPCSCConfig)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "artifactregistry.projects.locations.getVpcscConfig",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "name"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(3 + self._additional_params.len());
+        params.push("name", self._name);
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. The name of the VPCSCConfig resource.
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationGetVpcscConfigCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationGetVpcscConfigCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationGetVpcscConfigCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationGetVpcscConfigCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationGetVpcscConfigCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationGetVpcscConfigCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Lists information about the supported locations for this service.
 ///
 /// A builder for the *locations.list* method supported by a *project* resource.
@@ -12270,9 +14415,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_list("name")
-///              .page_token("diam")
-///              .page_size(-61)
-///              .filter("ipsum")
+///              .page_token("et")
+///              .page_size(-31)
+///              .filter("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -12535,6 +14680,310 @@ where
     /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
     /// for details).
     pub fn clear_scopes(mut self) -> ProjectLocationListCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Updates the VPCSC Config for the Project.
+///
+/// A builder for the *locations.updateVpcscConfig* method supported by a *project* resource.
+/// It is not used directly, but through a [`ProjectMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_artifactregistry1 as artifactregistry1;
+/// use artifactregistry1::api::VPCSCConfig;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use artifactregistry1::{ArtifactRegistry, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = ArtifactRegistry::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = VPCSCConfig::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.projects().locations_update_vpcsc_config(req, "name")
+///              .update_mask(&Default::default())
+///              .doit().await;
+/// # }
+/// ```
+pub struct ProjectLocationUpdateVpcscConfigCall<'a, S>
+    where S: 'a {
+
+    hub: &'a ArtifactRegistry<S>,
+    _request: VPCSCConfig,
+    _name: String,
+    _update_mask: Option<client::FieldMask>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for ProjectLocationUpdateVpcscConfigCall<'a, S> {}
+
+impl<'a, S> ProjectLocationUpdateVpcscConfigCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, VPCSCConfig)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "artifactregistry.projects.locations.updateVpcscConfig",
+                               http_method: hyper::Method::PATCH });
+
+        for &field in ["alt", "name", "updateMask"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(5 + self._additional_params.len());
+        params.push("name", self._name);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+name}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudPlatform.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+name}", "name")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["name"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: VPCSCConfig) -> ProjectLocationUpdateVpcscConfigCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// The name of the project's VPC SC Config. Always of the form: projects/{projectID}/locations/{location}/vpcscConfig In update request: never set In response: always set
+    ///
+    /// Sets the *name* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn name(mut self, new_value: &str) -> ProjectLocationUpdateVpcscConfigCall<'a, S> {
+        self._name = new_value.to_string();
+        self
+    }
+    /// Field mask to support partial updates.
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> ProjectLocationUpdateVpcscConfigCall<'a, S> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> ProjectLocationUpdateVpcscConfigCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> ProjectLocationUpdateVpcscConfigCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudPlatform`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> ProjectLocationUpdateVpcscConfigCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> ProjectLocationUpdateVpcscConfigCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> ProjectLocationUpdateVpcscConfigCall<'a, S> {
         self._scopes.clear();
         self
     }

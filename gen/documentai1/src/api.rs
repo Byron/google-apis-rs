@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -125,7 +125,7 @@ impl<'a, S> Document<S> {
         Document {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://documentai.googleapis.com/".to_string(),
             _root_url: "https://documentai.googleapis.com/".to_string(),
         }
@@ -139,7 +139,7 @@ impl<'a, S> Document<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -210,7 +210,7 @@ pub struct GoogleCloudDocumentaiV1BatchDocumentsInputConfig {
 impl client::Part for GoogleCloudDocumentaiV1BatchDocumentsInputConfig {}
 
 
-/// Request message for batch process document method.
+/// Request message for BatchProcessDocuments.
 /// 
 /// # Activities
 /// 
@@ -222,15 +222,22 @@ impl client::Part for GoogleCloudDocumentaiV1BatchDocumentsInputConfig {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDocumentaiV1BatchProcessRequest {
-    /// The overall output config for batch process.
+    /// The output configuration for the BatchProcessDocuments method.
     #[serde(rename="documentOutputConfig")]
     
     pub document_output_config: Option<GoogleCloudDocumentaiV1DocumentOutputConfig>,
-    /// The input documents for batch process.
+    /// The input documents for the BatchProcessDocuments method.
     #[serde(rename="inputDocuments")]
     
     pub input_documents: Option<GoogleCloudDocumentaiV1BatchDocumentsInputConfig>,
-    /// Whether Human Review feature should be skipped for this request. Default to false.
+    /// Optional. The labels with user-defined metadata for the request. Label keys and values can be no longer than 63 characters (Unicode codepoints) and can only contain lowercase letters, numeric characters, underscores, and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter.
+    
+    pub labels: Option<HashMap<String, String>>,
+    /// Inference-time options for the process API
+    #[serde(rename="processOptions")]
+    
+    pub process_options: Option<GoogleCloudDocumentaiV1ProcessOptions>,
+    /// Whether human review should be skipped for this request. Default to `false`.
     #[serde(rename="skipHumanReview")]
     
     pub skip_human_review: Option<bool>,
@@ -258,7 +265,7 @@ pub struct GoogleCloudDocumentaiV1BoundingPoly {
 impl client::Part for GoogleCloudDocumentaiV1BoundingPoly {}
 
 
-/// Request message for the deploy processor version method.
+/// Request message for the DeployProcessorVersion method.
 /// 
 /// # Activities
 /// 
@@ -273,7 +280,7 @@ pub struct GoogleCloudDocumentaiV1DeployProcessorVersionRequest { _never_set: Op
 impl client::RequestValue for GoogleCloudDocumentaiV1DeployProcessorVersionRequest {}
 
 
-/// Request message for the disable processor method.
+/// Request message for the DisableProcessor method.
 /// 
 /// # Activities
 /// 
@@ -297,7 +304,7 @@ impl client::RequestValue for GoogleCloudDocumentaiV1DisableProcessorRequest {}
 pub struct GoogleCloudDocumentaiV1Document {
     /// Optional. Inline document content, represented as a stream of bytes. Note: As with all `bytes` fields, protobuffers use a pure binary representation, whereas JSON representations use base64.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub content: Option<Vec<u8>>,
     /// A list of entities detected on Document.text. For document shards, entities in this list may cross shard boundaries.
     
@@ -309,7 +316,7 @@ pub struct GoogleCloudDocumentaiV1Document {
     /// Any error that occurred while processing this document.
     
     pub error: Option<GoogleRpcStatus>,
-    /// An IANA published MIME type (also referred to as media type). For more information, see https://www.iana.org/assignments/media-types/media-types.xhtml.
+    /// An IANA published [media type (MIME type)](https://www.iana.org/assignments/media-types/media-types.xhtml).
     #[serde(rename="mimeType")]
     
     pub mime_type: Option<String>,
@@ -334,7 +341,7 @@ pub struct GoogleCloudDocumentaiV1Document {
     #[serde(rename="textStyles")]
     
     pub text_styles: Option<Vec<GoogleCloudDocumentaiV1DocumentStyle>>,
-    /// Optional. Currently supports Google Cloud Storage URI of the form `gs://bucket_name/object_name`. Object versioning is not supported. See [Google Cloud Storage Request URIs](https://cloud.google.com/storage/docs/reference-uris) for more info.
+    /// Optional. Currently supports Google Cloud Storage URI of the form `gs://bucket_name/object_name`. Object versioning is not supported. For more information, refer to [Google Cloud Storage Request URIs](https://cloud.google.com/storage/docs/reference-uris).
     
     pub uri: Option<String>,
 }
@@ -547,7 +554,7 @@ pub struct GoogleCloudDocumentaiV1DocumentPage {
     /// Rendered image for this page. This image is preprocessed to remove any skew, rotation, and distortions such that the annotation bounding boxes can be upright and axis-aligned.
     
     pub image: Option<GoogleCloudDocumentaiV1DocumentPageImage>,
-    /// Image Quality Scores.
+    /// Image quality scores.
     #[serde(rename="imageQualityScores")]
     
     pub image_quality_scores: Option<GoogleCloudDocumentaiV1DocumentPageImageQualityScores>,
@@ -611,7 +618,7 @@ impl client::Part for GoogleCloudDocumentaiV1DocumentPageAnchor {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDocumentaiV1DocumentPageAnchorPageRef {
-    /// Optional. Identifies the bounding polygon of a layout element on the page.
+    /// Optional. Identifies the bounding polygon of a layout element on the page. If `layout_type` is set, the bounding polygon must be exactly the same to the layout element it's referring to.
     #[serde(rename="boundingPoly")]
     
     pub bounding_poly: Option<GoogleCloudDocumentaiV1BoundingPoly>,
@@ -685,7 +692,7 @@ pub struct GoogleCloudDocumentaiV1DocumentPageDetectedLanguage {
     /// Confidence of detected language. Range `[0, 1]`.
     
     pub confidence: Option<f32>,
-    /// The BCP-47 language code, such as `en-US` or `sr-Latn`. For more information, see https://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
+    /// The [BCP-47 language code](https://www.unicode.org/reports/tr35/#Unicode_locale_identifier), such as `en-US` or `sr-Latn`.
     #[serde(rename="languageCode")]
     
     pub language_code: Option<String>,
@@ -767,12 +774,12 @@ impl client::Part for GoogleCloudDocumentaiV1DocumentPageFormField {}
 pub struct GoogleCloudDocumentaiV1DocumentPageImage {
     /// Raw byte content of the image.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub content: Option<Vec<u8>>,
     /// Height of the image in pixels.
     
     pub height: Option<i32>,
-    /// Encoding mime type for the image.
+    /// Encoding [media type (MIME type)](https://www.iana.org/assignments/media-types/media-types.xhtml) for the image.
     #[serde(rename="mimeType")]
     
     pub mime_type: Option<String>,
@@ -784,7 +791,7 @@ pub struct GoogleCloudDocumentaiV1DocumentPageImage {
 impl client::Part for GoogleCloudDocumentaiV1DocumentPageImage {}
 
 
-/// Image Quality Scores for the page image
+/// Image quality scores for the page image.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -795,7 +802,7 @@ pub struct GoogleCloudDocumentaiV1DocumentPageImageQualityScores {
     #[serde(rename="detectedDefects")]
     
     pub detected_defects: Option<Vec<GoogleCloudDocumentaiV1DocumentPageImageQualityScoresDetectedDefect>>,
-    /// The overall quality score. Range `[0, 1]` where 1 is perfect quality.
+    /// The overall quality score. Range `[0, 1]` where `1` is perfect quality.
     #[serde(rename="qualityScore")]
     
     pub quality_score: Option<f32>,
@@ -811,7 +818,7 @@ impl client::Part for GoogleCloudDocumentaiV1DocumentPageImageQualityScores {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDocumentaiV1DocumentPageImageQualityScoresDetectedDefect {
-    /// Confidence of detected defect. Range `[0, 1]` where 1 indicates strong confidence of that the defect exists.
+    /// Confidence of detected defect. Range `[0, 1]` where `1` indicates strong confidence that the defect exists.
     
     pub confidence: Option<f32>,
     /// Name of the defect type. Supported values are: - `quality/defect_blurry` - `quality/defect_noisy` - `quality/defect_dark` - `quality/defect_faint` - `quality/defect_text_too_small` - `quality/defect_document_cutoff` - `quality/defect_text_cutoff` - `quality/defect_glare`
@@ -883,7 +890,7 @@ pub struct GoogleCloudDocumentaiV1DocumentPageMatrix {
     pub cols: Option<i32>,
     /// The matrix data.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub data: Option<Vec<u8>>,
     /// Number of rows in the matrix.
     
@@ -1031,6 +1038,10 @@ pub struct GoogleCloudDocumentaiV1DocumentPageToken {
     /// The history of this annotation.
     
     pub provenance: Option<GoogleCloudDocumentaiV1DocumentProvenance>,
+    /// Text style attributes.
+    #[serde(rename="styleInfo")]
+    
+    pub style_info: Option<GoogleCloudDocumentaiV1DocumentPageTokenStyleInfo>,
 }
 
 impl client::Part for GoogleCloudDocumentaiV1DocumentPageToken {}
@@ -1050,6 +1061,70 @@ pub struct GoogleCloudDocumentaiV1DocumentPageTokenDetectedBreak {
 }
 
 impl client::Part for GoogleCloudDocumentaiV1DocumentPageTokenDetectedBreak {}
+
+
+/// Font and other text style attributes.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDocumentaiV1DocumentPageTokenStyleInfo {
+    /// Color of the background.
+    #[serde(rename="backgroundColor")]
+    
+    pub background_color: Option<GoogleTypeColor>,
+    /// Whether the text is bold (equivalent to font_weight is at least `700`).
+    
+    pub bold: Option<bool>,
+    /// Font size in points (`1` point is `¹⁄₇₂` inches).
+    #[serde(rename="fontSize")]
+    
+    pub font_size: Option<i32>,
+    /// Name or style of the font.
+    #[serde(rename="fontType")]
+    
+    pub font_type: Option<String>,
+    /// TrueType weight on a scale `100` (thin) to `1000` (ultra-heavy). Normal is `400`, bold is `700`.
+    #[serde(rename="fontWeight")]
+    
+    pub font_weight: Option<i32>,
+    /// Whether the text is handwritten.
+    
+    pub handwritten: Option<bool>,
+    /// Whether the text is italic.
+    
+    pub italic: Option<bool>,
+    /// Letter spacing in points.
+    #[serde(rename="letterSpacing")]
+    
+    pub letter_spacing: Option<f64>,
+    /// Font size in pixels, equal to _unrounded font_size_ * _resolution_ ÷ `72.0`.
+    #[serde(rename="pixelFontSize")]
+    
+    pub pixel_font_size: Option<f64>,
+    /// Whether the text is in small caps.
+    
+    pub smallcaps: Option<bool>,
+    /// Whether the text is strikethrough.
+    
+    pub strikeout: Option<bool>,
+    /// Whether the text is a subscript.
+    
+    pub subscript: Option<bool>,
+    /// Whether the text is a superscript.
+    
+    pub superscript: Option<bool>,
+    /// Color of the text.
+    #[serde(rename="textColor")]
+    
+    pub text_color: Option<GoogleTypeColor>,
+    /// Whether the text is underlined.
+    
+    pub underlined: Option<bool>,
+}
+
+impl client::Part for GoogleCloudDocumentaiV1DocumentPageTokenStyleInfo {}
 
 
 /// Detected non-text visual elements e.g. checkbox, signature etc. on the page.
@@ -1131,7 +1206,7 @@ pub struct GoogleCloudDocumentaiV1DocumentRevision {
     /// If the change was made by a person specify the name or id of that person.
     
     pub agent: Option<String>,
-    /// The time that the revision was created.
+    /// The time that the revision was created, internally generated by doc proto storage at the time of create.
     #[serde(rename="createTime")]
     
     pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
@@ -1139,7 +1214,7 @@ pub struct GoogleCloudDocumentaiV1DocumentRevision {
     #[serde(rename="humanReview")]
     
     pub human_review: Option<GoogleCloudDocumentaiV1DocumentRevisionHumanReview>,
-    /// Id of the revision. Unique within the context of the document.
+    /// Id of the revision, internally generated by doc proto storage. Unique within the context of the document.
     
     pub id: Option<String>,
     /// The revisions that this revision is based on. This can include one or more parent (when documents are merged.) This field represents the index into the `revisions` field.
@@ -1221,10 +1296,10 @@ pub struct GoogleCloudDocumentaiV1DocumentSchemaEntityType {
     #[serde(rename="enumValues")]
     
     pub enum_values: Option<GoogleCloudDocumentaiV1DocumentSchemaEntityTypeEnumValues>,
-    /// Name of the type. It must be unique within the schema file and cannot be a 'Common Type'. Besides that we use the following naming conventions: - *use `snake_casing`* - name matching is case-sensitive - Maximum 64 characters. - Must start with a letter. - Allowed characters: ASCII letters `[a-z0-9_-]`. (For backward compatibility internal infrastructure and tooling can handle any ascii character) - The `/` is sometimes used to denote a property of a type. For example `line_item/amount`. This convention is deprecated, but will still be honored for backward compatibility.
+    /// Name of the type. It must be unique within the schema file and cannot be a "Common Type". The following naming conventions are used: - Use `snake_casing`. - Name matching is case-sensitive. - Maximum 64 characters. - Must start with a letter. - Allowed characters: ASCII letters `[a-z0-9_-]`. (For backward compatibility internal infrastructure and tooling can handle any ascii character.) - The `/` is sometimes used to denote a property of a type. For example `line_item/amount`. This convention is deprecated, but will still be honored for backward compatibility.
     
     pub name: Option<String>,
-    /// Describing the nested structure, or composition of an entity.
+    /// Description the nested structure, or composition of an entity.
     
     pub properties: Option<Vec<GoogleCloudDocumentaiV1DocumentSchemaEntityTypeProperty>>,
 }
@@ -1254,6 +1329,10 @@ impl client::Part for GoogleCloudDocumentaiV1DocumentSchemaEntityTypeEnumValues 
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDocumentaiV1DocumentSchemaEntityTypeProperty {
+    /// User defined name for the property.
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
     /// The name of the property. Follows the same guidelines as the EntityType name.
     
     pub name: Option<String>,
@@ -1281,7 +1360,7 @@ pub struct GoogleCloudDocumentaiV1DocumentSchemaMetadata {
     #[serde(rename="documentAllowMultipleLabels")]
     
     pub document_allow_multiple_labels: Option<bool>,
-    /// If true, a `document` entity type can be applied to subdocument ( splitting). Otherwise, it can only be applied to the entire document (classification).
+    /// If true, a `document` entity type can be applied to subdocument (splitting). Otherwise, it can only be applied to the entire document (classification).
     #[serde(rename="documentSplitter")]
     
     pub document_splitter: Option<bool>,
@@ -1347,7 +1426,7 @@ pub struct GoogleCloudDocumentaiV1DocumentStyle {
     #[serde(rename="fontSize")]
     
     pub font_size: Option<GoogleCloudDocumentaiV1DocumentStyleFontSize>,
-    /// Font weight. Possible values are normal, bold, bolder, and lighter. https://www.w3schools.com/cssref/pr_font_weight.asp
+    /// [Font weight](https://www.w3schools.com/cssref/pr_font_weight.asp). Possible values are `normal`, `bold`, `bolder`, and `lighter`.
     #[serde(rename="fontWeight")]
     
     pub font_weight: Option<String>,
@@ -1355,11 +1434,11 @@ pub struct GoogleCloudDocumentaiV1DocumentStyle {
     #[serde(rename="textAnchor")]
     
     pub text_anchor: Option<GoogleCloudDocumentaiV1DocumentTextAnchor>,
-    /// Text decoration. Follows CSS standard. https://www.w3schools.com/cssref/pr_text_text-decoration.asp
+    /// [Text decoration](https://www.w3schools.com/cssref/pr_text_text-decoration.asp). Follows CSS standard. 
     #[serde(rename="textDecoration")]
     
     pub text_decoration: Option<String>,
-    /// Text style. Possible values are normal, italic, and oblique. https://www.w3schools.com/cssref/pr_font_font-style.asp
+    /// [Text style](https://www.w3schools.com/cssref/pr_font_font-style.asp). Possible values are `normal`, `italic`, and `oblique`.
     #[serde(rename="textStyle")]
     
     pub text_style: Option<String>,
@@ -1378,7 +1457,7 @@ pub struct GoogleCloudDocumentaiV1DocumentStyleFontSize {
     /// Font size for the text.
     
     pub size: Option<f32>,
-    /// Unit for the font size. Follows CSS naming (in, px, pt, etc.).
+    /// Unit for the font size. Follows CSS naming (such as `in`, `px`, and `pt`).
     
     pub unit: Option<String>,
 }
@@ -1450,7 +1529,7 @@ pub struct GoogleCloudDocumentaiV1DocumentTextChange {
 impl client::Part for GoogleCloudDocumentaiV1DocumentTextChange {}
 
 
-/// Request message for the enable processor method.
+/// Request message for the EnableProcessor method.
 /// 
 /// # Activities
 /// 
@@ -1694,7 +1773,7 @@ pub struct GoogleCloudDocumentaiV1EvaluationReference {
 impl client::Part for GoogleCloudDocumentaiV1EvaluationReference {}
 
 
-/// Response message for fetch processor types.
+/// Response message for the FetchProcessorTypes method.
 /// 
 /// # Activities
 /// 
@@ -1772,7 +1851,7 @@ impl client::Part for GoogleCloudDocumentaiV1GcsPrefix {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDocumentaiV1HumanReviewStatus {
-    /// The name of the operation triggered by the processed document. This field is populated only when the [state] is [HUMAN_REVIEW_IN_PROGRESS]. It has the same response type and metadata as the long running operation returned by [ReviewDocument] method.
+    /// The name of the operation triggered by the processed document. This field is populated only when the state is `HUMAN_REVIEW_IN_PROGRESS`. It has the same response type and metadata as the long-running operation returned by ReviewDocument.
     #[serde(rename="humanReviewOperation")]
     
     pub human_review_operation: Option<String>,
@@ -1788,7 +1867,7 @@ pub struct GoogleCloudDocumentaiV1HumanReviewStatus {
 impl client::Part for GoogleCloudDocumentaiV1HumanReviewStatus {}
 
 
-/// The response from ListEvaluations.
+/// The response from `ListEvaluations`.
 /// 
 /// # Activities
 /// 
@@ -1811,7 +1890,7 @@ pub struct GoogleCloudDocumentaiV1ListEvaluationsResponse {
 impl client::ResponseResult for GoogleCloudDocumentaiV1ListEvaluationsResponse {}
 
 
-/// Response message for list processor types.
+/// Response message for the ListProcessorTypes method.
 /// 
 /// # Activities
 /// 
@@ -1835,7 +1914,7 @@ pub struct GoogleCloudDocumentaiV1ListProcessorTypesResponse {
 impl client::ResponseResult for GoogleCloudDocumentaiV1ListProcessorTypesResponse {}
 
 
-/// Response message for list processors.
+/// Response message for the ListProcessorVersions method.
 /// 
 /// # Activities
 /// 
@@ -1859,7 +1938,7 @@ pub struct GoogleCloudDocumentaiV1ListProcessorVersionsResponse {
 impl client::ResponseResult for GoogleCloudDocumentaiV1ListProcessorVersionsResponse {}
 
 
-/// Response message for list processors.
+/// Response message for the ListProcessors method.
 /// 
 /// # Activities
 /// 
@@ -1900,7 +1979,137 @@ pub struct GoogleCloudDocumentaiV1NormalizedVertex {
 impl client::Part for GoogleCloudDocumentaiV1NormalizedVertex {}
 
 
-/// Request message for the process document method.
+/// Config for Document OCR.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDocumentaiV1OcrConfig {
+    /// A list of advanced OCR options to further fine-tune OCR behavior. Current valid values are: - `legacy_layout`: a heuristics layout detection algorithm, which serves as an alternative to the current ML-based layout detection algorithm. Customers can choose the best suitable layout algorithm based on their situation.
+    #[serde(rename="advancedOcrOptions")]
+    
+    pub advanced_ocr_options: Option<Vec<String>>,
+    /// Turn on font identification model and return font style information. Deprecated, use PremiumFeatures.compute_style_info instead.
+    #[serde(rename="computeStyleInfo")]
+    
+    pub compute_style_info: Option<bool>,
+    /// Turn off character box detector in OCR engine. Character box detection is enabled by default in OCR 2.0 (and later) processors.
+    #[serde(rename="disableCharacterBoxesDetection")]
+    
+    pub disable_character_boxes_detection: Option<bool>,
+    /// Enables intelligent document quality scores after OCR. Can help with diagnosing why OCR responses are of poor quality for a given input. Adds additional latency comparable to regular OCR to the process call.
+    #[serde(rename="enableImageQualityScores")]
+    
+    pub enable_image_quality_scores: Option<bool>,
+    /// Enables special handling for PDFs with existing text information. Results in better text extraction quality in such PDF inputs.
+    #[serde(rename="enableNativePdfParsing")]
+    
+    pub enable_native_pdf_parsing: Option<bool>,
+    /// Includes symbol level OCR information if set to true.
+    #[serde(rename="enableSymbol")]
+    
+    pub enable_symbol: Option<bool>,
+    /// Hints for the OCR model.
+    
+    pub hints: Option<GoogleCloudDocumentaiV1OcrConfigHints>,
+    /// Configurations for premium OCR features.
+    #[serde(rename="premiumFeatures")]
+    
+    pub premium_features: Option<GoogleCloudDocumentaiV1OcrConfigPremiumFeatures>,
+}
+
+impl client::Part for GoogleCloudDocumentaiV1OcrConfig {}
+
+
+/// Hints for OCR Engine
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDocumentaiV1OcrConfigHints {
+    /// List of BCP-47 language codes to use for OCR. In most cases, not specifying it yields the best results since it enables automatic language detection. For languages based on the Latin alphabet, setting hints is not needed. In rare cases, when the language of the text in the image is known, setting a hint will help get better results (although it will be a significant hindrance if the hint is wrong).
+    #[serde(rename="languageHints")]
+    
+    pub language_hints: Option<Vec<String>>,
+}
+
+impl client::Part for GoogleCloudDocumentaiV1OcrConfigHints {}
+
+
+/// Configurations for premium OCR features.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDocumentaiV1OcrConfigPremiumFeatures {
+    /// Turn on font identification model and return font style information.
+    #[serde(rename="computeStyleInfo")]
+    
+    pub compute_style_info: Option<bool>,
+    /// Turn on the model that can extract LaTeX math formulas.
+    #[serde(rename="enableMathOcr")]
+    
+    pub enable_math_ocr: Option<bool>,
+    /// Turn on selection mark detector in OCR engine. Only available in OCR 2.0 (and later) processors.
+    #[serde(rename="enableSelectionMarkDetection")]
+    
+    pub enable_selection_mark_detection: Option<bool>,
+}
+
+impl client::Part for GoogleCloudDocumentaiV1OcrConfigPremiumFeatures {}
+
+
+/// Options for Process API
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDocumentaiV1ProcessOptions {
+    /// Only process certain pages from the end, same as above.
+    #[serde(rename="fromEnd")]
+    
+    pub from_end: Option<i32>,
+    /// Only process certain pages from the start. Process all if the document has fewer pages.
+    #[serde(rename="fromStart")]
+    
+    pub from_start: Option<i32>,
+    /// Which pages to process (1-indexed).
+    #[serde(rename="individualPageSelector")]
+    
+    pub individual_page_selector: Option<GoogleCloudDocumentaiV1ProcessOptionsIndividualPageSelector>,
+    /// Only applicable to `OCR_PROCESSOR` and `FORM_PARSER_PROCESSOR`. Returns error if set on other processor types.
+    #[serde(rename="ocrConfig")]
+    
+    pub ocr_config: Option<GoogleCloudDocumentaiV1OcrConfig>,
+    /// Optional. Override the schema of the ProcessorVersion. Will return an Invalid Argument error if this field is set when the underlying ProcessorVersion doesn't support schema override.
+    #[serde(rename="schemaOverride")]
+    
+    pub schema_override: Option<GoogleCloudDocumentaiV1DocumentSchema>,
+}
+
+impl client::Part for GoogleCloudDocumentaiV1ProcessOptions {}
+
+
+/// A list of individual page numbers.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDocumentaiV1ProcessOptionsIndividualPageSelector {
+    /// Optional. Indices of the pages (starting from 1).
+    
+    pub pages: Option<Vec<i32>>,
+}
+
+impl client::Part for GoogleCloudDocumentaiV1ProcessOptionsIndividualPageSelector {}
+
+
+/// Request message for the ProcessDocument method.
 /// 
 /// # Activities
 /// 
@@ -1912,19 +2121,30 @@ impl client::Part for GoogleCloudDocumentaiV1NormalizedVertex {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDocumentaiV1ProcessRequest {
-    /// Specifies which fields to include in ProcessResponse's document. Only supports top level document and pages field so it must be in the form of `{document_field_name}` or `pages.{page_field_name}`.
+    /// Specifies which fields to include in the ProcessResponse.document output. Only supports top-level document and pages field, so it must be in the form of `{document_field_name}` or `pages.{page_field_name}`.
     #[serde(rename="fieldMask")]
     
     pub field_mask: Option<client::FieldMask>,
+    /// A raw document on Google Cloud Storage.
+    #[serde(rename="gcsDocument")]
+    
+    pub gcs_document: Option<GoogleCloudDocumentaiV1GcsDocument>,
     /// An inline document proto.
     #[serde(rename="inlineDocument")]
     
     pub inline_document: Option<GoogleCloudDocumentaiV1Document>,
+    /// Optional. The labels with user-defined metadata for the request. Label keys and values can be no longer than 63 characters (Unicode codepoints) and can only contain lowercase letters, numeric characters, underscores, and dashes. International characters are allowed. Label values are optional. Label keys must start with a letter.
+    
+    pub labels: Option<HashMap<String, String>>,
+    /// Inference-time options for the process API
+    #[serde(rename="processOptions")]
+    
+    pub process_options: Option<GoogleCloudDocumentaiV1ProcessOptions>,
     /// A raw document content (bytes).
     #[serde(rename="rawDocument")]
     
     pub raw_document: Option<GoogleCloudDocumentaiV1RawDocument>,
-    /// Whether Human Review feature should be skipped for this request. Default to false.
+    /// Whether human review should be skipped for this request. Default to `false`.
     #[serde(rename="skipHumanReview")]
     
     pub skip_human_review: Option<bool>,
@@ -1933,7 +2153,7 @@ pub struct GoogleCloudDocumentaiV1ProcessRequest {
 impl client::RequestValue for GoogleCloudDocumentaiV1ProcessRequest {}
 
 
-/// Response message for the process document method.
+/// Response message for the ProcessDocument method.
 /// 
 /// # Activities
 /// 
@@ -1981,7 +2201,7 @@ pub struct GoogleCloudDocumentaiV1Processor {
     #[serde(rename="displayName")]
     
     pub display_name: Option<String>,
-    /// The KMS key used for encryption/decryption in CMEK scenarios. See https://cloud.google.com/security-key-management.
+    /// The [KMS key](https://cloud.google.com/security-key-management) used for encryption and decryption in CMEK scenarios.
     #[serde(rename="kmsKeyName")]
     
     pub kms_key_name: Option<String>,
@@ -1992,10 +2212,14 @@ pub struct GoogleCloudDocumentaiV1Processor {
     #[serde(rename="processEndpoint")]
     
     pub process_endpoint: Option<String>,
+    /// Output only. The processor version aliases.
+    #[serde(rename="processorVersionAliases")]
+    
+    pub processor_version_aliases: Option<Vec<GoogleCloudDocumentaiV1ProcessorVersionAlias>>,
     /// Output only. The state of the processor.
     
     pub state: Option<String>,
-    /// The processor type, e.g., `OCR_PROCESSOR`, `INVOICE_PROCESSOR`, etc. To get a list of processors types, see FetchProcessorTypes.
+    /// The processor type, such as: `OCR_PROCESSOR`, `INVOICE_PROCESSOR`. To get a list of processor types, see FetchProcessorTypes.
     #[serde(rename="type")]
     
     pub type_: Option<String>,
@@ -2038,7 +2262,7 @@ pub struct GoogleCloudDocumentaiV1ProcessorType {
     #[serde(rename="sampleDocumentUris")]
     
     pub sample_document_uris: Option<Vec<String>>,
-    /// The processor type, e.g., `OCR_PROCESSOR`, `INVOICE_PROCESSOR`, etc.
+    /// The processor type, such as: `OCR_PROCESSOR`, `INVOICE_PROCESSOR`.
     #[serde(rename="type")]
     
     pub type_: Option<String>,
@@ -2054,7 +2278,7 @@ impl client::ResponseResult for GoogleCloudDocumentaiV1ProcessorType {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudDocumentaiV1ProcessorTypeLocationInfo {
-    /// The location id, currently must be one of [us, eu].
+    /// The location ID. For supported locations, refer to [regional and multi-regional support](https://cloud.google.com/document-ai/docs/regions).
     #[serde(rename="locationId")]
     
     pub location_id: Option<String>,
@@ -2063,7 +2287,7 @@ pub struct GoogleCloudDocumentaiV1ProcessorTypeLocationInfo {
 impl client::Part for GoogleCloudDocumentaiV1ProcessorTypeLocationInfo {}
 
 
-/// A processor version is an implementation of a processor. Each processor can have multiple versions, pre-trained by Google internally or up-trained by the customer. At a time, a processor can only have one default version version. So the processor’s behavior (when processing documents) is defined by a default version
+/// A processor version is an implementation of a processor. Each processor can have multiple versions, pretrained by Google internally or uptrained by the customer. A processor can only have one default version at a time. Its document-processing behavior is defined by that version.
 /// 
 /// # Activities
 /// 
@@ -2090,7 +2314,7 @@ pub struct GoogleCloudDocumentaiV1ProcessorVersion {
     #[serde(rename="documentSchema")]
     
     pub document_schema: Option<GoogleCloudDocumentaiV1DocumentSchema>,
-    /// Denotes that this ProcessorVersion is managed by google.
+    /// Output only. Denotes that this `ProcessorVersion` is managed by Google.
     #[serde(rename="googleManaged")]
     
     pub google_managed: Option<bool>,
@@ -2106,6 +2330,10 @@ pub struct GoogleCloudDocumentaiV1ProcessorVersion {
     #[serde(rename="latestEvaluation")]
     
     pub latest_evaluation: Option<GoogleCloudDocumentaiV1EvaluationReference>,
+    /// Output only. The model type of this processor version.
+    #[serde(rename="modelType")]
+    
+    pub model_type: Option<String>,
     /// The resource name of the processor version. Format: `projects/{project}/locations/{location}/processors/{processor}/processorVersions/{processor_version}`
     
     pub name: Option<String>,
@@ -2115,6 +2343,25 @@ pub struct GoogleCloudDocumentaiV1ProcessorVersion {
 }
 
 impl client::ResponseResult for GoogleCloudDocumentaiV1ProcessorVersion {}
+
+
+/// Contains the alias and the aliased resource name of processor version.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDocumentaiV1ProcessorVersionAlias {
+    /// The alias in the form of `processor_version` resource name.
+    
+    pub alias: Option<String>,
+    /// The resource name of aliased processor version.
+    #[serde(rename="processorVersion")]
+    
+    pub processor_version: Option<String>,
+}
+
+impl client::Part for GoogleCloudDocumentaiV1ProcessorVersionAlias {}
 
 
 /// Information about the upcoming deprecation of this processor version.
@@ -2146,8 +2393,12 @@ impl client::Part for GoogleCloudDocumentaiV1ProcessorVersionDeprecationInfo {}
 pub struct GoogleCloudDocumentaiV1RawDocument {
     /// Inline document content.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub content: Option<Vec<u8>>,
+    /// The display name of the document, it supports all Unicode characters except the following: `*`, `?`, `[`, `]`, `%`, `{`, `}`,`'`, `\"`, `,` `~`, `=` and `:` are reserved. If not specified, a default ID is generated.
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
     /// An IANA MIME type (RFC6838) indicating the nature and format of the content.
     #[serde(rename="mimeType")]
     
@@ -2157,7 +2408,7 @@ pub struct GoogleCloudDocumentaiV1RawDocument {
 impl client::Part for GoogleCloudDocumentaiV1RawDocument {}
 
 
-/// Request message for review document method.
+/// Request message for the ReviewDocument method.
 /// 
 /// # Activities
 /// 
@@ -2188,7 +2439,7 @@ pub struct GoogleCloudDocumentaiV1ReviewDocumentRequest {
 impl client::RequestValue for GoogleCloudDocumentaiV1ReviewDocumentRequest {}
 
 
-/// Request message for the set default processor version method.
+/// Request message for the SetDefaultProcessorVersion method.
 /// 
 /// # Activities
 /// 
@@ -2208,7 +2459,7 @@ pub struct GoogleCloudDocumentaiV1SetDefaultProcessorVersionRequest {
 impl client::RequestValue for GoogleCloudDocumentaiV1SetDefaultProcessorVersionRequest {}
 
 
-/// Request message for the create processor version method.
+/// Request message for the TrainProcessorVersion method.
 /// 
 /// # Activities
 /// 
@@ -2223,11 +2474,15 @@ pub struct GoogleCloudDocumentaiV1TrainProcessorVersionRequest {
     #[serde(rename="baseProcessorVersion")]
     
     pub base_processor_version: Option<String>,
+    /// Options to control Custom Document Extraction (CDE) Processor.
+    #[serde(rename="customDocumentExtractionOptions")]
+    
+    pub custom_document_extraction_options: Option<GoogleCloudDocumentaiV1TrainProcessorVersionRequestCustomDocumentExtractionOptions>,
     /// Optional. The schema the processor version will be trained with.
     #[serde(rename="documentSchema")]
     
     pub document_schema: Option<GoogleCloudDocumentaiV1DocumentSchema>,
-    /// Optional. The input data used to train the `ProcessorVersion`.
+    /// Optional. The input data used to train the ProcessorVersion.
     #[serde(rename="inputData")]
     
     pub input_data: Option<GoogleCloudDocumentaiV1TrainProcessorVersionRequestInputData>,
@@ -2240,7 +2495,23 @@ pub struct GoogleCloudDocumentaiV1TrainProcessorVersionRequest {
 impl client::RequestValue for GoogleCloudDocumentaiV1TrainProcessorVersionRequest {}
 
 
-/// The input data used to train a new `ProcessorVersion`.
+/// Options to control the training of the Custom Document Extraction (CDE) Processor.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudDocumentaiV1TrainProcessorVersionRequestCustomDocumentExtractionOptions {
+    /// Training method to use for CDE training.
+    #[serde(rename="trainingMethod")]
+    
+    pub training_method: Option<String>,
+}
+
+impl client::Part for GoogleCloudDocumentaiV1TrainProcessorVersionRequestCustomDocumentExtractionOptions {}
+
+
+/// The input data used to train a new ProcessorVersion.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2260,7 +2531,7 @@ pub struct GoogleCloudDocumentaiV1TrainProcessorVersionRequestInputData {
 impl client::Part for GoogleCloudDocumentaiV1TrainProcessorVersionRequestInputData {}
 
 
-/// Request message for the undeploy processor version method.
+/// Request message for the UndeployProcessorVersion method.
 /// 
 /// # Activities
 /// 
@@ -2316,7 +2587,7 @@ pub struct GoogleCloudLocationListLocationsResponse {
 impl client::ResponseResult for GoogleCloudLocationListLocationsResponse {}
 
 
-/// A resource that represents Google Cloud Platform location.
+/// A resource that represents a Google Cloud location.
 /// 
 /// # Activities
 /// 
@@ -2408,7 +2679,7 @@ pub struct GoogleLongrunningOperation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -2453,7 +2724,7 @@ pub struct GoogleRpcStatus {
 impl client::Part for GoogleRpcStatus {}
 
 
-/// Represents a color in the RGBA color space. This representation is designed for simplicity of conversion to/from color representations in various languages over compactness. For example, the fields of this representation can be trivially provided to the constructor of `java.awt.Color` in Java; it can also be trivially provided to UIColor's `+colorWithRed:green:blue:alpha` method in iOS; and, with just a little work, it can be easily formatted into a CSS `rgba()` string in JavaScript. This reference page doesn't carry information about the absolute color space that should be used to interpret the RGB value (e.g. sRGB, Adobe RGB, DCI-P3, BT.2020, etc.). By default, applications should assume the sRGB color space. When color equality needs to be decided, implementations, unless documented otherwise, treat two colors as equal if all their red, green, blue, and alpha values each differ by at most 1e-5. Example (Java): import com.google.type.Color; // ... public static java.awt.Color fromProto(Color protocolor) { float alpha = protocolor.hasAlpha() ? protocolor.getAlpha().getValue() : 1.0; return new java.awt.Color( protocolor.getRed(), protocolor.getGreen(), protocolor.getBlue(), alpha); } public static Color toProto(java.awt.Color color) { float red = (float) color.getRed(); float green = (float) color.getGreen(); float blue = (float) color.getBlue(); float denominator = 255.0; Color.Builder resultBuilder = Color .newBuilder() .setRed(red / denominator) .setGreen(green / denominator) .setBlue(blue / denominator); int alpha = color.getAlpha(); if (alpha != 255) { result.setAlpha( FloatValue .newBuilder() .setValue(((float) alpha) / denominator) .build()); } return resultBuilder.build(); } // ... Example (iOS / Obj-C): // ... static UIColor* fromProto(Color* protocolor) { float red = [protocolor red]; float green = [protocolor green]; float blue = [protocolor blue]; FloatValue* alpha_wrapper = [protocolor alpha]; float alpha = 1.0; if (alpha_wrapper != nil) { alpha = [alpha_wrapper value]; } return [UIColor colorWithRed:red green:green blue:blue alpha:alpha]; } static Color* toProto(UIColor* color) { CGFloat red, green, blue, alpha; if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) { return nil; } Color* result = [[Color alloc] init]; [result setRed:red]; [result setGreen:green]; [result setBlue:blue]; if (alpha <= 0.9999) { [result setAlpha:floatWrapperWithValue(alpha)]; } [result autorelease]; return result; } // ... Example (JavaScript): // ... var protoToCssColor = function(rgb_color) { var redFrac = rgb_color.red || 0.0; var greenFrac = rgb_color.green || 0.0; var blueFrac = rgb_color.blue || 0.0; var red = Math.floor(redFrac * 255); var green = Math.floor(greenFrac * 255); var blue = Math.floor(blueFrac * 255); if (!('alpha' in rgb_color)) { return rgbToCssColor(red, green, blue); } var alphaFrac = rgb_color.alpha.value || 0.0; var rgbParams = [red, green, blue].join(','); return ['rgba(', rgbParams, ',', alphaFrac, ')'].join(''); }; var rgbToCssColor = function(red, green, blue) { var rgbNumber = new Number((red << 16) | (green << 8) | blue); var hexString = rgbNumber.toString(16); var missingZeros = 6 - hexString.length; var resultBuilder = ['#']; for (var i = 0; i < missingZeros; i++) { resultBuilder.push('0'); } resultBuilder.push(hexString); return resultBuilder.join(''); }; // ...
+/// Represents a color in the RGBA color space. This representation is designed for simplicity of conversion to and from color representations in various languages over compactness. For example, the fields of this representation can be trivially provided to the constructor of `java.awt.Color` in Java; it can also be trivially provided to UIColor's `+colorWithRed:green:blue:alpha` method in iOS; and, with just a little work, it can be easily formatted into a CSS `rgba()` string in JavaScript. This reference page doesn't have information about the absolute color space that should be used to interpret the RGB value—for example, sRGB, Adobe RGB, DCI-P3, and BT.2020. By default, applications should assume the sRGB color space. When color equality needs to be decided, implementations, unless documented otherwise, treat two colors as equal if all their red, green, blue, and alpha values each differ by at most `1e-5`. Example (Java): import com.google.type.Color; // ... public static java.awt.Color fromProto(Color protocolor) { float alpha = protocolor.hasAlpha() ? protocolor.getAlpha().getValue() : 1.0; return new java.awt.Color( protocolor.getRed(), protocolor.getGreen(), protocolor.getBlue(), alpha); } public static Color toProto(java.awt.Color color) { float red = (float) color.getRed(); float green = (float) color.getGreen(); float blue = (float) color.getBlue(); float denominator = 255.0; Color.Builder resultBuilder = Color .newBuilder() .setRed(red / denominator) .setGreen(green / denominator) .setBlue(blue / denominator); int alpha = color.getAlpha(); if (alpha != 255) { result.setAlpha( FloatValue .newBuilder() .setValue(((float) alpha) / denominator) .build()); } return resultBuilder.build(); } // ... Example (iOS / Obj-C): // ... static UIColor* fromProto(Color* protocolor) { float red = [protocolor red]; float green = [protocolor green]; float blue = [protocolor blue]; FloatValue* alpha_wrapper = [protocolor alpha]; float alpha = 1.0; if (alpha_wrapper != nil) { alpha = [alpha_wrapper value]; } return [UIColor colorWithRed:red green:green blue:blue alpha:alpha]; } static Color* toProto(UIColor* color) { CGFloat red, green, blue, alpha; if (![color getRed:&red green:&green blue:&blue alpha:&alpha]) { return nil; } Color* result = [[Color alloc] init]; [result setRed:red]; [result setGreen:green]; [result setBlue:blue]; if (alpha <= 0.9999) { [result setAlpha:floatWrapperWithValue(alpha)]; } [result autorelease]; return result; } // ... Example (JavaScript): // ... var protoToCssColor = function(rgb_color) { var redFrac = rgb_color.red || 0.0; var greenFrac = rgb_color.green || 0.0; var blueFrac = rgb_color.blue || 0.0; var red = Math.floor(redFrac * 255); var green = Math.floor(greenFrac * 255); var blue = Math.floor(blueFrac * 255); if (!('alpha' in rgb_color)) { return rgbToCssColor(red, green, blue); } var alphaFrac = rgb_color.alpha.value || 0.0; var rgbParams = [red, green, blue].join(','); return ['rgba(', rgbParams, ',', alphaFrac, ')'].join(''); }; var rgbToCssColor = function(red, green, blue) { var rgbNumber = new Number((red << 16) | (green << 8) | blue); var hexString = rgbNumber.toString(16); var missingZeros = 6 - hexString.length; var resultBuilder = ['#']; for (var i = 0; i < missingZeros; i++) { resultBuilder.push('0'); } resultBuilder.push(hexString); return resultBuilder.join(''); }; // ...
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -2769,7 +3040,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
     /// 
     /// # Arguments
     ///
@@ -2810,7 +3081,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The location of processor type to list. The available processor types may depend on the allow-listing on projects. Format: `projects/{project}/locations/{location}`
+    /// * `parent` - Required. The location of processor types to list. Format: `projects/{project}/locations/{location}`.
     pub fn locations_processor_types_list(&self, parent: &str) -> ProjectLocationProcessorTypeListCall<'a, S> {
         ProjectLocationProcessorTypeListCall {
             hub: self.hub,
@@ -3009,7 +3280,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Trains a new processor version. Operation metadata is returned as cloud_documentai_core.TrainProcessorVersionMetadata.
+    /// Trains a new processor version. Operation metadata is returned as TrainProcessorVersionMetadata.
     /// 
     /// # Arguments
     ///
@@ -3066,7 +3337,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a processor from the type processor that the user chose. The processor will be at "ENABLED" state by default after its creation.
+    /// Creates a processor from the ProcessorType provided. The processor will be at `ENABLED` state by default after its creation.
     /// 
     /// # Arguments
     ///
@@ -3214,11 +3485,11 @@ impl<'a, S> ProjectMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Fetches processor types. Note that we do not use ListProcessorTypes here because it is not paginated.
+    /// Fetches processor types. Note that we don't use ListProcessorTypes here, because it isn't paginated.
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. The project of processor type to list. The available processor types may depend on the allow-listing on projects. Format: `projects/{project}/locations/{location}`
+    /// * `parent` - Required. The location of processor types to list. Format: `projects/{project}/locations/{location}`.
     pub fn locations_fetch_processor_types(&self, parent: &str) -> ProjectLocationFetchProcessorTypeCall<'a, S> {
         ProjectLocationFetchProcessorTypeCall {
             hub: self.hub,
@@ -4078,7 +4349,7 @@ where
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *locations.operations.list* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -4824,7 +5095,7 @@ where
     }
 
 
-    /// Required. The location of processor type to list. The available processor types may depend on the allow-listing on projects. Format: `projects/{project}/locations/{location}`
+    /// Required. The location of processor types to list. Format: `projects/{project}/locations/{location}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4841,7 +5112,7 @@ where
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of processor types to return. If unspecified, at most 100 processor types will be returned. The maximum value is 500; values above 500 will be coerced to 500.
+    /// The maximum number of processor types to return. If unspecified, at most `100` processor types will be returned. The maximum value is `500`. Values above `500` will be coerced to `500`.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationProcessorTypeListCall<'a, S> {
@@ -5681,7 +5952,7 @@ where
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The standard list page size. If unspecified, at most 5 evaluations will be returned. The maximum value is 100; values above 100 will be coerced to 100.
+    /// The standard list page size. If unspecified, at most `5` evaluations are returned. The maximum value is `100`. Values above `100` are coerced to `100`.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationProcessorProcessorVersionEvaluationListCall<'a, S> {
@@ -7367,7 +7638,7 @@ where
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of processor versions to return. If unspecified, at most 10 processor versions will be returned. The maximum value is 20; values above 20 will be coerced to 20.
+    /// The maximum number of processor versions to return. If unspecified, at most `10` processor versions will be returned. The maximum value is `20`. Values above `20` will be coerced to `20`.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationProcessorProcessorVersionListCall<'a, S> {
@@ -7742,7 +8013,7 @@ where
 }
 
 
-/// Trains a new processor version. Operation metadata is returned as cloud_documentai_core.TrainProcessorVersionMetadata.
+/// Trains a new processor version. Operation metadata is returned as TrainProcessorVersionMetadata.
 ///
 /// A builder for the *locations.processors.processorVersions.train* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -8618,7 +8889,7 @@ where
 }
 
 
-/// Creates a processor from the type processor that the user chose. The processor will be at "ENABLED" state by default after its creation.
+/// Creates a processor from the ProcessorType provided. The processor will be at `ENABLED` state by default after its creation.
 ///
 /// A builder for the *locations.processors.create* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -10221,7 +10492,7 @@ where
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// The maximum number of processors to return. If unspecified, at most 50 processors will be returned. The maximum value is 100; values above 100 will be coerced to 100.
+    /// The maximum number of processors to return. If unspecified, at most `50` processors will be returned. The maximum value is `100`. Values above `100` will be coerced to `100`.
     ///
     /// Sets the *page size* query property to the given value.
     pub fn page_size(mut self, new_value: i32) -> ProjectLocationProcessorListCall<'a, S> {
@@ -10888,7 +11159,7 @@ where
 }
 
 
-/// Fetches processor types. Note that we do not use ListProcessorTypes here because it is not paginated.
+/// Fetches processor types. Note that we don't use ListProcessorTypes here, because it isn't paginated.
 ///
 /// A builder for the *locations.fetchProcessorTypes* method supported by a *project* resource.
 /// It is not used directly, but through a [`ProjectMethods`] instance.
@@ -11064,7 +11335,7 @@ where
     }
 
 
-    /// Required. The project of processor type to list. The available processor types may depend on the allow-listing on projects. Format: `projects/{project}/locations/{location}`
+    /// Required. The location of processor types to list. Format: `projects/{project}/locations/{location}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///

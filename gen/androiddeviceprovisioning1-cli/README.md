@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Android Provisioning Partner* API at revision *20230115*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Android Provisioning Partner* API at revision *20240304*. The CLI is at version *5.0.4*.
 
 ```bash
 androiddeviceprovisioning1 [options]
@@ -52,6 +52,7 @@ androiddeviceprovisioning1 [options]
                 devices-find-by-identifier <partner-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 devices-find-by-owner <partner-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 devices-get <name> [-p <v>]... [-o <out>]
+                devices-get-sim-lock-state <partner-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 devices-metadata <metadata-owner-id> <device-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 devices-unclaim <partner-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 devices-unclaim-async <partner-id> (-r <kv>)... [-p <v>]... [-o <out>]

@@ -4,12 +4,12 @@
 [package]
 
 name = "google-storage1"
-version = "5.0.3+20230119"
+version = "5.0.4+20240229"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with storage (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/storage1"
 homepage = "https://developers.google.com/storage/docs/json_api/"
-documentation = "https://docs.rs/google-storage1/5.0.3+20230119"
+documentation = "https://docs.rs/google-storage1/5.0.4+20240229"
 license = "MIT"
 keywords = ["storage", "google", "protocol", "web", "api"]
 autobins = false

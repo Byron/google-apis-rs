@@ -1,4 +1,4 @@
-site_name: Cloud Run v5.0.3+20230113
+site_name: Cloud Run v5.0.4+20240225
 site_url: http://byron.github.io/google-apis-rs/google-run1-cli
 site_description: A complete library to interact with Cloud Run (protocol v1)
 
@@ -52,6 +52,10 @@ nav:
     - 'Locations Jobs Set Iam Policy': 'projects_locations-jobs-set-iam-policy.md'
     - 'Locations Jobs Test Iam Permissions': 'projects_locations-jobs-test-iam-permissions.md'
     - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Operations Wait': 'projects_locations-operations-wait.md'
     - 'Locations Revisions Delete': 'projects_locations-revisions-delete.md'
     - 'Locations Revisions Get': 'projects_locations-revisions-get.md'
     - 'Locations Revisions List': 'projects_locations-revisions-list.md'

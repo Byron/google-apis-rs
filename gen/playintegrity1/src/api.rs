@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// Private Service: https://www.googleapis.com/auth/playintegrity
     Full,
@@ -125,7 +125,7 @@ impl<'a, S> PlayIntegrity<S> {
         PlayIntegrity {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://playintegrity.googleapis.com/".to_string(),
             _root_url: "https://playintegrity.googleapis.com/".to_string(),
         }
@@ -136,7 +136,7 @@ impl<'a, S> PlayIntegrity<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -164,7 +164,7 @@ impl<'a, S> PlayIntegrity<S> {
 // ############
 // SCHEMAS ###
 // ##########
-/// Contains a signal helping apps differentiating between likely genuine users and likely non-genuine traffic (such as accounts being used for fraud, accounts used by automated traffic, or accounts used in device farms) based on the presence and volume of Play store activity.
+/// (Restricted Access) Contains a signal helping apps differentiating between likely genuine and likely non-genuine user traffic.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
@@ -187,7 +187,7 @@ impl client::Part for AccountActivity {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AccountDetails {
-    /// Details about the account activity for the user in the scope.
+    /// (Restricted Access) Details about the account activity for the user in the scope.
     #[serde(rename="accountActivity")]
     
     pub account_activity: Option<AccountActivity>,
@@ -198,6 +198,26 @@ pub struct AccountDetails {
 }
 
 impl client::Part for AccountDetails {}
+
+
+/// Contains signals about others apps on the device which could be used to access or control the requesting app.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AppAccessRiskVerdict {
+    /// Required. App access risk verdict related to apps that are not installed by Google Play, and are not preloaded on the system image by the device manufacturer.
+    #[serde(rename="otherApps")]
+    
+    pub other_apps: Option<String>,
+    /// Required. App access risk verdict related to apps that are not installed by the Google Play Store, and are not preloaded on the system image by the device manufacturer.
+    #[serde(rename="playOrSystemApps")]
+    
+    pub play_or_system_apps: Option<String>,
+}
+
+impl client::Part for AppAccessRiskVerdict {}
 
 
 /// Contains the application integrity information.
@@ -276,13 +296,53 @@ impl client::ResponseResult for DecodeIntegrityTokenResponse {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DeviceIntegrity {
-    /// Details about the integrity of the device the app is running on
+    /// Details about the integrity of the device the app is running on.
     #[serde(rename="deviceRecognitionVerdict")]
     
     pub device_recognition_verdict: Option<Vec<String>>,
+    /// Details about the device activity of the device the app is running on.
+    #[serde(rename="recentDeviceActivity")]
+    
+    pub recent_device_activity: Option<RecentDeviceActivity>,
 }
 
 impl client::Part for DeviceIntegrity {}
+
+
+/// Contains information about the environment Play Integrity API runs in, e.g. Play Protect verdict.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EnvironmentDetails {
+    /// The evaluation of the App Access Risk verdicts.
+    #[serde(rename="appAccessRiskVerdict")]
+    
+    pub app_access_risk_verdict: Option<AppAccessRiskVerdict>,
+    /// The evaluation of Play Protect verdict.
+    #[serde(rename="playProtectVerdict")]
+    
+    pub play_protect_verdict: Option<String>,
+}
+
+impl client::Part for EnvironmentDetails {}
+
+
+/// Recent device activity can help developers identify devices that have exhibited hyperactive attestation activity, which could be a sign of an attack or token farming.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RecentDeviceActivity {
+    /// Required. Indicates the activity level of the device.
+    #[serde(rename="deviceActivityLevel")]
+    
+    pub device_activity_level: Option<String>,
+}
+
+impl client::Part for RecentDeviceActivity {}
 
 
 /// Contains the integrity request information.
@@ -348,6 +408,10 @@ pub struct TokenPayloadExternal {
     #[serde(rename="deviceIntegrity")]
     
     pub device_integrity: Option<DeviceIntegrity>,
+    /// Details of the environment Play Integrity API runs in.
+    #[serde(rename="environmentDetails")]
+    
+    pub environment_details: Option<EnvironmentDetails>,
     /// Required. Details about the integrity request.
     #[serde(rename="requestDetails")]
     

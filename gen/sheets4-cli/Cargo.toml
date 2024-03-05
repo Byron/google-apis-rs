@@ -4,7 +4,7 @@
 [package]
 
 name = "google-sheets4-cli"
-version = "5.0.3+20230119"
+version = "5.0.4+20240229"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Sheets (protocol v4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/sheets4-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-sheets4]
 path = "../sheets4"
-version = "5.0.3+20230119"
+version = "5.0.4+20240229"
 

@@ -663,6 +663,613 @@ where
         }
     }
 
+    async fn _folders_event_threat_detection_settings_custom_modules_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "ancestor-module" => Some(("ancestorModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enablement-state" => Some(("enablementState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-editor" => Some(("lastEditor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ancestor-module", "description", "display-name", "enablement-state", "last-editor", "name", "type", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::EventThreatDetectionCustomModule = json::value::from_value(object).unwrap();
+        let mut call = self.hub.folders().event_threat_detection_settings_custom_modules_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_event_threat_detection_settings_custom_modules_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().event_threat_detection_settings_custom_modules_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_event_threat_detection_settings_custom_modules_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().event_threat_detection_settings_custom_modules_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_event_threat_detection_settings_custom_modules_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().event_threat_detection_settings_custom_modules_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_event_threat_detection_settings_custom_modules_list_descendant(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().event_threat_detection_settings_custom_modules_list_descendant(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_event_threat_detection_settings_custom_modules_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "ancestor-module" => Some(("ancestorModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enablement-state" => Some(("enablementState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-editor" => Some(("lastEditor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ancestor-module", "description", "display-name", "enablement-state", "last-editor", "name", "type", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::EventThreatDetectionCustomModule = json::value::from_value(object).unwrap();
+        let mut call = self.hub.folders().event_threat_detection_settings_custom_modules_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_event_threat_detection_settings_effective_custom_modules_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().event_threat_detection_settings_effective_custom_modules_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_event_threat_detection_settings_effective_custom_modules_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().event_threat_detection_settings_effective_custom_modules_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_event_threat_detection_settings_validate_custom_module(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "raw-text" => Some(("rawText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["raw-text", "type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ValidateEventThreatDetectionCustomModuleRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.folders().event_threat_detection_settings_validate_custom_module(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _folders_findings_bulk_mute(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -716,6 +1323,205 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_locations_mute_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().locations_mute_configs_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_locations_mute_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().locations_mute_configs_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_locations_mute_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "most-recent-editor" => Some(("mostRecentEditor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "display-name", "filter", "most-recent-editor", "name", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudSecuritycenterV1MuteConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.folders().locations_mute_configs_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1451,6 +2257,634 @@ where
         }
     }
 
+    async fn _folders_security_health_analytics_settings_custom_modules_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "ancestor-module" => Some(("ancestorModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.description" => Some(("customConfig.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.description" => Some(("customConfig.predicate.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.expression" => Some(("customConfig.predicate.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.location" => Some(("customConfig.predicate.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.title" => Some(("customConfig.predicate.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.recommendation" => Some(("customConfig.recommendation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.resource-selector.resource-types" => Some(("customConfig.resourceSelector.resourceTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "custom-config.severity" => Some(("customConfig.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enablement-state" => Some(("enablementState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-editor" => Some(("lastEditor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ancestor-module", "custom-config", "description", "display-name", "enablement-state", "expression", "last-editor", "location", "name", "predicate", "recommendation", "resource-selector", "resource-types", "severity", "title", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule = json::value::from_value(object).unwrap();
+        let mut call = self.hub.folders().security_health_analytics_settings_custom_modules_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_security_health_analytics_settings_custom_modules_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().security_health_analytics_settings_custom_modules_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_security_health_analytics_settings_custom_modules_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().security_health_analytics_settings_custom_modules_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_security_health_analytics_settings_custom_modules_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().security_health_analytics_settings_custom_modules_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_security_health_analytics_settings_custom_modules_list_descendant(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().security_health_analytics_settings_custom_modules_list_descendant(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_security_health_analytics_settings_custom_modules_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "ancestor-module" => Some(("ancestorModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.description" => Some(("customConfig.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.description" => Some(("customConfig.predicate.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.expression" => Some(("customConfig.predicate.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.location" => Some(("customConfig.predicate.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.title" => Some(("customConfig.predicate.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.recommendation" => Some(("customConfig.recommendation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.resource-selector.resource-types" => Some(("customConfig.resourceSelector.resourceTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "custom-config.severity" => Some(("customConfig.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enablement-state" => Some(("enablementState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-editor" => Some(("lastEditor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ancestor-module", "custom-config", "description", "display-name", "enablement-state", "expression", "last-editor", "location", "name", "predicate", "recommendation", "resource-selector", "resource-types", "severity", "title", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule = json::value::from_value(object).unwrap();
+        let mut call = self.hub.folders().security_health_analytics_settings_custom_modules_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_security_health_analytics_settings_custom_modules_simulate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "custom-config.description" => Some(("customConfig.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.description" => Some(("customConfig.predicate.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.expression" => Some(("customConfig.predicate.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.location" => Some(("customConfig.predicate.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.title" => Some(("customConfig.predicate.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.recommendation" => Some(("customConfig.recommendation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.resource-selector.resource-types" => Some(("customConfig.resourceSelector.resourceTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "custom-config.severity" => Some(("customConfig.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource.iam-policy-data.etag" => Some(("resource.iamPolicyData.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource.iam-policy-data.version" => Some(("resource.iamPolicyData.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "resource.resource-type" => Some(("resource.resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["custom-config", "description", "etag", "expression", "iam-policy-data", "location", "predicate", "recommendation", "resource", "resource-selector", "resource-type", "resource-types", "severity", "title", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SimulateSecurityHealthAnalyticsCustomModuleRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.folders().security_health_analytics_settings_custom_modules_simulate(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_security_health_analytics_settings_effective_custom_modules_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().security_health_analytics_settings_effective_custom_modules_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _folders_security_health_analytics_settings_effective_custom_modules_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.folders().security_health_analytics_settings_effective_custom_modules_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _folders_sources_findings_external_systems_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -1475,12 +2909,23 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "assignees" => Some(("assignees", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "case-close-time" => Some(("caseCloseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "case-create-time" => Some(("caseCreateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "case-priority" => Some(("casePriority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "case-sla" => Some(("caseSla", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "case-uri" => Some(("caseUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-system-update-time" => Some(("externalSystemUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-uid" => Some(("externalUid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.assignee" => Some(("ticketInfo.assignee", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.description" => Some(("ticketInfo.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.id" => Some(("ticketInfo.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.status" => Some(("ticketInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.update-time" => Some(("ticketInfo.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.uri" => Some(("ticketInfo.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["assignees", "external-system-update-time", "external-uid", "name", "status"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["assignee", "assignees", "case-close-time", "case-create-time", "case-priority", "case-sla", "case-uri", "description", "external-system-update-time", "external-uid", "id", "name", "status", "ticket-info", "update-time", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1738,18 +3183,46 @@ where
                     "access.principal-subject" => Some(("access.principalSubject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.service-account-key-name" => Some(("access.serviceAccountKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.service-name" => Some(("access.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.user-agent" => Some(("access.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.user-agent-family" => Some(("access.userAgentFamily", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.user-name" => Some(("access.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "application.base-uri" => Some(("application.baseUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "application.full-uri" => Some(("application.fullUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attack-exposure.attack-exposure-result" => Some(("attackExposure.attackExposureResult", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attack-exposure.exposed-high-value-resources-count" => Some(("attackExposure.exposedHighValueResourcesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "attack-exposure.exposed-low-value-resources-count" => Some(("attackExposure.exposedLowValueResourcesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "attack-exposure.exposed-medium-value-resources-count" => Some(("attackExposure.exposedMediumValueResourcesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "attack-exposure.latest-calculation-time" => Some(("attackExposure.latestCalculationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attack-exposure.score" => Some(("attackExposure.score", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "attack-exposure.state" => Some(("attackExposure.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.appliance" => Some(("backupDisasterRecovery.appliance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.applications" => Some(("backupDisasterRecovery.applications", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "backup-disaster-recovery.backup-create-time" => Some(("backupDisasterRecovery.backupCreateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.backup-template" => Some(("backupDisasterRecovery.backupTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.backup-type" => Some(("backupDisasterRecovery.backupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.host" => Some(("backupDisasterRecovery.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.policies" => Some(("backupDisasterRecovery.policies", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "backup-disaster-recovery.policy-options" => Some(("backupDisasterRecovery.policyOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "backup-disaster-recovery.profile" => Some(("backupDisasterRecovery.profile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.storage-pool" => Some(("backupDisasterRecovery.storagePool", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "canonical-name" => Some(("canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "category" => Some(("category", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-data-profile.data-profile" => Some(("cloudDlpDataProfile.dataProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-data-profile.parent-type" => Some(("cloudDlpDataProfile.parentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.full-scan" => Some(("cloudDlpInspection.fullScan", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.info-type" => Some(("cloudDlpInspection.infoType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.info-type-count" => Some(("cloudDlpInspection.infoTypeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.inspect-job" => Some(("cloudDlpInspection.inspectJob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.display-name" => Some(("database.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.grantees" => Some(("database.grantees", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "database.name" => Some(("database.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.query" => Some(("database.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.user-name" => Some(("database.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.version" => Some(("database.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-time" => Some(("eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exfiltration.total-exfiltrated-bytes" => Some(("exfiltration.totalExfiltratedBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-uri" => Some(("externalUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "finding-class" => Some(("findingClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "indicator.domains" => Some(("indicator.domains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -1769,6 +3242,7 @@ where
                     "mitre-attack.primary-tactic" => Some(("mitreAttack.primaryTactic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mitre-attack.primary-techniques" => Some(("mitreAttack.primaryTechniques", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "mitre-attack.version" => Some(("mitreAttack.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "module-name" => Some(("moduleName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute" => Some(("mute", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute-initiator" => Some(("muteInitiator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute-update-time" => Some(("muteUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1780,6 +3254,13 @@ where
                     "security-marks.canonical-name" => Some(("securityMarks.canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-marks.marks" => Some(("securityMarks.marks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "security-marks.name" => Some(("securityMarks.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.changed-policy" => Some(("securityPosture.changedPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.name" => Some(("securityPosture.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.policy" => Some(("securityPosture.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.policy-set" => Some(("securityPosture.policySet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.posture-deployment" => Some(("securityPosture.postureDeployment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.posture-deployment-resource" => Some(("securityPosture.postureDeploymentResource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.revision-id" => Some(("securityPosture.revisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "severity" => Some(("severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.cvssv3.attack-complexity" => Some(("vulnerability.cve.cvssv3.attackComplexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1791,10 +3272,25 @@ where
                     "vulnerability.cve.cvssv3.privileges-required" => Some(("vulnerability.cve.cvssv3.privilegesRequired", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.cvssv3.scope" => Some(("vulnerability.cve.cvssv3.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.cvssv3.user-interaction" => Some(("vulnerability.cve.cvssv3.userInteraction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.exploitation-activity" => Some(("vulnerability.cve.exploitationActivity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.id" => Some(("vulnerability.cve.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.impact" => Some(("vulnerability.cve.impact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.observed-in-the-wild" => Some(("vulnerability.cve.observedInTheWild", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "vulnerability.cve.upstream-fix-available" => Some(("vulnerability.cve.upstreamFixAvailable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.zero-day" => Some(("vulnerability.cve.zeroDay", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.cpe-uri" => Some(("vulnerability.fixedPackage.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.package-name" => Some(("vulnerability.fixedPackage.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.package-type" => Some(("vulnerability.fixedPackage.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.package-version" => Some(("vulnerability.fixedPackage.packageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.cpe-uri" => Some(("vulnerability.offendingPackage.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.package-name" => Some(("vulnerability.offendingPackage.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.package-type" => Some(("vulnerability.offendingPackage.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.package-version" => Some(("vulnerability.offendingPackage.packageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.security-bulletin.bulletin-id" => Some(("vulnerability.securityBulletin.bulletinId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.security-bulletin.submission-time" => Some(("vulnerability.securityBulletin.submissionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.security-bulletin.suggested-upgrade-version" => Some(("vulnerability.securityBulletin.suggestedUpgradeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "attack-complexity", "attack-vector", "availability-impact", "base-score", "caller-ip", "caller-ip-geo", "canonical-name", "category", "confidentiality-impact", "create-time", "cve", "cvssv3", "database", "description", "display-name", "domains", "event-time", "external-uri", "finding-class", "grantees", "id", "indicator", "integrity-impact", "ip-addresses", "kernel-rootkit", "marks", "method-name", "mitre-attack", "mute", "mute-initiator", "mute-update-time", "name", "next-steps", "parent", "parent-display-name", "primary-tactic", "primary-techniques", "principal-email", "principal-subject", "privileges-required", "query", "region-code", "resource-name", "scope", "security-marks", "service-account-key-name", "service-name", "severity", "state", "unexpected-code-modification", "unexpected-ftrace-handler", "unexpected-interrupt-handler", "unexpected-kernel-code-pages", "unexpected-kprobe-handler", "unexpected-processes-in-runqueue", "unexpected-read-only-data-modification", "unexpected-system-call-handler", "upstream-fix-available", "uris", "user-agent-family", "user-interaction", "user-name", "version", "vulnerability"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "appliance", "application", "applications", "attack-complexity", "attack-exposure", "attack-exposure-result", "attack-vector", "availability-impact", "backup-create-time", "backup-disaster-recovery", "backup-template", "backup-type", "base-score", "base-uri", "bulletin-id", "caller-ip", "caller-ip-geo", "canonical-name", "category", "changed-policy", "cloud-dlp-data-profile", "cloud-dlp-inspection", "confidentiality-impact", "cpe-uri", "create-time", "cve", "cvssv3", "data-profile", "database", "description", "display-name", "domains", "event-time", "exfiltration", "exploitation-activity", "exposed-high-value-resources-count", "exposed-low-value-resources-count", "exposed-medium-value-resources-count", "external-uri", "finding-class", "fixed-package", "full-scan", "full-uri", "grantees", "host", "id", "impact", "indicator", "info-type", "info-type-count", "inspect-job", "integrity-impact", "ip-addresses", "kernel-rootkit", "latest-calculation-time", "marks", "method-name", "mitre-attack", "module-name", "mute", "mute-initiator", "mute-update-time", "name", "next-steps", "observed-in-the-wild", "offending-package", "package-name", "package-type", "package-version", "parent", "parent-display-name", "parent-type", "policies", "policy", "policy-options", "policy-set", "posture-deployment", "posture-deployment-resource", "primary-tactic", "primary-techniques", "principal-email", "principal-subject", "privileges-required", "profile", "query", "region-code", "resource-name", "revision-id", "scope", "score", "security-bulletin", "security-marks", "security-posture", "service-account-key-name", "service-name", "severity", "state", "storage-pool", "submission-time", "suggested-upgrade-version", "total-exfiltrated-bytes", "unexpected-code-modification", "unexpected-ftrace-handler", "unexpected-interrupt-handler", "unexpected-kernel-code-pages", "unexpected-kprobe-handler", "unexpected-processes-in-runqueue", "unexpected-read-only-data-modification", "unexpected-system-call-handler", "upstream-fix-available", "uris", "user-agent", "user-agent-family", "user-interaction", "user-name", "version", "vulnerability", "zero-day"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2879,6 +4375,613 @@ where
         }
     }
 
+    async fn _organizations_event_threat_detection_settings_custom_modules_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "ancestor-module" => Some(("ancestorModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enablement-state" => Some(("enablementState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-editor" => Some(("lastEditor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ancestor-module", "description", "display-name", "enablement-state", "last-editor", "name", "type", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::EventThreatDetectionCustomModule = json::value::from_value(object).unwrap();
+        let mut call = self.hub.organizations().event_threat_detection_settings_custom_modules_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_event_threat_detection_settings_custom_modules_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().event_threat_detection_settings_custom_modules_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_event_threat_detection_settings_custom_modules_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().event_threat_detection_settings_custom_modules_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_event_threat_detection_settings_custom_modules_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().event_threat_detection_settings_custom_modules_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_event_threat_detection_settings_custom_modules_list_descendant(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().event_threat_detection_settings_custom_modules_list_descendant(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_event_threat_detection_settings_custom_modules_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "ancestor-module" => Some(("ancestorModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enablement-state" => Some(("enablementState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-editor" => Some(("lastEditor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ancestor-module", "description", "display-name", "enablement-state", "last-editor", "name", "type", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::EventThreatDetectionCustomModule = json::value::from_value(object).unwrap();
+        let mut call = self.hub.organizations().event_threat_detection_settings_custom_modules_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_event_threat_detection_settings_effective_custom_modules_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().event_threat_detection_settings_effective_custom_modules_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_event_threat_detection_settings_effective_custom_modules_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().event_threat_detection_settings_effective_custom_modules_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_event_threat_detection_settings_validate_custom_module(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "raw-text" => Some(("rawText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["raw-text", "type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ValidateEventThreatDetectionCustomModuleRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.organizations().event_threat_detection_settings_validate_custom_module(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _organizations_findings_bulk_mute(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -2984,6 +5087,205 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_mute_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().locations_mute_configs_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_mute_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().locations_mute_configs_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_mute_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "most-recent-editor" => Some(("mostRecentEditor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "display-name", "filter", "most-recent-editor", "name", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudSecuritycenterV1MuteConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.organizations().locations_mute_configs_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -3937,6 +6239,1400 @@ where
         }
     }
 
+    async fn _organizations_resource_value_configs_batch_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::BatchCreateResourceValueConfigsRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.organizations().resource_value_configs_batch_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_resource_value_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().resource_value_configs_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_resource_value_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().resource_value_configs_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_resource_value_configs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().resource_value_configs_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_resource_value_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-labels-selector" => Some(("resourceLabelsSelector", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "resource-type" => Some(("resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-value" => Some(("resourceValue", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "scope" => Some(("scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sensitive-data-protection-mapping.high-sensitivity-mapping" => Some(("sensitiveDataProtectionMapping.highSensitivityMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sensitive-data-protection-mapping.medium-sensitivity-mapping" => Some(("sensitiveDataProtectionMapping.mediumSensitivityMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "tag-values" => Some(("tagValues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "high-sensitivity-mapping", "medium-sensitivity-mapping", "name", "resource-labels-selector", "resource-type", "resource-value", "scope", "sensitive-data-protection-mapping", "tag-values", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudSecuritycenterV1ResourceValueConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.organizations().resource_value_configs_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_security_health_analytics_settings_custom_modules_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "ancestor-module" => Some(("ancestorModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.description" => Some(("customConfig.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.description" => Some(("customConfig.predicate.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.expression" => Some(("customConfig.predicate.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.location" => Some(("customConfig.predicate.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.title" => Some(("customConfig.predicate.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.recommendation" => Some(("customConfig.recommendation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.resource-selector.resource-types" => Some(("customConfig.resourceSelector.resourceTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "custom-config.severity" => Some(("customConfig.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enablement-state" => Some(("enablementState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-editor" => Some(("lastEditor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ancestor-module", "custom-config", "description", "display-name", "enablement-state", "expression", "last-editor", "location", "name", "predicate", "recommendation", "resource-selector", "resource-types", "severity", "title", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule = json::value::from_value(object).unwrap();
+        let mut call = self.hub.organizations().security_health_analytics_settings_custom_modules_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_security_health_analytics_settings_custom_modules_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().security_health_analytics_settings_custom_modules_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_security_health_analytics_settings_custom_modules_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().security_health_analytics_settings_custom_modules_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_security_health_analytics_settings_custom_modules_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().security_health_analytics_settings_custom_modules_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_security_health_analytics_settings_custom_modules_list_descendant(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().security_health_analytics_settings_custom_modules_list_descendant(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_security_health_analytics_settings_custom_modules_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "ancestor-module" => Some(("ancestorModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.description" => Some(("customConfig.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.description" => Some(("customConfig.predicate.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.expression" => Some(("customConfig.predicate.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.location" => Some(("customConfig.predicate.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.title" => Some(("customConfig.predicate.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.recommendation" => Some(("customConfig.recommendation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.resource-selector.resource-types" => Some(("customConfig.resourceSelector.resourceTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "custom-config.severity" => Some(("customConfig.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enablement-state" => Some(("enablementState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-editor" => Some(("lastEditor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ancestor-module", "custom-config", "description", "display-name", "enablement-state", "expression", "last-editor", "location", "name", "predicate", "recommendation", "resource-selector", "resource-types", "severity", "title", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule = json::value::from_value(object).unwrap();
+        let mut call = self.hub.organizations().security_health_analytics_settings_custom_modules_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_security_health_analytics_settings_custom_modules_simulate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "custom-config.description" => Some(("customConfig.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.description" => Some(("customConfig.predicate.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.expression" => Some(("customConfig.predicate.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.location" => Some(("customConfig.predicate.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.title" => Some(("customConfig.predicate.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.recommendation" => Some(("customConfig.recommendation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.resource-selector.resource-types" => Some(("customConfig.resourceSelector.resourceTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "custom-config.severity" => Some(("customConfig.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource.iam-policy-data.etag" => Some(("resource.iamPolicyData.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource.iam-policy-data.version" => Some(("resource.iamPolicyData.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "resource.resource-type" => Some(("resource.resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["custom-config", "description", "etag", "expression", "iam-policy-data", "location", "predicate", "recommendation", "resource", "resource-selector", "resource-type", "resource-types", "severity", "title", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SimulateSecurityHealthAnalyticsCustomModuleRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.organizations().security_health_analytics_settings_custom_modules_simulate(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_security_health_analytics_settings_effective_custom_modules_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().security_health_analytics_settings_effective_custom_modules_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_security_health_analytics_settings_effective_custom_modules_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().security_health_analytics_settings_effective_custom_modules_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_simulations_attack_exposure_results_attack_paths_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().simulations_attack_exposure_results_attack_paths_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_simulations_attack_exposure_results_valued_resources_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().simulations_attack_exposure_results_valued_resources_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_simulations_attack_paths_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().simulations_attack_paths_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_simulations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().simulations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_simulations_valued_resources_attack_paths_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().simulations_valued_resources_attack_paths_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_simulations_valued_resources_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().simulations_valued_resources_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_simulations_valued_resources_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().simulations_valued_resources_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _organizations_sources_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -4055,18 +7751,46 @@ where
                     "access.principal-subject" => Some(("access.principalSubject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.service-account-key-name" => Some(("access.serviceAccountKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.service-name" => Some(("access.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.user-agent" => Some(("access.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.user-agent-family" => Some(("access.userAgentFamily", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.user-name" => Some(("access.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "application.base-uri" => Some(("application.baseUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "application.full-uri" => Some(("application.fullUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attack-exposure.attack-exposure-result" => Some(("attackExposure.attackExposureResult", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attack-exposure.exposed-high-value-resources-count" => Some(("attackExposure.exposedHighValueResourcesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "attack-exposure.exposed-low-value-resources-count" => Some(("attackExposure.exposedLowValueResourcesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "attack-exposure.exposed-medium-value-resources-count" => Some(("attackExposure.exposedMediumValueResourcesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "attack-exposure.latest-calculation-time" => Some(("attackExposure.latestCalculationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attack-exposure.score" => Some(("attackExposure.score", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "attack-exposure.state" => Some(("attackExposure.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.appliance" => Some(("backupDisasterRecovery.appliance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.applications" => Some(("backupDisasterRecovery.applications", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "backup-disaster-recovery.backup-create-time" => Some(("backupDisasterRecovery.backupCreateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.backup-template" => Some(("backupDisasterRecovery.backupTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.backup-type" => Some(("backupDisasterRecovery.backupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.host" => Some(("backupDisasterRecovery.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.policies" => Some(("backupDisasterRecovery.policies", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "backup-disaster-recovery.policy-options" => Some(("backupDisasterRecovery.policyOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "backup-disaster-recovery.profile" => Some(("backupDisasterRecovery.profile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.storage-pool" => Some(("backupDisasterRecovery.storagePool", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "canonical-name" => Some(("canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "category" => Some(("category", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-data-profile.data-profile" => Some(("cloudDlpDataProfile.dataProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-data-profile.parent-type" => Some(("cloudDlpDataProfile.parentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.full-scan" => Some(("cloudDlpInspection.fullScan", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.info-type" => Some(("cloudDlpInspection.infoType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.info-type-count" => Some(("cloudDlpInspection.infoTypeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.inspect-job" => Some(("cloudDlpInspection.inspectJob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.display-name" => Some(("database.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.grantees" => Some(("database.grantees", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "database.name" => Some(("database.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.query" => Some(("database.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.user-name" => Some(("database.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.version" => Some(("database.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-time" => Some(("eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exfiltration.total-exfiltrated-bytes" => Some(("exfiltration.totalExfiltratedBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-uri" => Some(("externalUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "finding-class" => Some(("findingClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "indicator.domains" => Some(("indicator.domains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -4086,6 +7810,7 @@ where
                     "mitre-attack.primary-tactic" => Some(("mitreAttack.primaryTactic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mitre-attack.primary-techniques" => Some(("mitreAttack.primaryTechniques", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "mitre-attack.version" => Some(("mitreAttack.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "module-name" => Some(("moduleName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute" => Some(("mute", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute-initiator" => Some(("muteInitiator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute-update-time" => Some(("muteUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4097,6 +7822,13 @@ where
                     "security-marks.canonical-name" => Some(("securityMarks.canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-marks.marks" => Some(("securityMarks.marks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "security-marks.name" => Some(("securityMarks.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.changed-policy" => Some(("securityPosture.changedPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.name" => Some(("securityPosture.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.policy" => Some(("securityPosture.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.policy-set" => Some(("securityPosture.policySet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.posture-deployment" => Some(("securityPosture.postureDeployment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.posture-deployment-resource" => Some(("securityPosture.postureDeploymentResource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.revision-id" => Some(("securityPosture.revisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "severity" => Some(("severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.cvssv3.attack-complexity" => Some(("vulnerability.cve.cvssv3.attackComplexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4108,10 +7840,25 @@ where
                     "vulnerability.cve.cvssv3.privileges-required" => Some(("vulnerability.cve.cvssv3.privilegesRequired", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.cvssv3.scope" => Some(("vulnerability.cve.cvssv3.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.cvssv3.user-interaction" => Some(("vulnerability.cve.cvssv3.userInteraction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.exploitation-activity" => Some(("vulnerability.cve.exploitationActivity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.id" => Some(("vulnerability.cve.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.impact" => Some(("vulnerability.cve.impact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.observed-in-the-wild" => Some(("vulnerability.cve.observedInTheWild", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "vulnerability.cve.upstream-fix-available" => Some(("vulnerability.cve.upstreamFixAvailable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.zero-day" => Some(("vulnerability.cve.zeroDay", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.cpe-uri" => Some(("vulnerability.fixedPackage.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.package-name" => Some(("vulnerability.fixedPackage.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.package-type" => Some(("vulnerability.fixedPackage.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.package-version" => Some(("vulnerability.fixedPackage.packageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.cpe-uri" => Some(("vulnerability.offendingPackage.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.package-name" => Some(("vulnerability.offendingPackage.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.package-type" => Some(("vulnerability.offendingPackage.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.package-version" => Some(("vulnerability.offendingPackage.packageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.security-bulletin.bulletin-id" => Some(("vulnerability.securityBulletin.bulletinId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.security-bulletin.submission-time" => Some(("vulnerability.securityBulletin.submissionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.security-bulletin.suggested-upgrade-version" => Some(("vulnerability.securityBulletin.suggestedUpgradeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "attack-complexity", "attack-vector", "availability-impact", "base-score", "caller-ip", "caller-ip-geo", "canonical-name", "category", "confidentiality-impact", "create-time", "cve", "cvssv3", "database", "description", "display-name", "domains", "event-time", "external-uri", "finding-class", "grantees", "id", "indicator", "integrity-impact", "ip-addresses", "kernel-rootkit", "marks", "method-name", "mitre-attack", "mute", "mute-initiator", "mute-update-time", "name", "next-steps", "parent", "parent-display-name", "primary-tactic", "primary-techniques", "principal-email", "principal-subject", "privileges-required", "query", "region-code", "resource-name", "scope", "security-marks", "service-account-key-name", "service-name", "severity", "state", "unexpected-code-modification", "unexpected-ftrace-handler", "unexpected-interrupt-handler", "unexpected-kernel-code-pages", "unexpected-kprobe-handler", "unexpected-processes-in-runqueue", "unexpected-read-only-data-modification", "unexpected-system-call-handler", "upstream-fix-available", "uris", "user-agent-family", "user-interaction", "user-name", "version", "vulnerability"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "appliance", "application", "applications", "attack-complexity", "attack-exposure", "attack-exposure-result", "attack-vector", "availability-impact", "backup-create-time", "backup-disaster-recovery", "backup-template", "backup-type", "base-score", "base-uri", "bulletin-id", "caller-ip", "caller-ip-geo", "canonical-name", "category", "changed-policy", "cloud-dlp-data-profile", "cloud-dlp-inspection", "confidentiality-impact", "cpe-uri", "create-time", "cve", "cvssv3", "data-profile", "database", "description", "display-name", "domains", "event-time", "exfiltration", "exploitation-activity", "exposed-high-value-resources-count", "exposed-low-value-resources-count", "exposed-medium-value-resources-count", "external-uri", "finding-class", "fixed-package", "full-scan", "full-uri", "grantees", "host", "id", "impact", "indicator", "info-type", "info-type-count", "inspect-job", "integrity-impact", "ip-addresses", "kernel-rootkit", "latest-calculation-time", "marks", "method-name", "mitre-attack", "module-name", "mute", "mute-initiator", "mute-update-time", "name", "next-steps", "observed-in-the-wild", "offending-package", "package-name", "package-type", "package-version", "parent", "parent-display-name", "parent-type", "policies", "policy", "policy-options", "policy-set", "posture-deployment", "posture-deployment-resource", "primary-tactic", "primary-techniques", "principal-email", "principal-subject", "privileges-required", "profile", "query", "region-code", "resource-name", "revision-id", "scope", "score", "security-bulletin", "security-marks", "security-posture", "service-account-key-name", "service-name", "severity", "state", "storage-pool", "submission-time", "suggested-upgrade-version", "total-exfiltrated-bytes", "unexpected-code-modification", "unexpected-ftrace-handler", "unexpected-interrupt-handler", "unexpected-kernel-code-pages", "unexpected-kprobe-handler", "unexpected-processes-in-runqueue", "unexpected-read-only-data-modification", "unexpected-system-call-handler", "upstream-fix-available", "uris", "user-agent", "user-agent-family", "user-interaction", "user-name", "version", "vulnerability", "zero-day"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4199,12 +7946,23 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "assignees" => Some(("assignees", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "case-close-time" => Some(("caseCloseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "case-create-time" => Some(("caseCreateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "case-priority" => Some(("casePriority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "case-sla" => Some(("caseSla", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "case-uri" => Some(("caseUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-system-update-time" => Some(("externalSystemUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-uid" => Some(("externalUid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.assignee" => Some(("ticketInfo.assignee", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.description" => Some(("ticketInfo.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.id" => Some(("ticketInfo.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.status" => Some(("ticketInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.update-time" => Some(("ticketInfo.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.uri" => Some(("ticketInfo.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["assignees", "external-system-update-time", "external-uid", "name", "status"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["assignee", "assignees", "case-close-time", "case-create-time", "case-priority", "case-sla", "case-uri", "description", "external-system-update-time", "external-uid", "id", "name", "status", "ticket-info", "update-time", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4462,18 +8220,46 @@ where
                     "access.principal-subject" => Some(("access.principalSubject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.service-account-key-name" => Some(("access.serviceAccountKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.service-name" => Some(("access.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.user-agent" => Some(("access.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.user-agent-family" => Some(("access.userAgentFamily", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.user-name" => Some(("access.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "application.base-uri" => Some(("application.baseUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "application.full-uri" => Some(("application.fullUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attack-exposure.attack-exposure-result" => Some(("attackExposure.attackExposureResult", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attack-exposure.exposed-high-value-resources-count" => Some(("attackExposure.exposedHighValueResourcesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "attack-exposure.exposed-low-value-resources-count" => Some(("attackExposure.exposedLowValueResourcesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "attack-exposure.exposed-medium-value-resources-count" => Some(("attackExposure.exposedMediumValueResourcesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "attack-exposure.latest-calculation-time" => Some(("attackExposure.latestCalculationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attack-exposure.score" => Some(("attackExposure.score", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "attack-exposure.state" => Some(("attackExposure.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.appliance" => Some(("backupDisasterRecovery.appliance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.applications" => Some(("backupDisasterRecovery.applications", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "backup-disaster-recovery.backup-create-time" => Some(("backupDisasterRecovery.backupCreateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.backup-template" => Some(("backupDisasterRecovery.backupTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.backup-type" => Some(("backupDisasterRecovery.backupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.host" => Some(("backupDisasterRecovery.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.policies" => Some(("backupDisasterRecovery.policies", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "backup-disaster-recovery.policy-options" => Some(("backupDisasterRecovery.policyOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "backup-disaster-recovery.profile" => Some(("backupDisasterRecovery.profile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.storage-pool" => Some(("backupDisasterRecovery.storagePool", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "canonical-name" => Some(("canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "category" => Some(("category", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-data-profile.data-profile" => Some(("cloudDlpDataProfile.dataProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-data-profile.parent-type" => Some(("cloudDlpDataProfile.parentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.full-scan" => Some(("cloudDlpInspection.fullScan", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.info-type" => Some(("cloudDlpInspection.infoType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.info-type-count" => Some(("cloudDlpInspection.infoTypeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.inspect-job" => Some(("cloudDlpInspection.inspectJob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.display-name" => Some(("database.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.grantees" => Some(("database.grantees", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "database.name" => Some(("database.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.query" => Some(("database.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.user-name" => Some(("database.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.version" => Some(("database.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-time" => Some(("eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exfiltration.total-exfiltrated-bytes" => Some(("exfiltration.totalExfiltratedBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-uri" => Some(("externalUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "finding-class" => Some(("findingClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "indicator.domains" => Some(("indicator.domains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -4493,6 +8279,7 @@ where
                     "mitre-attack.primary-tactic" => Some(("mitreAttack.primaryTactic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mitre-attack.primary-techniques" => Some(("mitreAttack.primaryTechniques", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "mitre-attack.version" => Some(("mitreAttack.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "module-name" => Some(("moduleName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute" => Some(("mute", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute-initiator" => Some(("muteInitiator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute-update-time" => Some(("muteUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4504,6 +8291,13 @@ where
                     "security-marks.canonical-name" => Some(("securityMarks.canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-marks.marks" => Some(("securityMarks.marks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "security-marks.name" => Some(("securityMarks.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.changed-policy" => Some(("securityPosture.changedPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.name" => Some(("securityPosture.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.policy" => Some(("securityPosture.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.policy-set" => Some(("securityPosture.policySet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.posture-deployment" => Some(("securityPosture.postureDeployment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.posture-deployment-resource" => Some(("securityPosture.postureDeploymentResource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.revision-id" => Some(("securityPosture.revisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "severity" => Some(("severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.cvssv3.attack-complexity" => Some(("vulnerability.cve.cvssv3.attackComplexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -4515,10 +8309,25 @@ where
                     "vulnerability.cve.cvssv3.privileges-required" => Some(("vulnerability.cve.cvssv3.privilegesRequired", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.cvssv3.scope" => Some(("vulnerability.cve.cvssv3.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.cvssv3.user-interaction" => Some(("vulnerability.cve.cvssv3.userInteraction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.exploitation-activity" => Some(("vulnerability.cve.exploitationActivity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.id" => Some(("vulnerability.cve.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.impact" => Some(("vulnerability.cve.impact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.observed-in-the-wild" => Some(("vulnerability.cve.observedInTheWild", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "vulnerability.cve.upstream-fix-available" => Some(("vulnerability.cve.upstreamFixAvailable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.zero-day" => Some(("vulnerability.cve.zeroDay", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.cpe-uri" => Some(("vulnerability.fixedPackage.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.package-name" => Some(("vulnerability.fixedPackage.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.package-type" => Some(("vulnerability.fixedPackage.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.package-version" => Some(("vulnerability.fixedPackage.packageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.cpe-uri" => Some(("vulnerability.offendingPackage.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.package-name" => Some(("vulnerability.offendingPackage.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.package-type" => Some(("vulnerability.offendingPackage.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.package-version" => Some(("vulnerability.offendingPackage.packageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.security-bulletin.bulletin-id" => Some(("vulnerability.securityBulletin.bulletinId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.security-bulletin.submission-time" => Some(("vulnerability.securityBulletin.submissionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.security-bulletin.suggested-upgrade-version" => Some(("vulnerability.securityBulletin.suggestedUpgradeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "attack-complexity", "attack-vector", "availability-impact", "base-score", "caller-ip", "caller-ip-geo", "canonical-name", "category", "confidentiality-impact", "create-time", "cve", "cvssv3", "database", "description", "display-name", "domains", "event-time", "external-uri", "finding-class", "grantees", "id", "indicator", "integrity-impact", "ip-addresses", "kernel-rootkit", "marks", "method-name", "mitre-attack", "mute", "mute-initiator", "mute-update-time", "name", "next-steps", "parent", "parent-display-name", "primary-tactic", "primary-techniques", "principal-email", "principal-subject", "privileges-required", "query", "region-code", "resource-name", "scope", "security-marks", "service-account-key-name", "service-name", "severity", "state", "unexpected-code-modification", "unexpected-ftrace-handler", "unexpected-interrupt-handler", "unexpected-kernel-code-pages", "unexpected-kprobe-handler", "unexpected-processes-in-runqueue", "unexpected-read-only-data-modification", "unexpected-system-call-handler", "upstream-fix-available", "uris", "user-agent-family", "user-interaction", "user-name", "version", "vulnerability"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "appliance", "application", "applications", "attack-complexity", "attack-exposure", "attack-exposure-result", "attack-vector", "availability-impact", "backup-create-time", "backup-disaster-recovery", "backup-template", "backup-type", "base-score", "base-uri", "bulletin-id", "caller-ip", "caller-ip-geo", "canonical-name", "category", "changed-policy", "cloud-dlp-data-profile", "cloud-dlp-inspection", "confidentiality-impact", "cpe-uri", "create-time", "cve", "cvssv3", "data-profile", "database", "description", "display-name", "domains", "event-time", "exfiltration", "exploitation-activity", "exposed-high-value-resources-count", "exposed-low-value-resources-count", "exposed-medium-value-resources-count", "external-uri", "finding-class", "fixed-package", "full-scan", "full-uri", "grantees", "host", "id", "impact", "indicator", "info-type", "info-type-count", "inspect-job", "integrity-impact", "ip-addresses", "kernel-rootkit", "latest-calculation-time", "marks", "method-name", "mitre-attack", "module-name", "mute", "mute-initiator", "mute-update-time", "name", "next-steps", "observed-in-the-wild", "offending-package", "package-name", "package-type", "package-version", "parent", "parent-display-name", "parent-type", "policies", "policy", "policy-options", "policy-set", "posture-deployment", "posture-deployment-resource", "primary-tactic", "primary-techniques", "principal-email", "principal-subject", "privileges-required", "profile", "query", "region-code", "resource-name", "revision-id", "scope", "score", "security-bulletin", "security-marks", "security-posture", "service-account-key-name", "service-name", "severity", "state", "storage-pool", "submission-time", "suggested-upgrade-version", "total-exfiltrated-bytes", "unexpected-code-modification", "unexpected-ftrace-handler", "unexpected-interrupt-handler", "unexpected-kernel-code-pages", "unexpected-kprobe-handler", "unexpected-processes-in-runqueue", "unexpected-read-only-data-modification", "unexpected-system-call-handler", "upstream-fix-available", "uris", "user-agent", "user-agent-family", "user-interaction", "user-name", "version", "vulnerability", "zero-day"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -6013,6 +9822,613 @@ where
         }
     }
 
+    async fn _projects_event_threat_detection_settings_custom_modules_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "ancestor-module" => Some(("ancestorModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enablement-state" => Some(("enablementState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-editor" => Some(("lastEditor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ancestor-module", "description", "display-name", "enablement-state", "last-editor", "name", "type", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::EventThreatDetectionCustomModule = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().event_threat_detection_settings_custom_modules_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_event_threat_detection_settings_custom_modules_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().event_threat_detection_settings_custom_modules_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_event_threat_detection_settings_custom_modules_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().event_threat_detection_settings_custom_modules_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_event_threat_detection_settings_custom_modules_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().event_threat_detection_settings_custom_modules_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_event_threat_detection_settings_custom_modules_list_descendant(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().event_threat_detection_settings_custom_modules_list_descendant(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_event_threat_detection_settings_custom_modules_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "ancestor-module" => Some(("ancestorModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enablement-state" => Some(("enablementState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-editor" => Some(("lastEditor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ancestor-module", "description", "display-name", "enablement-state", "last-editor", "name", "type", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::EventThreatDetectionCustomModule = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().event_threat_detection_settings_custom_modules_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_event_threat_detection_settings_effective_custom_modules_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().event_threat_detection_settings_effective_custom_modules_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_event_threat_detection_settings_effective_custom_modules_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().event_threat_detection_settings_effective_custom_modules_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_event_threat_detection_settings_validate_custom_module(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "raw-text" => Some(("rawText", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["raw-text", "type"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::ValidateEventThreatDetectionCustomModuleRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().event_threat_detection_settings_validate_custom_module(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_findings_bulk_mute(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -6066,6 +10482,205 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_mute_configs_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_mute_configs_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_mute_configs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_mute_configs_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_mute_configs_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "filter" => Some(("filter", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "most-recent-editor" => Some(("mostRecentEditor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "display-name", "filter", "most-recent-editor", "name", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudSecuritycenterV1MuteConfig = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_mute_configs_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -6801,6 +11416,634 @@ where
         }
     }
 
+    async fn _projects_security_health_analytics_settings_custom_modules_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "ancestor-module" => Some(("ancestorModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.description" => Some(("customConfig.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.description" => Some(("customConfig.predicate.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.expression" => Some(("customConfig.predicate.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.location" => Some(("customConfig.predicate.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.title" => Some(("customConfig.predicate.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.recommendation" => Some(("customConfig.recommendation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.resource-selector.resource-types" => Some(("customConfig.resourceSelector.resourceTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "custom-config.severity" => Some(("customConfig.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enablement-state" => Some(("enablementState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-editor" => Some(("lastEditor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ancestor-module", "custom-config", "description", "display-name", "enablement-state", "expression", "last-editor", "location", "name", "predicate", "recommendation", "resource-selector", "resource-types", "severity", "title", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().security_health_analytics_settings_custom_modules_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_security_health_analytics_settings_custom_modules_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().security_health_analytics_settings_custom_modules_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_security_health_analytics_settings_custom_modules_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().security_health_analytics_settings_custom_modules_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_security_health_analytics_settings_custom_modules_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().security_health_analytics_settings_custom_modules_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_security_health_analytics_settings_custom_modules_list_descendant(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().security_health_analytics_settings_custom_modules_list_descendant(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_security_health_analytics_settings_custom_modules_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "ancestor-module" => Some(("ancestorModule", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.description" => Some(("customConfig.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.description" => Some(("customConfig.predicate.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.expression" => Some(("customConfig.predicate.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.location" => Some(("customConfig.predicate.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.title" => Some(("customConfig.predicate.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.recommendation" => Some(("customConfig.recommendation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.resource-selector.resource-types" => Some(("customConfig.resourceSelector.resourceTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "custom-config.severity" => Some(("customConfig.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "enablement-state" => Some(("enablementState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "last-editor" => Some(("lastEditor", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ancestor-module", "custom-config", "description", "display-name", "enablement-state", "expression", "last-editor", "location", "name", "predicate", "recommendation", "resource-selector", "resource-types", "severity", "title", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().security_health_analytics_settings_custom_modules_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["update-mask"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_security_health_analytics_settings_custom_modules_simulate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "custom-config.description" => Some(("customConfig.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.description" => Some(("customConfig.predicate.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.expression" => Some(("customConfig.predicate.expression", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.location" => Some(("customConfig.predicate.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.predicate.title" => Some(("customConfig.predicate.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.recommendation" => Some(("customConfig.recommendation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-config.resource-selector.resource-types" => Some(("customConfig.resourceSelector.resourceTypes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "custom-config.severity" => Some(("customConfig.severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource.iam-policy-data.etag" => Some(("resource.iamPolicyData.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource.iam-policy-data.version" => Some(("resource.iamPolicyData.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "resource.resource-type" => Some(("resource.resourceType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["custom-config", "description", "etag", "expression", "iam-policy-data", "location", "predicate", "recommendation", "resource", "resource-selector", "resource-type", "resource-types", "severity", "title", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SimulateSecurityHealthAnalyticsCustomModuleRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().security_health_analytics_settings_custom_modules_simulate(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_security_health_analytics_settings_effective_custom_modules_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().security_health_analytics_settings_effective_custom_modules_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_security_health_analytics_settings_effective_custom_modules_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().security_health_analytics_settings_effective_custom_modules_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_sources_findings_external_systems_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -6825,12 +12068,23 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "assignees" => Some(("assignees", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "case-close-time" => Some(("caseCloseTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "case-create-time" => Some(("caseCreateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "case-priority" => Some(("casePriority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "case-sla" => Some(("caseSla", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "case-uri" => Some(("caseUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-system-update-time" => Some(("externalSystemUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-uid" => Some(("externalUid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status" => Some(("status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.assignee" => Some(("ticketInfo.assignee", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.description" => Some(("ticketInfo.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.id" => Some(("ticketInfo.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.status" => Some(("ticketInfo.status", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.update-time" => Some(("ticketInfo.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ticket-info.uri" => Some(("ticketInfo.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["assignees", "external-system-update-time", "external-uid", "name", "status"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["assignee", "assignees", "case-close-time", "case-create-time", "case-priority", "case-sla", "case-uri", "description", "external-system-update-time", "external-uid", "id", "name", "status", "ticket-info", "update-time", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7088,18 +12342,46 @@ where
                     "access.principal-subject" => Some(("access.principalSubject", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.service-account-key-name" => Some(("access.serviceAccountKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.service-name" => Some(("access.serviceName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "access.user-agent" => Some(("access.userAgent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.user-agent-family" => Some(("access.userAgentFamily", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "access.user-name" => Some(("access.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "application.base-uri" => Some(("application.baseUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "application.full-uri" => Some(("application.fullUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attack-exposure.attack-exposure-result" => Some(("attackExposure.attackExposureResult", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attack-exposure.exposed-high-value-resources-count" => Some(("attackExposure.exposedHighValueResourcesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "attack-exposure.exposed-low-value-resources-count" => Some(("attackExposure.exposedLowValueResourcesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "attack-exposure.exposed-medium-value-resources-count" => Some(("attackExposure.exposedMediumValueResourcesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "attack-exposure.latest-calculation-time" => Some(("attackExposure.latestCalculationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "attack-exposure.score" => Some(("attackExposure.score", JsonTypeInfo { jtype: JsonType::Float, ctype: ComplexType::Pod })),
+                    "attack-exposure.state" => Some(("attackExposure.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.appliance" => Some(("backupDisasterRecovery.appliance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.applications" => Some(("backupDisasterRecovery.applications", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "backup-disaster-recovery.backup-create-time" => Some(("backupDisasterRecovery.backupCreateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.backup-template" => Some(("backupDisasterRecovery.backupTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.backup-type" => Some(("backupDisasterRecovery.backupType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.host" => Some(("backupDisasterRecovery.host", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.policies" => Some(("backupDisasterRecovery.policies", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "backup-disaster-recovery.policy-options" => Some(("backupDisasterRecovery.policyOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "backup-disaster-recovery.profile" => Some(("backupDisasterRecovery.profile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "backup-disaster-recovery.storage-pool" => Some(("backupDisasterRecovery.storagePool", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "canonical-name" => Some(("canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "category" => Some(("category", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-data-profile.data-profile" => Some(("cloudDlpDataProfile.dataProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-data-profile.parent-type" => Some(("cloudDlpDataProfile.parentType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.full-scan" => Some(("cloudDlpInspection.fullScan", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.info-type" => Some(("cloudDlpInspection.infoType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.info-type-count" => Some(("cloudDlpInspection.infoTypeCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cloud-dlp-inspection.inspect-job" => Some(("cloudDlpInspection.inspectJob", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.display-name" => Some(("database.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.grantees" => Some(("database.grantees", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "database.name" => Some(("database.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.query" => Some(("database.query", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "database.user-name" => Some(("database.userName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "database.version" => Some(("database.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "event-time" => Some(("eventTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "exfiltration.total-exfiltrated-bytes" => Some(("exfiltration.totalExfiltratedBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "external-uri" => Some(("externalUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "finding-class" => Some(("findingClass", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "indicator.domains" => Some(("indicator.domains", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -7119,6 +12401,7 @@ where
                     "mitre-attack.primary-tactic" => Some(("mitreAttack.primaryTactic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mitre-attack.primary-techniques" => Some(("mitreAttack.primaryTechniques", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "mitre-attack.version" => Some(("mitreAttack.version", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "module-name" => Some(("moduleName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute" => Some(("mute", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute-initiator" => Some(("muteInitiator", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "mute-update-time" => Some(("muteUpdateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7130,6 +12413,13 @@ where
                     "security-marks.canonical-name" => Some(("securityMarks.canonicalName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "security-marks.marks" => Some(("securityMarks.marks", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "security-marks.name" => Some(("securityMarks.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.changed-policy" => Some(("securityPosture.changedPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.name" => Some(("securityPosture.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.policy" => Some(("securityPosture.policy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.policy-set" => Some(("securityPosture.policySet", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.posture-deployment" => Some(("securityPosture.postureDeployment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.posture-deployment-resource" => Some(("securityPosture.postureDeploymentResource", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "security-posture.revision-id" => Some(("securityPosture.revisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "severity" => Some(("severity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.cvssv3.attack-complexity" => Some(("vulnerability.cve.cvssv3.attackComplexity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -7141,10 +12431,25 @@ where
                     "vulnerability.cve.cvssv3.privileges-required" => Some(("vulnerability.cve.cvssv3.privilegesRequired", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.cvssv3.scope" => Some(("vulnerability.cve.cvssv3.scope", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.cvssv3.user-interaction" => Some(("vulnerability.cve.cvssv3.userInteraction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.exploitation-activity" => Some(("vulnerability.cve.exploitationActivity", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "vulnerability.cve.id" => Some(("vulnerability.cve.id", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.impact" => Some(("vulnerability.cve.impact", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.observed-in-the-wild" => Some(("vulnerability.cve.observedInTheWild", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "vulnerability.cve.upstream-fix-available" => Some(("vulnerability.cve.upstreamFixAvailable", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "vulnerability.cve.zero-day" => Some(("vulnerability.cve.zeroDay", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.cpe-uri" => Some(("vulnerability.fixedPackage.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.package-name" => Some(("vulnerability.fixedPackage.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.package-type" => Some(("vulnerability.fixedPackage.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.fixed-package.package-version" => Some(("vulnerability.fixedPackage.packageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.cpe-uri" => Some(("vulnerability.offendingPackage.cpeUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.package-name" => Some(("vulnerability.offendingPackage.packageName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.package-type" => Some(("vulnerability.offendingPackage.packageType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.offending-package.package-version" => Some(("vulnerability.offendingPackage.packageVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.security-bulletin.bulletin-id" => Some(("vulnerability.securityBulletin.bulletinId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.security-bulletin.submission-time" => Some(("vulnerability.securityBulletin.submissionTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "vulnerability.security-bulletin.suggested-upgrade-version" => Some(("vulnerability.securityBulletin.suggestedUpgradeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "attack-complexity", "attack-vector", "availability-impact", "base-score", "caller-ip", "caller-ip-geo", "canonical-name", "category", "confidentiality-impact", "create-time", "cve", "cvssv3", "database", "description", "display-name", "domains", "event-time", "external-uri", "finding-class", "grantees", "id", "indicator", "integrity-impact", "ip-addresses", "kernel-rootkit", "marks", "method-name", "mitre-attack", "mute", "mute-initiator", "mute-update-time", "name", "next-steps", "parent", "parent-display-name", "primary-tactic", "primary-techniques", "principal-email", "principal-subject", "privileges-required", "query", "region-code", "resource-name", "scope", "security-marks", "service-account-key-name", "service-name", "severity", "state", "unexpected-code-modification", "unexpected-ftrace-handler", "unexpected-interrupt-handler", "unexpected-kernel-code-pages", "unexpected-kprobe-handler", "unexpected-processes-in-runqueue", "unexpected-read-only-data-modification", "unexpected-system-call-handler", "upstream-fix-available", "uris", "user-agent-family", "user-interaction", "user-name", "version", "vulnerability"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access", "additional-tactics", "additional-techniques", "appliance", "application", "applications", "attack-complexity", "attack-exposure", "attack-exposure-result", "attack-vector", "availability-impact", "backup-create-time", "backup-disaster-recovery", "backup-template", "backup-type", "base-score", "base-uri", "bulletin-id", "caller-ip", "caller-ip-geo", "canonical-name", "category", "changed-policy", "cloud-dlp-data-profile", "cloud-dlp-inspection", "confidentiality-impact", "cpe-uri", "create-time", "cve", "cvssv3", "data-profile", "database", "description", "display-name", "domains", "event-time", "exfiltration", "exploitation-activity", "exposed-high-value-resources-count", "exposed-low-value-resources-count", "exposed-medium-value-resources-count", "external-uri", "finding-class", "fixed-package", "full-scan", "full-uri", "grantees", "host", "id", "impact", "indicator", "info-type", "info-type-count", "inspect-job", "integrity-impact", "ip-addresses", "kernel-rootkit", "latest-calculation-time", "marks", "method-name", "mitre-attack", "module-name", "mute", "mute-initiator", "mute-update-time", "name", "next-steps", "observed-in-the-wild", "offending-package", "package-name", "package-type", "package-version", "parent", "parent-display-name", "parent-type", "policies", "policy", "policy-options", "policy-set", "posture-deployment", "posture-deployment-resource", "primary-tactic", "primary-techniques", "principal-email", "principal-subject", "privileges-required", "profile", "query", "region-code", "resource-name", "revision-id", "scope", "score", "security-bulletin", "security-marks", "security-posture", "service-account-key-name", "service-name", "severity", "state", "storage-pool", "submission-time", "suggested-upgrade-version", "total-exfiltrated-bytes", "unexpected-code-modification", "unexpected-ftrace-handler", "unexpected-interrupt-handler", "unexpected-kernel-code-pages", "unexpected-kprobe-handler", "unexpected-processes-in-runqueue", "unexpected-read-only-data-modification", "unexpected-system-call-handler", "upstream-fix-available", "uris", "user-agent", "user-agent-family", "user-interaction", "user-name", "version", "vulnerability", "zero-day"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -7563,8 +12868,44 @@ where
                     ("big-query-exports-patch", Some(opt)) => {
                         call_result = self._folders_big_query_exports_patch(opt, dry_run, &mut err).await;
                     },
+                    ("event-threat-detection-settings-custom-modules-create", Some(opt)) => {
+                        call_result = self._folders_event_threat_detection_settings_custom_modules_create(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-custom-modules-delete", Some(opt)) => {
+                        call_result = self._folders_event_threat_detection_settings_custom_modules_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-custom-modules-get", Some(opt)) => {
+                        call_result = self._folders_event_threat_detection_settings_custom_modules_get(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-custom-modules-list", Some(opt)) => {
+                        call_result = self._folders_event_threat_detection_settings_custom_modules_list(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-custom-modules-list-descendant", Some(opt)) => {
+                        call_result = self._folders_event_threat_detection_settings_custom_modules_list_descendant(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-custom-modules-patch", Some(opt)) => {
+                        call_result = self._folders_event_threat_detection_settings_custom_modules_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-effective-custom-modules-get", Some(opt)) => {
+                        call_result = self._folders_event_threat_detection_settings_effective_custom_modules_get(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-effective-custom-modules-list", Some(opt)) => {
+                        call_result = self._folders_event_threat_detection_settings_effective_custom_modules_list(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-validate-custom-module", Some(opt)) => {
+                        call_result = self._folders_event_threat_detection_settings_validate_custom_module(opt, dry_run, &mut err).await;
+                    },
                     ("findings-bulk-mute", Some(opt)) => {
                         call_result = self._folders_findings_bulk_mute(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-mute-configs-delete", Some(opt)) => {
+                        call_result = self._folders_locations_mute_configs_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-mute-configs-get", Some(opt)) => {
+                        call_result = self._folders_locations_mute_configs_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-mute-configs-patch", Some(opt)) => {
+                        call_result = self._folders_locations_mute_configs_patch(opt, dry_run, &mut err).await;
                     },
                     ("mute-configs-create", Some(opt)) => {
                         call_result = self._folders_mute_configs_create(opt, dry_run, &mut err).await;
@@ -7595,6 +12936,33 @@ where
                     },
                     ("notification-configs-patch", Some(opt)) => {
                         call_result = self._folders_notification_configs_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-create", Some(opt)) => {
+                        call_result = self._folders_security_health_analytics_settings_custom_modules_create(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-delete", Some(opt)) => {
+                        call_result = self._folders_security_health_analytics_settings_custom_modules_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-get", Some(opt)) => {
+                        call_result = self._folders_security_health_analytics_settings_custom_modules_get(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-list", Some(opt)) => {
+                        call_result = self._folders_security_health_analytics_settings_custom_modules_list(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-list-descendant", Some(opt)) => {
+                        call_result = self._folders_security_health_analytics_settings_custom_modules_list_descendant(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-patch", Some(opt)) => {
+                        call_result = self._folders_security_health_analytics_settings_custom_modules_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-simulate", Some(opt)) => {
+                        call_result = self._folders_security_health_analytics_settings_custom_modules_simulate(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-effective-custom-modules-get", Some(opt)) => {
+                        call_result = self._folders_security_health_analytics_settings_effective_custom_modules_get(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-effective-custom-modules-list", Some(opt)) => {
+                        call_result = self._folders_security_health_analytics_settings_effective_custom_modules_list(opt, dry_run, &mut err).await;
                     },
                     ("sources-findings-external-systems-patch", Some(opt)) => {
                         call_result = self._folders_sources_findings_external_systems_patch(opt, dry_run, &mut err).await;
@@ -7655,11 +13023,47 @@ where
                     ("big-query-exports-patch", Some(opt)) => {
                         call_result = self._organizations_big_query_exports_patch(opt, dry_run, &mut err).await;
                     },
+                    ("event-threat-detection-settings-custom-modules-create", Some(opt)) => {
+                        call_result = self._organizations_event_threat_detection_settings_custom_modules_create(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-custom-modules-delete", Some(opt)) => {
+                        call_result = self._organizations_event_threat_detection_settings_custom_modules_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-custom-modules-get", Some(opt)) => {
+                        call_result = self._organizations_event_threat_detection_settings_custom_modules_get(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-custom-modules-list", Some(opt)) => {
+                        call_result = self._organizations_event_threat_detection_settings_custom_modules_list(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-custom-modules-list-descendant", Some(opt)) => {
+                        call_result = self._organizations_event_threat_detection_settings_custom_modules_list_descendant(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-custom-modules-patch", Some(opt)) => {
+                        call_result = self._organizations_event_threat_detection_settings_custom_modules_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-effective-custom-modules-get", Some(opt)) => {
+                        call_result = self._organizations_event_threat_detection_settings_effective_custom_modules_get(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-effective-custom-modules-list", Some(opt)) => {
+                        call_result = self._organizations_event_threat_detection_settings_effective_custom_modules_list(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-validate-custom-module", Some(opt)) => {
+                        call_result = self._organizations_event_threat_detection_settings_validate_custom_module(opt, dry_run, &mut err).await;
+                    },
                     ("findings-bulk-mute", Some(opt)) => {
                         call_result = self._organizations_findings_bulk_mute(opt, dry_run, &mut err).await;
                     },
                     ("get-organization-settings", Some(opt)) => {
                         call_result = self._organizations_get_organization_settings(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-mute-configs-delete", Some(opt)) => {
+                        call_result = self._organizations_locations_mute_configs_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-mute-configs-get", Some(opt)) => {
+                        call_result = self._organizations_locations_mute_configs_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-mute-configs-patch", Some(opt)) => {
+                        call_result = self._organizations_locations_mute_configs_patch(opt, dry_run, &mut err).await;
                     },
                     ("mute-configs-create", Some(opt)) => {
                         call_result = self._organizations_mute_configs_create(opt, dry_run, &mut err).await;
@@ -7702,6 +13106,69 @@ where
                     },
                     ("operations-list", Some(opt)) => {
                         call_result = self._organizations_operations_list(opt, dry_run, &mut err).await;
+                    },
+                    ("resource-value-configs-batch-create", Some(opt)) => {
+                        call_result = self._organizations_resource_value_configs_batch_create(opt, dry_run, &mut err).await;
+                    },
+                    ("resource-value-configs-delete", Some(opt)) => {
+                        call_result = self._organizations_resource_value_configs_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("resource-value-configs-get", Some(opt)) => {
+                        call_result = self._organizations_resource_value_configs_get(opt, dry_run, &mut err).await;
+                    },
+                    ("resource-value-configs-list", Some(opt)) => {
+                        call_result = self._organizations_resource_value_configs_list(opt, dry_run, &mut err).await;
+                    },
+                    ("resource-value-configs-patch", Some(opt)) => {
+                        call_result = self._organizations_resource_value_configs_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-create", Some(opt)) => {
+                        call_result = self._organizations_security_health_analytics_settings_custom_modules_create(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-delete", Some(opt)) => {
+                        call_result = self._organizations_security_health_analytics_settings_custom_modules_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-get", Some(opt)) => {
+                        call_result = self._organizations_security_health_analytics_settings_custom_modules_get(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-list", Some(opt)) => {
+                        call_result = self._organizations_security_health_analytics_settings_custom_modules_list(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-list-descendant", Some(opt)) => {
+                        call_result = self._organizations_security_health_analytics_settings_custom_modules_list_descendant(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-patch", Some(opt)) => {
+                        call_result = self._organizations_security_health_analytics_settings_custom_modules_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-simulate", Some(opt)) => {
+                        call_result = self._organizations_security_health_analytics_settings_custom_modules_simulate(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-effective-custom-modules-get", Some(opt)) => {
+                        call_result = self._organizations_security_health_analytics_settings_effective_custom_modules_get(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-effective-custom-modules-list", Some(opt)) => {
+                        call_result = self._organizations_security_health_analytics_settings_effective_custom_modules_list(opt, dry_run, &mut err).await;
+                    },
+                    ("simulations-attack-exposure-results-attack-paths-list", Some(opt)) => {
+                        call_result = self._organizations_simulations_attack_exposure_results_attack_paths_list(opt, dry_run, &mut err).await;
+                    },
+                    ("simulations-attack-exposure-results-valued-resources-list", Some(opt)) => {
+                        call_result = self._organizations_simulations_attack_exposure_results_valued_resources_list(opt, dry_run, &mut err).await;
+                    },
+                    ("simulations-attack-paths-list", Some(opt)) => {
+                        call_result = self._organizations_simulations_attack_paths_list(opt, dry_run, &mut err).await;
+                    },
+                    ("simulations-get", Some(opt)) => {
+                        call_result = self._organizations_simulations_get(opt, dry_run, &mut err).await;
+                    },
+                    ("simulations-valued-resources-attack-paths-list", Some(opt)) => {
+                        call_result = self._organizations_simulations_valued_resources_attack_paths_list(opt, dry_run, &mut err).await;
+                    },
+                    ("simulations-valued-resources-get", Some(opt)) => {
+                        call_result = self._organizations_simulations_valued_resources_get(opt, dry_run, &mut err).await;
+                    },
+                    ("simulations-valued-resources-list", Some(opt)) => {
+                        call_result = self._organizations_simulations_valued_resources_list(opt, dry_run, &mut err).await;
                     },
                     ("sources-create", Some(opt)) => {
                         call_result = self._organizations_sources_create(opt, dry_run, &mut err).await;
@@ -7783,8 +13250,44 @@ where
                     ("big-query-exports-patch", Some(opt)) => {
                         call_result = self._projects_big_query_exports_patch(opt, dry_run, &mut err).await;
                     },
+                    ("event-threat-detection-settings-custom-modules-create", Some(opt)) => {
+                        call_result = self._projects_event_threat_detection_settings_custom_modules_create(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-custom-modules-delete", Some(opt)) => {
+                        call_result = self._projects_event_threat_detection_settings_custom_modules_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-custom-modules-get", Some(opt)) => {
+                        call_result = self._projects_event_threat_detection_settings_custom_modules_get(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-custom-modules-list", Some(opt)) => {
+                        call_result = self._projects_event_threat_detection_settings_custom_modules_list(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-custom-modules-list-descendant", Some(opt)) => {
+                        call_result = self._projects_event_threat_detection_settings_custom_modules_list_descendant(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-custom-modules-patch", Some(opt)) => {
+                        call_result = self._projects_event_threat_detection_settings_custom_modules_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-effective-custom-modules-get", Some(opt)) => {
+                        call_result = self._projects_event_threat_detection_settings_effective_custom_modules_get(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-effective-custom-modules-list", Some(opt)) => {
+                        call_result = self._projects_event_threat_detection_settings_effective_custom_modules_list(opt, dry_run, &mut err).await;
+                    },
+                    ("event-threat-detection-settings-validate-custom-module", Some(opt)) => {
+                        call_result = self._projects_event_threat_detection_settings_validate_custom_module(opt, dry_run, &mut err).await;
+                    },
                     ("findings-bulk-mute", Some(opt)) => {
                         call_result = self._projects_findings_bulk_mute(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-mute-configs-delete", Some(opt)) => {
+                        call_result = self._projects_locations_mute_configs_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-mute-configs-get", Some(opt)) => {
+                        call_result = self._projects_locations_mute_configs_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-mute-configs-patch", Some(opt)) => {
+                        call_result = self._projects_locations_mute_configs_patch(opt, dry_run, &mut err).await;
                     },
                     ("mute-configs-create", Some(opt)) => {
                         call_result = self._projects_mute_configs_create(opt, dry_run, &mut err).await;
@@ -7815,6 +13318,33 @@ where
                     },
                     ("notification-configs-patch", Some(opt)) => {
                         call_result = self._projects_notification_configs_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-create", Some(opt)) => {
+                        call_result = self._projects_security_health_analytics_settings_custom_modules_create(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-delete", Some(opt)) => {
+                        call_result = self._projects_security_health_analytics_settings_custom_modules_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-get", Some(opt)) => {
+                        call_result = self._projects_security_health_analytics_settings_custom_modules_get(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-list", Some(opt)) => {
+                        call_result = self._projects_security_health_analytics_settings_custom_modules_list(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-list-descendant", Some(opt)) => {
+                        call_result = self._projects_security_health_analytics_settings_custom_modules_list_descendant(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-patch", Some(opt)) => {
+                        call_result = self._projects_security_health_analytics_settings_custom_modules_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-custom-modules-simulate", Some(opt)) => {
+                        call_result = self._projects_security_health_analytics_settings_custom_modules_simulate(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-effective-custom-modules-get", Some(opt)) => {
+                        call_result = self._projects_security_health_analytics_settings_effective_custom_modules_get(opt, dry_run, &mut err).await;
+                    },
+                    ("security-health-analytics-settings-effective-custom-modules-list", Some(opt)) => {
+                        call_result = self._projects_security_health_analytics_settings_effective_custom_modules_list(opt, dry_run, &mut err).await;
                     },
                     ("sources-findings-external-systems-patch", Some(opt)) => {
                         call_result = self._projects_sources_findings_external_systems_patch(opt, dry_run, &mut err).await;
@@ -7919,7 +13449,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("folders", "methods: 'assets-group', 'assets-list', 'assets-update-security-marks', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'findings-bulk-mute', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'notification-configs-create', 'notification-configs-delete', 'notification-configs-get', 'notification-configs-list', 'notification-configs-patch', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks' and 'sources-list'", vec![
+        ("folders", "methods: 'assets-group', 'assets-list', 'assets-update-security-marks', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'event-threat-detection-settings-custom-modules-create', 'event-threat-detection-settings-custom-modules-delete', 'event-threat-detection-settings-custom-modules-get', 'event-threat-detection-settings-custom-modules-list', 'event-threat-detection-settings-custom-modules-list-descendant', 'event-threat-detection-settings-custom-modules-patch', 'event-threat-detection-settings-effective-custom-modules-get', 'event-threat-detection-settings-effective-custom-modules-list', 'event-threat-detection-settings-validate-custom-module', 'findings-bulk-mute', 'locations-mute-configs-delete', 'locations-mute-configs-get', 'locations-mute-configs-patch', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'notification-configs-create', 'notification-configs-delete', 'notification-configs-get', 'notification-configs-list', 'notification-configs-patch', 'security-health-analytics-settings-custom-modules-create', 'security-health-analytics-settings-custom-modules-delete', 'security-health-analytics-settings-custom-modules-get', 'security-health-analytics-settings-custom-modules-list', 'security-health-analytics-settings-custom-modules-list-descendant', 'security-health-analytics-settings-custom-modules-patch', 'security-health-analytics-settings-custom-modules-simulate', 'security-health-analytics-settings-effective-custom-modules-get', 'security-health-analytics-settings-effective-custom-modules-list', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks' and 'sources-list'", vec![
             ("assets-group",
                     Some(r##"Filters an organization's assets and groups them by their specified properties."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_assets-group",
@@ -8120,6 +13650,222 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("event-threat-detection-settings-custom-modules-create",
+                    Some(r##"Creates a resident Event Threat Detection custom module at the scope of the given Resource Manager parent, and also creates inherited custom modules for all descendants of the given parent. These modules are enabled by default."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_event-threat-detection-settings-custom-modules-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The new custom module's parent. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-custom-modules-delete",
+                    Some(r##"Deletes the specified Event Threat Detection custom module and all of its descendants in the Resource Manager hierarchy. This method is only supported for resident custom modules."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_event-threat-detection-settings-custom-modules-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the custom module to delete. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-custom-modules-get",
+                    Some(r##"Gets an Event Threat Detection custom module."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_event-threat-detection-settings-custom-modules-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the custom module to get. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-custom-modules-list",
+                    Some(r##"Lists all Event Threat Detection custom modules for the given Resource Manager parent. This includes resident modules defined at the scope of the parent along with modules inherited from ancestors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_event-threat-detection-settings-custom-modules-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-custom-modules-list-descendant",
+                    Some(r##"Lists all resident Event Threat Detection custom modules under the given Resource Manager parent and its descendants."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_event-threat-detection-settings-custom-modules-list-descendant",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-custom-modules-patch",
+                    Some(r##"Updates the Event Threat Detection custom module with the given name based on the given update mask. Updating the enablement state is supported for both resident and inherited modules (though resident modules cannot have an enablement state of "inherited"). Updating the display name or configuration of a module is supported for resident modules only. The type of a module cannot be changed."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_event-threat-detection-settings-custom-modules-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Immutable. The resource name of the Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-effective-custom-modules-get",
+                    Some(r##"Gets an effective Event Threat Detection custom module at the given level."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_event-threat-detection-settings-effective-custom-modules-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name of the effective Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-effective-custom-modules-list",
+                    Some(r##"Lists all effective Event Threat Detection custom modules for the given parent. This includes resident modules defined at the scope of the parent along with modules inherited from its ancestors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_event-threat-detection-settings-effective-custom-modules-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the parent to list custom modules for. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-validate-custom-module",
+                    Some(r##"Validates the given Event Threat Detection custom module."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_event-threat-detection-settings-validate-custom-module",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the parent to validate the Custom Module under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("findings-bulk-mute",
                     Some(r##"Kicks off an LRO to bulk mute findings for a parent based on a filter. The parent can be either an organization, folder or project. The findings matched by the filter will be muted after the LRO is done."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_findings-bulk-mute",
@@ -8127,6 +13873,78 @@ async fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"Required. The parent, at which bulk action needs to be applied. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-mute-configs-delete",
+                    Some(r##"Deletes an existing mute config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_locations-mute-configs-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-mute-configs-get",
+                    Some(r##"Gets a mute config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_locations-mute-configs-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-mute-configs-patch",
+                    Some(r##"Updates a mute config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_locations-mute-configs-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}""##),
                      Some(true),
                      Some(false)),
         
@@ -8182,7 +14000,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, or projects/{project}/muteConfigs/{config_id}"##),
+                     Some(r##"Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
                      Some(true),
                      Some(false)),
         
@@ -8204,7 +14022,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, or projects/{project}/muteConfigs/{config_id}"##),
+                     Some(r##"Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
                      Some(true),
                      Some(false)),
         
@@ -8248,7 +14066,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}""##),
+                     Some(r##"This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}""##),
                      Some(true),
                      Some(false)),
         
@@ -8392,6 +14210,222 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("security-health-analytics-settings-custom-modules-create",
+                    Some(r##"Creates a resident SecurityHealthAnalyticsCustomModule at the scope of the given CRM parent, and also creates inherited SecurityHealthAnalyticsCustomModules for all CRM descendants of the given parent. These modules are enabled by default."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_security-health-analytics-settings-custom-modules-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the new custom module's parent. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-delete",
+                    Some(r##"Deletes the specified SecurityHealthAnalyticsCustomModule and all of its descendants in the CRM hierarchy. This method is only supported for resident custom modules."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_security-health-analytics-settings-custom-modules-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the custom module to delete. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-get",
+                    Some(r##"Retrieves a SecurityHealthAnalyticsCustomModule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_security-health-analytics-settings-custom-modules-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-list",
+                    Some(r##"Returns a list of all SecurityHealthAnalyticsCustomModules for the given parent. This includes resident modules defined at the scope of the parent, and inherited modules, inherited from CRM ancestors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_security-health-analytics-settings-custom-modules-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-list-descendant",
+                    Some(r##"Returns a list of all resident SecurityHealthAnalyticsCustomModules under the given CRM parent and all of the parent’s CRM descendants."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_security-health-analytics-settings-custom-modules-list-descendant",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list descendant custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-patch",
+                    Some(r##"Updates the SecurityHealthAnalyticsCustomModule under the given name based on the given update mask. Updating the enablement state is supported on both resident and inherited modules (though resident modules cannot have an enablement state of "inherited"). Updating the display name and custom config of a module is supported on resident modules only."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_security-health-analytics-settings-custom-modules-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Immutable. The resource name of the custom module. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", or "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}" The id {customModule} is server-generated and is not user settable. It will be a numeric id containing 1-20 digits."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-simulate",
+                    Some(r##"Simulates a given SecurityHealthAnalyticsCustomModule and Resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_security-health-analytics-settings-custom-modules-simulate",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The relative resource name of the organization, project, or folder. For more information about relative resource names, see [Relative Resource Name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) Example: `organizations/{organization_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-effective-custom-modules-get",
+                    Some(r##"Retrieves an EffectiveSecurityHealthAnalyticsCustomModule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_security-health-analytics-settings-effective-custom-modules-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the effective custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-effective-custom-modules-list",
+                    Some(r##"Returns a list of all EffectiveSecurityHealthAnalyticsCustomModules for the given parent. This includes resident modules defined at the scope of the parent, and inherited modules, inherited from CRM ancestors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_security-health-analytics-settings-effective-custom-modules-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list effective custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("sources-findings-external-systems-patch",
                     Some(r##"Updates external system. This is for a given finding."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/folders_sources-findings-external-systems-patch",
@@ -8476,7 +14510,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The relative resource name of this finding. See: https://cloud.google.com/apis/design/resource_names#relative_resource_name Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}""##),
+                     Some(r##"The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -8606,7 +14640,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("organizations", "methods: 'assets-group', 'assets-list', 'assets-run-discovery', 'assets-update-security-marks', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'findings-bulk-mute', 'get-organization-settings', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'notification-configs-create', 'notification-configs-delete', 'notification-configs-get', 'notification-configs-list', 'notification-configs-patch', 'operations-cancel', 'operations-delete', 'operations-get', 'operations-list', 'sources-create', 'sources-findings-create', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks', 'sources-get', 'sources-get-iam-policy', 'sources-list', 'sources-patch', 'sources-set-iam-policy', 'sources-test-iam-permissions' and 'update-organization-settings'", vec![
+        ("organizations", "methods: 'assets-group', 'assets-list', 'assets-run-discovery', 'assets-update-security-marks', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'event-threat-detection-settings-custom-modules-create', 'event-threat-detection-settings-custom-modules-delete', 'event-threat-detection-settings-custom-modules-get', 'event-threat-detection-settings-custom-modules-list', 'event-threat-detection-settings-custom-modules-list-descendant', 'event-threat-detection-settings-custom-modules-patch', 'event-threat-detection-settings-effective-custom-modules-get', 'event-threat-detection-settings-effective-custom-modules-list', 'event-threat-detection-settings-validate-custom-module', 'findings-bulk-mute', 'get-organization-settings', 'locations-mute-configs-delete', 'locations-mute-configs-get', 'locations-mute-configs-patch', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'notification-configs-create', 'notification-configs-delete', 'notification-configs-get', 'notification-configs-list', 'notification-configs-patch', 'operations-cancel', 'operations-delete', 'operations-get', 'operations-list', 'resource-value-configs-batch-create', 'resource-value-configs-delete', 'resource-value-configs-get', 'resource-value-configs-list', 'resource-value-configs-patch', 'security-health-analytics-settings-custom-modules-create', 'security-health-analytics-settings-custom-modules-delete', 'security-health-analytics-settings-custom-modules-get', 'security-health-analytics-settings-custom-modules-list', 'security-health-analytics-settings-custom-modules-list-descendant', 'security-health-analytics-settings-custom-modules-patch', 'security-health-analytics-settings-custom-modules-simulate', 'security-health-analytics-settings-effective-custom-modules-get', 'security-health-analytics-settings-effective-custom-modules-list', 'simulations-attack-exposure-results-attack-paths-list', 'simulations-attack-exposure-results-valued-resources-list', 'simulations-attack-paths-list', 'simulations-get', 'simulations-valued-resources-attack-paths-list', 'simulations-valued-resources-get', 'simulations-valued-resources-list', 'sources-create', 'sources-findings-create', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks', 'sources-get', 'sources-get-iam-policy', 'sources-list', 'sources-patch', 'sources-set-iam-policy', 'sources-test-iam-permissions' and 'update-organization-settings'", vec![
             ("assets-group",
                     Some(r##"Filters an organization's assets and groups them by their specified properties."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_assets-group",
@@ -8835,6 +14869,222 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("event-threat-detection-settings-custom-modules-create",
+                    Some(r##"Creates a resident Event Threat Detection custom module at the scope of the given Resource Manager parent, and also creates inherited custom modules for all descendants of the given parent. These modules are enabled by default."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_event-threat-detection-settings-custom-modules-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The new custom module's parent. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-custom-modules-delete",
+                    Some(r##"Deletes the specified Event Threat Detection custom module and all of its descendants in the Resource Manager hierarchy. This method is only supported for resident custom modules."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_event-threat-detection-settings-custom-modules-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the custom module to delete. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-custom-modules-get",
+                    Some(r##"Gets an Event Threat Detection custom module."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_event-threat-detection-settings-custom-modules-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the custom module to get. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-custom-modules-list",
+                    Some(r##"Lists all Event Threat Detection custom modules for the given Resource Manager parent. This includes resident modules defined at the scope of the parent along with modules inherited from ancestors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_event-threat-detection-settings-custom-modules-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-custom-modules-list-descendant",
+                    Some(r##"Lists all resident Event Threat Detection custom modules under the given Resource Manager parent and its descendants."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_event-threat-detection-settings-custom-modules-list-descendant",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-custom-modules-patch",
+                    Some(r##"Updates the Event Threat Detection custom module with the given name based on the given update mask. Updating the enablement state is supported for both resident and inherited modules (though resident modules cannot have an enablement state of "inherited"). Updating the display name or configuration of a module is supported for resident modules only. The type of a module cannot be changed."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_event-threat-detection-settings-custom-modules-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Immutable. The resource name of the Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-effective-custom-modules-get",
+                    Some(r##"Gets an effective Event Threat Detection custom module at the given level."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_event-threat-detection-settings-effective-custom-modules-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name of the effective Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-effective-custom-modules-list",
+                    Some(r##"Lists all effective Event Threat Detection custom modules for the given parent. This includes resident modules defined at the scope of the parent along with modules inherited from its ancestors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_event-threat-detection-settings-effective-custom-modules-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the parent to list custom modules for. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-validate-custom-module",
+                    Some(r##"Validates the given Event Threat Detection custom module."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_event-threat-detection-settings-validate-custom-module",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the parent to validate the Custom Module under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("findings-bulk-mute",
                     Some(r##"Kicks off an LRO to bulk mute findings for a parent based on a filter. The parent can be either an organization, folder or project. The findings matched by the filter will be muted after the LRO is done."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_findings-bulk-mute",
@@ -8885,6 +15135,78 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-mute-configs-delete",
+                    Some(r##"Deletes an existing mute config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_locations-mute-configs-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-mute-configs-get",
+                    Some(r##"Gets a mute config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_locations-mute-configs-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-mute-configs-patch",
+                    Some(r##"Updates a mute config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_locations-mute-configs-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("mute-configs-create",
                     Some(r##"Creates a mute config."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_mute-configs-create",
@@ -8919,7 +15241,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, or projects/{project}/muteConfigs/{config_id}"##),
+                     Some(r##"Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
                      Some(true),
                      Some(false)),
         
@@ -8941,7 +15263,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, or projects/{project}/muteConfigs/{config_id}"##),
+                     Some(r##"Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
                      Some(true),
                      Some(false)),
         
@@ -8985,7 +15307,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}""##),
+                     Some(r##"This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}""##),
                      Some(true),
                      Some(false)),
         
@@ -9196,12 +15518,504 @@ async fn main() {
                      Some(false)),
                   ]),
             ("operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_operations-list",
                   vec![
                     (Some(r##"name"##),
                      None,
                      Some(r##"The name of the operation's parent resource."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("resource-value-configs-batch-create",
+                    Some(r##"Creates a ResourceValueConfig for an organization. Maps user's tags to difference resource values for use by the attack path simulation."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_resource-value-configs-batch-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the new ResourceValueConfig's parent. The parent field in the CreateResourceValueConfigRequest messages must either be empty or match this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("resource-value-configs-delete",
+                    Some(r##"Deletes a ResourceValueConfig."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_resource-value-configs-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the ResourceValueConfig to delete"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("resource-value-configs-get",
+                    Some(r##"Gets a ResourceValueConfig."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_resource-value-configs-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the resource value config to retrieve. Its format is organizations/{organization}/resourceValueConfigs/{config_id}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("resource-value-configs-list",
+                    Some(r##"Lists all ResourceValueConfigs."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_resource-value-configs-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent, which owns the collection of resource value configs. Its format is "organizations/[organization_id]""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("resource-value-configs-patch",
+                    Some(r##"Updates an existing ResourceValueConfigs with new rules."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_resource-value-configs-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Name for the resource value config"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-create",
+                    Some(r##"Creates a resident SecurityHealthAnalyticsCustomModule at the scope of the given CRM parent, and also creates inherited SecurityHealthAnalyticsCustomModules for all CRM descendants of the given parent. These modules are enabled by default."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_security-health-analytics-settings-custom-modules-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the new custom module's parent. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-delete",
+                    Some(r##"Deletes the specified SecurityHealthAnalyticsCustomModule and all of its descendants in the CRM hierarchy. This method is only supported for resident custom modules."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_security-health-analytics-settings-custom-modules-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the custom module to delete. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-get",
+                    Some(r##"Retrieves a SecurityHealthAnalyticsCustomModule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_security-health-analytics-settings-custom-modules-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-list",
+                    Some(r##"Returns a list of all SecurityHealthAnalyticsCustomModules for the given parent. This includes resident modules defined at the scope of the parent, and inherited modules, inherited from CRM ancestors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_security-health-analytics-settings-custom-modules-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-list-descendant",
+                    Some(r##"Returns a list of all resident SecurityHealthAnalyticsCustomModules under the given CRM parent and all of the parent’s CRM descendants."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_security-health-analytics-settings-custom-modules-list-descendant",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list descendant custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-patch",
+                    Some(r##"Updates the SecurityHealthAnalyticsCustomModule under the given name based on the given update mask. Updating the enablement state is supported on both resident and inherited modules (though resident modules cannot have an enablement state of "inherited"). Updating the display name and custom config of a module is supported on resident modules only."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_security-health-analytics-settings-custom-modules-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Immutable. The resource name of the custom module. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", or "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}" The id {customModule} is server-generated and is not user settable. It will be a numeric id containing 1-20 digits."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-simulate",
+                    Some(r##"Simulates a given SecurityHealthAnalyticsCustomModule and Resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_security-health-analytics-settings-custom-modules-simulate",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The relative resource name of the organization, project, or folder. For more information about relative resource names, see [Relative Resource Name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) Example: `organizations/{organization_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-effective-custom-modules-get",
+                    Some(r##"Retrieves an EffectiveSecurityHealthAnalyticsCustomModule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_security-health-analytics-settings-effective-custom-modules-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the effective custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-effective-custom-modules-list",
+                    Some(r##"Returns a list of all EffectiveSecurityHealthAnalyticsCustomModules for the given parent. This includes resident modules defined at the scope of the parent, and inherited modules, inherited from CRM ancestors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_security-health-analytics-settings-effective-custom-modules-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list effective custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("simulations-attack-exposure-results-attack-paths-list",
+                    Some(r##"Lists the attack paths for a set of simulation results or valued resources and filter."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_simulations-attack-exposure-results-attack-paths-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list attack paths. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}" "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("simulations-attack-exposure-results-valued-resources-list",
+                    Some(r##"Lists the valued resources for a set of simulation results and filter."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_simulations-attack-exposure-results-valued-resources-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list valued resources. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("simulations-attack-paths-list",
+                    Some(r##"Lists the attack paths for a set of simulation results or valued resources and filter."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_simulations-attack-paths-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list attack paths. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}" "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("simulations-get",
+                    Some(r##"Get the simulation by name or the latest simulation for the given organization."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_simulations-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The organization name or simulation name of this simulation Valid format: "organizations/{organization}/simulations/latest" "organizations/{organization}/simulations/{simulation}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("simulations-valued-resources-attack-paths-list",
+                    Some(r##"Lists the attack paths for a set of simulation results or valued resources and filter."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_simulations-valued-resources-attack-paths-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list attack paths. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}" "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("simulations-valued-resources-get",
+                    Some(r##"Get the valued resource by name"##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_simulations-valued-resources-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of this valued resource Valid format: "organizations/{organization}/simulations/{simulation}/valuedResources/{valued_resource}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("simulations-valued-resources-list",
+                    Some(r##"Lists the valued resources for a set of simulation results and filter."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/organizations_simulations-valued-resources-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list valued resources. Valid formats: "organizations/{organization}", "organizations/{organization}/simulations/{simulation}" "organizations/{organization}/simulations/{simulation}/attackExposureResults/{attack_exposure_result_v2}""##),
                      Some(true),
                      Some(false)),
         
@@ -9357,7 +16171,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The relative resource name of this finding. See: https://cloud.google.com/apis/design/resource_names#relative_resource_name Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}""##),
+                     Some(r##"The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -9649,7 +16463,7 @@ async fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'assets-group', 'assets-list', 'assets-update-security-marks', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'findings-bulk-mute', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'notification-configs-create', 'notification-configs-delete', 'notification-configs-get', 'notification-configs-list', 'notification-configs-patch', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks' and 'sources-list'", vec![
+        ("projects", "methods: 'assets-group', 'assets-list', 'assets-update-security-marks', 'big-query-exports-create', 'big-query-exports-delete', 'big-query-exports-get', 'big-query-exports-list', 'big-query-exports-patch', 'event-threat-detection-settings-custom-modules-create', 'event-threat-detection-settings-custom-modules-delete', 'event-threat-detection-settings-custom-modules-get', 'event-threat-detection-settings-custom-modules-list', 'event-threat-detection-settings-custom-modules-list-descendant', 'event-threat-detection-settings-custom-modules-patch', 'event-threat-detection-settings-effective-custom-modules-get', 'event-threat-detection-settings-effective-custom-modules-list', 'event-threat-detection-settings-validate-custom-module', 'findings-bulk-mute', 'locations-mute-configs-delete', 'locations-mute-configs-get', 'locations-mute-configs-patch', 'mute-configs-create', 'mute-configs-delete', 'mute-configs-get', 'mute-configs-list', 'mute-configs-patch', 'notification-configs-create', 'notification-configs-delete', 'notification-configs-get', 'notification-configs-list', 'notification-configs-patch', 'security-health-analytics-settings-custom-modules-create', 'security-health-analytics-settings-custom-modules-delete', 'security-health-analytics-settings-custom-modules-get', 'security-health-analytics-settings-custom-modules-list', 'security-health-analytics-settings-custom-modules-list-descendant', 'security-health-analytics-settings-custom-modules-patch', 'security-health-analytics-settings-custom-modules-simulate', 'security-health-analytics-settings-effective-custom-modules-get', 'security-health-analytics-settings-effective-custom-modules-list', 'sources-findings-external-systems-patch', 'sources-findings-group', 'sources-findings-list', 'sources-findings-patch', 'sources-findings-set-mute', 'sources-findings-set-state', 'sources-findings-update-security-marks' and 'sources-list'", vec![
             ("assets-group",
                     Some(r##"Filters an organization's assets and groups them by their specified properties."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_assets-group",
@@ -9850,6 +16664,222 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("event-threat-detection-settings-custom-modules-create",
+                    Some(r##"Creates a resident Event Threat Detection custom module at the scope of the given Resource Manager parent, and also creates inherited custom modules for all descendants of the given parent. These modules are enabled by default."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_event-threat-detection-settings-custom-modules-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The new custom module's parent. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-custom-modules-delete",
+                    Some(r##"Deletes the specified Event Threat Detection custom module and all of its descendants in the Resource Manager hierarchy. This method is only supported for resident custom modules."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_event-threat-detection-settings-custom-modules-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the custom module to delete. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-custom-modules-get",
+                    Some(r##"Gets an Event Threat Detection custom module."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_event-threat-detection-settings-custom-modules-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the custom module to get. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-custom-modules-list",
+                    Some(r##"Lists all Event Threat Detection custom modules for the given Resource Manager parent. This includes resident modules defined at the scope of the parent along with modules inherited from ancestors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_event-threat-detection-settings-custom-modules-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-custom-modules-list-descendant",
+                    Some(r##"Lists all resident Event Threat Detection custom modules under the given Resource Manager parent and its descendants."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_event-threat-detection-settings-custom-modules-list-descendant",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the parent to list custom modules under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-custom-modules-patch",
+                    Some(r##"Updates the Event Threat Detection custom module with the given name based on the given update mask. Updating the enablement state is supported for both resident and inherited modules (though resident modules cannot have an enablement state of "inherited"). Updating the display name or configuration of a module is supported for resident modules only. The type of a module cannot be changed."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_event-threat-detection-settings-custom-modules-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Immutable. The resource name of the Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/customModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/customModules/{module}". * "projects/{project}/eventThreatDetectionSettings/customModules/{module}"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-effective-custom-modules-get",
+                    Some(r##"Gets an effective Event Threat Detection custom module at the given level."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_event-threat-detection-settings-effective-custom-modules-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The resource name of the effective Event Threat Detection custom module. Its format is: * "organizations/{organization}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "folders/{folder}/eventThreatDetectionSettings/effectiveCustomModules/{module}". * "projects/{project}/eventThreatDetectionSettings/effectiveCustomModules/{module}"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-effective-custom-modules-list",
+                    Some(r##"Lists all effective Event Threat Detection custom modules for the given parent. This includes resident modules defined at the scope of the parent along with modules inherited from its ancestors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_event-threat-detection-settings-effective-custom-modules-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the parent to list custom modules for. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("event-threat-detection-settings-validate-custom-module",
+                    Some(r##"Validates the given Event Threat Detection custom module."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_event-threat-detection-settings-validate-custom-module",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the parent to validate the Custom Module under. Its format is: * "organizations/{organization}/eventThreatDetectionSettings". * "folders/{folder}/eventThreatDetectionSettings". * "projects/{project}/eventThreatDetectionSettings"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("findings-bulk-mute",
                     Some(r##"Kicks off an LRO to bulk mute findings for a parent based on a filter. The parent can be either an organization, folder or project. The findings matched by the filter will be muted after the LRO is done."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_findings-bulk-mute",
@@ -9857,6 +16887,78 @@ async fn main() {
                     (Some(r##"parent"##),
                      None,
                      Some(r##"Required. The parent, at which bulk action needs to be applied. Its format is "organizations/[organization_id]", "folders/[folder_id]", "projects/[project_id]"."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-mute-configs-delete",
+                    Some(r##"Deletes an existing mute config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_locations-mute-configs-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-mute-configs-get",
+                    Some(r##"Gets a mute config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_locations-mute-configs-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-mute-configs-patch",
+                    Some(r##"Updates a mute config."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_locations-mute-configs-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}""##),
                      Some(true),
                      Some(false)),
         
@@ -9912,7 +17014,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, or projects/{project}/muteConfigs/{config_id}"##),
+                     Some(r##"Required. Name of the mute config to delete. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
                      Some(true),
                      Some(false)),
         
@@ -9934,7 +17036,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, or projects/{project}/muteConfigs/{config_id}"##),
+                     Some(r##"Required. Name of the mute config to retrieve. Its format is organizations/{organization}/muteConfigs/{config_id}, folders/{folder}/muteConfigs/{config_id}, projects/{project}/muteConfigs/{config_id}, organizations/{organization}/locations/global/muteConfigs/{config_id}, folders/{folder}/locations/global/muteConfigs/{config_id}, or projects/{project}/locations/global/muteConfigs/{config_id}."##),
                      Some(true),
                      Some(false)),
         
@@ -9978,7 +17080,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}""##),
+                     Some(r##"This field will be ignored if provided on config creation. Format "organizations/{organization}/muteConfigs/{mute_config}" "folders/{folder}/muteConfigs/{mute_config}" "projects/{project}/muteConfigs/{mute_config}" "organizations/{organization}/locations/global/muteConfigs/{mute_config}" "folders/{folder}/locations/global/muteConfigs/{mute_config}" "projects/{project}/locations/global/muteConfigs/{mute_config}""##),
                      Some(true),
                      Some(false)),
         
@@ -10122,6 +17224,222 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("security-health-analytics-settings-custom-modules-create",
+                    Some(r##"Creates a resident SecurityHealthAnalyticsCustomModule at the scope of the given CRM parent, and also creates inherited SecurityHealthAnalyticsCustomModules for all CRM descendants of the given parent. These modules are enabled by default."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_security-health-analytics-settings-custom-modules-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Resource name of the new custom module's parent. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-delete",
+                    Some(r##"Deletes the specified SecurityHealthAnalyticsCustomModule and all of its descendants in the CRM hierarchy. This method is only supported for resident custom modules."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_security-health-analytics-settings-custom-modules-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the custom module to delete. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-get",
+                    Some(r##"Retrieves a SecurityHealthAnalyticsCustomModule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_security-health-analytics-settings-custom-modules-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-list",
+                    Some(r##"Returns a list of all SecurityHealthAnalyticsCustomModules for the given parent. This includes resident modules defined at the scope of the parent, and inherited modules, inherited from CRM ancestors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_security-health-analytics-settings-custom-modules-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-list-descendant",
+                    Some(r##"Returns a list of all resident SecurityHealthAnalyticsCustomModules under the given CRM parent and all of the parent’s CRM descendants."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_security-health-analytics-settings-custom-modules-list-descendant",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list descendant custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-patch",
+                    Some(r##"Updates the SecurityHealthAnalyticsCustomModule under the given name based on the given update mask. Updating the enablement state is supported on both resident and inherited modules (though resident modules cannot have an enablement state of "inherited"). Updating the display name and custom config of a module is supported on resident modules only."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_security-health-analytics-settings-custom-modules-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Immutable. The resource name of the custom module. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{customModule}", or "folders/{folder}/securityHealthAnalyticsSettings/customModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/customModules/{customModule}" The id {customModule} is server-generated and is not user settable. It will be a numeric id containing 1-20 digits."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-custom-modules-simulate",
+                    Some(r##"Simulates a given SecurityHealthAnalyticsCustomModule and Resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_security-health-analytics-settings-custom-modules-simulate",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The relative resource name of the organization, project, or folder. For more information about relative resource names, see [Relative Resource Name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) Example: `organizations/{organization_id}`"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-effective-custom-modules-get",
+                    Some(r##"Retrieves an EffectiveSecurityHealthAnalyticsCustomModule."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_security-health-analytics-settings-effective-custom-modules-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the effective custom module to get. Its format is "organizations/{organization}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/effectiveCustomModules/{customModule}""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("security-health-analytics-settings-effective-custom-modules-list",
+                    Some(r##"Returns a list of all EffectiveSecurityHealthAnalyticsCustomModules for the given parent. This includes resident modules defined at the scope of the parent, and inherited modules, inherited from CRM ancestors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_security-health-analytics-settings-effective-custom-modules-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of parent to list effective custom modules. Its format is "organizations/{organization}/securityHealthAnalyticsSettings", "folders/{folder}/securityHealthAnalyticsSettings", or "projects/{project}/securityHealthAnalyticsSettings""##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("sources-findings-external-systems-patch",
                     Some(r##"Updates external system. This is for a given finding."##),
                     "Details at http://byron.github.io/google-apis-rs/google_securitycenter1_cli/projects_sources-findings-external-systems-patch",
@@ -10206,7 +17524,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The relative resource name of this finding. See: https://cloud.google.com/apis/design/resource_names#relative_resource_name Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}""##),
+                     Some(r##"The [relative resource name](https://cloud.google.com/apis/design/resource_names#relative_resource_name) of the finding. Example: "organizations/{organization_id}/sources/{source_id}/findings/{finding_id}", "folders/{folder_id}/sources/{source_id}/findings/{finding_id}", "projects/{project_id}/sources/{source_id}/findings/{finding_id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -10340,7 +17658,7 @@ async fn main() {
     
     let mut app = App::new("securitycenter1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
+           .version("5.0.4+20240302")
            .about("Security Command Center API provides access to temporal views of assets and findings within an organization.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_securitycenter1_cli")
            .arg(Arg::with_name("url")

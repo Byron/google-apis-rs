@@ -1,4 +1,4 @@
-site_name: Tag Manager v5.0.3+20230123
+site_name: Tag Manager v5.0.4+20240228
 site_url: http://byron.github.io/google-apis-rs/google-tagmanager2-cli
 site_description: A complete library to interact with Tag Manager (protocol v2)
 
@@ -81,6 +81,12 @@ nav:
     - 'Containers Workspaces Templates List': 'accounts_containers-workspaces-templates-list.md'
     - 'Containers Workspaces Templates Revert': 'accounts_containers-workspaces-templates-revert.md'
     - 'Containers Workspaces Templates Update': 'accounts_containers-workspaces-templates-update.md'
+    - 'Containers Workspaces Transformations Create': 'accounts_containers-workspaces-transformations-create.md'
+    - 'Containers Workspaces Transformations Delete': 'accounts_containers-workspaces-transformations-delete.md'
+    - 'Containers Workspaces Transformations Get': 'accounts_containers-workspaces-transformations-get.md'
+    - 'Containers Workspaces Transformations List': 'accounts_containers-workspaces-transformations-list.md'
+    - 'Containers Workspaces Transformations Revert': 'accounts_containers-workspaces-transformations-revert.md'
+    - 'Containers Workspaces Transformations Update': 'accounts_containers-workspaces-transformations-update.md'
     - 'Containers Workspaces Triggers Create': 'accounts_containers-workspaces-triggers-create.md'
     - 'Containers Workspaces Triggers Delete': 'accounts_containers-workspaces-triggers-delete.md'
     - 'Containers Workspaces Triggers Get': 'accounts_containers-workspaces-triggers-get.md'

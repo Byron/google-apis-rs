@@ -1060,7 +1060,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("repos-get-iam-policy",
-                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
+                    Some(r##"Gets the IAM policy policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sourcerepo1_cli/projects_repos-get-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -1132,7 +1132,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("repos-set-iam-policy",
-                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy."##),
+                    Some(r##"Sets the IAM policy on the specified resource. Replaces any existing policy."##),
                     "Details at http://byron.github.io/google-apis-rs/google_sourcerepo1_cli/projects_repos-set-iam-policy",
                   vec![
                     (Some(r##"resource"##),
@@ -1249,7 +1249,7 @@ async fn main() {
     
     let mut app = App::new("sourcerepo1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
+           .version("5.0.4+20240304")
            .about("Accesses source code repositories hosted by Google.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_sourcerepo1_cli")
            .arg(Arg::with_name("url")

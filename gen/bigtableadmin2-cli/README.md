@@ -25,13 +25,11 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Bigtable Admin* API at revision *20230110*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Bigtable Admin* API at revision *20240221*. The CLI is at version *5.0.4*.
 
 ```bash
 bigtableadmin2 [options]
         operations
-                cancel <name> [-p <v>]... [-o <out>]
-                delete <name> [-p <v>]... [-o <out>]
                 get <name> [-p <v>]... [-o <out>]
                 projects-operations-list <name> [-p <v>]... [-o <out>]
         projects
@@ -79,7 +77,6 @@ bigtableadmin2 [options]
                 instances-tables-undelete <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 instances-update <name> (-r <kv>)... [-p <v>]... [-o <out>]
-                locations-get <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
   bigtableadmin2 --help
 

@@ -80,6 +80,7 @@ where
                     "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "source-file-share" => Some(("sourceFileShare", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-instance" => Some(("sourceInstance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -87,7 +88,7 @@ where
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "storage-bytes" => Some(("storageBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["capacity-gb", "create-time", "description", "download-bytes", "kms-key-name", "labels", "name", "satisfies-pzs", "source-file-share", "source-instance", "source-instance-tier", "state", "storage-bytes"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["capacity-gb", "create-time", "description", "download-bytes", "kms-key-name", "labels", "name", "satisfies-pzi", "satisfies-pzs", "source-file-share", "source-instance", "source-instance-tier", "state", "storage-bytes"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -350,6 +351,7 @@ where
                     "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "source-file-share" => Some(("sourceFileShare", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-instance" => Some(("sourceInstance", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -357,7 +359,7 @@ where
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "storage-bytes" => Some(("storageBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["capacity-gb", "create-time", "description", "download-bytes", "kms-key-name", "labels", "name", "satisfies-pzs", "source-file-share", "source-instance", "source-instance-tier", "state", "storage-bytes"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["capacity-gb", "create-time", "description", "download-bytes", "kms-key-name", "labels", "name", "satisfies-pzi", "satisfies-pzs", "source-file-share", "source-instance", "source-instance-tier", "state", "storage-bytes"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -500,6 +502,8 @@ where
                     "capacity-step-size-gb" => Some(("capacityStepSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "directory-services.managed-active-directory.computer" => Some(("directoryServices.managedActiveDirectory.computer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "directory-services.managed-active-directory.domain" => Some(("directoryServices.managedActiveDirectory.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -508,13 +512,14 @@ where
                     "multi-share-enabled" => Some(("multiShareEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "protocol" => Some(("protocol", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status-message" => Some(("statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suspension-reasons" => Some(("suspensionReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tier" => Some(("tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["capacity-gb", "capacity-step-size-gb", "create-time", "description", "etag", "kms-key-name", "labels", "max-capacity-gb", "max-share-count", "multi-share-enabled", "name", "protocol", "satisfies-pzs", "state", "status-message", "suspension-reasons", "tier"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["capacity-gb", "capacity-step-size-gb", "computer", "create-time", "description", "directory-services", "domain", "etag", "kms-key-name", "labels", "managed-active-directory", "max-capacity-gb", "max-share-count", "multi-share-enabled", "name", "protocol", "satisfies-pzi", "satisfies-pzs", "state", "status-message", "suspension-reasons", "tier"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -778,6 +783,8 @@ where
                     "capacity-step-size-gb" => Some(("capacityStepSizeGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "directory-services.managed-active-directory.computer" => Some(("directoryServices.managedActiveDirectory.computer", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "directory-services.managed-active-directory.domain" => Some(("directoryServices.managedActiveDirectory.domain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kms-key-name" => Some(("kmsKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -786,13 +793,14 @@ where
                     "multi-share-enabled" => Some(("multiShareEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "protocol" => Some(("protocol", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "satisfies-pzi" => Some(("satisfiesPzi", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "satisfies-pzs" => Some(("satisfiesPzs", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "status-message" => Some(("statusMessage", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "suspension-reasons" => Some(("suspensionReasons", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "tier" => Some(("tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["capacity-gb", "capacity-step-size-gb", "create-time", "description", "etag", "kms-key-name", "labels", "max-capacity-gb", "max-share-count", "multi-share-enabled", "name", "protocol", "satisfies-pzs", "state", "status-message", "suspension-reasons", "tier"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["capacity-gb", "capacity-step-size-gb", "computer", "create-time", "description", "directory-services", "domain", "etag", "kms-key-name", "labels", "managed-active-directory", "max-capacity-gb", "max-share-count", "multi-share-enabled", "name", "protocol", "satisfies-pzi", "satisfies-pzs", "state", "status-message", "suspension-reasons", "tier"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1051,6 +1059,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "backup" => Some(("backup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "capacity-gb" => Some(("capacityGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1059,7 +1068,7 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["capacity-gb", "create-time", "description", "labels", "mount-name", "name", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup", "capacity-gb", "create-time", "description", "labels", "mount-name", "name", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1315,6 +1324,7 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "backup" => Some(("backup", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "capacity-gb" => Some(("capacityGb", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1323,7 +1333,7 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["capacity-gb", "create-time", "description", "labels", "mount-name", "name", "state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["backup", "capacity-gb", "create-time", "description", "labels", "mount-name", "name", "state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2530,7 +2540,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. projects/{project_id}/locations/{location_id}/instances/{instance_id}. The resource name of the instance, in the format"##),
+                     Some(r##"Required. `projects/{project_id}/locations/{location_id}/instances/{instance_id}`. The resource name of the instance, in the format"##),
                      Some(true),
                      Some(false)),
         
@@ -2891,7 +2901,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_file1_beta1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -2918,7 +2928,7 @@ async fn main() {
     
     let mut app = App::new("file1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230103")
+           .version("5.0.4+20240126")
            .about("The Cloud Filestore API is used for creating and managing cloud file servers.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_file1_beta1_cli")
            .arg(Arg::with_name("url")

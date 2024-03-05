@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// Verify your enterprise credentials
     Full,
@@ -125,7 +125,7 @@ impl<'a, S> Verifiedaccess<S> {
         Verifiedaccess {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://verifiedaccess.googleapis.com/".to_string(),
             _root_url: "https://verifiedaccess.googleapis.com/".to_string(),
         }
@@ -136,7 +136,7 @@ impl<'a, S> Verifiedaccess<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -211,11 +211,11 @@ impl client::RequestValue for Empty {}
 pub struct SignedData {
     /// The data to be signed.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub data: Option<Vec<u8>>,
     /// The signature of the data field.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub signature: Option<Vec<u8>>,
 }
 
@@ -257,6 +257,10 @@ impl client::RequestValue for VerifyChallengeResponseRequest {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VerifyChallengeResponseResult {
+    /// Attested device id (ADID) of the device, read from the verified data.
+    #[serde(rename="attestedDeviceId")]
+    
+    pub attested_device_id: Option<String>,
     /// Device enrollment id is returned in this field (for the machine response only).
     #[serde(rename="deviceEnrollmentId")]
     

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *calendar* crate version *5.0.3+20221229*, where *20221229* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *calendar* crate version *5.0.4+20240223*, where *20240223* is the exact revision of the *calendar:v3* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *calendar* *v3* API can be found at the
 //! [official documentation site](https://developers.google.com/google-apps/calendar/firstapp).
@@ -154,7 +154,8 @@
 //!              .max_results(-99)
 //!              .max_attendees(-56)
 //!              .i_cal_uid("eos")
-//!              .always_include_email(false)
+//!              .add_event_types("labore")
+//!              .always_include_email(true)
 //!              .doit().await;
 //! 
 //! match result {

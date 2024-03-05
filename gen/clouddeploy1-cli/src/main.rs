@@ -50,6 +50,1138 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
+    async fn _projects_locations_custom_target_types_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-actions.deploy-action" => Some(("customActions.deployAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-actions.render-action" => Some(("customActions.renderAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-target-type-id" => Some(("customTargetTypeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "create-time", "custom-actions", "custom-target-type-id", "deploy-action", "description", "etag", "labels", "name", "render-action", "uid", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CustomTargetType = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_custom_target_types_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "validate-only" => {
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
+                },
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                "custom-target-type-id" => {
+                    call = call.custom_target_type_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["custom-target-type-id", "request-id", "validate-only"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_custom_target_types_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_custom_target_types_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "validate-only" => {
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
+                },
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                "etag" => {
+                    call = call.etag(value.unwrap_or(""));
+                },
+                "allow-missing" => {
+                    call = call.allow_missing(        value.map(|v| arg_from_str(v, err, "allow-missing", "boolean")).unwrap_or(false));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["allow-missing", "etag", "request-id", "validate-only"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_custom_target_types_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_custom_target_types_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_custom_target_types_get_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_custom_target_types_get_iam_policy(opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "options-requested-policy-version" => {
+                    call = call.options_requested_policy_version(        value.map(|v| arg_from_str(v, err, "options-requested-policy-version", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["options-requested-policy-version"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_custom_target_types_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_custom_target_types_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_custom_target_types_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-actions.deploy-action" => Some(("customActions.deployAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-actions.render-action" => Some(("customActions.renderAction", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-target-type-id" => Some(("customTargetTypeId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "create-time", "custom-actions", "custom-target-type-id", "deploy-action", "description", "etag", "labels", "name", "render-action", "uid", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CustomTargetType = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_custom_target_types_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "validate-only" => {
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
+                },
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                "allow-missing" => {
+                    call = call.allow_missing(        value.map(|v| arg_from_str(v, err, "allow-missing", "boolean")).unwrap_or(false));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["allow-missing", "request-id", "update-mask", "validate-only"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_custom_target_types_set_iam_policy(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "policy.etag" => Some(("policy.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "policy.version" => Some(("policy.version", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["etag", "policy", "update-mask", "version"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::SetIamPolicyRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_custom_target_types_set_iam_policy(request, opt.value_of("resource").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_delivery_pipelines_automation_runs_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CancelAutomationRunRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_delivery_pipelines_automation_runs_cancel(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_delivery_pipelines_automation_runs_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_delivery_pipelines_automation_runs_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_delivery_pipelines_automation_runs_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_delivery_pipelines_automation_runs_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_delivery_pipelines_automations_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "suspended" => Some(("suspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "create-time", "description", "etag", "labels", "name", "service-account", "suspended", "uid", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Automation = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_delivery_pipelines_automations_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "validate-only" => {
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
+                },
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                "automation-id" => {
+                    call = call.automation_id(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["automation-id", "request-id", "validate-only"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_delivery_pipelines_automations_delete(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_delivery_pipelines_automations_delete(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "validate-only" => {
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
+                },
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                "etag" => {
+                    call = call.etag(value.unwrap_or(""));
+                },
+                "allow-missing" => {
+                    call = call.allow_missing(        value.map(|v| arg_from_str(v, err, "allow-missing", "boolean")).unwrap_or(false));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["allow-missing", "etag", "request-id", "validate-only"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_delivery_pipelines_automations_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_delivery_pipelines_automations_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_delivery_pipelines_automations_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_delivery_pipelines_automations_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_delivery_pipelines_automations_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "suspended" => Some(("suspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "create-time", "description", "etag", "labels", "name", "service-account", "suspended", "uid", "update-time"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::Automation = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_delivery_pipelines_automations_patch(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "validate-only" => {
+                    call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
+                },
+                "update-mask" => {
+                    call = call.update_mask(        value.map(|v| arg_from_str(v, err, "update-mask", "google-fieldmask")).unwrap_or(FieldMask::default()));
+                },
+                "request-id" => {
+                    call = call.request_id(value.unwrap_or(""));
+                },
+                "allow-missing" => {
+                    call = call.allow_missing(        value.map(|v| arg_from_str(v, err, "allow-missing", "boolean")).unwrap_or(false));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["allow-missing", "request-id", "update-mask", "validate-only"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_delivery_pipelines_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -623,6 +1755,11 @@ where
                 match &temp_cursor.to_string()[..] {
                     "abandoned" => Some(("abandoned", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "condition.release-ready-condition.status" => Some(("condition.releaseReadyCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "condition.skaffold-supported-condition.maintenance-mode-time" => Some(("condition.skaffoldSupportedCondition.maintenanceModeTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.skaffold-supported-condition.skaffold-support-state" => Some(("condition.skaffoldSupportedCondition.skaffoldSupportState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "condition.skaffold-supported-condition.status" => Some(("condition.skaffoldSupportedCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "condition.skaffold-supported-condition.support-expiration-time" => Some(("condition.skaffoldSupportedCondition.supportExpirationTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delivery-pipeline-snapshot.annotations" => Some(("deliveryPipelineSnapshot.annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "delivery-pipeline-snapshot.condition.pipeline-ready-condition.status" => Some(("deliveryPipelineSnapshot.condition.pipelineReadyCondition.status", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -640,6 +1777,7 @@ where
                     "delivery-pipeline-snapshot.suspended" => Some(("deliveryPipelineSnapshot.suspended", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "delivery-pipeline-snapshot.uid" => Some(("deliveryPipelineSnapshot.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delivery-pipeline-snapshot.update-time" => Some(("deliveryPipelineSnapshot.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deploy-parameters" => Some(("deployParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -652,7 +1790,7 @@ where
                     "skaffold-version" => Some(("skaffoldVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["abandoned", "annotations", "condition", "create-time", "delivery-pipeline-snapshot", "description", "error-details", "etag", "labels", "missing-targets", "name", "pipeline-ready-condition", "render-end-time", "render-start-time", "render-state", "skaffold-config-path", "skaffold-config-uri", "skaffold-version", "status", "suspended", "targets-present-condition", "targets-type-condition", "uid", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["abandoned", "annotations", "condition", "create-time", "delivery-pipeline-snapshot", "deploy-parameters", "description", "error-details", "etag", "labels", "maintenance-mode-time", "missing-targets", "name", "pipeline-ready-condition", "release-ready-condition", "render-end-time", "render-start-time", "render-state", "skaffold-config-path", "skaffold-config-uri", "skaffold-support-state", "skaffold-supported-condition", "skaffold-version", "status", "support-expiration-time", "suspended", "targets-present-condition", "targets-type-condition", "uid", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -839,6 +1977,91 @@ where
         }
     }
 
+    async fn _projects_locations_delivery_pipelines_releases_rollouts_advance(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "phase-id" => Some(("phaseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["phase-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::AdvanceRolloutRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_delivery_pipelines_releases_rollouts_advance(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_delivery_pipelines_releases_rollouts_approve(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -924,6 +2147,90 @@ where
         }
     }
 
+    async fn _projects_locations_delivery_pipelines_releases_rollouts_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::CancelRolloutRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_delivery_pipelines_releases_rollouts_cancel(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_delivery_pipelines_releases_rollouts_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -950,6 +2257,7 @@ where
                     "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "approval-state" => Some(("approvalState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "approve-time" => Some(("approveTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "controller-rollout" => Some(("controllerRollout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deploy-end-time" => Some(("deployEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "deploy-failure-cause" => Some(("deployFailureCause", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -960,15 +2268,23 @@ where
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "failure-reason" => Some(("failureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "metadata.automation.advance-automation-runs" => Some(("metadata.automation.advanceAutomationRuns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "metadata.automation.current-repair-automation-run" => Some(("metadata.automation.currentRepairAutomationRun", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata.automation.promote-automation-run" => Some(("metadata.automation.promoteAutomationRun", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "metadata.automation.repair-automation-runs" => Some(("metadata.automation.repairAutomationRuns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "metadata.cloud-run.job" => Some(("metadata.cloudRun.job", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.cloud-run.revision" => Some(("metadata.cloudRun.revision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.cloud-run.service" => Some(("metadata.cloudRun.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "metadata.cloud-run.service-urls" => Some(("metadata.cloudRun.serviceUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "metadata.custom.values" => Some(("metadata.custom.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-of-rollout" => Some(("rollbackOfRollout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rolled-back-by-rollouts" => Some(("rolledBackByRollouts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "target-id" => Some(("targetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "approval-state", "approve-time", "cloud-run", "create-time", "deploy-end-time", "deploy-failure-cause", "deploy-start-time", "deploying-build", "description", "enqueue-time", "etag", "failure-reason", "labels", "metadata", "name", "revision", "service", "service-urls", "state", "target-id", "uid"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advance-automation-runs", "annotations", "approval-state", "approve-time", "automation", "cloud-run", "controller-rollout", "create-time", "current-repair-automation-run", "custom", "deploy-end-time", "deploy-failure-cause", "deploy-start-time", "deploying-build", "description", "enqueue-time", "etag", "failure-reason", "job", "labels", "metadata", "name", "promote-automation-run", "repair-automation-runs", "revision", "rollback-of-rollout", "rolled-back-by-rollouts", "service", "service-urls", "state", "target-id", "uid", "values"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -984,6 +2300,9 @@ where
             match key {
                 "validate-only" => {
                     call = call.validate_only(        value.map(|v| arg_from_str(v, err, "validate-only", "boolean")).unwrap_or(false));
+                },
+                "starting-phase-id" => {
+                    call = call.starting_phase_id(value.unwrap_or(""));
                 },
                 "rollout-id" => {
                     call = call.rollout_id(value.unwrap_or(""));
@@ -1004,7 +2323,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["request-id", "rollout-id", "validate-only"].iter().map(|v|*v));
+                                                                           v.extend(["request-id", "rollout-id", "starting-phase-id", "validate-only"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1041,6 +2360,92 @@ where
     async fn _projects_locations_delivery_pipelines_releases_rollouts_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_delivery_pipelines_releases_rollouts_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_delivery_pipelines_releases_rollouts_ignore_job(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "job-id" => Some(("jobId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "phase-id" => Some(("phaseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["job-id", "phase-id"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::IgnoreJobRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_delivery_pipelines_releases_rollouts_ignore_job(request, opt.value_of("rollout").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1207,6 +2612,90 @@ where
         }
     }
 
+    async fn _projects_locations_delivery_pipelines_releases_rollouts_job_runs_terminate(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec![]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::TerminateJobRunRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_delivery_pipelines_releases_rollouts_job_runs_terminate(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_delivery_pipelines_releases_rollouts_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         let mut call = self.hub.projects().locations_delivery_pipelines_releases_rollouts_list(opt.value_of("parent").unwrap_or(""));
@@ -1309,6 +2798,125 @@ where
         }
         let mut request: api::RetryJobRequest = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().locations_delivery_pipelines_releases_rollouts_retry_job(request, opt.value_of("rollout").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_delivery_pipelines_rollback_target(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "release-id" => Some(("releaseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.annotations" => Some(("rollbackConfig.rollout.annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "rollback-config.rollout.approval-state" => Some(("rollbackConfig.rollout.approvalState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.approve-time" => Some(("rollbackConfig.rollout.approveTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.controller-rollout" => Some(("rollbackConfig.rollout.controllerRollout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.create-time" => Some(("rollbackConfig.rollout.createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.deploy-end-time" => Some(("rollbackConfig.rollout.deployEndTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.deploy-failure-cause" => Some(("rollbackConfig.rollout.deployFailureCause", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.deploy-start-time" => Some(("rollbackConfig.rollout.deployStartTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.deploying-build" => Some(("rollbackConfig.rollout.deployingBuild", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.description" => Some(("rollbackConfig.rollout.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.enqueue-time" => Some(("rollbackConfig.rollout.enqueueTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.etag" => Some(("rollbackConfig.rollout.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.failure-reason" => Some(("rollbackConfig.rollout.failureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.labels" => Some(("rollbackConfig.rollout.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "rollback-config.rollout.metadata.automation.advance-automation-runs" => Some(("rollbackConfig.rollout.metadata.automation.advanceAutomationRuns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "rollback-config.rollout.metadata.automation.current-repair-automation-run" => Some(("rollbackConfig.rollout.metadata.automation.currentRepairAutomationRun", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.metadata.automation.promote-automation-run" => Some(("rollbackConfig.rollout.metadata.automation.promoteAutomationRun", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.metadata.automation.repair-automation-runs" => Some(("rollbackConfig.rollout.metadata.automation.repairAutomationRuns", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "rollback-config.rollout.metadata.cloud-run.job" => Some(("rollbackConfig.rollout.metadata.cloudRun.job", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.metadata.cloud-run.revision" => Some(("rollbackConfig.rollout.metadata.cloudRun.revision", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.metadata.cloud-run.service" => Some(("rollbackConfig.rollout.metadata.cloudRun.service", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.metadata.cloud-run.service-urls" => Some(("rollbackConfig.rollout.metadata.cloudRun.serviceUrls", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "rollback-config.rollout.metadata.custom.values" => Some(("rollbackConfig.rollout.metadata.custom.values", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "rollback-config.rollout.name" => Some(("rollbackConfig.rollout.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.rollback-of-rollout" => Some(("rollbackConfig.rollout.rollbackOfRollout", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.rolled-back-by-rollouts" => Some(("rollbackConfig.rollout.rolledBackByRollouts", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "rollback-config.rollout.state" => Some(("rollbackConfig.rollout.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.target-id" => Some(("rollbackConfig.rollout.targetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.rollout.uid" => Some(("rollbackConfig.rollout.uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollback-config.starting-phase-id" => Some(("rollbackConfig.startingPhaseId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollout-id" => Some(("rolloutId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "rollout-to-roll-back" => Some(("rolloutToRollBack", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "target-id" => Some(("targetId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "validate-only" => Some(("validateOnly", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advance-automation-runs", "annotations", "approval-state", "approve-time", "automation", "cloud-run", "controller-rollout", "create-time", "current-repair-automation-run", "custom", "deploy-end-time", "deploy-failure-cause", "deploy-start-time", "deploying-build", "description", "enqueue-time", "etag", "failure-reason", "job", "labels", "metadata", "name", "promote-automation-run", "release-id", "repair-automation-runs", "revision", "rollback-config", "rollback-of-rollout", "rolled-back-by-rollouts", "rollout", "rollout-id", "rollout-to-roll-back", "service", "service-urls", "starting-phase-id", "state", "target-id", "uid", "validate-only", "values"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::RollbackTargetRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_delivery_pipelines_rollback_target(request, opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -1972,11 +3580,14 @@ where
                     "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "anthos-cluster.membership" => Some(("anthosCluster.membership", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-target.custom-target-type" => Some(("customTarget.customTargetType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deploy-parameters" => Some(("deployParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gke.cluster" => Some(("gke.cluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gke.internal-ip" => Some(("gke.internalIp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "multi-target.target-ids" => Some(("multiTarget.targetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "require-approval" => Some(("requireApproval", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "run.location" => Some(("run.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1984,7 +3595,7 @@ where
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "anthos-cluster", "cluster", "create-time", "description", "etag", "gke", "internal-ip", "labels", "location", "membership", "name", "require-approval", "run", "target-id", "uid", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "anthos-cluster", "cluster", "create-time", "custom-target", "custom-target-type", "deploy-parameters", "description", "etag", "gke", "internal-ip", "labels", "location", "membership", "multi-target", "name", "require-approval", "run", "target-id", "target-ids", "uid", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2318,11 +3929,14 @@ where
                     "annotations" => Some(("annotations", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "anthos-cluster.membership" => Some(("anthosCluster.membership", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-target.custom-target-type" => Some(("customTarget.customTargetType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "deploy-parameters" => Some(("deployParameters", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gke.cluster" => Some(("gke.cluster", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "gke.internal-ip" => Some(("gke.internalIp", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "multi-target.target-ids" => Some(("multiTarget.targetIds", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "require-approval" => Some(("requireApproval", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "run.location" => Some(("run.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2330,7 +3944,7 @@ where
                     "uid" => Some(("uid", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "anthos-cluster", "cluster", "create-time", "description", "etag", "gke", "internal-ip", "labels", "location", "membership", "name", "require-approval", "run", "target-id", "uid", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["annotations", "anthos-cluster", "cluster", "create-time", "custom-target", "custom-target-type", "deploy-parameters", "description", "etag", "gke", "internal-ip", "labels", "location", "membership", "multi-target", "name", "require-approval", "run", "target-id", "target-ids", "uid", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2582,6 +4196,51 @@ where
         match self.opt.subcommand() {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
+                    ("locations-custom-target-types-create", Some(opt)) => {
+                        call_result = self._projects_locations_custom_target_types_create(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-custom-target-types-delete", Some(opt)) => {
+                        call_result = self._projects_locations_custom_target_types_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-custom-target-types-get", Some(opt)) => {
+                        call_result = self._projects_locations_custom_target_types_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-custom-target-types-get-iam-policy", Some(opt)) => {
+                        call_result = self._projects_locations_custom_target_types_get_iam_policy(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-custom-target-types-list", Some(opt)) => {
+                        call_result = self._projects_locations_custom_target_types_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-custom-target-types-patch", Some(opt)) => {
+                        call_result = self._projects_locations_custom_target_types_patch(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-custom-target-types-set-iam-policy", Some(opt)) => {
+                        call_result = self._projects_locations_custom_target_types_set_iam_policy(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-delivery-pipelines-automation-runs-cancel", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_automation_runs_cancel(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-delivery-pipelines-automation-runs-get", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_automation_runs_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-delivery-pipelines-automation-runs-list", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_automation_runs_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-delivery-pipelines-automations-create", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_automations_create(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-delivery-pipelines-automations-delete", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_automations_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-delivery-pipelines-automations-get", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_automations_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-delivery-pipelines-automations-list", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_automations_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-delivery-pipelines-automations-patch", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_automations_patch(opt, dry_run, &mut err).await;
+                    },
                     ("locations-delivery-pipelines-create", Some(opt)) => {
                         call_result = self._projects_locations_delivery_pipelines_create(opt, dry_run, &mut err).await;
                     },
@@ -2612,8 +4271,14 @@ where
                     ("locations-delivery-pipelines-releases-list", Some(opt)) => {
                         call_result = self._projects_locations_delivery_pipelines_releases_list(opt, dry_run, &mut err).await;
                     },
+                    ("locations-delivery-pipelines-releases-rollouts-advance", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_releases_rollouts_advance(opt, dry_run, &mut err).await;
+                    },
                     ("locations-delivery-pipelines-releases-rollouts-approve", Some(opt)) => {
                         call_result = self._projects_locations_delivery_pipelines_releases_rollouts_approve(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-delivery-pipelines-releases-rollouts-cancel", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_releases_rollouts_cancel(opt, dry_run, &mut err).await;
                     },
                     ("locations-delivery-pipelines-releases-rollouts-create", Some(opt)) => {
                         call_result = self._projects_locations_delivery_pipelines_releases_rollouts_create(opt, dry_run, &mut err).await;
@@ -2621,17 +4286,26 @@ where
                     ("locations-delivery-pipelines-releases-rollouts-get", Some(opt)) => {
                         call_result = self._projects_locations_delivery_pipelines_releases_rollouts_get(opt, dry_run, &mut err).await;
                     },
+                    ("locations-delivery-pipelines-releases-rollouts-ignore-job", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_releases_rollouts_ignore_job(opt, dry_run, &mut err).await;
+                    },
                     ("locations-delivery-pipelines-releases-rollouts-job-runs-get", Some(opt)) => {
                         call_result = self._projects_locations_delivery_pipelines_releases_rollouts_job_runs_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-delivery-pipelines-releases-rollouts-job-runs-list", Some(opt)) => {
                         call_result = self._projects_locations_delivery_pipelines_releases_rollouts_job_runs_list(opt, dry_run, &mut err).await;
                     },
+                    ("locations-delivery-pipelines-releases-rollouts-job-runs-terminate", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_releases_rollouts_job_runs_terminate(opt, dry_run, &mut err).await;
+                    },
                     ("locations-delivery-pipelines-releases-rollouts-list", Some(opt)) => {
                         call_result = self._projects_locations_delivery_pipelines_releases_rollouts_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-delivery-pipelines-releases-rollouts-retry-job", Some(opt)) => {
                         call_result = self._projects_locations_delivery_pipelines_releases_rollouts_retry_job(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-delivery-pipelines-rollback-target", Some(opt)) => {
+                        call_result = self._projects_locations_delivery_pipelines_rollback_target(opt, dry_run, &mut err).await;
                     },
                     ("locations-delivery-pipelines-set-iam-policy", Some(opt)) => {
                         call_result = self._projects_locations_delivery_pipelines_set_iam_policy(opt, dry_run, &mut err).await;
@@ -2763,14 +4437,380 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-delivery-pipelines-create', 'locations-delivery-pipelines-delete', 'locations-delivery-pipelines-get', 'locations-delivery-pipelines-get-iam-policy', 'locations-delivery-pipelines-list', 'locations-delivery-pipelines-patch', 'locations-delivery-pipelines-releases-abandon', 'locations-delivery-pipelines-releases-create', 'locations-delivery-pipelines-releases-get', 'locations-delivery-pipelines-releases-list', 'locations-delivery-pipelines-releases-rollouts-approve', 'locations-delivery-pipelines-releases-rollouts-create', 'locations-delivery-pipelines-releases-rollouts-get', 'locations-delivery-pipelines-releases-rollouts-job-runs-get', 'locations-delivery-pipelines-releases-rollouts-job-runs-list', 'locations-delivery-pipelines-releases-rollouts-list', 'locations-delivery-pipelines-releases-rollouts-retry-job', 'locations-delivery-pipelines-set-iam-policy', 'locations-delivery-pipelines-test-iam-permissions', 'locations-get', 'locations-get-config', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-targets-create', 'locations-targets-delete', 'locations-targets-get', 'locations-targets-get-iam-policy', 'locations-targets-list', 'locations-targets-patch', 'locations-targets-set-iam-policy' and 'locations-targets-test-iam-permissions'", vec![
+        ("projects", "methods: 'locations-custom-target-types-create', 'locations-custom-target-types-delete', 'locations-custom-target-types-get', 'locations-custom-target-types-get-iam-policy', 'locations-custom-target-types-list', 'locations-custom-target-types-patch', 'locations-custom-target-types-set-iam-policy', 'locations-delivery-pipelines-automation-runs-cancel', 'locations-delivery-pipelines-automation-runs-get', 'locations-delivery-pipelines-automation-runs-list', 'locations-delivery-pipelines-automations-create', 'locations-delivery-pipelines-automations-delete', 'locations-delivery-pipelines-automations-get', 'locations-delivery-pipelines-automations-list', 'locations-delivery-pipelines-automations-patch', 'locations-delivery-pipelines-create', 'locations-delivery-pipelines-delete', 'locations-delivery-pipelines-get', 'locations-delivery-pipelines-get-iam-policy', 'locations-delivery-pipelines-list', 'locations-delivery-pipelines-patch', 'locations-delivery-pipelines-releases-abandon', 'locations-delivery-pipelines-releases-create', 'locations-delivery-pipelines-releases-get', 'locations-delivery-pipelines-releases-list', 'locations-delivery-pipelines-releases-rollouts-advance', 'locations-delivery-pipelines-releases-rollouts-approve', 'locations-delivery-pipelines-releases-rollouts-cancel', 'locations-delivery-pipelines-releases-rollouts-create', 'locations-delivery-pipelines-releases-rollouts-get', 'locations-delivery-pipelines-releases-rollouts-ignore-job', 'locations-delivery-pipelines-releases-rollouts-job-runs-get', 'locations-delivery-pipelines-releases-rollouts-job-runs-list', 'locations-delivery-pipelines-releases-rollouts-job-runs-terminate', 'locations-delivery-pipelines-releases-rollouts-list', 'locations-delivery-pipelines-releases-rollouts-retry-job', 'locations-delivery-pipelines-rollback-target', 'locations-delivery-pipelines-set-iam-policy', 'locations-delivery-pipelines-test-iam-permissions', 'locations-get', 'locations-get-config', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-targets-create', 'locations-targets-delete', 'locations-targets-get', 'locations-targets-get-iam-policy', 'locations-targets-list', 'locations-targets-patch', 'locations-targets-set-iam-policy' and 'locations-targets-test-iam-permissions'", vec![
+            ("locations-custom-target-types-create",
+                    Some(r##"Creates a new CustomTargetType in a given project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-custom-target-types-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent collection in which the `CustomTargetType` should be created. Format should be `projects/{project_id}/locations/{location_name}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-custom-target-types-delete",
+                    Some(r##"Deletes a single CustomTargetType."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-custom-target-types-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the `CustomTargetType` to delete. Format must be `projects/{project_id}/locations/{location_name}/customTargetTypes/{custom_target_type}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-custom-target-types-get",
+                    Some(r##"Gets details of a single CustomTargetType."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-custom-target-types-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the `CustomTargetType`. Format must be `projects/{project_id}/locations/{location_name}/customTargetTypes/{custom_target_type}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-custom-target-types-get-iam-policy",
+                    Some(r##"Gets the access control policy for a resource. Returns an empty policy if the resource exists and does not have a policy set."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-custom-target-types-get-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-custom-target-types-list",
+                    Some(r##"Lists CustomTargetTypes in a given project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-custom-target-types-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent that owns this collection of custom target types. Format must be `projects/{project_id}/locations/{location_name}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-custom-target-types-patch",
+                    Some(r##"Updates a single CustomTargetType."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-custom-target-types-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Optional. Name of the `CustomTargetType`. Format is `projects/{project}/locations/{location}/customTargetTypes/a-z{0,62}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-custom-target-types-set-iam-policy",
+                    Some(r##"Sets the access control policy on the specified resource. Replaces any existing policy. Can return `NOT_FOUND`, `INVALID_ARGUMENT`, and `PERMISSION_DENIED` errors."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-custom-target-types-set-iam-policy",
+                  vec![
+                    (Some(r##"resource"##),
+                     None,
+                     Some(r##"REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-delivery-pipelines-automation-runs-cancel",
+                    Some(r##"Cancels an AutomationRun. The `state` of the `AutomationRun` after cancelling is `CANCELLED`. `CancelAutomationRun` can be called on AutomationRun in the state `IN_PROGRESS` and `PENDING`; AutomationRun in a different state returns an `FAILED_PRECONDITION` error."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-automation-runs-cancel",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the `AutomationRun`. Format is `projects/{project}/locations/{location}/deliveryPipelines/{delivery_pipeline}/automationRuns/{automation_run}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-delivery-pipelines-automation-runs-get",
+                    Some(r##"Gets details of a single AutomationRun."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-automation-runs-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the `AutomationRun`. Format must be `projects/{project}/locations/{location}/deliveryPipelines/{delivery_pipeline}/automationRuns/{automation_run}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-delivery-pipelines-automation-runs-list",
+                    Some(r##"Lists AutomationRuns in a given project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-automation-runs-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent `Delivery Pipeline`, which owns this collection of automationRuns. Format must be `projects/{project}/locations/{location}/deliveryPipelines/{delivery_pipeline}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-delivery-pipelines-automations-create",
+                    Some(r##"Creates a new Automation in a given project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-automations-create",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent collection in which the `Automation` should be created. Format should be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-delivery-pipelines-automations-delete",
+                    Some(r##"Deletes a single Automation resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-automations-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the `Automation` to delete. Format should be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}/automations/{automation_name}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-delivery-pipelines-automations-get",
+                    Some(r##"Gets details of a single Automation."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-automations-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the `Automation`. Format must be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}/automations/{automation_name}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-delivery-pipelines-automations-list",
+                    Some(r##"Lists Automations in a given project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-automations-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent `Delivery Pipeline`, which owns this collection of automations. Format must be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-delivery-pipelines-automations-patch",
+                    Some(r##"Updates the parameters of a single Automation resource."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-automations-patch",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Output only. Name of the `Automation`. Format is `projects/{project}/locations/{location}/deliveryPipelines/{delivery_pipeline}/automations/{automation}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-delivery-pipelines-create",
                     Some(r##"Creates a new DeliveryPipeline in a given project and location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent collection in which the `DeliveryPipeline` should be created. Format should be projects/{project_id}/locations/{location_name}."##),
+                     Some(r##"Required. The parent collection in which the `DeliveryPipeline` should be created. Format should be `projects/{project_id}/locations/{location_name}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2798,7 +4838,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the `DeliveryPipeline` to delete. Format should be projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}."##),
+                     Some(r##"Required. The name of the `DeliveryPipeline` to delete. Format should be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2820,7 +4860,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the `DeliveryPipeline`. Format must be projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}."##),
+                     Some(r##"Required. Name of the `DeliveryPipeline`. Format must be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2864,7 +4904,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent, which owns this collection of pipelines. Format must be projects/{project_id}/locations/{location_name}."##),
+                     Some(r##"Required. The parent, which owns this collection of pipelines. Format must be `projects/{project_id}/locations/{location_name}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2886,7 +4926,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Optional. Name of the `DeliveryPipeline`. Format is projects/{project}/ locations/{location}/deliveryPipelines/a-z{0,62}."##),
+                     Some(r##"Optional. Name of the `DeliveryPipeline`. Format is `projects/{project}/locations/{location}/deliveryPipelines/a-z{0,62}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2914,7 +4954,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the Release. Format is projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}/ releases/{release}."##),
+                     Some(r##"Required. Name of the Release. Format is `projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}/releases/{release}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2942,7 +4982,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent collection in which the `Release` should be created. Format should be projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}."##),
+                     Some(r##"Required. The parent collection in which the `Release` should be created. Format should be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2970,7 +5010,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the `Release`. Format must be projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}/releases/{release_name}."##),
+                     Some(r##"Required. Name of the `Release`. Format must be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}/releases/{release_name}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3008,13 +5048,69 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-delivery-pipelines-releases-rollouts-advance",
+                    Some(r##"Advances a Rollout in a given project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-releases-rollouts-advance",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the Rollout. Format is `projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}/releases/{release}/rollouts/{rollout}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-delivery-pipelines-releases-rollouts-approve",
                     Some(r##"Approves a Rollout."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-releases-rollouts-approve",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the Rollout. Format is projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}/ releases/{release}/rollouts/{rollout}."##),
+                     Some(r##"Required. Name of the Rollout. Format is `projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}/releases/{release}/rollouts/{rollout}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-delivery-pipelines-releases-rollouts-cancel",
+                    Some(r##"Cancels a Rollout in a given project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-releases-rollouts-cancel",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the Rollout. Format is `projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}/releases/{release}/rollouts/{rollout}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3042,7 +5138,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent collection in which the `Rollout` should be created. Format should be projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}/releases/{release_name}."##),
+                     Some(r##"Required. The parent collection in which the `Rollout` should be created. Format should be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}/releases/{release_name}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3070,9 +5166,37 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the `Rollout`. Format must be projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}/releases/{release_name}/rollouts/{rollout_name}."##),
+                     Some(r##"Required. Name of the `Rollout`. Format must be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}/releases/{release_name}/rollouts/{rollout_name}`."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-delivery-pipelines-releases-rollouts-ignore-job",
+                    Some(r##"Ignores the specified Job in a Rollout."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-releases-rollouts-ignore-job",
+                  vec![
+                    (Some(r##"rollout"##),
+                     None,
+                     Some(r##"Required. Name of the Rollout. Format is `projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}/releases/{release}/rollouts/{rollout}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -3092,7 +5216,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the `JobRun`. Format must be projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}/releases/{release_name}/rollouts/{rollout_name}/jobRuns/{job_run_name}."##),
+                     Some(r##"Required. Name of the `JobRun`. Format must be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}/releases/{release_name}/rollouts/{rollout_name}/jobRuns/{job_run_name}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3117,6 +5241,34 @@ async fn main() {
                      Some(r##"Required. The `Rollout` which owns this collection of `JobRun` objects."##),
                      Some(true),
                      Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-delivery-pipelines-releases-rollouts-job-runs-terminate",
+                    Some(r##"Terminates a Job Run in a given project and location."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-releases-rollouts-job-runs-terminate",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the `JobRun`. Format must be `projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}/releases/{release}/rollouts/{rollout}/jobRuns/{jobRun}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -3158,7 +5310,35 @@ async fn main() {
                   vec![
                     (Some(r##"rollout"##),
                      None,
-                     Some(r##"Required. Name of the Rollout. Format is projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}/ releases/{release}/rollouts/{rollout}."##),
+                     Some(r##"Required. Name of the Rollout. Format is `projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}/releases/{release}/rollouts/{rollout}`."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-delivery-pipelines-rollback-target",
+                    Some(r##"Creates a `Rollout` to roll back the specified target."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-delivery-pipelines-rollback-target",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The `DeliveryPipeline` for which the rollback `Rollout` should be created. Format should be `projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3375,7 +5555,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -3402,7 +5582,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent collection in which the `Target` should be created. Format should be projects/{project_id}/locations/{location_name}."##),
+                     Some(r##"Required. The parent collection in which the `Target` should be created. Format should be `projects/{project_id}/locations/{location_name}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3430,7 +5610,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The name of the `Target` to delete. Format should be projects/{project_id}/locations/{location_name}/targets/{target_name}."##),
+                     Some(r##"Required. The name of the `Target` to delete. Format should be `projects/{project_id}/locations/{location_name}/targets/{target_name}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3452,7 +5632,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the `Target`. Format must be projects/{project_id}/locations/{location_name}/targets/{target_name}."##),
+                     Some(r##"Required. Name of the `Target`. Format must be `projects/{project_id}/locations/{location_name}/targets/{target_name}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3496,7 +5676,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The parent, which owns this collection of targets. Format must be projects/{project_id}/locations/{location_name}."##),
+                     Some(r##"Required. The parent, which owns this collection of targets. Format must be `projects/{project_id}/locations/{location_name}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3518,7 +5698,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Optional. Name of the `Target`. Format is projects/{project}/locations/{location}/targets/a-z{0,62}."##),
+                     Some(r##"Optional. Name of the `Target`. Format is `projects/{project}/locations/{location}/targets/a-z{0,62}`."##),
                      Some(true),
                      Some(false)),
         
@@ -3602,7 +5782,7 @@ async fn main() {
     
     let mut app = App::new("clouddeploy1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230105")
+           .version("5.0.4+20240221")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_clouddeploy1_cli")
            .arg(Arg::with_name("url")

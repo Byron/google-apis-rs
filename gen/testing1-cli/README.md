@@ -25,13 +25,18 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *testing* API at revision *20230119*. The CLI is at version *5.0.3*.
+This documentation was generated from the *testing* API at revision *20240227*. The CLI is at version *5.0.4*.
 
 ```bash
 testing1 [options]
         application-detail-service
                 get-apk-details (-r <kv>)... [-p <v>]... [-o <out>]
         projects
+                device-sessions-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                device-sessions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                device-sessions-get <name> [-p <v>]... [-o <out>]
+                device-sessions-list <parent> [-p <v>]... [-o <out>]
+                device-sessions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-matrices-cancel <project-id> <test-matrix-id> [-p <v>]... [-o <out>]
                 test-matrices-create <project-id> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-matrices-get <project-id> <test-matrix-id> [-p <v>]... [-o <out>]

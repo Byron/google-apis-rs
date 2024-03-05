@@ -1,4 +1,4 @@
-site_name: BigQuery Data Transfer v5.0.3+20230115
+site_name: BigQuery Data Transfer v5.0.4+20240227
 site_url: http://byron.github.io/google-apis-rs/google-bigquerydatatransfer1-cli
 site_description: A complete library to interact with BigQuery Data Transfer (protocol v1)
 
@@ -31,6 +31,7 @@ nav:
     - 'Locations Transfer Configs Runs Transfer Logs List': 'projects_locations-transfer-configs-runs-transfer-logs-list.md'
     - 'Locations Transfer Configs Schedule Runs': 'projects_locations-transfer-configs-schedule-runs.md'
     - 'Locations Transfer Configs Start Manual Runs': 'projects_locations-transfer-configs-start-manual-runs.md'
+    - 'Locations Unenroll Data Sources': 'projects_locations-unenroll-data-sources.md'
     - 'Transfer Configs Create': 'projects_transfer-configs-create.md'
     - 'Transfer Configs Delete': 'projects_transfer-configs-delete.md'
     - 'Transfer Configs Get': 'projects_transfer-configs-get.md'

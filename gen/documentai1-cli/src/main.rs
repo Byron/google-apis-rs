@@ -573,9 +573,29 @@ where
                     "document-output-config.gcs-output-config.sharding-config.pages-overlap" => Some(("documentOutputConfig.gcsOutputConfig.shardingConfig.pagesOverlap", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "document-output-config.gcs-output-config.sharding-config.pages-per-shard" => Some(("documentOutputConfig.gcsOutputConfig.shardingConfig.pagesPerShard", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "input-documents.gcs-prefix.gcs-uri-prefix" => Some(("inputDocuments.gcsPrefix.gcsUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "process-options.from-end" => Some(("processOptions.fromEnd", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "process-options.from-start" => Some(("processOptions.fromStart", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "process-options.individual-page-selector.pages" => Some(("processOptions.individualPageSelector.pages", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "process-options.ocr-config.advanced-ocr-options" => Some(("processOptions.ocrConfig.advancedOcrOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "process-options.ocr-config.compute-style-info" => Some(("processOptions.ocrConfig.computeStyleInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.disable-character-boxes-detection" => Some(("processOptions.ocrConfig.disableCharacterBoxesDetection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.enable-image-quality-scores" => Some(("processOptions.ocrConfig.enableImageQualityScores", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.enable-native-pdf-parsing" => Some(("processOptions.ocrConfig.enableNativePdfParsing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.enable-symbol" => Some(("processOptions.ocrConfig.enableSymbol", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.hints.language-hints" => Some(("processOptions.ocrConfig.hints.languageHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "process-options.ocr-config.premium-features.compute-style-info" => Some(("processOptions.ocrConfig.premiumFeatures.computeStyleInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.premium-features.enable-math-ocr" => Some(("processOptions.ocrConfig.premiumFeatures.enableMathOcr", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.premium-features.enable-selection-mark-detection" => Some(("processOptions.ocrConfig.premiumFeatures.enableSelectionMarkDetection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.description" => Some(("processOptions.schemaOverride.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.display-name" => Some(("processOptions.schemaOverride.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.document-allow-multiple-labels" => Some(("processOptions.schemaOverride.metadata.documentAllowMultipleLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.document-splitter" => Some(("processOptions.schemaOverride.metadata.documentSplitter", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.prefixed-naming-on-properties" => Some(("processOptions.schemaOverride.metadata.prefixedNamingOnProperties", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.skip-naming-validation" => Some(("processOptions.schemaOverride.metadata.skipNamingValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "skip-human-review" => Some(("skipHumanReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["document-output-config", "field-mask", "gcs-output-config", "gcs-prefix", "gcs-uri", "gcs-uri-prefix", "input-documents", "pages-overlap", "pages-per-shard", "sharding-config", "skip-human-review"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-ocr-options", "compute-style-info", "description", "disable-character-boxes-detection", "display-name", "document-allow-multiple-labels", "document-output-config", "document-splitter", "enable-image-quality-scores", "enable-math-ocr", "enable-native-pdf-parsing", "enable-selection-mark-detection", "enable-symbol", "field-mask", "from-end", "from-start", "gcs-output-config", "gcs-prefix", "gcs-uri", "gcs-uri-prefix", "hints", "individual-page-selector", "input-documents", "labels", "language-hints", "metadata", "ocr-config", "pages", "pages-overlap", "pages-per-shard", "prefixed-naming-on-properties", "premium-features", "process-options", "schema-override", "sharding-config", "skip-human-review", "skip-naming-validation"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1183,6 +1203,8 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "field-mask" => Some(("fieldMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gcs-document.gcs-uri" => Some(("gcsDocument.gcsUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gcs-document.mime-type" => Some(("gcsDocument.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "inline-document.content" => Some(("inlineDocument.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "inline-document.error.code" => Some(("inlineDocument.error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "inline-document.error.message" => Some(("inlineDocument.error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1192,11 +1214,32 @@ where
                     "inline-document.shard-info.text-offset" => Some(("inlineDocument.shardInfo.textOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "inline-document.text" => Some(("inlineDocument.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "inline-document.uri" => Some(("inlineDocument.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "process-options.from-end" => Some(("processOptions.fromEnd", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "process-options.from-start" => Some(("processOptions.fromStart", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "process-options.individual-page-selector.pages" => Some(("processOptions.individualPageSelector.pages", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "process-options.ocr-config.advanced-ocr-options" => Some(("processOptions.ocrConfig.advancedOcrOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "process-options.ocr-config.compute-style-info" => Some(("processOptions.ocrConfig.computeStyleInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.disable-character-boxes-detection" => Some(("processOptions.ocrConfig.disableCharacterBoxesDetection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.enable-image-quality-scores" => Some(("processOptions.ocrConfig.enableImageQualityScores", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.enable-native-pdf-parsing" => Some(("processOptions.ocrConfig.enableNativePdfParsing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.enable-symbol" => Some(("processOptions.ocrConfig.enableSymbol", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.hints.language-hints" => Some(("processOptions.ocrConfig.hints.languageHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "process-options.ocr-config.premium-features.compute-style-info" => Some(("processOptions.ocrConfig.premiumFeatures.computeStyleInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.premium-features.enable-math-ocr" => Some(("processOptions.ocrConfig.premiumFeatures.enableMathOcr", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.premium-features.enable-selection-mark-detection" => Some(("processOptions.ocrConfig.premiumFeatures.enableSelectionMarkDetection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.description" => Some(("processOptions.schemaOverride.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.display-name" => Some(("processOptions.schemaOverride.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.document-allow-multiple-labels" => Some(("processOptions.schemaOverride.metadata.documentAllowMultipleLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.document-splitter" => Some(("processOptions.schemaOverride.metadata.documentSplitter", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.prefixed-naming-on-properties" => Some(("processOptions.schemaOverride.metadata.prefixedNamingOnProperties", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.skip-naming-validation" => Some(("processOptions.schemaOverride.metadata.skipNamingValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "raw-document.content" => Some(("rawDocument.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "raw-document.display-name" => Some(("rawDocument.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "raw-document.mime-type" => Some(("rawDocument.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "skip-human-review" => Some(("skipHumanReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "content", "error", "field-mask", "inline-document", "message", "mime-type", "raw-document", "shard-count", "shard-index", "shard-info", "skip-human-review", "text", "text-offset", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-ocr-options", "code", "compute-style-info", "content", "description", "disable-character-boxes-detection", "display-name", "document-allow-multiple-labels", "document-splitter", "enable-image-quality-scores", "enable-math-ocr", "enable-native-pdf-parsing", "enable-selection-mark-detection", "enable-symbol", "error", "field-mask", "from-end", "from-start", "gcs-document", "gcs-uri", "hints", "individual-page-selector", "inline-document", "labels", "language-hints", "message", "metadata", "mime-type", "ocr-config", "pages", "prefixed-naming-on-properties", "premium-features", "process-options", "raw-document", "schema-override", "shard-count", "shard-index", "shard-info", "skip-human-review", "skip-naming-validation", "text", "text-offset", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1284,9 +1327,29 @@ where
                     "document-output-config.gcs-output-config.sharding-config.pages-overlap" => Some(("documentOutputConfig.gcsOutputConfig.shardingConfig.pagesOverlap", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "document-output-config.gcs-output-config.sharding-config.pages-per-shard" => Some(("documentOutputConfig.gcsOutputConfig.shardingConfig.pagesPerShard", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "input-documents.gcs-prefix.gcs-uri-prefix" => Some(("inputDocuments.gcsPrefix.gcsUriPrefix", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "process-options.from-end" => Some(("processOptions.fromEnd", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "process-options.from-start" => Some(("processOptions.fromStart", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "process-options.individual-page-selector.pages" => Some(("processOptions.individualPageSelector.pages", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "process-options.ocr-config.advanced-ocr-options" => Some(("processOptions.ocrConfig.advancedOcrOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "process-options.ocr-config.compute-style-info" => Some(("processOptions.ocrConfig.computeStyleInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.disable-character-boxes-detection" => Some(("processOptions.ocrConfig.disableCharacterBoxesDetection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.enable-image-quality-scores" => Some(("processOptions.ocrConfig.enableImageQualityScores", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.enable-native-pdf-parsing" => Some(("processOptions.ocrConfig.enableNativePdfParsing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.enable-symbol" => Some(("processOptions.ocrConfig.enableSymbol", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.hints.language-hints" => Some(("processOptions.ocrConfig.hints.languageHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "process-options.ocr-config.premium-features.compute-style-info" => Some(("processOptions.ocrConfig.premiumFeatures.computeStyleInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.premium-features.enable-math-ocr" => Some(("processOptions.ocrConfig.premiumFeatures.enableMathOcr", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.premium-features.enable-selection-mark-detection" => Some(("processOptions.ocrConfig.premiumFeatures.enableSelectionMarkDetection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.description" => Some(("processOptions.schemaOverride.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.display-name" => Some(("processOptions.schemaOverride.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.document-allow-multiple-labels" => Some(("processOptions.schemaOverride.metadata.documentAllowMultipleLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.document-splitter" => Some(("processOptions.schemaOverride.metadata.documentSplitter", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.prefixed-naming-on-properties" => Some(("processOptions.schemaOverride.metadata.prefixedNamingOnProperties", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.skip-naming-validation" => Some(("processOptions.schemaOverride.metadata.skipNamingValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "skip-human-review" => Some(("skipHumanReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["document-output-config", "field-mask", "gcs-output-config", "gcs-prefix", "gcs-uri", "gcs-uri-prefix", "input-documents", "pages-overlap", "pages-per-shard", "sharding-config", "skip-human-review"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-ocr-options", "compute-style-info", "description", "disable-character-boxes-detection", "display-name", "document-allow-multiple-labels", "document-output-config", "document-splitter", "enable-image-quality-scores", "enable-math-ocr", "enable-native-pdf-parsing", "enable-selection-mark-detection", "enable-symbol", "field-mask", "from-end", "from-start", "gcs-output-config", "gcs-prefix", "gcs-uri", "gcs-uri-prefix", "hints", "individual-page-selector", "input-documents", "labels", "language-hints", "metadata", "ocr-config", "pages", "pages-overlap", "pages-per-shard", "prefixed-naming-on-properties", "premium-features", "process-options", "schema-override", "sharding-config", "skip-human-review", "skip-naming-validation"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1813,6 +1876,8 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "field-mask" => Some(("fieldMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gcs-document.gcs-uri" => Some(("gcsDocument.gcsUri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "gcs-document.mime-type" => Some(("gcsDocument.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "inline-document.content" => Some(("inlineDocument.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "inline-document.error.code" => Some(("inlineDocument.error.code", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "inline-document.error.message" => Some(("inlineDocument.error.message", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1822,11 +1887,32 @@ where
                     "inline-document.shard-info.text-offset" => Some(("inlineDocument.shardInfo.textOffset", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "inline-document.text" => Some(("inlineDocument.text", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "inline-document.uri" => Some(("inlineDocument.uri", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "process-options.from-end" => Some(("processOptions.fromEnd", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "process-options.from-start" => Some(("processOptions.fromStart", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "process-options.individual-page-selector.pages" => Some(("processOptions.individualPageSelector.pages", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Vec })),
+                    "process-options.ocr-config.advanced-ocr-options" => Some(("processOptions.ocrConfig.advancedOcrOptions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "process-options.ocr-config.compute-style-info" => Some(("processOptions.ocrConfig.computeStyleInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.disable-character-boxes-detection" => Some(("processOptions.ocrConfig.disableCharacterBoxesDetection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.enable-image-quality-scores" => Some(("processOptions.ocrConfig.enableImageQualityScores", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.enable-native-pdf-parsing" => Some(("processOptions.ocrConfig.enableNativePdfParsing", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.enable-symbol" => Some(("processOptions.ocrConfig.enableSymbol", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.hints.language-hints" => Some(("processOptions.ocrConfig.hints.languageHints", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "process-options.ocr-config.premium-features.compute-style-info" => Some(("processOptions.ocrConfig.premiumFeatures.computeStyleInfo", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.premium-features.enable-math-ocr" => Some(("processOptions.ocrConfig.premiumFeatures.enableMathOcr", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.ocr-config.premium-features.enable-selection-mark-detection" => Some(("processOptions.ocrConfig.premiumFeatures.enableSelectionMarkDetection", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.description" => Some(("processOptions.schemaOverride.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.display-name" => Some(("processOptions.schemaOverride.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.document-allow-multiple-labels" => Some(("processOptions.schemaOverride.metadata.documentAllowMultipleLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.document-splitter" => Some(("processOptions.schemaOverride.metadata.documentSplitter", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.prefixed-naming-on-properties" => Some(("processOptions.schemaOverride.metadata.prefixedNamingOnProperties", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "process-options.schema-override.metadata.skip-naming-validation" => Some(("processOptions.schemaOverride.metadata.skipNamingValidation", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "raw-document.content" => Some(("rawDocument.content", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "raw-document.display-name" => Some(("rawDocument.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "raw-document.mime-type" => Some(("rawDocument.mimeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "skip-human-review" => Some(("skipHumanReview", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["code", "content", "error", "field-mask", "inline-document", "message", "mime-type", "raw-document", "shard-count", "shard-index", "shard-info", "skip-human-review", "text", "text-offset", "uri"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["advanced-ocr-options", "code", "compute-style-info", "content", "description", "disable-character-boxes-detection", "display-name", "document-allow-multiple-labels", "document-splitter", "enable-image-quality-scores", "enable-math-ocr", "enable-native-pdf-parsing", "enable-selection-mark-detection", "enable-symbol", "error", "field-mask", "from-end", "from-start", "gcs-document", "gcs-uri", "hints", "individual-page-selector", "inline-document", "labels", "language-hints", "message", "metadata", "mime-type", "ocr-config", "pages", "prefixed-naming-on-properties", "premium-features", "process-options", "raw-document", "schema-override", "shard-count", "shard-index", "shard-info", "skip-human-review", "skip-naming-validation", "text", "text-offset", "uri"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1910,6 +1996,7 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "base-processor-version" => Some(("baseProcessorVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "custom-document-extraction-options.training-method" => Some(("customDocumentExtractionOptions.trainingMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document-schema.description" => Some(("documentSchema.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document-schema.display-name" => Some(("documentSchema.displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "document-schema.metadata.document-allow-multiple-labels" => Some(("documentSchema.metadata.documentAllowMultipleLabels", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1955,10 +2042,11 @@ where
                     "processor-version.latest-evaluation.aggregate-metrics-exact.true-positives-count" => Some(("processorVersion.latestEvaluation.aggregateMetricsExact.truePositivesCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "processor-version.latest-evaluation.evaluation" => Some(("processorVersion.latestEvaluation.evaluation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "processor-version.latest-evaluation.operation" => Some(("processorVersion.latestEvaluation.operation", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "processor-version.model-type" => Some(("processorVersion.modelType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "processor-version.name" => Some(("processorVersion.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "processor-version.state" => Some(("processorVersion.state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregate-metrics", "aggregate-metrics-exact", "base-processor-version", "create-time", "deprecation-info", "deprecation-time", "description", "display-name", "document-allow-multiple-labels", "document-schema", "document-splitter", "evaluation", "f1-score", "false-negatives-count", "false-positives-count", "gcs-prefix", "gcs-uri-prefix", "google-managed", "ground-truth-document-count", "ground-truth-occurrences-count", "input-data", "kms-key-name", "kms-key-version-name", "latest-evaluation", "metadata", "name", "operation", "precision", "predicted-document-count", "predicted-occurrences-count", "prefixed-naming-on-properties", "processor-version", "recall", "replacement-processor-version", "skip-naming-validation", "state", "test-documents", "total-documents-count", "training-documents", "true-positives-count"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregate-metrics", "aggregate-metrics-exact", "base-processor-version", "create-time", "custom-document-extraction-options", "deprecation-info", "deprecation-time", "description", "display-name", "document-allow-multiple-labels", "document-schema", "document-splitter", "evaluation", "f1-score", "false-negatives-count", "false-positives-count", "gcs-prefix", "gcs-uri-prefix", "google-managed", "ground-truth-document-count", "ground-truth-occurrences-count", "input-data", "kms-key-name", "kms-key-version-name", "latest-evaluation", "metadata", "model-type", "name", "operation", "precision", "predicted-document-count", "predicted-occurrences-count", "prefixed-naming-on-properties", "processor-version", "recall", "replacement-processor-version", "skip-naming-validation", "state", "test-documents", "total-documents-count", "training-documents", "training-method", "true-positives-count"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2453,12 +2541,12 @@ async fn main() {
         
         ("projects", "methods: 'locations-fetch-processor-types', 'locations-get', 'locations-list', 'locations-operations-cancel', 'locations-operations-get', 'locations-operations-list', 'locations-processor-types-get', 'locations-processor-types-list', 'locations-processors-batch-process', 'locations-processors-create', 'locations-processors-delete', 'locations-processors-disable', 'locations-processors-enable', 'locations-processors-get', 'locations-processors-human-review-config-review-document', 'locations-processors-list', 'locations-processors-process', 'locations-processors-processor-versions-batch-process', 'locations-processors-processor-versions-delete', 'locations-processors-processor-versions-deploy', 'locations-processors-processor-versions-evaluate-processor-version', 'locations-processors-processor-versions-evaluations-get', 'locations-processors-processor-versions-evaluations-list', 'locations-processors-processor-versions-get', 'locations-processors-processor-versions-list', 'locations-processors-processor-versions-process', 'locations-processors-processor-versions-train', 'locations-processors-processor-versions-undeploy', 'locations-processors-set-default-processor-version' and 'operations-get'", vec![
             ("locations-fetch-processor-types",
-                    Some(r##"Fetches processor types. Note that we do not use ListProcessorTypes here because it is not paginated."##),
+                    Some(r##"Fetches processor types. Note that we don't use ListProcessorTypes here, because it isn't paginated."##),
                     "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/projects_locations-fetch-processor-types",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The project of processor type to list. The available processor types may depend on the allow-listing on projects. Format: `projects/{project}/locations/{location}`"##),
+                     Some(r##"Required. The location of processor types to list. Format: `projects/{project}/locations/{location}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2563,7 +2651,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -2612,7 +2700,7 @@ async fn main() {
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The location of processor type to list. The available processor types may depend on the allow-listing on projects. Format: `projects/{project}/locations/{location}`"##),
+                     Some(r##"Required. The location of processor types to list. Format: `projects/{project}/locations/{location}`."##),
                      Some(true),
                      Some(false)),
         
@@ -2657,7 +2745,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-processors-create",
-                    Some(r##"Creates a processor from the type processor that the user chose. The processor will be at "ENABLED" state by default after its creation."##),
+                    Some(r##"Creates a processor from the ProcessorType provided. The processor will be at `ENABLED` state by default after its creation."##),
                     "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/projects_locations-processors-create",
                   vec![
                     (Some(r##"parent"##),
@@ -3085,7 +3173,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-processors-processor-versions-train",
-                    Some(r##"Trains a new processor version. Operation metadata is returned as cloud_documentai_core.TrainProcessorVersionMetadata."##),
+                    Some(r##"Trains a new processor version. Operation metadata is returned as TrainProcessorVersionMetadata."##),
                     "Details at http://byron.github.io/google-apis-rs/google_documentai1_cli/projects_locations-processors-processor-versions-train",
                   vec![
                     (Some(r##"parent"##),
@@ -3196,7 +3284,7 @@ async fn main() {
     
     let mut app = App::new("documentai1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230117")
+           .version("5.0.4+20240223")
            .about("Service to parse structured information from unstructured or semi-structured documents using state-of-the-art Google AI such as natural language, computer vision, translation, and AutoML.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_documentai1_cli")
            .arg(Arg::with_name("url")

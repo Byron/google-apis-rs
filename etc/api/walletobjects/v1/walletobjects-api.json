@@ -772,6 +772,33 @@
         },
         "genericclass": {
             "methods": {
+                "addmessage": {
+                    "description": "Adds a message to the generic class referenced by the given class ID.",
+                    "flatPath": "walletobjects/v1/genericClass/{resourceId}/addMessage",
+                    "httpMethod": "POST",
+                    "id": "walletobjects.genericclass.addmessage",
+                    "parameterOrder": [
+                        "resourceId"
+                    ],
+                    "parameters": {
+                        "resourceId": {
+                            "description": "The unique identifier for a class. This ID must be unique across all classes from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "walletobjects/v1/genericClass/{resourceId}/addMessage",
+                    "request": {
+                        "$ref": "AddMessageRequest"
+                    },
+                    "response": {
+                        "$ref": "GenericClassAddMessageResponse"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/wallet_object.issuer"
+                    ]
+                },
                 "get": {
                     "description": "Returns the generic class with the given class ID.",
                     "flatPath": "walletobjects/v1/genericClass/{resourceId}",
@@ -905,6 +932,33 @@
         },
         "genericobject": {
             "methods": {
+                "addmessage": {
+                    "description": "Adds a message to the generic object referenced by the given object ID.",
+                    "flatPath": "walletobjects/v1/genericObject/{resourceId}/addMessage",
+                    "httpMethod": "POST",
+                    "id": "walletobjects.genericobject.addmessage",
+                    "parameterOrder": [
+                        "resourceId"
+                    ],
+                    "parameters": {
+                        "resourceId": {
+                            "description": "The unique identifier for an object. This ID must be unique across all classes from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "walletobjects/v1/genericObject/{resourceId}/addMessage",
+                    "request": {
+                        "$ref": "AddMessageRequest"
+                    },
+                    "response": {
+                        "$ref": "GenericObjectAddMessageResponse"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/wallet_object.issuer"
+                    ]
+                },
                 "get": {
                     "description": "Returns the generic object with the given object ID.",
                     "flatPath": "walletobjects/v1/genericObject/{resourceId}",
@@ -1842,9 +1896,35 @@
         },
         "media": {
             "methods": {
+                "download": {
+                    "description": "Downloads rotating barcode values for the transit object referenced by the given object ID.",
+                    "flatPath": "walletobjects/v1/transitObject/{resourceId}/downloadRotatingBarcodeValues",
+                    "httpMethod": "GET",
+                    "id": "walletobjects.media.download",
+                    "parameterOrder": [
+                        "resourceId"
+                    ],
+                    "parameters": {
+                        "resourceId": {
+                            "description": "The unique identifier for an object. This ID must be unique across all objects from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'.",
+                            "location": "path",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "walletobjects/v1/transitObject/{resourceId}/downloadRotatingBarcodeValues",
+                    "response": {
+                        "$ref": "Media"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/wallet_object.issuer"
+                    ],
+                    "supportsMediaDownload": true,
+                    "useMediaDownloadService": true
+                },
                 "upload": {
-                    "description": "Uploads a private image and returns an Id to be used in its place.",
-                    "flatPath": "walletobjects/v1/privateContent/{issuerId}/uploadPrivateImage",
+                    "description": "Uploads rotating barcode values for the transit object referenced by the given object ID. Note the max upload size is specified in google3/production/config/cdd/apps-upload/customers/payments-consumer-passes/config.gcl and enforced by Scotty.",
+                    "flatPath": "walletobjects/v1/transitObject/{resourceId}/uploadRotatingBarcodeValues",
                     "httpMethod": "POST",
                     "id": "walletobjects.media.upload",
                     "mediaUpload": {
@@ -1854,28 +1934,27 @@
                         "protocols": {
                             "simple": {
                                 "multipart": true,
-                                "path": "/upload/walletobjects/v1/privateContent/{issuerId}/uploadPrivateImage"
+                                "path": "/upload/walletobjects/v1/transitObject/{resourceId}/uploadRotatingBarcodeValues"
                             }
                         }
                     },
                     "parameterOrder": [
-                        "issuerId"
+                        "resourceId"
                     ],
                     "parameters": {
-                        "issuerId": {
-                            "description": "The ID of the issuer sending the image.",
-                            "format": "int64",
+                        "resourceId": {
+                            "description": "The unique identifier for an object. This ID must be unique across all objects from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, '.', '_', or '-'.",
                             "location": "path",
                             "required": true,
                             "type": "string"
                         }
                     },
-                    "path": "walletobjects/v1/privateContent/{issuerId}/uploadPrivateImage",
+                    "path": "walletobjects/v1/transitObject/{resourceId}/uploadRotatingBarcodeValues",
                     "request": {
-                        "$ref": "UploadPrivateImageRequest"
+                        "$ref": "TransitObjectUploadRotatingBarcodeValuesRequest"
                     },
                     "response": {
-                        "$ref": "UploadPrivateImageResponse"
+                        "$ref": "TransitObjectUploadRotatingBarcodeValuesResponse"
                     },
                     "scopes": [
                         "https://www.googleapis.com/auth/wallet_object.issuer"
@@ -2600,39 +2679,9 @@
                     ]
                 }
             }
-        },
-        "walletobjects": {
-            "resources": {
-                "v1": {
-                    "resources": {
-                        "privateContent": {
-                            "methods": {
-                                "uploadPrivateData": {
-                                    "description": "Upload private data (text or URI) and returns an Id to be used in its place.",
-                                    "flatPath": "walletobjects/v1/privateContent/uploadPrivateData",
-                                    "httpMethod": "POST",
-                                    "id": "walletobjects.walletobjects.v1.privateContent.uploadPrivateData",
-                                    "parameterOrder": [],
-                                    "parameters": {},
-                                    "path": "walletobjects/v1/privateContent/uploadPrivateData",
-                                    "request": {
-                                        "$ref": "UploadPrivateDataRequest"
-                                    },
-                                    "response": {
-                                        "$ref": "UploadPrivateDataResponse"
-                                    },
-                                    "scopes": [
-                                        "https://www.googleapis.com/auth/wallet_object.issuer"
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
     },
-    "revision": "20230124",
+    "revision": "20240304",
     "rootUrl": "https://walletobjects.googleapis.com/",
     "schemas": {
         "ActivationOptions": {
@@ -2661,6 +2710,13 @@
                         "not_activated",
                         "ACTIVATED",
                         "activated"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -2700,6 +2756,7 @@
                     "type": "string"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#airportInfo\"`.",
                     "type": "string"
                 },
@@ -2753,8 +2810,13 @@
         "AppLinkDataAppLinkInfoAppTarget": {
             "id": "AppLinkDataAppLinkInfoAppTarget",
             "properties": {
+                "packageName": {
+                    "description": "Package name for AppTarget. For example: com.google.android.gm",
+                    "type": "string"
+                },
                 "targetUri": {
-                    "$ref": "Uri"
+                    "$ref": "Uri",
+                    "description": "URI for AppTarget. The description on the URI must be set. Prefer setting package field instead, if this target is defined for your application."
                 }
             },
             "type": "object"
@@ -2782,6 +2844,7 @@
                     "type": "string"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#barcode\"`.",
                     "type": "string"
                 },
@@ -2832,6 +2895,36 @@
                         "upcA",
                         "TEXT_ONLY",
                         "textOnly"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        true,
+                        false,
+                        true,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -2924,6 +3017,13 @@
                         "BACK",
                         "back"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "",
@@ -2946,6 +3046,7 @@
                     "description": "A small image shown above the boarding barcode. Airlines can use it to communicate any special boarding privileges. In the event the security program logo is also set, this image might be rendered alongside the logo for that security program."
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#boardingAndSeatingInfo\"`.",
                     "type": "string"
                 },
@@ -2982,6 +3083,15 @@
                         "BOARDING_POLICY_OTHER",
                         "boardingPolicyOther"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "",
@@ -2994,6 +3104,7 @@
                     "type": "string"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#boardingAndSeatingPolicy\"`.",
                     "type": "string"
                 },
@@ -3009,6 +3120,17 @@
                         "tierBased",
                         "SEAT_CLASS_POLICY_OTHER",
                         "seatClassPolicyOther"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -3030,6 +3152,7 @@
             "id": "CallbackOptions",
             "properties": {
                 "updateRequestUrl": {
+                    "deprecated": true,
                     "description": "URL for the merchant endpoint that would be called to request updates. The URL should be hosted on HTTPS and robots.txt should allow the URL path to be accessible by UserAgent:Google-Valuables. Deprecated.",
                     "type": "string"
                 },
@@ -3158,6 +3281,7 @@
             "id": "CompositeMedia",
             "properties": {
                 "blobRef": {
+                    "deprecated": true,
                     "description": "Blobstore v1 reference, set if reference_type is BLOBSTORE_REF This should be the byte representation of a blobstore.BlobRef. Since Blobstore is deprecating v1, use blobstore2_info instead. For now, any v2 blob will also be represented in this field as v1 BlobRef.",
                     "format": "byte",
                     "type": "string"
@@ -3409,6 +3533,15 @@
                         "DISABLED",
                         "disabled"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "Visible only to testers that have access to issuer account.",
@@ -3517,6 +3650,13 @@
                         "GATES_OPEN",
                         "gatesOpen"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "",
@@ -3531,6 +3671,7 @@
                     "type": "string"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#eventDateTime\"`.",
                     "type": "string"
                 },
@@ -3549,6 +3690,7 @@
                     "type": "string"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#eventReservationInfo\"`.",
                     "type": "string"
                 }
@@ -3563,6 +3705,7 @@
                     "description": "The gate the ticket holder should enter to get to their seat, such as \"A\" or \"West\". This field is localizable so you may translate words or use different alphabets for the characters in an identifier."
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#eventSeat\"`.",
                     "type": "string"
                 },
@@ -3585,6 +3728,7 @@
             "id": "EventTicketClass",
             "properties": {
                 "allowMultipleUsersPerObject": {
+                    "deprecated": true,
                     "description": "Deprecated. Use `multipleDevicesAndHoldersAllowedStatus` instead.",
                     "type": "boolean"
                 },
@@ -3608,6 +3752,17 @@
                         "orderNumber",
                         "RESERVATION_NUMBER",
                         "reservationNumber"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -3677,6 +3832,15 @@
                         "ENTRANCE",
                         "entrance"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "",
@@ -3713,6 +3877,7 @@
                 },
                 "infoModuleData": {
                     "$ref": "InfoModuleData",
+                    "deprecated": true,
                     "description": "Deprecated. Use textModulesData instead."
                 },
                 "issuerName": {
@@ -3720,6 +3885,7 @@
                     "type": "string"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#eventTicketClass\"`.",
                     "type": "string"
                 },
@@ -3754,19 +3920,28 @@
                     "enum": [
                         "STATUS_UNSPECIFIED",
                         "MULTIPLE_HOLDERS",
-                        "multipleHolders",
                         "ONE_USER_ALL_DEVICES",
-                        "oneUserAllDevices",
                         "ONE_USER_ONE_DEVICE",
+                        "multipleHolders",
+                        "oneUserAllDevices",
                         "oneUserOneDevice"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        true,
+                        true
+                    ],
                     "enumDescriptions": [
-                        "",
-                        "Multiple users on multiple devices are allowed.",
+                        "Unspecified preference.",
+                        "The Pass object is shareable by a user and can be saved by any number of different users, and on any number of devices. Partners typically use this setup for passes that do not need to be restricted to a single user or pinned to a single device.",
+                        "An object can only be saved by one user, but this user can view and use it on multiple of their devices. Once the first user saves the object, no other user will be allowed to view or save it.",
+                        "An object can only be saved by one user on a single device. Intended for use by select partners in limited circumstances. An example use case is a transit ticket that should be \"device pinned\", meaning it can be saved, viewed and used only by a single user on a single device. Contact support for additional information.",
                         "Legacy alias for `MULTIPLE_HOLDERS`. Deprecated.",
-                        "One user on multiple devices is allowed.",
                         "Legacy alias for `ONE_USER_ALL_DEVICES`. Deprecated.",
-                        "Intended for use by select partners in limited circumstances. Contact support for additional information.",
                         "Legacy alias for `ONE_USER_ONE_DEVICE`. Deprecated."
                     ],
                     "type": "string"
@@ -3796,6 +3971,17 @@
                         "DRAFT",
                         "draft"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "",
@@ -3816,6 +4002,11 @@
                         "ROW",
                         "row"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "",
@@ -3829,6 +4020,11 @@
                         "SEAT_LABEL_UNSPECIFIED",
                         "SEAT",
                         "seat"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -3845,6 +4041,13 @@
                         "section",
                         "THEATER",
                         "theater"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -3871,6 +4074,7 @@
                     "description": "Event venue details."
                 },
                 "version": {
+                    "deprecated": true,
                     "description": "Deprecated",
                     "format": "int64",
                     "type": "string"
@@ -3889,8 +4093,13 @@
                     ],
                     "type": "string"
                 },
+                "wideLogo": {
+                    "$ref": "Image",
+                    "description": "The wide logo of the ticket. When provided, this will be used in place of the logo in the top left of the card view."
+                },
                 "wordMark": {
                     "$ref": "Image",
+                    "deprecated": true,
                     "description": "Deprecated."
                 }
             },
@@ -3986,6 +4195,7 @@
                     "description": "Deprecated. Use textModulesData instead."
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#eventTicketObject\"`.",
                     "type": "string"
                 },
@@ -4013,6 +4223,10 @@
                         "$ref": "Message"
                     },
                     "type": "array"
+                },
+                "passConstraints": {
+                    "$ref": "PassConstraints",
+                    "description": "Pass constraints for the object. Includes limiting NFC and screenshot behaviors."
                 },
                 "reservationInfo": {
                     "$ref": "EventReservationInfo",
@@ -4042,6 +4256,17 @@
                         "expired",
                         "INACTIVE",
                         "inactive"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -4080,6 +4305,7 @@
                     "description": "The time period this object will be `active` and object can be used. An object's state will be changed to `expired` when this time period has passed."
                 },
                 "version": {
+                    "deprecated": true,
                     "description": "Deprecated",
                     "format": "int64",
                     "type": "string"
@@ -4122,6 +4348,7 @@
                     "description": "The address of the venue, such as \"24 Willie Mays Plaza\\nSan Francisco, CA 94107\". Address lines are separated by line feed (`\\n`) characters. This is required."
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#eventVenue\"`.",
                     "type": "string"
                 },
@@ -4133,7 +4360,7 @@
             "type": "object"
         },
         "ExpiryNotification": {
-            "description": "Indicates that the issuer would like GooglePay to send expiry notifications 2 days prior to the card expiration.",
+            "description": "Indicates that the issuer would like Google Wallet to send expiry notifications 2 days prior to the card expiration.",
             "id": "ExpiryNotification",
             "properties": {
                 "enableNotification": {
@@ -4163,6 +4390,21 @@
                         "dateYear",
                         "YEAR_MONTH",
                         "YEAR_MONTH_DAY"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        false
                     ],
                     "enumDescriptions": [
                         "Default option when no format is specified, when selected, no formatting will be applied.",
@@ -4219,6 +4461,15 @@
                         "ORIGIN_NAME",
                         "originName"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "",
@@ -4238,7 +4489,7 @@
             "properties": {
                 "airlineAllianceLogo": {
                     "$ref": "Image",
-                    "description": "A logo for the airline alliance, displayed above the QR code that the passenger scans to board."
+                    "description": "A logo for the airline alliance, displayed below the QR code that the passenger scans to board."
                 },
                 "airlineLogo": {
                     "$ref": "Image",
@@ -4257,8 +4508,13 @@
                     "type": "string"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#flightCarrier\"`.",
                     "type": "string"
+                },
+                "wideAirlineLogo": {
+                    "$ref": "Image",
+                    "description": "The wide logo of the airline. When provided, this will be used in place of the airline logo in the top left of the card view."
                 }
             },
             "type": "object"
@@ -4267,6 +4523,7 @@
             "id": "FlightClass",
             "properties": {
                 "allowMultipleUsersPerObject": {
+                    "deprecated": true,
                     "description": "Deprecated. Use `multipleDevicesAndHoldersAllowedStatus` instead.",
                     "type": "boolean"
                 },
@@ -4315,6 +4572,21 @@
                         "DIVERTED",
                         "diverted"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "Flight is on time, early, or delayed.",
@@ -4357,6 +4629,7 @@
                 },
                 "infoModuleData": {
                     "$ref": "InfoModuleData",
+                    "deprecated": true,
                     "description": "Deprecated. Use textModulesData instead."
                 },
                 "issuerName": {
@@ -4364,6 +4637,7 @@
                     "type": "string"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#flightClass\"`.",
                     "type": "string"
                 },
@@ -4422,19 +4696,28 @@
                     "enum": [
                         "STATUS_UNSPECIFIED",
                         "MULTIPLE_HOLDERS",
-                        "multipleHolders",
                         "ONE_USER_ALL_DEVICES",
-                        "oneUserAllDevices",
                         "ONE_USER_ONE_DEVICE",
+                        "multipleHolders",
+                        "oneUserAllDevices",
                         "oneUserOneDevice"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        true,
+                        true
+                    ],
                     "enumDescriptions": [
-                        "",
-                        "Multiple users on multiple devices are allowed.",
+                        "Unspecified preference.",
+                        "The Pass object is shareable by a user and can be saved by any number of different users, and on any number of devices. Partners typically use this setup for passes that do not need to be restricted to a single user or pinned to a single device.",
+                        "An object can only be saved by one user, but this user can view and use it on multiple of their devices. Once the first user saves the object, no other user will be allowed to view or save it.",
+                        "An object can only be saved by one user on a single device. Intended for use by select partners in limited circumstances. An example use case is a transit ticket that should be \"device pinned\", meaning it can be saved, viewed and used only by a single user on a single device. Contact support for additional information.",
                         "Legacy alias for `MULTIPLE_HOLDERS`. Deprecated.",
-                        "One user on multiple devices is allowed.",
                         "Legacy alias for `ONE_USER_ALL_DEVICES`. Deprecated.",
-                        "Intended for use by select partners in limited circumstances. Contact support for additional information.",
                         "Legacy alias for `ONE_USER_ONE_DEVICE`. Deprecated."
                     ],
                     "type": "string"
@@ -4468,6 +4751,17 @@
                         "DRAFT",
                         "draft"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "",
@@ -4493,6 +4787,7 @@
                     "type": "array"
                 },
                 "version": {
+                    "deprecated": true,
                     "description": "Deprecated",
                     "format": "int64",
                     "type": "string"
@@ -4513,6 +4808,7 @@
                 },
                 "wordMark": {
                     "$ref": "Image",
+                    "deprecated": true,
                     "description": "Deprecated."
                 }
             },
@@ -4561,6 +4857,7 @@
                     "type": "string"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#flightHeader\"`.",
                     "type": "string"
                 },
@@ -4638,6 +4935,7 @@
                     "description": "Deprecated. Use textModulesData instead."
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#flightObject\"`.",
                     "type": "string"
                 },
@@ -4658,6 +4956,10 @@
                         "$ref": "Message"
                     },
                     "type": "array"
+                },
+                "passConstraints": {
+                    "$ref": "PassConstraints",
+                    "description": "Pass constraints for the object. Includes limiting NFC and screenshot behaviors."
                 },
                 "passengerName": {
                     "description": "Required. Passenger name as it would appear on the boarding pass. eg: \"Dave M Gahan\" or \"Gahan/Dave\" or \"GAHAN/DAVEM\"",
@@ -4692,6 +4994,17 @@
                         "INACTIVE",
                         "inactive"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "Object is active and displayed to with other active objects.",
@@ -4717,6 +5030,7 @@
                     "description": "The time period this object will be `active` and object can be used. An object's state will be changed to `expired` when this time period has passed."
                 },
                 "version": {
+                    "deprecated": true,
                     "description": "Deprecated",
                     "format": "int64",
                     "type": "string"
@@ -4763,6 +5077,7 @@
                     "description": "Frequent flyer program name. eg: \"Lufthansa Miles & More\""
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#frequentFlyerInfo\"`.",
                     "type": "string"
                 }
@@ -4800,24 +5115,40 @@
                     "$ref": "LinksModuleData",
                     "description": "Links module data. If `linksModuleData` is also defined on the object, both will be displayed. The maximum number of these fields displayed is 10 from class and 10 from object."
                 },
+                "messages": {
+                    "description": "An array of messages displayed in the app. All users of this object will receive its associated messages. The maximum number of these fields is 10.",
+                    "items": {
+                        "$ref": "Message"
+                    },
+                    "type": "array"
+                },
                 "multipleDevicesAndHoldersAllowedStatus": {
                     "description": "Identifies whether multiple users and devices will save the same object referencing this class.",
                     "enum": [
                         "STATUS_UNSPECIFIED",
                         "MULTIPLE_HOLDERS",
-                        "multipleHolders",
                         "ONE_USER_ALL_DEVICES",
-                        "oneUserAllDevices",
                         "ONE_USER_ONE_DEVICE",
+                        "multipleHolders",
+                        "oneUserAllDevices",
                         "oneUserOneDevice"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        true,
+                        true
+                    ],
                     "enumDescriptions": [
-                        "",
-                        "Multiple users on multiple devices are allowed.",
+                        "Unspecified preference.",
+                        "The Pass object is shareable by a user and can be saved by any number of different users, and on any number of devices. Partners typically use this setup for passes that do not need to be restricted to a single user or pinned to a single device.",
+                        "An object can only be saved by one user, but this user can view and use it on multiple of their devices. Once the first user saves the object, no other user will be allowed to view or save it.",
+                        "An object can only be saved by one user on a single device. Intended for use by select partners in limited circumstances. An example use case is a transit ticket that should be \"device pinned\", meaning it can be saved, viewed and used only by a single user on a single device. Contact support for additional information.",
                         "Legacy alias for `MULTIPLE_HOLDERS`. Deprecated.",
-                        "One user on multiple devices is allowed.",
                         "Legacy alias for `ONE_USER_ALL_DEVICES`. Deprecated.",
-                        "Intended for use by select partners in limited circumstances. Contact support for additional information.",
                         "Legacy alias for `ONE_USER_ONE_DEVICE`. Deprecated."
                     ],
                     "type": "string"
@@ -4858,6 +5189,17 @@
             },
             "type": "object"
         },
+        "GenericClassAddMessageResponse": {
+            "description": "Response to adding a new issuer message to the class. This contains the entire updated GenericClass.",
+            "id": "GenericClassAddMessageResponse",
+            "properties": {
+                "resource": {
+                    "$ref": "GenericClass",
+                    "description": "The updated EventTicketClass resource."
+                }
+            },
+            "type": "object"
+        },
         "GenericClassListResponse": {
             "description": "List response which contains the list of all generic classes for a given issuer ID.",
             "id": "GenericClassListResponse",
@@ -4877,7 +5219,7 @@
             "type": "object"
         },
         "GenericObject": {
-            "description": "Generic Object Next ID: 119",
+            "description": "Generic Object Next ID: 121",
             "id": "GenericObject",
             "properties": {
                 "appLinkData": {
@@ -4897,12 +5239,36 @@
                     "type": "string"
                 },
                 "genericType": {
-                    "description": "Specify which `GenericType` the card belongs to. Deprecated.",
+                    "description": "Specify which `GenericType` the card belongs to.",
                     "enum": [
-                        "GENERIC_TYPE_UNSPECIFIED"
+                        "GENERIC_TYPE_UNSPECIFIED",
+                        "GENERIC_SEASON_PASS",
+                        "GENERIC_UTILITY_BILLS",
+                        "GENERIC_PARKING_PASS",
+                        "GENERIC_VOUCHER",
+                        "GENERIC_GYM_MEMBERSHIP",
+                        "GENERIC_LIBRARY_MEMBERSHIP",
+                        "GENERIC_RESERVATIONS",
+                        "GENERIC_AUTO_INSURANCE",
+                        "GENERIC_HOME_INSURANCE",
+                        "GENERIC_ENTRY_TICKET",
+                        "GENERIC_RECEIPT",
+                        "GENERIC_OTHER"
                     ],
                     "enumDescriptions": [
-                        "Unspecified generic type."
+                        "Unspecified generic type.",
+                        "Season pass",
+                        "Utility bills",
+                        "Parking pass",
+                        "Voucher",
+                        "Gym membership cards",
+                        "Library membership cards",
+                        "Reservations",
+                        "Auto-insurance cards",
+                        "Home-insurance cards",
+                        "Entry tickets",
+                        "Receipts",
+                        "Other type"
                     ],
                     "type": "string"
                 },
@@ -4949,6 +5315,10 @@
                     "$ref": "Notifications",
                     "description": "The notification settings that are enabled for this object."
                 },
+                "passConstraints": {
+                    "$ref": "PassConstraints",
+                    "description": "Pass constraints for the object. Includes limiting NFC and screenshot behaviors."
+                },
                 "rotatingBarcode": {
                     "$ref": "RotatingBarcode",
                     "description": "The rotating barcode settings/details."
@@ -4969,6 +5339,17 @@
                         "expired",
                         "INACTIVE",
                         "inactive"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -4997,6 +5378,21 @@
                 "validTimeInterval": {
                     "$ref": "TimeInterval",
                     "description": "The time period this object will be considered valid or usable. When the time period is passed, the object will be considered expired, which will affect the rendering on user's devices."
+                },
+                "wideLogo": {
+                    "$ref": "Image",
+                    "description": "The wide logo of the pass. When provided, this will be used in place of the logo in the top left of the card view."
+                }
+            },
+            "type": "object"
+        },
+        "GenericObjectAddMessageResponse": {
+            "description": "Response to adding a new issuer message to the object. This contains the entire updated GenericObject.",
+            "id": "GenericObjectAddMessageResponse",
+            "properties": {
+                "resource": {
+                    "$ref": "GenericObject",
+                    "description": "The updated GenericObject resource."
                 }
             },
             "type": "object"
@@ -5027,6 +5423,7 @@
                     "type": "boolean"
                 },
                 "allowMultipleUsersPerObject": {
+                    "deprecated": true,
                     "description": "Deprecated. Use `multipleDevicesAndHoldersAllowedStatus` instead.",
                     "type": "boolean"
                 },
@@ -5079,6 +5476,7 @@
                 },
                 "infoModuleData": {
                     "$ref": "InfoModuleData",
+                    "deprecated": true,
                     "description": "Deprecated. Use textModulesData instead."
                 },
                 "issuerName": {
@@ -5086,6 +5484,7 @@
                     "type": "string"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#giftCardClass\"`.",
                     "type": "string"
                 },
@@ -5136,19 +5535,28 @@
                     "enum": [
                         "STATUS_UNSPECIFIED",
                         "MULTIPLE_HOLDERS",
-                        "multipleHolders",
                         "ONE_USER_ALL_DEVICES",
-                        "oneUserAllDevices",
                         "ONE_USER_ONE_DEVICE",
+                        "multipleHolders",
+                        "oneUserAllDevices",
                         "oneUserOneDevice"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        true,
+                        true
+                    ],
                     "enumDescriptions": [
-                        "",
-                        "Multiple users on multiple devices are allowed.",
+                        "Unspecified preference.",
+                        "The Pass object is shareable by a user and can be saved by any number of different users, and on any number of devices. Partners typically use this setup for passes that do not need to be restricted to a single user or pinned to a single device.",
+                        "An object can only be saved by one user, but this user can view and use it on multiple of their devices. Once the first user saves the object, no other user will be allowed to view or save it.",
+                        "An object can only be saved by one user on a single device. Intended for use by select partners in limited circumstances. An example use case is a transit ticket that should be \"device pinned\", meaning it can be saved, viewed and used only by a single user on a single device. Contact support for additional information.",
                         "Legacy alias for `MULTIPLE_HOLDERS`. Deprecated.",
-                        "One user on multiple devices is allowed.",
                         "Legacy alias for `ONE_USER_ALL_DEVICES`. Deprecated.",
-                        "Intended for use by select partners in limited circumstances. Contact support for additional information.",
                         "Legacy alias for `ONE_USER_ONE_DEVICE`. Deprecated."
                     ],
                     "type": "string"
@@ -5186,6 +5594,17 @@
                         "DRAFT",
                         "draft"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "",
@@ -5211,6 +5630,7 @@
                     "type": "array"
                 },
                 "version": {
+                    "deprecated": true,
                     "description": "Deprecated",
                     "format": "int64",
                     "type": "string"
@@ -5229,8 +5649,13 @@
                     ],
                     "type": "string"
                 },
+                "wideProgramLogo": {
+                    "$ref": "Image",
+                    "description": "The wide logo of the gift card program or company. When provided, this will be used in place of the program logo in the top left of the card view."
+                },
                 "wordMark": {
                     "$ref": "Image",
+                    "deprecated": true,
                     "description": "Deprecated."
                 }
             },
@@ -5334,6 +5759,7 @@
                     "description": "Deprecated. Use textModulesData instead."
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#giftCardObject\"`.",
                     "type": "string"
                 },
@@ -5354,6 +5780,10 @@
                         "$ref": "Message"
                     },
                     "type": "array"
+                },
+                "passConstraints": {
+                    "$ref": "PassConstraints",
+                    "description": "Pass constraints for the object. Includes limiting NFC and screenshot behaviors."
                 },
                 "pin": {
                     "description": "The card's PIN.",
@@ -5380,6 +5810,17 @@
                         "INACTIVE",
                         "inactive"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "Object is active and displayed to with other active objects.",
@@ -5405,6 +5846,7 @@
                     "description": "The time period this object will be `active` and object can be used. An object's state will be changed to `expired` when this time period has passed."
                 },
                 "version": {
+                    "deprecated": true,
                     "description": "Deprecated",
                     "format": "int64",
                     "type": "string"
@@ -5455,7 +5897,7 @@
             "type": "object"
         },
         "Image": {
-            "description": "Wrapping type for Google hosted images.",
+            "description": "Wrapping type for Google hosted images. Next ID: 7",
             "id": "Image",
             "properties": {
                 "contentDescription": {
@@ -5463,6 +5905,7 @@
                     "description": "Description of the image used for accessibility."
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#image\"`.",
                     "type": "string"
                 },
@@ -5491,11 +5934,13 @@
             "id": "ImageUri",
             "properties": {
                 "description": {
+                    "deprecated": true,
                     "description": "Additional information about the image, which is unused and retained only for backward compatibility.",
                     "type": "string"
                 },
                 "localizedDescription": {
                     "$ref": "LocalizedString",
+                    "deprecated": true,
                     "description": "Translated strings for the description, which are unused and retained only for backward compatibility."
                 },
                 "uri": {
@@ -5516,6 +5961,7 @@
                     "type": "array"
                 },
                 "showLastUpdateTime": {
+                    "deprecated": true,
                     "type": "boolean"
                 }
             },
@@ -5524,6 +5970,10 @@
         "Issuer": {
             "id": "Issuer",
             "properties": {
+                "callbackOptions": {
+                    "$ref": "CallbackOptions",
+                    "description": "Allows the issuer to provide their callback settings."
+                },
                 "contactInfo": {
                     "$ref": "IssuerContactInfo",
                     "description": "Issuer contact information."
@@ -5597,6 +6047,13 @@
                         "SIGN_UP",
                         "signUp"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "",
@@ -5638,7 +6095,7 @@
             "id": "JwtResource",
             "properties": {
                 "jwt": {
-                    "description": "A string representing a JWT of the format described at https://developers.google.com/pay/passes/reference/s2w-reference#google-pay-api-for-passes-jwt",
+                    "description": "A string representing a JWT of the format described at https://developers.google.com/wallet/reference/rest/v1/Jwt",
                     "type": "string"
                 }
             },
@@ -5684,6 +6141,7 @@
             "id": "LatLongPoint",
             "properties": {
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#latLongPoint\"`.",
                     "type": "string"
                 },
@@ -5718,15 +6176,16 @@
             "properties": {
                 "firstRowOption": {
                     "$ref": "FirstRowOption",
-                    "description": "Specifies from a predefined set of options or from a reference to the field what will be displayed in the first row."
+                    "description": "Specifies from a predefined set of options or from a reference to the field what will be displayed in the first row. To set this override, set the FirstRowOption.fieldOption to the FieldSelector of your choice."
                 },
                 "secondRowOption": {
                     "$ref": "FieldSelector",
-                    "description": "A reference to the field to be displayed in the second row. This option is only displayed if there are not multiple user objects in a group. If there is a group, the second row will always display a field shared by all objects."
+                    "description": "A reference to the field to be displayed in the second row. This option is only displayed if there are not multiple user objects in a group. If there is a group, the second row will always display a field shared by all objects. To set this override, please set secondRowOption to the FieldSelector of you choice."
                 },
                 "thirdRowOption": {
                     "$ref": "FieldSelector",
-                    "description": "A reference to the field to be displayed in the third row. This option is only displayed if there are not multiple user objects in a group. If there is a group, the third row will always display the number of objects in the group. Eg: \"3 passes\""
+                    "deprecated": true,
+                    "description": "An unused/deprecated field. Setting it will have no effect on what the user sees."
                 }
             },
             "type": "object"
@@ -5739,6 +6198,7 @@
                     "description": "Contains the string to be displayed if no appropriate translation is available."
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#localizedString\"`.",
                     "type": "string"
                 },
@@ -5764,6 +6224,7 @@
                     "type": "string"
                 },
                 "allowMultipleUsersPerObject": {
+                    "deprecated": true,
                     "description": "Deprecated. Use `multipleDevicesAndHoldersAllowedStatus` instead.",
                     "type": "boolean"
                 },
@@ -5812,6 +6273,7 @@
                 },
                 "infoModuleData": {
                     "$ref": "InfoModuleData",
+                    "deprecated": true,
                     "description": "Deprecated. Use textModulesData instead."
                 },
                 "issuerName": {
@@ -5819,6 +6281,7 @@
                     "type": "string"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#loyaltyClass\"`.",
                     "type": "string"
                 },
@@ -5877,19 +6340,28 @@
                     "enum": [
                         "STATUS_UNSPECIFIED",
                         "MULTIPLE_HOLDERS",
-                        "multipleHolders",
                         "ONE_USER_ALL_DEVICES",
-                        "oneUserAllDevices",
                         "ONE_USER_ONE_DEVICE",
+                        "multipleHolders",
+                        "oneUserAllDevices",
                         "oneUserOneDevice"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        true,
+                        true
+                    ],
                     "enumDescriptions": [
-                        "",
-                        "Multiple users on multiple devices are allowed.",
+                        "Unspecified preference.",
+                        "The Pass object is shareable by a user and can be saved by any number of different users, and on any number of devices. Partners typically use this setup for passes that do not need to be restricted to a single user or pinned to a single device.",
+                        "An object can only be saved by one user, but this user can view and use it on multiple of their devices. Once the first user saves the object, no other user will be allowed to view or save it.",
+                        "An object can only be saved by one user on a single device. Intended for use by select partners in limited circumstances. An example use case is a transit ticket that should be \"device pinned\", meaning it can be saved, viewed and used only by a single user on a single device. Contact support for additional information.",
                         "Legacy alias for `MULTIPLE_HOLDERS`. Deprecated.",
-                        "One user on multiple devices is allowed.",
                         "Legacy alias for `ONE_USER_ALL_DEVICES`. Deprecated.",
-                        "Intended for use by select partners in limited circumstances. Contact support for additional information.",
                         "Legacy alias for `ONE_USER_ONE_DEVICE`. Deprecated."
                     ],
                     "type": "string"
@@ -5926,6 +6398,17 @@
                         "rejected",
                         "DRAFT",
                         "draft"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -5968,6 +6451,7 @@
                     "type": "array"
                 },
                 "version": {
+                    "deprecated": true,
                     "description": "Deprecated",
                     "format": "int64",
                     "type": "string"
@@ -5986,8 +6470,13 @@
                     ],
                     "type": "string"
                 },
+                "wideProgramLogo": {
+                    "$ref": "Image",
+                    "description": "The wide logo of the loyalty program or company. When provided, this will be used in place of the program logo in the top left of the card view."
+                },
                 "wordMark": {
                     "$ref": "Image",
+                    "deprecated": true,
                     "description": "Deprecated."
                 }
             },
@@ -6083,6 +6572,7 @@
                     "description": "Deprecated. Use textModulesData instead."
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#loyaltyObject\"`.",
                     "type": "string"
                 },
@@ -6115,6 +6605,10 @@
                     },
                     "type": "array"
                 },
+                "passConstraints": {
+                    "$ref": "PassConstraints",
+                    "description": "Pass constraints for the object. Includes limiting NFC and screenshot behaviors."
+                },
                 "rotatingBarcode": {
                     "$ref": "RotatingBarcode",
                     "description": "The rotating barcode type and value."
@@ -6139,6 +6633,17 @@
                         "expired",
                         "INACTIVE",
                         "inactive"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -6165,6 +6670,7 @@
                     "description": "The time period this object will be `active` and object can be used. An object's state will be changed to `expired` when this time period has passed."
                 },
                 "version": {
+                    "deprecated": true,
                     "description": "Deprecated",
                     "format": "int64",
                     "type": "string"
@@ -6246,15 +6752,18 @@
             "id": "Media",
             "properties": {
                 "algorithm": {
+                    "deprecated": true,
                     "description": "Deprecated, use one of explicit hash type fields instead. Algorithm used for calculating the hash. As of 2011/01/21, \"MD5\" is the only possible value for this field. New values may be added at any time.",
                     "type": "string"
                 },
                 "bigstoreObjectRef": {
+                    "deprecated": true,
                     "description": "Use object_id instead.",
                     "format": "byte",
                     "type": "string"
                 },
                 "blobRef": {
+                    "deprecated": true,
                     "description": "Blobstore v1 reference, set if reference_type is BLOBSTORE_REF This should be the byte representation of a blobstore.BlobRef. Since Blobstore is deprecating v1, use blobstore2_info instead. For now, any v2 blob will also be represented in this field as v1 BlobRef.",
                     "format": "byte",
                     "type": "string"
@@ -6317,6 +6826,7 @@
                     "type": "string"
                 },
                 "hash": {
+                    "deprecated": true,
                     "description": "Deprecated, use one of explicit hash type fields instead. These two hash related fields will only be populated on Scotty based media uploads and will contain the content of the hash group in the NotificationRequest: http://cs/#google3/uploader/service/proto/upload_listener.proto&q=class:Hash Hex encoded hash value of the uploaded media.",
                     "type": "string"
                 },
@@ -6456,6 +6966,11 @@
                     "description": "The Scotty request ID.",
                     "type": "string"
                 },
+                "requestReceivedParamsServingInfo": {
+                    "description": "The partition of the Scotty server handling this request. type is uploader_service.RequestReceivedParamsServingInfo LINT.IfChange(request_received_params_serving_info_annotations) LINT.ThenChange()",
+                    "format": "byte",
+                    "type": "string"
+                },
                 "totalBytes": {
                     "description": "The total size of the file.",
                     "format": "int64",
@@ -6489,6 +7004,7 @@
                     "type": "string"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#walletObjectMessage\"`.",
                     "type": "string"
                 },
@@ -6501,13 +7017,20 @@
                     "description": "Translated strings for the message header."
                 },
                 "messageType": {
-                    "description": "The type of the message. Currently, this can only be set for offers.",
+                    "description": "The message type.",
                     "enum": [
                         "MESSAGE_TYPE_UNSPECIFIED",
                         "TEXT",
                         "text",
                         "EXPIRATION_NOTIFICATION",
                         "expirationNotification"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -6559,6 +7082,7 @@
                     "type": "string"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#money\"`.",
                     "type": "string"
                 },
@@ -6609,6 +7133,7 @@
             "id": "OfferClass",
             "properties": {
                 "allowMultipleUsersPerObject": {
+                    "deprecated": true,
                     "description": "Deprecated. Use `multipleDevicesAndHoldersAllowedStatus` instead.",
                     "type": "boolean"
                 },
@@ -6665,6 +7190,7 @@
                 },
                 "infoModuleData": {
                     "$ref": "InfoModuleData",
+                    "deprecated": true,
                     "description": "Deprecated. Use textModulesData instead."
                 },
                 "issuerName": {
@@ -6672,6 +7198,7 @@
                     "type": "string"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#offerClass\"`.",
                     "type": "string"
                 },
@@ -6722,19 +7249,28 @@
                     "enum": [
                         "STATUS_UNSPECIFIED",
                         "MULTIPLE_HOLDERS",
-                        "multipleHolders",
                         "ONE_USER_ALL_DEVICES",
-                        "oneUserAllDevices",
                         "ONE_USER_ONE_DEVICE",
+                        "multipleHolders",
+                        "oneUserAllDevices",
                         "oneUserOneDevice"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        true,
+                        true
+                    ],
                     "enumDescriptions": [
-                        "",
-                        "Multiple users on multiple devices are allowed.",
+                        "Unspecified preference.",
+                        "The Pass object is shareable by a user and can be saved by any number of different users, and on any number of devices. Partners typically use this setup for passes that do not need to be restricted to a single user or pinned to a single device.",
+                        "An object can only be saved by one user, but this user can view and use it on multiple of their devices. Once the first user saves the object, no other user will be allowed to view or save it.",
+                        "An object can only be saved by one user on a single device. Intended for use by select partners in limited circumstances. An example use case is a transit ticket that should be \"device pinned\", meaning it can be saved, viewed and used only by a single user on a single device. Contact support for additional information.",
                         "Legacy alias for `MULTIPLE_HOLDERS`. Deprecated.",
-                        "One user on multiple devices is allowed.",
                         "Legacy alias for `ONE_USER_ALL_DEVICES`. Deprecated.",
-                        "Intended for use by select partners in limited circumstances. Contact support for additional information.",
                         "Legacy alias for `ONE_USER_ONE_DEVICE`. Deprecated."
                     ],
                     "type": "string"
@@ -6755,6 +7291,17 @@
                         "both",
                         "TEMPORARY_PRICE_REDUCTION",
                         "temporaryPriceReduction"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -6794,6 +7341,17 @@
                         "DRAFT",
                         "draft"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "",
@@ -6831,6 +7389,7 @@
                     "description": "The title image of the offer. This image is displayed in both the details and list views of the app."
                 },
                 "version": {
+                    "deprecated": true,
                     "description": "Deprecated",
                     "format": "int64",
                     "type": "string"
@@ -6849,8 +7408,13 @@
                     ],
                     "type": "string"
                 },
+                "wideTitleImage": {
+                    "$ref": "Image",
+                    "description": "The wide title image of the offer. When provided, this will be used in place of the title image in the top left of the card view."
+                },
                 "wordMark": {
                     "$ref": "Image",
+                    "deprecated": true,
                     "description": "Deprecated."
                 }
             },
@@ -6938,6 +7502,7 @@
                     "description": "Deprecated. Use textModulesData instead."
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#offerObject\"`.",
                     "type": "string"
                 },
@@ -6959,6 +7524,10 @@
                     },
                     "type": "array"
                 },
+                "passConstraints": {
+                    "$ref": "PassConstraints",
+                    "description": "Pass constraints for the object. Includes limiting NFC and screenshot behaviors."
+                },
                 "rotatingBarcode": {
                     "$ref": "RotatingBarcode",
                     "description": "The rotating barcode type and value."
@@ -6979,6 +7548,17 @@
                         "expired",
                         "INACTIVE",
                         "inactive"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -7005,6 +7585,7 @@
                     "description": "The time period this object will be `active` and object can be used. An object's state will be changed to `expired` when this time period has passed."
                 },
                 "version": {
+                    "deprecated": true,
                     "description": "Deprecated",
                     "format": "int64",
                     "type": "string"
@@ -7043,6 +7624,7 @@
             "id": "Pagination",
             "properties": {
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#pagination\"`.",
                     "type": "string"
                 },
@@ -7054,6 +7636,44 @@
                     "description": "Number of results returned in this page.",
                     "format": "int32",
                     "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "PassConstraints": {
+            "description": "Container for any constraints that may be placed on passes.",
+            "id": "PassConstraints",
+            "properties": {
+                "nfcConstraint": {
+                    "description": "The NFC constraints for the pass.",
+                    "items": {
+                        "enum": [
+                            "NFC_CONSTRAINT_UNSPECIFIED",
+                            "BLOCK_PAYMENT",
+                            "BLOCK_CLOSED_LOOP_TRANSIT"
+                        ],
+                        "enumDescriptions": [
+                            "Default value, no specified constraint.",
+                            "Payment cards will not be conveyed while the pass is open.",
+                            "Closed loop transit cards will not be conveyed while the pass is open."
+                        ],
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "screenshotEligibility": {
+                    "description": "The screenshot eligibility for the pass.",
+                    "enum": [
+                        "SCREENSHOT_ELIGIBILITY_UNSPECIFIED",
+                        "ELIGIBLE",
+                        "INELIGIBLE"
+                    ],
+                    "enumDescriptions": [
+                        "Default value, same as ELIGIBLE.",
+                        "Default behavior for all existing Passes if ScreenshotEligibility is not set. Allows screenshots to be taken on Android devices.",
+                        "Disallows screenshots to be taken on Android devices. Note that older versions of Wallet may still allow screenshots to be taken."
+                    ],
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -7075,6 +7695,15 @@
                         "reader",
                         "WRITER",
                         "writer"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -7104,36 +7733,6 @@
                         "$ref": "Permission"
                     },
                     "type": "array"
-                }
-            },
-            "type": "object"
-        },
-        "PrivateText": {
-            "description": "Private data for TextModule. This data will be rendered as a TextModule for a pass.",
-            "id": "PrivateText",
-            "properties": {
-                "body": {
-                    "$ref": "LocalizedString",
-                    "description": "Translated strings for the body."
-                },
-                "header": {
-                    "$ref": "LocalizedString",
-                    "description": "Translated strings for the header."
-                }
-            },
-            "type": "object"
-        },
-        "PrivateUri": {
-            "description": "Private data for LinkModule. This data will be rendered as the LinkModule for a pass.",
-            "id": "PrivateUri",
-            "properties": {
-                "description": {
-                    "$ref": "LocalizedString",
-                    "description": "The URI's title appearing in the app as text and its translated strings. Recommended maximum is 20 characters to ensure the full string is displayed on smaller screens."
-                },
-                "uri": {
-                    "description": "The location of a web page, image, or other resource. URIs in the `LinksModuleData` can have different prefixes indicating the type of URI (a link to a web page, a link to a map, a telephone number, or an email address).",
-                    "type": "string"
                 }
             },
             "type": "object"
@@ -7180,6 +7779,7 @@
                     "description": "Frequent flyer membership information."
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#reservationInfo\"`.",
                     "type": "string"
                 }
@@ -7280,6 +7880,10 @@
                     "description": "An optional text that will override the default text that shows under the barcode. This field is intended for a human readable equivalent of the barcode value, used when the barcode cannot be scanned.",
                     "type": "string"
                 },
+                "initialRotatingBarcodeValues": {
+                    "$ref": "RotatingBarcodeValues",
+                    "description": "Input only. NOTE: This feature is only available for the transit vertical. Optional set of initial rotating barcode values. This allows a small subset of barcodes to be included with the object. Further rotating barcode values must be uploaded with the UploadRotatingBarcodeValues endpoint."
+                },
                 "renderEncoding": {
                     "description": "The render encoding for the barcode. When specified, barcode is rendered in the given encoding. Otherwise best known encoding is chosen by Google.",
                     "enum": [
@@ -7331,6 +7935,36 @@
                         "upcA",
                         "TEXT_ONLY",
                         "textOnly"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        true,
+                        false,
+                        true,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -7418,6 +8052,29 @@
             },
             "type": "object"
         },
+        "RotatingBarcodeValues": {
+            "description": "A payload containing many barcode values and start date/time.",
+            "id": "RotatingBarcodeValues",
+            "properties": {
+                "periodMillis": {
+                    "description": "Required. The amount of time each barcode is valid for.",
+                    "format": "int64",
+                    "type": "string"
+                },
+                "startDateTime": {
+                    "description": "Required. The date/time the first barcode is valid from. Barcodes will be rotated through using period_millis defined on the object's RotatingBarcodeValueInfo. This is an ISO 8601 extended format date/time, with an offset. Time may be specified up to nanosecond precision. Offsets may be specified with seconds precision (even though offset seconds is not part of ISO 8601). For example: `1985-04-12T23:20:50.52Z` would be 20 minutes and 50.52 seconds after the 23rd hour of April 12th, 1985 in UTC. `1985-04-12T19:20:50.52-04:00` would be 20 minutes and 50.52 seconds after the 19th hour of April 12th, 1985, 4 hours before UTC (same instant in time as the above example). If the event were in New York, this would be the equivalent of Eastern Daylight Time (EDT). Remember that offset varies in regions that observe Daylight Saving Time (or Summer Time), depending on the time of the year.",
+                    "type": "string"
+                },
+                "values": {
+                    "description": "Required. The values to encode in the barcode. At least one value is required.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "SecurityAnimation": {
             "id": "SecurityAnimation",
             "properties": {
@@ -7427,6 +8084,11 @@
                         "ANIMATION_UNSPECIFIED",
                         "FOIL_SHIMMER",
                         "foilShimmer"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -7463,6 +8125,7 @@
                     "type": "array"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#smartTap\"`.",
                     "type": "string"
                 },
@@ -7507,6 +8170,13 @@
                         "frequentFlyerProgramNameAndNumber",
                         "FLIGHT_NUMBER_AND_OPERATING_FLIGHT_NUMBER",
                         "flightNumberAndOperatingFlightNumber"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -7678,6 +8348,15 @@
                         "BUSINESS",
                         "business"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "",
@@ -7708,6 +8387,7 @@
                     "description": "End time of the interval. Offset is not required. If an offset is provided and `start` time is set, `start` must also include an offset."
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#timeInterval\"`.",
                     "type": "string"
                 },
@@ -7726,6 +8406,7 @@
                     "description": "Activation options for an activatable ticket."
                 },
                 "allowMultipleUsersPerObject": {
+                    "deprecated": true,
                     "description": "Deprecated. Use `multipleDevicesAndHoldersAllowedStatus` instead.",
                     "type": "boolean"
                 },
@@ -7850,6 +8531,7 @@
                 },
                 "infoModuleData": {
                     "$ref": "InfoModuleData",
+                    "deprecated": true,
                     "description": "Deprecated. Use textModulesData instead."
                 },
                 "issuerName": {
@@ -7891,19 +8573,28 @@
                     "enum": [
                         "STATUS_UNSPECIFIED",
                         "MULTIPLE_HOLDERS",
-                        "multipleHolders",
                         "ONE_USER_ALL_DEVICES",
-                        "oneUserAllDevices",
                         "ONE_USER_ONE_DEVICE",
+                        "multipleHolders",
+                        "oneUserAllDevices",
                         "oneUserOneDevice"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        false,
+                        false,
+                        true,
+                        true,
+                        true
+                    ],
                     "enumDescriptions": [
-                        "",
-                        "Multiple users on multiple devices are allowed.",
+                        "Unspecified preference.",
+                        "The Pass object is shareable by a user and can be saved by any number of different users, and on any number of devices. Partners typically use this setup for passes that do not need to be restricted to a single user or pinned to a single device.",
+                        "An object can only be saved by one user, but this user can view and use it on multiple of their devices. Once the first user saves the object, no other user will be allowed to view or save it.",
+                        "An object can only be saved by one user on a single device. Intended for use by select partners in limited circumstances. An example use case is a transit ticket that should be \"device pinned\", meaning it can be saved, viewed and used only by a single user on a single device. Contact support for additional information.",
                         "Legacy alias for `MULTIPLE_HOLDERS`. Deprecated.",
-                        "One user on multiple devices is allowed.",
                         "Legacy alias for `ONE_USER_ALL_DEVICES`. Deprecated.",
-                        "Intended for use by select partners in limited circumstances. Contact support for additional information.",
                         "Legacy alias for `ONE_USER_ONE_DEVICE`. Deprecated."
                     ],
                     "type": "string"
@@ -7932,6 +8623,17 @@
                         "rejected",
                         "DRAFT",
                         "draft"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -7976,6 +8678,19 @@
                         "OTHER",
                         "other"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "",
@@ -7992,6 +8707,7 @@
                     "type": "string"
                 },
                 "version": {
+                    "deprecated": true,
                     "description": "Deprecated",
                     "format": "int64",
                     "type": "string"
@@ -8014,8 +8730,13 @@
                     "$ref": "Image",
                     "description": "Watermark image to display on the user's device."
                 },
+                "wideLogo": {
+                    "$ref": "Image",
+                    "description": "The wide logo of the ticket. When provided, this will be used in place of the logo in the top left of the card view."
+                },
                 "wordMark": {
                     "$ref": "Image",
+                    "deprecated": true,
                     "description": "Deprecated."
                 }
             },
@@ -8081,6 +8802,15 @@
                         "child",
                         "SENIOR",
                         "senior"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -8162,6 +8892,10 @@
                     },
                     "type": "array"
                 },
+                "passConstraints": {
+                    "$ref": "PassConstraints",
+                    "description": "Pass constraints for the object. Includes limiting NFC and screenshot behaviors."
+                },
                 "passengerNames": {
                     "description": "The name(s) of the passengers the ticket is assigned to. The above `passengerType` field is meant to give Google context on this field.",
                     "type": "string"
@@ -8174,6 +8908,13 @@
                         "singlePassenger",
                         "MULTIPLE_PASSENGERS",
                         "multiplePassengers"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -8208,6 +8949,17 @@
                         "expired",
                         "INACTIVE",
                         "inactive"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
                     ],
                     "enumDescriptions": [
                         "",
@@ -8259,6 +9011,15 @@
                         "EXCHANGED",
                         "exchanged"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "",
@@ -8283,6 +9044,13 @@
                         "ONE_WAY",
                         "oneWay"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        true,
+                        false,
+                        true
+                    ],
                     "enumDescriptions": [
                         "",
                         "",
@@ -8297,6 +9065,7 @@
                     "description": "The time period this object will be `active` and object can be used. An object's state will be changed to `expired` when this time period has passed."
                 },
                 "version": {
+                    "deprecated": true,
                     "description": "Deprecated",
                     "format": "int64",
                     "type": "string"
@@ -8331,10 +9100,32 @@
             },
             "type": "object"
         },
+        "TransitObjectUploadRotatingBarcodeValuesRequest": {
+            "description": "Request to upload rotating barcode values.",
+            "id": "TransitObjectUploadRotatingBarcodeValuesRequest",
+            "properties": {
+                "blob": {
+                    "$ref": "Media",
+                    "description": "A reference to the rotating barcode values payload that was uploaded."
+                },
+                "mediaRequestInfo": {
+                    "$ref": "MediaRequestInfo",
+                    "description": "Extra information about the uploaded media."
+                }
+            },
+            "type": "object"
+        },
+        "TransitObjectUploadRotatingBarcodeValuesResponse": {
+            "description": "Response for uploading rotating barcode values.",
+            "id": "TransitObjectUploadRotatingBarcodeValuesResponse",
+            "properties": {},
+            "type": "object"
+        },
         "TranslatedString": {
             "id": "TranslatedString",
             "properties": {
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#translatedString\"`.",
                     "type": "string"
                 },
@@ -8350,71 +9141,12 @@
             "type": "object"
         },
         "UpcomingNotification": {
-            "description": "Indicates that the issuer would like GooglePay send an upcoming card validity notification 1 day before card becomes valid/usable.",
+            "description": "Indicates that the issuer would like Google Wallet to send an upcoming card validity notification 1 day before card becomes valid/usable.",
             "id": "UpcomingNotification",
             "properties": {
                 "enableNotification": {
                     "description": "Indicates if the object needs to have upcoming notification enabled.",
                     "type": "boolean"
-                }
-            },
-            "type": "object"
-        },
-        "UploadPrivateDataRequest": {
-            "description": "Request for sending user private Text or URI by the Issuer.",
-            "id": "UploadPrivateDataRequest",
-            "properties": {
-                "issuerId": {
-                    "description": "The ID of the issuer sending the data.",
-                    "format": "int64",
-                    "type": "string"
-                },
-                "text": {
-                    "$ref": "PrivateText",
-                    "description": "Private text data of the user."
-                },
-                "uri": {
-                    "$ref": "PrivateUri",
-                    "description": "Private URIs of the user."
-                }
-            },
-            "type": "object"
-        },
-        "UploadPrivateDataResponse": {
-            "description": "Response for uploading user private data (text or URIs)",
-            "id": "UploadPrivateDataResponse",
-            "properties": {
-                "privateContentId": {
-                    "description": "A 64-bit content id for the private data that was uploaded by the Issuer.",
-                    "format": "int64",
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
-        "UploadPrivateImageRequest": {
-            "description": "Request to upload user's private images by Issuers to be used in passes.",
-            "id": "UploadPrivateImageRequest",
-            "properties": {
-                "blob": {
-                    "$ref": "Media",
-                    "description": "A reference to the image payload that was uploaded by Scotty."
-                },
-                "mediaRequestInfo": {
-                    "$ref": "MediaRequestInfo",
-                    "description": "Extra information about the uploaded media."
-                }
-            },
-            "type": "object"
-        },
-        "UploadPrivateImageResponse": {
-            "description": "Response for uploading the private image",
-            "id": "UploadPrivateImageResponse",
-            "properties": {
-                "privateContentId": {
-                    "description": "A 64-bit content id for the image that was uploaded by the Issuer.",
-                    "format": "int64",
-                    "type": "string"
                 }
             },
             "type": "object"
@@ -8431,6 +9163,7 @@
                     "type": "string"
                 },
                 "kind": {
+                    "deprecated": true,
                     "description": "Identifies what kind of resource this is. Value: the fixed string `\"walletobjects#uri\"`.",
                     "type": "string"
                 },
@@ -8447,6 +9180,6 @@
         }
     },
     "servicePath": "",
-    "title": "Google Pay Passes API",
+    "title": "Google Wallet API",
     "version": "v1"
 }

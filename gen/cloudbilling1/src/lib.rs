@@ -2,17 +2,19 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Cloudbilling* crate version *5.0.3+20221206*, where *20221206* is the exact revision of the *cloudbilling:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Cloudbilling* crate version *5.0.4+20240214*, where *20240214* is the exact revision of the *cloudbilling:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Cloudbilling* *v1* API can be found at the
-//! [official documentation site](https://cloud.google.com/billing/).
+//! [official documentation site](https://cloud.google.com/billing/docs/apis).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/cloudbilling1).
 //! # Features
 //! 
 //! Handle the following *Resources* with ease from the central [hub](Cloudbilling) ... 
 //! 
 //! * [billing accounts](api::BillingAccount)
-//!  * [*create*](api::BillingAccountCreateCall), [*get*](api::BillingAccountGetCall), [*get iam policy*](api::BillingAccountGetIamPolicyCall), [*list*](api::BillingAccountListCall), [*patch*](api::BillingAccountPatchCall), [*projects list*](api::BillingAccountProjectListCall), [*set iam policy*](api::BillingAccountSetIamPolicyCall) and [*test iam permissions*](api::BillingAccountTestIamPermissionCall)
+//!  * [*create*](api::BillingAccountCreateCall), [*get*](api::BillingAccountGetCall), [*get iam policy*](api::BillingAccountGetIamPolicyCall), [*list*](api::BillingAccountListCall), [*move*](api::BillingAccountMoveCall), [*patch*](api::BillingAccountPatchCall), [*projects list*](api::BillingAccountProjectListCall), [*set iam policy*](api::BillingAccountSetIamPolicyCall), [*sub accounts create*](api::BillingAccountSubAccountCreateCall), [*sub accounts list*](api::BillingAccountSubAccountListCall) and [*test iam permissions*](api::BillingAccountTestIamPermissionCall)
+//! * organizations
+//!  * [*billing accounts create*](api::OrganizationBillingAccountCreateCall), [*billing accounts list*](api::OrganizationBillingAccountListCall) and [*billing accounts move*](api::OrganizationBillingAccountMoveCall)
 //! * projects
 //!  * [*get billing info*](api::ProjectGetBillingInfoCall) and [*update billing info*](api::ProjectUpdateBillingInfoCall)
 //! * [services](api::Service)
@@ -52,13 +54,18 @@
 //! 
 //! ```ignore
 //! let r = hub.billing_accounts().projects_list(...).doit().await
+//! let r = hub.billing_accounts().sub_accounts_create(...).doit().await
+//! let r = hub.billing_accounts().sub_accounts_list(...).doit().await
 //! let r = hub.billing_accounts().create(...).doit().await
 //! let r = hub.billing_accounts().get(...).doit().await
 //! let r = hub.billing_accounts().get_iam_policy(...).doit().await
 //! let r = hub.billing_accounts().list(...).doit().await
+//! let r = hub.billing_accounts().move_(...).doit().await
 //! let r = hub.billing_accounts().patch(...).doit().await
 //! let r = hub.billing_accounts().set_iam_policy(...).doit().await
 //! let r = hub.billing_accounts().test_iam_permissions(...).doit().await
+//! let r = hub.organizations().billing_accounts_create(...).doit().await
+//! let r = hub.organizations().billing_accounts_move(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -106,9 +113,10 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.billing_accounts().projects_list("name")
-//!              .page_token("voluptua.")
-//!              .page_size(-27)
+//! let result = hub.billing_accounts().sub_accounts_list("parent")
+//!              .page_token("At")
+//!              .page_size(-8)
+//!              .filter("sed")
 //!              .doit().await;
 //! 
 //! match result {

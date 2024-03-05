@@ -4,7 +4,7 @@
 [package]
 
 name = "google-jobs4-cli"
-version = "5.0.3+20230120"
+version = "5.0.4+20240202"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Talent Solution (protocol v4)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/jobs4-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-jobs4]
 path = "../jobs4"
-version = "5.0.3+20230120"
+version = "5.0.4+20240202"
 

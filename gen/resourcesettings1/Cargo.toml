@@ -4,12 +4,12 @@
 [package]
 
 name = "google-resourcesettings1"
-version = "5.0.3+20230123"
+version = "5.0.4+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Resource Settings (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/resourcesettings1"
 homepage = "https://cloud.google.com/resource-manager/docs/resource-settings/overview"
-documentation = "https://docs.rs/google-resourcesettings1/5.0.3+20230123"
+documentation = "https://docs.rs/google-resourcesettings1/5.0.4+20240303"
 license = "MIT"
 keywords = ["resourcesettings", "google", "protocol", "web", "api"]
 autobins = false

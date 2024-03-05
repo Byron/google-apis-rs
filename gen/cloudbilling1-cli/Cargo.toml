@@ -4,11 +4,11 @@
 [package]
 
 name = "google-cloudbilling1-cli"
-version = "5.0.3+20221206"
+version = "5.0.4+20240214"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloudbilling (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudbilling1-cli"
-homepage = "https://cloud.google.com/billing/"
+homepage = "https://cloud.google.com/billing/docs/apis"
 documentation = "http://byron.github.io/google-apis-rs/google_cloudbilling1_cli"
 license = "MIT"
 keywords = ["cloudbilling", "google", "cli"]
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-cloudbilling1]
 path = "../cloudbilling1"
-version = "5.0.3+20221206"
+version = "5.0.4+20240214"
 

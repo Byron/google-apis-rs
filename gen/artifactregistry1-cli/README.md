@@ -25,13 +25,14 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Artifact Registry* API at revision *20230113*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Artifact Registry* API at revision *20240213*. The CLI is at version *5.0.4*.
 
 ```bash
 artifactregistry1 [options]
         projects
                 get-project-settings <name> [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
+                locations-get-vpcsc-config <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-repositories-apt-artifacts-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -44,6 +45,9 @@ artifactregistry1 [options]
                 locations-repositories-files-list <parent> [-p <v>]... [-o <out>]
                 locations-repositories-get <name> [-p <v>]... [-o <out>]
                 locations-repositories-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-repositories-go-modules-upload <parent> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                locations-repositories-googet-artifacts-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-repositories-googet-artifacts-upload <parent> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 locations-repositories-kfp-artifacts-upload <parent> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
                 locations-repositories-list <parent> [-p <v>]... [-o <out>]
                 locations-repositories-maven-artifacts-get <name> [-p <v>]... [-o <out>]
@@ -58,6 +62,7 @@ artifactregistry1 [options]
                 locations-repositories-packages-tags-get <name> [-p <v>]... [-o <out>]
                 locations-repositories-packages-tags-list <parent> [-p <v>]... [-o <out>]
                 locations-repositories-packages-tags-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-repositories-packages-versions-batch-delete <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-repositories-packages-versions-delete <name> [-p <v>]... [-o <out>]
                 locations-repositories-packages-versions-get <name> [-p <v>]... [-o <out>]
                 locations-repositories-packages-versions-list <parent> [-p <v>]... [-o <out>]
@@ -68,6 +73,7 @@ artifactregistry1 [options]
                 locations-repositories-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-repositories-yum-artifacts-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-repositories-yum-artifacts-upload <parent> (-r <kv>)... (-u simple -f <file> [-m <mime>]) [-p <v>]... [-o <out>]
+                locations-update-vpcsc-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 update-project-settings <name> (-r <kv>)... [-p <v>]... [-o <out>]
   artifactregistry1 --help
 

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-recommendationengine1_beta1-cli"
-version = "5.0.3+20230105"
+version = "5.0.4+20240229"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Recommendations AI (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/recommendationengine1_beta1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-recommendationengine1_beta1]
 path = "../recommendationengine1_beta1"
-version = "5.0.3+20230105"
+version = "5.0.4+20240229"
 

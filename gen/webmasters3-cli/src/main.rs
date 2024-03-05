@@ -863,7 +863,7 @@ async fn main() {
     
     let mut app = App::new("webmasters3")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20190428")
+           .version("5.0.4+20190428")
            .about("View Google Search Console data for your verified sites.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_webmasters3_cli")
            .arg(Arg::with_name("url")

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Dfareporting* crate version *5.0.3+20230118*, where *20230118* is the exact revision of the *dfareporting:v3.5* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Dfareporting* crate version *5.0.4+20240201*, where *20240201* is the exact revision of the *dfareporting:v3.5* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Dfareporting* *v3d5* API can be found at the
 //! [official documentation site](https://developers.google.com/doubleclick-advertisers/).
@@ -11,136 +11,13 @@
 //! 
 //! Handle the following *Resources* with ease from the central [hub](Dfareporting) ... 
 //! 
-//! * [account active ad summaries](api::AccountActiveAdSummary)
-//!  * [*get*](api::AccountActiveAdSummaryGetCall)
-//! * [account permission groups](api::AccountPermissionGroup)
-//!  * [*get*](api::AccountPermissionGroupGetCall) and [*list*](api::AccountPermissionGroupListCall)
-//! * [account permissions](api::AccountPermission)
-//!  * [*get*](api::AccountPermissionGetCall) and [*list*](api::AccountPermissionListCall)
-//! * [account user profiles](api::AccountUserProfile)
-//!  * [*get*](api::AccountUserProfileGetCall), [*insert*](api::AccountUserProfileInsertCall), [*list*](api::AccountUserProfileListCall), [*patch*](api::AccountUserProfilePatchCall) and [*update*](api::AccountUserProfileUpdateCall)
-//! * [accounts](api::Account)
-//!  * [*get*](api::AccountGetCall), [*list*](api::AccountListCall), [*patch*](api::AccountPatchCall) and [*update*](api::AccountUpdateCall)
-//! * [ads](api::Ad)
-//!  * [*get*](api::AdGetCall), [*insert*](api::AdInsertCall), [*list*](api::AdListCall), [*patch*](api::AdPatchCall) and [*update*](api::AdUpdateCall)
-//! * [advertiser groups](api::AdvertiserGroup)
-//!  * [*delete*](api::AdvertiserGroupDeleteCall), [*get*](api::AdvertiserGroupGetCall), [*insert*](api::AdvertiserGroupInsertCall), [*list*](api::AdvertiserGroupListCall), [*patch*](api::AdvertiserGroupPatchCall) and [*update*](api::AdvertiserGroupUpdateCall)
-//! * advertiser landing pages
-//!  * [*get*](api::AdvertiserLandingPageGetCall), [*insert*](api::AdvertiserLandingPageInsertCall), [*list*](api::AdvertiserLandingPageListCall), [*patch*](api::AdvertiserLandingPagePatchCall) and [*update*](api::AdvertiserLandingPageUpdateCall)
-//! * [advertisers](api::Advertiser)
-//!  * [*get*](api::AdvertiserGetCall), [*insert*](api::AdvertiserInsertCall), [*list*](api::AdvertiserListCall), [*patch*](api::AdvertiserPatchCall) and [*update*](api::AdvertiserUpdateCall)
-//! * [browsers](api::Browser)
-//!  * [*list*](api::BrowserListCall)
-//! * [campaign creative associations](api::CampaignCreativeAssociation)
-//!  * [*insert*](api::CampaignCreativeAssociationInsertCall) and [*list*](api::CampaignCreativeAssociationListCall)
-//! * [campaigns](api::Campaign)
-//!  * [*get*](api::CampaignGetCall), [*insert*](api::CampaignInsertCall), [*list*](api::CampaignListCall), [*patch*](api::CampaignPatchCall) and [*update*](api::CampaignUpdateCall)
-//! * [change logs](api::ChangeLog)
-//!  * [*get*](api::ChangeLogGetCall) and [*list*](api::ChangeLogListCall)
-//! * [cities](api::City)
-//!  * [*list*](api::CityListCall)
-//! * [connection types](api::ConnectionType)
-//!  * [*get*](api::ConnectionTypeGetCall) and [*list*](api::ConnectionTypeListCall)
-//! * [content categories](api::ContentCategory)
-//!  * [*delete*](api::ContentCategoryDeleteCall), [*get*](api::ContentCategoryGetCall), [*insert*](api::ContentCategoryInsertCall), [*list*](api::ContentCategoryListCall), [*patch*](api::ContentCategoryPatchCall) and [*update*](api::ContentCategoryUpdateCall)
-//! * [conversions](api::Conversion)
-//!  * [*batchinsert*](api::ConversionBatchinsertCall) and [*batchupdate*](api::ConversionBatchupdateCall)
-//! * [countries](api::Country)
-//!  * [*get*](api::CountryGetCall) and [*list*](api::CountryListCall)
-//! * [creative assets](api::CreativeAsset)
-//!  * [*insert*](api::CreativeAssetInsertCall)
-//! * [creative field values](api::CreativeFieldValue)
-//!  * [*delete*](api::CreativeFieldValueDeleteCall), [*get*](api::CreativeFieldValueGetCall), [*insert*](api::CreativeFieldValueInsertCall), [*list*](api::CreativeFieldValueListCall), [*patch*](api::CreativeFieldValuePatchCall) and [*update*](api::CreativeFieldValueUpdateCall)
-//! * [creative fields](api::CreativeField)
-//!  * [*delete*](api::CreativeFieldDeleteCall), [*get*](api::CreativeFieldGetCall), [*insert*](api::CreativeFieldInsertCall), [*list*](api::CreativeFieldListCall), [*patch*](api::CreativeFieldPatchCall) and [*update*](api::CreativeFieldUpdateCall)
-//! * [creative groups](api::CreativeGroup)
-//!  * [*get*](api::CreativeGroupGetCall), [*insert*](api::CreativeGroupInsertCall), [*list*](api::CreativeGroupListCall), [*patch*](api::CreativeGroupPatchCall) and [*update*](api::CreativeGroupUpdateCall)
-//! * [creatives](api::Creative)
-//!  * [*get*](api::CreativeGetCall), [*insert*](api::CreativeInsertCall), [*list*](api::CreativeListCall), [*patch*](api::CreativePatchCall) and [*update*](api::CreativeUpdateCall)
-//! * [dimension values](api::DimensionValue)
-//!  * [*query*](api::DimensionValueQueryCall)
-//! * [directory sites](api::DirectorySite)
-//!  * [*get*](api::DirectorySiteGetCall), [*insert*](api::DirectorySiteInsertCall) and [*list*](api::DirectorySiteListCall)
-//! * [dynamic targeting keys](api::DynamicTargetingKey)
-//!  * [*delete*](api::DynamicTargetingKeyDeleteCall), [*insert*](api::DynamicTargetingKeyInsertCall) and [*list*](api::DynamicTargetingKeyListCall)
-//! * [event tags](api::EventTag)
-//!  * [*delete*](api::EventTagDeleteCall), [*get*](api::EventTagGetCall), [*insert*](api::EventTagInsertCall), [*list*](api::EventTagListCall), [*patch*](api::EventTagPatchCall) and [*update*](api::EventTagUpdateCall)
-//! * [files](api::File)
-//!  * [*get*](api::FileGetCall) and [*list*](api::FileListCall)
-//! * [floodlight activities](api::FloodlightActivity)
-//!  * [*delete*](api::FloodlightActivityDeleteCall), [*generatetag*](api::FloodlightActivityGeneratetagCall), [*get*](api::FloodlightActivityGetCall), [*insert*](api::FloodlightActivityInsertCall), [*list*](api::FloodlightActivityListCall), [*patch*](api::FloodlightActivityPatchCall) and [*update*](api::FloodlightActivityUpdateCall)
-//! * [floodlight activity groups](api::FloodlightActivityGroup)
-//!  * [*get*](api::FloodlightActivityGroupGetCall), [*insert*](api::FloodlightActivityGroupInsertCall), [*list*](api::FloodlightActivityGroupListCall), [*patch*](api::FloodlightActivityGroupPatchCall) and [*update*](api::FloodlightActivityGroupUpdateCall)
-//! * [floodlight configurations](api::FloodlightConfiguration)
-//!  * [*get*](api::FloodlightConfigurationGetCall), [*list*](api::FloodlightConfigurationListCall), [*patch*](api::FloodlightConfigurationPatchCall) and [*update*](api::FloodlightConfigurationUpdateCall)
-//! * [inventory items](api::InventoryItem)
-//!  * [*get*](api::InventoryItemGetCall) and [*list*](api::InventoryItemListCall)
-//! * [languages](api::Language)
-//!  * [*list*](api::LanguageListCall)
-//! * [metros](api::Metro)
-//!  * [*list*](api::MetroListCall)
-//! * [mobile apps](api::MobileApp)
-//!  * [*get*](api::MobileAppGetCall) and [*list*](api::MobileAppListCall)
-//! * [mobile carriers](api::MobileCarrier)
-//!  * [*get*](api::MobileCarrierGetCall) and [*list*](api::MobileCarrierListCall)
-//! * [operating system versions](api::OperatingSystemVersion)
-//!  * [*get*](api::OperatingSystemVersionGetCall) and [*list*](api::OperatingSystemVersionListCall)
-//! * [operating systems](api::OperatingSystem)
-//!  * [*get*](api::OperatingSystemGetCall) and [*list*](api::OperatingSystemListCall)
-//! * [order documents](api::OrderDocument)
-//!  * [*get*](api::OrderDocumentGetCall) and [*list*](api::OrderDocumentListCall)
-//! * [orders](api::Order)
-//!  * [*get*](api::OrderGetCall) and [*list*](api::OrderListCall)
-//! * [placement groups](api::PlacementGroup)
-//!  * [*get*](api::PlacementGroupGetCall), [*insert*](api::PlacementGroupInsertCall), [*list*](api::PlacementGroupListCall), [*patch*](api::PlacementGroupPatchCall) and [*update*](api::PlacementGroupUpdateCall)
-//! * [placement strategies](api::PlacementStrategy)
-//!  * [*delete*](api::PlacementStrategyDeleteCall), [*get*](api::PlacementStrategyGetCall), [*insert*](api::PlacementStrategyInsertCall), [*list*](api::PlacementStrategyListCall), [*patch*](api::PlacementStrategyPatchCall) and [*update*](api::PlacementStrategyUpdateCall)
-//! * [placements](api::Placement)
-//!  * [*generatetags*](api::PlacementGeneratetagCall), [*get*](api::PlacementGetCall), [*insert*](api::PlacementInsertCall), [*list*](api::PlacementListCall), [*patch*](api::PlacementPatchCall) and [*update*](api::PlacementUpdateCall)
-//! * [platform types](api::PlatformType)
-//!  * [*get*](api::PlatformTypeGetCall) and [*list*](api::PlatformTypeListCall)
-//! * [postal codes](api::PostalCode)
-//!  * [*get*](api::PostalCodeGetCall) and [*list*](api::PostalCodeListCall)
-//! * [projects](api::Project)
-//!  * [*get*](api::ProjectGetCall) and [*list*](api::ProjectListCall)
-//! * [regions](api::Region)
-//!  * [*list*](api::RegionListCall)
-//! * [remarketing list shares](api::RemarketingListShare)
-//!  * [*get*](api::RemarketingListShareGetCall), [*patch*](api::RemarketingListSharePatchCall) and [*update*](api::RemarketingListShareUpdateCall)
-//! * [remarketing lists](api::RemarketingList)
-//!  * [*get*](api::RemarketingListGetCall), [*insert*](api::RemarketingListInsertCall), [*list*](api::RemarketingListListCall), [*patch*](api::RemarketingListPatchCall) and [*update*](api::RemarketingListUpdateCall)
-//! * [reports](api::Report)
-//!  * [*compatible fields query*](api::ReportCompatibleFieldQueryCall), [*delete*](api::ReportDeleteCall), [*files get*](api::ReportFileGetCall), [*files list*](api::ReportFileListCall), [*get*](api::ReportGetCall), [*insert*](api::ReportInsertCall), [*list*](api::ReportListCall), [*patch*](api::ReportPatchCall), [*run*](api::ReportRunCall) and [*update*](api::ReportUpdateCall)
-//! * [sites](api::Site)
-//!  * [*get*](api::SiteGetCall), [*insert*](api::SiteInsertCall), [*list*](api::SiteListCall), [*patch*](api::SitePatchCall) and [*update*](api::SiteUpdateCall)
-//! * [sizes](api::Size)
-//!  * [*get*](api::SizeGetCall), [*insert*](api::SizeInsertCall) and [*list*](api::SizeListCall)
-//! * [subaccounts](api::Subaccount)
-//!  * [*get*](api::SubaccountGetCall), [*insert*](api::SubaccountInsertCall), [*list*](api::SubaccountListCall), [*patch*](api::SubaccountPatchCall) and [*update*](api::SubaccountUpdateCall)
-//! * [targetable remarketing lists](api::TargetableRemarketingList)
-//!  * [*get*](api::TargetableRemarketingListGetCall) and [*list*](api::TargetableRemarketingListListCall)
-//! * [targeting templates](api::TargetingTemplate)
-//!  * [*get*](api::TargetingTemplateGetCall), [*insert*](api::TargetingTemplateInsertCall), [*list*](api::TargetingTemplateListCall), [*patch*](api::TargetingTemplatePatchCall) and [*update*](api::TargetingTemplateUpdateCall)
-//! * [user profiles](api::UserProfile)
-//!  * [*get*](api::UserProfileGetCall) and [*list*](api::UserProfileListCall)
-//! * [user role permission groups](api::UserRolePermissionGroup)
-//!  * [*get*](api::UserRolePermissionGroupGetCall) and [*list*](api::UserRolePermissionGroupListCall)
-//! * [user role permissions](api::UserRolePermission)
-//!  * [*get*](api::UserRolePermissionGetCall) and [*list*](api::UserRolePermissionListCall)
-//! * [user roles](api::UserRole)
-//!  * [*delete*](api::UserRoleDeleteCall), [*get*](api::UserRoleGetCall), [*insert*](api::UserRoleInsertCall), [*list*](api::UserRoleListCall), [*patch*](api::UserRolePatchCall) and [*update*](api::UserRoleUpdateCall)
-//! * [video formats](api::VideoFormat)
-//!  * [*get*](api::VideoFormatGetCall) and [*list*](api::VideoFormatListCall)
+//! * media
+//!  * [*upload*](api::MediaUploadCall)
 //! 
 //! 
 //! Upload supported by ...
 //! 
-//! * [*insert creative assets*](api::CreativeAssetInsertCall)
-//! 
-//! Download supported by ...
-//! 
-//! * [*get files*](api::FileGetCall)
-//! * [*files get reports*](api::ReportFileGetCall)
+//! * [*upload media*](api::MediaUploadCall)
 //! 
 //! 
 //! 
@@ -174,16 +51,7 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.reports().compatible_fields_query(...).doit().await
-//! let r = hub.reports().files_get(...).doit().await
-//! let r = hub.reports().files_list(...).doit().await
-//! let r = hub.reports().delete(...).doit().await
-//! let r = hub.reports().get(...).doit().await
-//! let r = hub.reports().insert(...).doit().await
-//! let r = hub.reports().list(...).doit().await
-//! let r = hub.reports().patch(...).doit().await
-//! let r = hub.reports().run(...).doit().await
-//! let r = hub.reports().update(...).doit().await
+//! let r = hub.media().upload(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -210,7 +78,9 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_dfareporting3d5 as dfareporting3d5;
+//! use dfareporting3d5::api::CreativeAssetMetadata;
 //! use dfareporting3d5::{Result, Error};
+//! use std::fs;
 //! # async fn dox() {
 //! use std::default::Default;
 //! use dfareporting3d5::{Dfareporting, oauth2, hyper, hyper_rustls, chrono, FieldMask};
@@ -228,15 +98,16 @@
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = Dfareporting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
-//! // You can configure optional parameters by calling the respective setters at will, and
-//! // execute the final call using `doit()`.
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.reports().files_list(-8, -80)
-//!              .sort_order("amet.")
-//!              .sort_field("takimata")
-//!              .page_token("amet.")
-//!              .max_results(-20)
-//!              .doit().await;
+//! let mut req = CreativeAssetMetadata::default();
+//! 
+//! // You can configure optional parameters by calling the respective setters at will, and
+//! // execute the final call using `upload(...)`.
+//! // Values shown here are possibly random and not representative !
+//! let result = hub.media().upload(req, -11, -55)
+//!              .upload(fs::File::open("file.ext").unwrap(), "application/octet-stream".parse().unwrap()).await;
 //! 
 //! match result {
 //!     Err(e) => match e {

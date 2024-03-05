@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -129,7 +129,7 @@ impl<'a, S> Firebasestorage<S> {
         Firebasestorage {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://firebasestorage.googleapis.com/".to_string(),
             _root_url: "https://firebasestorage.googleapis.com/".to_string(),
         }
@@ -140,7 +140,7 @@ impl<'a, S> Firebasestorage<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -195,7 +195,7 @@ impl client::RequestValue for AddFirebaseRequest {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Bucket {
-    /// Resource name of the bucket.
+    /// Output only. Resource name of the bucket.
     
     pub name: Option<String>,
 }
@@ -306,7 +306,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `bucket` - Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_number}/buckets/{bucket_id}`.
+    /// * `bucket` - Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_id_or_number}/buckets/{bucket_id}`.
     pub fn buckets_add_firebase(&self, request: AddFirebaseRequest, bucket: &str) -> ProjectBucketAddFirebaseCall<'a, S> {
         ProjectBucketAddFirebaseCall {
             hub: self.hub,
@@ -324,7 +324,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `name` - Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_number}/buckets/{bucket_id}`.
+    /// * `name` - Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_id_or_number}/buckets/{bucket_id}`.
     pub fn buckets_get(&self, name: &str) -> ProjectBucketGetCall<'a, S> {
         ProjectBucketGetCall {
             hub: self.hub,
@@ -341,7 +341,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// 
     /// # Arguments
     ///
-    /// * `parent` - Required. Resource name of the parent Firebase project, `projects/{project_number}`.
+    /// * `parent` - Required. Resource name of the parent Firebase project, `projects/{project_id_or_number}`.
     pub fn buckets_list(&self, parent: &str) -> ProjectBucketListCall<'a, S> {
         ProjectBucketListCall {
             hub: self.hub,
@@ -361,7 +361,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `bucket` - Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_number}/buckets/{bucket_id}`.
+    /// * `bucket` - Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_id_or_number}/buckets/{bucket_id}`.
     pub fn buckets_remove_firebase(&self, request: RemoveFirebaseRequest, bucket: &str) -> ProjectBucketRemoveFirebaseCall<'a, S> {
         ProjectBucketRemoveFirebaseCall {
             hub: self.hub,
@@ -588,7 +588,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_number}/buckets/{bucket_id}`.
+    /// Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_id_or_number}/buckets/{bucket_id}`.
     ///
     /// Sets the *bucket* path property to the given value.
     ///
@@ -850,7 +850,7 @@ where
     }
 
 
-    /// Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_number}/buckets/{bucket_id}`.
+    /// Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_id_or_number}/buckets/{bucket_id}`.
     ///
     /// Sets the *name* path property to the given value.
     ///
@@ -1122,7 +1122,7 @@ where
     }
 
 
-    /// Required. Resource name of the parent Firebase project, `projects/{project_number}`.
+    /// Required. Resource name of the parent Firebase project, `projects/{project_id_or_number}`.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -1428,7 +1428,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_number}/buckets/{bucket_id}`.
+    /// Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_id_or_number}/buckets/{bucket_id}`.
     ///
     /// Sets the *bucket* path property to the given value.
     ///

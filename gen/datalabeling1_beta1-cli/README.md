@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Data Labeling* API at revision *20221205*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Data Labeling* API at revision *20240207*. The CLI is at version *5.0.4*.
 
 ```bash
 datalabeling1-beta1 [options]

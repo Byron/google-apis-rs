@@ -151,6 +151,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "regions" => {
+                    call = call.add_regions(value.unwrap_or(""));
+                },
                 "project-id" => {
                     call = call.project_id(value.unwrap_or(""));
                 },
@@ -167,7 +170,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["project-id"].iter().map(|v|*v));
+                                                                           v.extend(["project-id", "regions"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -823,7 +826,7 @@ async fn main() {
     
     let mut app = App::new("oslogin1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230115")
+           .version("5.0.4+20240225")
            .about("You can use OS Login to manage access to your VM instances using IAM roles.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_oslogin1_cli")
            .arg(Arg::with_name("url")

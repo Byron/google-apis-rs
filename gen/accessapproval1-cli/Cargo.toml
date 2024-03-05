@@ -4,11 +4,11 @@
 [package]
 
 name = "google-accessapproval1-cli"
-version = "5.0.3+20230120"
+version = "5.0.4+20240223"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Access Approval (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/accessapproval1-cli"
-homepage = "https://cloud.google.com/cloud-provider-access-management/access-approval/docs"
+homepage = "https://cloud.google.com/assured-workloads/access-approval/docs"
 documentation = "http://byron.github.io/google-apis-rs/google_accessapproval1_cli"
 license = "MIT"
 keywords = ["accessapproval", "google", "cli"]
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-accessapproval1]
 path = "../accessapproval1"
-version = "5.0.3+20230120"
+version = "5.0.4+20240223"
 

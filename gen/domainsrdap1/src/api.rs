@@ -97,7 +97,7 @@ impl<'a, S> DomainsRDAP<S> {
         DomainsRDAP {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://domainsrdap.googleapis.com/".to_string(),
             _root_url: "https://domainsrdap.googleapis.com/".to_string(),
         }
@@ -123,7 +123,7 @@ impl<'a, S> DomainsRDAP<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -170,7 +170,7 @@ pub struct HttpBody {
     pub content_type: Option<String>,
     /// The HTTP request/response body as raw binary.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub data: Option<Vec<u8>>,
     /// Application specific response metadata. Must be set in the first response for streaming APIs.
     

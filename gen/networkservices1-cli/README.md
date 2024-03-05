@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *NetworkServices* API at revision *20230105*. The CLI is at version *5.0.3*.
+This documentation was generated from the *NetworkServices* API at revision *20240224*. The CLI is at version *5.0.4*.
 
 ```bash
 networkservices1 [options]
@@ -66,6 +66,16 @@ networkservices1 [options]
                 locations-http-routes-get <name> [-p <v>]... [-o <out>]
                 locations-http-routes-list <parent> [-p <v>]... [-o <out>]
                 locations-http-routes-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-lb-route-extensions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-lb-route-extensions-delete <name> [-p <v>]... [-o <out>]
+                locations-lb-route-extensions-get <name> [-p <v>]... [-o <out>]
+                locations-lb-route-extensions-list <parent> [-p <v>]... [-o <out>]
+                locations-lb-route-extensions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-lb-traffic-extensions-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-lb-traffic-extensions-delete <name> [-p <v>]... [-o <out>]
+                locations-lb-traffic-extensions-get <name> [-p <v>]... [-o <out>]
+                locations-lb-traffic-extensions-list <parent> [-p <v>]... [-o <out>]
+                locations-lb-traffic-extensions-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
                 locations-meshes-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-meshes-delete <name> [-p <v>]... [-o <out>]
@@ -86,6 +96,14 @@ networkservices1 [options]
                 locations-service-bindings-list <parent> [-p <v>]... [-o <out>]
                 locations-service-bindings-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-service-bindings-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-service-lb-policies-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-service-lb-policies-delete <name> [-p <v>]... [-o <out>]
+                locations-service-lb-policies-get <name> [-p <v>]... [-o <out>]
+                locations-service-lb-policies-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-service-lb-policies-list <parent> [-p <v>]... [-o <out>]
+                locations-service-lb-policies-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-service-lb-policies-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-service-lb-policies-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-tcp-routes-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-tcp-routes-delete <name> [-p <v>]... [-o <out>]
                 locations-tcp-routes-get <name> [-p <v>]... [-o <out>]

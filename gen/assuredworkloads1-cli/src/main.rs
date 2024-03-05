@@ -164,6 +164,71 @@ where
         }
     }
 
+    async fn _organizations_locations_workloads_analyze_workload_move(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().locations_workloads_analyze_workload_move(opt.value_of("target").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "project" => {
+                    call = call.project(value.unwrap_or(""));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "asset-types" => {
+                    call = call.add_asset_types(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["asset-types", "page-size", "page-token", "project"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _organizations_locations_workloads_create(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -189,11 +254,16 @@ where
                 match &temp_cursor.to_string()[..] {
                     "billing-account" => Some(("billingAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compliance-regime" => Some(("complianceRegime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "compliance-status.acknowledged-resource-violation-count" => Some(("complianceStatus.acknowledgedResourceViolationCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "compliance-status.acknowledged-violation-count" => Some(("complianceStatus.acknowledgedViolationCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "compliance-status.active-resource-violation-count" => Some(("complianceStatus.activeResourceViolationCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "compliance-status.active-violation-count" => Some(("complianceStatus.activeViolationCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "compliant-but-disallowed-services" => Some(("compliantButDisallowedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ekm-provisioning-response.ekm-provisioning-error-domain" => Some(("ekmProvisioningResponse.ekmProvisioningErrorDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ekm-provisioning-response.ekm-provisioning-error-mapping" => Some(("ekmProvisioningResponse.ekmProvisioningErrorMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ekm-provisioning-response.ekm-provisioning-state" => Some(("ekmProvisioningResponse.ekmProvisioningState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enable-sovereign-controls" => Some(("enableSovereignControls", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kaj-enrollment-state" => Some(("kajEnrollmentState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -202,11 +272,16 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "partner" => Some(("partner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partner-permissions.assured-workloads-monitoring" => Some(("partnerPermissions.assuredWorkloadsMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "partner-permissions.data-logs-viewer" => Some(("partnerPermissions.dataLogsViewer", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "partner-permissions.service-access-approver" => Some(("partnerPermissions.serviceAccessApprover", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "provisioned-resources-parent" => Some(("provisionedResourcesParent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-monitoring-enabled" => Some(("resourceMonitoringEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "saa-enrollment-response.setup-errors" => Some(("saaEnrollmentResponse.setupErrors", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "saa-enrollment-response.setup-status" => Some(("saaEnrollmentResponse.setupStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "violation-notifications-enabled" => Some(("violationNotificationsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acknowledged-violation-count", "active-violation-count", "billing-account", "compliance-regime", "compliance-status", "compliant-but-disallowed-services", "create-time", "display-name", "enable-sovereign-controls", "etag", "kaj-enrollment-state", "kms-settings", "labels", "name", "next-rotation-time", "partner", "provisioned-resources-parent", "rotation-period", "saa-enrollment-response", "setup-errors", "setup-status"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acknowledged-resource-violation-count", "acknowledged-violation-count", "active-resource-violation-count", "active-violation-count", "assured-workloads-monitoring", "billing-account", "compliance-regime", "compliance-status", "compliant-but-disallowed-services", "create-time", "data-logs-viewer", "display-name", "ekm-provisioning-error-domain", "ekm-provisioning-error-mapping", "ekm-provisioning-response", "ekm-provisioning-state", "enable-sovereign-controls", "etag", "kaj-enrollment-state", "kms-settings", "labels", "name", "next-rotation-time", "partner", "partner-permissions", "provisioned-resources-parent", "resource-monitoring-enabled", "rotation-period", "saa-enrollment-response", "service-access-approver", "setup-errors", "setup-status", "violation-notifications-enabled"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -293,6 +368,58 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["etag"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _organizations_locations_workloads_enable_resource_monitoring(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.organizations().locations_workloads_enable_resource_monitoring(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -464,12 +591,12 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partner-permissions.assured-workloads-monitoring" => Some(("partnerPermissions.assuredWorkloadsMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "partner-permissions.data-logs-viewer" => Some(("partnerPermissions.dataLogsViewer", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
-                    "partner-permissions.remediate-folder-violations" => Some(("partnerPermissions.remediateFolderViolations", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "partner-permissions.service-access-approver" => Some(("partnerPermissions.serviceAccessApprover", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["data-logs-viewer", "etag", "partner-permissions", "remediate-folder-violations", "service-access-approver", "update-mask"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["assured-workloads-monitoring", "data-logs-viewer", "etag", "partner-permissions", "service-access-approver", "update-mask"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -554,11 +681,16 @@ where
                 match &temp_cursor.to_string()[..] {
                     "billing-account" => Some(("billingAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "compliance-regime" => Some(("complianceRegime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "compliance-status.acknowledged-resource-violation-count" => Some(("complianceStatus.acknowledgedResourceViolationCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "compliance-status.acknowledged-violation-count" => Some(("complianceStatus.acknowledgedViolationCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "compliance-status.active-resource-violation-count" => Some(("complianceStatus.activeResourceViolationCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "compliance-status.active-violation-count" => Some(("complianceStatus.activeViolationCount", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "compliant-but-disallowed-services" => Some(("compliantButDisallowedServices", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ekm-provisioning-response.ekm-provisioning-error-domain" => Some(("ekmProvisioningResponse.ekmProvisioningErrorDomain", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ekm-provisioning-response.ekm-provisioning-error-mapping" => Some(("ekmProvisioningResponse.ekmProvisioningErrorMapping", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "ekm-provisioning-response.ekm-provisioning-state" => Some(("ekmProvisioningResponse.ekmProvisioningState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "enable-sovereign-controls" => Some(("enableSovereignControls", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "kaj-enrollment-state" => Some(("kajEnrollmentState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -567,11 +699,16 @@ where
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "partner" => Some(("partner", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "partner-permissions.assured-workloads-monitoring" => Some(("partnerPermissions.assuredWorkloadsMonitoring", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "partner-permissions.data-logs-viewer" => Some(("partnerPermissions.dataLogsViewer", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "partner-permissions.service-access-approver" => Some(("partnerPermissions.serviceAccessApprover", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "provisioned-resources-parent" => Some(("provisionedResourcesParent", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "resource-monitoring-enabled" => Some(("resourceMonitoringEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "saa-enrollment-response.setup-errors" => Some(("saaEnrollmentResponse.setupErrors", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "saa-enrollment-response.setup-status" => Some(("saaEnrollmentResponse.setupStatus", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "violation-notifications-enabled" => Some(("violationNotificationsEnabled", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acknowledged-violation-count", "active-violation-count", "billing-account", "compliance-regime", "compliance-status", "compliant-but-disallowed-services", "create-time", "display-name", "enable-sovereign-controls", "etag", "kaj-enrollment-state", "kms-settings", "labels", "name", "next-rotation-time", "partner", "provisioned-resources-parent", "rotation-period", "saa-enrollment-response", "setup-errors", "setup-status"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acknowledged-resource-violation-count", "acknowledged-violation-count", "active-resource-violation-count", "active-violation-count", "assured-workloads-monitoring", "billing-account", "compliance-regime", "compliance-status", "compliant-but-disallowed-services", "create-time", "data-logs-viewer", "display-name", "ekm-provisioning-error-domain", "ekm-provisioning-error-mapping", "ekm-provisioning-response", "ekm-provisioning-state", "enable-sovereign-controls", "etag", "kaj-enrollment-state", "kms-settings", "labels", "name", "next-rotation-time", "partner", "partner-permissions", "provisioned-resources-parent", "resource-monitoring-enabled", "rotation-period", "saa-enrollment-response", "service-access-approver", "setup-errors", "setup-status", "violation-notifications-enabled"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -743,10 +880,11 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "acknowledge-type" => Some(("acknowledgeType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "comment" => Some(("comment", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "non-compliant-org-policy" => Some(("nonCompliantOrgPolicy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["comment", "non-compliant-org-policy"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["acknowledge-type", "comment", "non-compliant-org-policy"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -939,11 +1077,17 @@ where
                     ("locations-operations-list", Some(opt)) => {
                         call_result = self._organizations_locations_operations_list(opt, dry_run, &mut err).await;
                     },
+                    ("locations-workloads-analyze-workload-move", Some(opt)) => {
+                        call_result = self._organizations_locations_workloads_analyze_workload_move(opt, dry_run, &mut err).await;
+                    },
                     ("locations-workloads-create", Some(opt)) => {
                         call_result = self._organizations_locations_workloads_create(opt, dry_run, &mut err).await;
                     },
                     ("locations-workloads-delete", Some(opt)) => {
                         call_result = self._organizations_locations_workloads_delete(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-workloads-enable-resource-monitoring", Some(opt)) => {
+                        call_result = self._organizations_locations_workloads_enable_resource_monitoring(opt, dry_run, &mut err).await;
                     },
                     ("locations-workloads-get", Some(opt)) => {
                         call_result = self._organizations_locations_workloads_get(opt, dry_run, &mut err).await;
@@ -1048,7 +1192,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("organizations", "methods: 'locations-operations-get', 'locations-operations-list', 'locations-workloads-create', 'locations-workloads-delete', 'locations-workloads-get', 'locations-workloads-list', 'locations-workloads-mutate-partner-permissions', 'locations-workloads-patch', 'locations-workloads-restrict-allowed-resources', 'locations-workloads-violations-acknowledge', 'locations-workloads-violations-get' and 'locations-workloads-violations-list'", vec![
+        ("organizations", "methods: 'locations-operations-get', 'locations-operations-list', 'locations-workloads-analyze-workload-move', 'locations-workloads-create', 'locations-workloads-delete', 'locations-workloads-enable-resource-monitoring', 'locations-workloads-get', 'locations-workloads-list', 'locations-workloads-mutate-partner-permissions', 'locations-workloads-patch', 'locations-workloads-restrict-allowed-resources', 'locations-workloads-violations-acknowledge', 'locations-workloads-violations-get' and 'locations-workloads-violations-list'", vec![
             ("locations-operations-get",
                     Some(r##"Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service."##),
                     "Details at http://byron.github.io/google-apis-rs/google_assuredworkloads1_cli/organizations_locations-operations-get",
@@ -1072,12 +1216,34 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_assuredworkloads1_cli/organizations_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
                      None,
                      Some(r##"The name of the operation's parent resource."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workloads-analyze-workload-move",
+                    Some(r##"Analyzes a hypothetical move of a source resource to a target workload to surface compliance risks. The analysis is best effort and is not guaranteed to be exhaustive."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_assuredworkloads1_cli/organizations_locations-workloads-analyze-workload-move",
+                  vec![
+                    (Some(r##"target"##),
+                     None,
+                     Some(r##"Required. The resource ID of the folder-based destination workload. This workload is where the source resource will hypothetically be moved to. Specify the workload's relative resource name, formatted as: "organizations/{ORGANIZATION_ID}/locations/{LOCATION_ID}/workloads/{WORKLOAD_ID}" For example: "organizations/123/locations/us-east1/workloads/assured-workload-2""##),
                      Some(true),
                      Some(false)),
         
@@ -1122,8 +1288,30 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-workloads-delete",
-                    Some(r##"Deletes the workload. Make sure that workload's direct children are already in a deleted state, otherwise the request will fail with a FAILED_PRECONDITION error."##),
+                    Some(r##"Deletes the workload. Make sure that workload's direct children are already in a deleted state, otherwise the request will fail with a FAILED_PRECONDITION error. In addition to assuredworkloads.workload.delete permission, the user should also have orgpolicy.policy.set permission on the deleted folder to remove Assured Workloads OrgPolicies."##),
                     "Details at http://byron.github.io/google-apis-rs/google_assuredworkloads1_cli/organizations_locations-workloads-delete",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The `name` field is used to identify the workload. Format: organizations/{org_id}/locations/{location_id}/workloads/{workload_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workloads-enable-resource-monitoring",
+                    Some(r##"Enable resource violation monitoring for a workload."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_assuredworkloads1_cli/organizations_locations-workloads-enable-resource-monitoring",
                   vec![
                     (Some(r##"name"##),
                      None,
@@ -1149,7 +1337,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The resource name of the Workload to fetch. This is the workload's relative path in the API, formatted as "organizations/{organization_id}/locations/{location_id}/workloads/{workload_id}". For example, "organizations/123/locations/us-east1/workloads/assured-workload-1"."##),
+                     Some(r##"Required. The resource name of the Workload to fetch. This is the workloads's relative path in the API, formatted as "organizations/{organization_id}/locations/{location_id}/workloads/{workload_id}". For example, "organizations/123/locations/us-east1/workloads/assured-workload-1"."##),
                      Some(true),
                      Some(false)),
         
@@ -1349,7 +1537,7 @@ async fn main() {
     
     let mut app = App::new("assuredworkloads1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230116")
+           .version("5.0.4+20240222")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_assuredworkloads1_cli")
            .arg(Arg::with_name("url")

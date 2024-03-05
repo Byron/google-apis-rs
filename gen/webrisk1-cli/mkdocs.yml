@@ -1,4 +1,4 @@
-site_name: Web Risk v5.0.3+20230121
+site_name: Web Risk v5.0.4+20240303
 site_url: http://byron.github.io/google-apis-rs/google-webrisk1-cli
 site_description: A complete library to interact with Web Risk (protocol v1)
 
@@ -17,7 +17,6 @@ nav:
     - 'Operations Get': 'projects_operations-get.md'
     - 'Operations List': 'projects_operations-list.md'
     - 'Submissions Create': 'projects_submissions-create.md'
-    - 'Uris Submit': 'projects_uris-submit.md'
 - 'Threat Lists':
     - 'Compute Diff': 'threat-lists_compute-diff.md'
 - 'Uris':

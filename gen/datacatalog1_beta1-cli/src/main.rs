@@ -5656,7 +5656,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. Resource name of this taxonomy, whose format is: "projects/{project_number}/locations/{location_id}/taxonomies/{id}"."##),
+                     Some(r##"Identifier. Resource name of this taxonomy, whose format is: "projects/{project_number}/locations/{location_id}/taxonomies/{id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -5806,7 +5806,7 @@ async fn main() {
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Output only. Resource name of this policy tag, whose format is: "projects/{project_number}/locations/{location_id}/taxonomies/{taxonomy_id}/policyTags/{id}"."##),
+                     Some(r##"Identifier. Resource name of this policy tag, whose format is: "projects/{project_number}/locations/{location_id}/taxonomies/{taxonomy_id}/policyTags/{id}"."##),
                      Some(true),
                      Some(false)),
         
@@ -5946,7 +5946,7 @@ async fn main() {
     
     let mut app = App::new("datacatalog1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230117")
+           .version("5.0.4+20240222")
            .about("A fully managed and highly scalable data discovery and metadata management service. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datacatalog1_beta1_cli")
            .arg(Arg::with_name("url")

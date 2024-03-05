@@ -169,8 +169,9 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-bytes" => Some(("profileBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-type" => Some(("profileType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["deployment", "duration", "labels", "name", "profile-bytes", "profile-type", "project-id", "target"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["deployment", "duration", "labels", "name", "profile-bytes", "profile-type", "project-id", "start-time", "target"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -197,6 +198,65 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_profiles_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().profiles_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -261,8 +321,9 @@ where
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-bytes" => Some(("profileBytes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "profile-type" => Some(("profileType", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["deployment", "duration", "labels", "name", "profile-bytes", "profile-type", "project-id", "target"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["deployment", "duration", "labels", "name", "profile-bytes", "profile-type", "project-id", "start-time", "target"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -338,6 +399,9 @@ where
                     },
                     ("profiles-create-offline", Some(opt)) => {
                         call_result = self._projects_profiles_create_offline(opt, dry_run, &mut err).await;
+                    },
+                    ("profiles-list", Some(opt)) => {
+                        call_result = self._projects_profiles_list(opt, dry_run, &mut err).await;
                     },
                     ("profiles-patch", Some(opt)) => {
                         call_result = self._projects_profiles_patch(opt, dry_run, &mut err).await;
@@ -421,9 +485,9 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'profiles-create', 'profiles-create-offline' and 'profiles-patch'", vec![
+        ("projects", "methods: 'profiles-create', 'profiles-create-offline', 'profiles-list' and 'profiles-patch'", vec![
             ("profiles-create",
-                    Some(r##"CreateProfile creates a new profile resource in the online mode. The server ensures that the new profiles are created at a constant rate per deployment, so the creation request may hang for some time until the next profile session is available. The request may fail with ABORTED error if the creation is not available within ~1m, the response will indicate the duration of the backoff the client should take before attempting creating a profile again. The backoff duration is returned in google.rpc.RetryInfo extension on the response status. To a gRPC client, the extension will be return as a binary-serialized proto in the trailing metadata item named "google.rpc.retryinfo-bin". "##),
+                    Some(r##"CreateProfile creates a new profile resource in the online mode. _Direct use of this API is discouraged, please use a [supported profiler agent](https://cloud.google.com/profiler/docs/about-profiler#profiling_agent) instead for profile collection._ The server ensures that the new profiles are created at a constant rate per deployment, so the creation request may hang for some time until the next profile session is available. The request may fail with ABORTED error if the creation is not available within ~1m, the response will indicate the duration of the backoff the client should take before attempting creating a profile again. The backoff duration is returned in google.rpc.RetryInfo extension on the response status. To a gRPC client, the extension will be return as a binary-serialized proto in the trailing metadata item named "google.rpc.retryinfo-bin". "##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudprofiler2_cli/projects_profiles-create",
                   vec![
                     (Some(r##"parent"##),
@@ -451,7 +515,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("profiles-create-offline",
-                    Some(r##"CreateOfflineProfile creates a new profile resource in the offline mode. The client provides the profile to create along with the profile bytes, the server records it."##),
+                    Some(r##"CreateOfflineProfile creates a new profile resource in the offline mode. The client provides the profile to create along with the profile bytes, the server records it. _Direct use of this API is discouraged, please use a [supported profiler agent](https://cloud.google.com/profiler/docs/about-profiler#profiling_agent) instead for profile collection._"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudprofiler2_cli/projects_profiles-create-offline",
                   vec![
                     (Some(r##"parent"##),
@@ -478,8 +542,30 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("profiles-list",
+                    Some(r##"Lists profiles which have been collected so far and for which the caller has permission to view."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_cloudprofiler2_cli/projects_profiles-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. The parent, which owns this collection of profiles. Format: projects/{user_project_id}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("profiles-patch",
-                    Some(r##"UpdateProfile updates the profile bytes and labels on the profile resource created in the online mode. Updating the bytes for profiles created in the offline mode is currently not supported: the profile content must be provided at the time of the profile creation."##),
+                    Some(r##"UpdateProfile updates the profile bytes and labels on the profile resource created in the online mode. Updating the bytes for profiles created in the offline mode is currently not supported: the profile content must be provided at the time of the profile creation. _Direct use of this API is discouraged, please use a [supported profiler agent](https://cloud.google.com/profiler/docs/about-profiler#profiling_agent) instead for profile collection._"##),
                     "Details at http://byron.github.io/google-apis-rs/google_cloudprofiler2_cli/projects_profiles-patch",
                   vec![
                     (Some(r##"name"##),
@@ -512,7 +598,7 @@ async fn main() {
     
     let mut app = App::new("cloudprofiler2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
+           .version("5.0.4+20240219")
            .about("Manages continuous profiling information.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_cloudprofiler2_cli")
            .arg(Arg::with_name("url")

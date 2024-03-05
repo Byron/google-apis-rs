@@ -4,12 +4,12 @@
 [package]
 
 name = "google-datafusion1_beta1"
-version = "5.0.3+20221213"
+version = "5.0.4+20240111"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Data Fusion (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/datafusion1_beta1"
 homepage = "https://cloud.google.com/data-fusion/docs"
-documentation = "https://docs.rs/google-datafusion1_beta1/5.0.3+20221213"
+documentation = "https://docs.rs/google-datafusion1_beta1/5.0.4+20240111"
 license = "MIT"
 keywords = ["datafusion", "google", "protocol", "web", "api"]
 autobins = false

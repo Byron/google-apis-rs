@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// View monetary and non-monetary YouTube Analytics reports for your YouTube content
     YtAnalyticMonetaryReadonly,
@@ -129,7 +129,7 @@ impl<'a, S> YouTubeReporting<S> {
         YouTubeReporting {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://youtubereporting.googleapis.com/".to_string(),
             _root_url: "https://youtubereporting.googleapis.com/".to_string(),
         }
@@ -146,7 +146,7 @@ impl<'a, S> YouTubeReporting<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -208,7 +208,7 @@ pub struct GdataBlobstore2Info {
     /// gdata
     #[serde(rename="downloadReadHandle")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub download_read_handle: Option<Vec<u8>>,
     /// gdata
     #[serde(rename="readToken")]
@@ -217,7 +217,7 @@ pub struct GdataBlobstore2Info {
     /// gdata
     #[serde(rename="uploadMetadataContainer")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub upload_metadata_container: Option<Vec<u8>>,
 }
 
@@ -234,7 +234,7 @@ pub struct GdataCompositeMedia {
     /// gdata
     #[serde(rename="blobRef")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub blob_ref: Option<Vec<u8>>,
     /// gdata
     #[serde(rename="blobstore2Info")]
@@ -243,7 +243,7 @@ pub struct GdataCompositeMedia {
     /// gdata
     #[serde(rename="cosmoBinaryReference")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub cosmo_binary_reference: Option<Vec<u8>>,
     /// gdata
     #[serde(rename="crc32cHash")]
@@ -251,7 +251,7 @@ pub struct GdataCompositeMedia {
     pub crc32c_hash: Option<u32>,
     /// gdata
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub inline: Option<Vec<u8>>,
     /// gdata
     
@@ -260,7 +260,7 @@ pub struct GdataCompositeMedia {
     /// gdata
     #[serde(rename="md5Hash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub md5_hash: Option<Vec<u8>>,
     /// gdata
     #[serde(rename="objectId")]
@@ -276,7 +276,7 @@ pub struct GdataCompositeMedia {
     /// gdata
     #[serde(rename="sha1Hash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub sha1_hash: Option<Vec<u8>>,
 }
 
@@ -467,12 +467,12 @@ pub struct GdataMedia {
     /// gdata
     #[serde(rename="bigstoreObjectRef")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub bigstore_object_ref: Option<Vec<u8>>,
     /// gdata
     #[serde(rename="blobRef")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub blob_ref: Option<Vec<u8>>,
     /// gdata
     #[serde(rename="blobstore2Info")]
@@ -493,7 +493,7 @@ pub struct GdataMedia {
     /// gdata
     #[serde(rename="cosmoBinaryReference")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub cosmo_binary_reference: Option<Vec<u8>>,
     /// gdata
     #[serde(rename="crc32cHash")]
@@ -535,7 +535,7 @@ pub struct GdataMedia {
     pub hash_verified: Option<bool>,
     /// gdata
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub inline: Option<Vec<u8>>,
     /// gdata
     #[serde(rename="isPotentialRetry")]
@@ -548,12 +548,12 @@ pub struct GdataMedia {
     /// gdata
     #[serde(rename="md5Hash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub md5_hash: Option<Vec<u8>>,
     /// gdata
     #[serde(rename="mediaId")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub media_id: Option<Vec<u8>>,
     /// gdata
     #[serde(rename="objectId")]
@@ -569,12 +569,12 @@ pub struct GdataMedia {
     /// gdata
     #[serde(rename="sha1Hash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub sha1_hash: Option<Vec<u8>>,
     /// gdata
     #[serde(rename="sha256Hash")]
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub sha256_hash: Option<Vec<u8>>,
     /// gdata
     

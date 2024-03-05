@@ -25,10 +25,12 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *GKE Hub* API at revision *20230106*. The CLI is at version *5.0.3*.
+This documentation was generated from the *GKE Hub* API at revision *20240225*. The CLI is at version *5.0.3*.
 
 ```bash
 gkehub1 [options]
+        organizations
+                locations-fleets-list <parent> [-p <v>]... [-o <out>]
         projects
                 locations-features-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-features-delete <name> [-p <v>]... [-o <out>]
@@ -38,8 +40,18 @@ gkehub1 [options]
                 locations-features-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-features-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-features-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-fleets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-fleets-delete <name> [-p <v>]... [-o <out>]
+                locations-fleets-get <name> [-p <v>]... [-o <out>]
+                locations-fleets-list <parent> [-p <v>]... [-o <out>]
+                locations-fleets-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
+                locations-memberships-bindings-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-memberships-bindings-delete <name> [-p <v>]... [-o <out>]
+                locations-memberships-bindings-get <name> [-p <v>]... [-o <out>]
+                locations-memberships-bindings-list <parent> [-p <v>]... [-o <out>]
+                locations-memberships-bindings-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-memberships-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-memberships-delete <name> [-p <v>]... [-o <out>]
                 locations-memberships-generate-connect-manifest <name> [-p <v>]... [-o <out>]
@@ -53,6 +65,24 @@ gkehub1 [options]
                 locations-operations-delete <name> [-p <v>]... [-o <out>]
                 locations-operations-get <name> [-p <v>]... [-o <out>]
                 locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-scopes-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-scopes-delete <name> [-p <v>]... [-o <out>]
+                locations-scopes-get <name> [-p <v>]... [-o <out>]
+                locations-scopes-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-scopes-list <parent> [-p <v>]... [-o <out>]
+                locations-scopes-namespaces-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-scopes-namespaces-delete <name> [-p <v>]... [-o <out>]
+                locations-scopes-namespaces-get <name> [-p <v>]... [-o <out>]
+                locations-scopes-namespaces-list <parent> [-p <v>]... [-o <out>]
+                locations-scopes-namespaces-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-scopes-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-scopes-rbacrolebindings-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-scopes-rbacrolebindings-delete <name> [-p <v>]... [-o <out>]
+                locations-scopes-rbacrolebindings-get <name> [-p <v>]... [-o <out>]
+                locations-scopes-rbacrolebindings-list <parent> [-p <v>]... [-o <out>]
+                locations-scopes-rbacrolebindings-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-scopes-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-scopes-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
   gkehub1 --help
 
 Configuration:

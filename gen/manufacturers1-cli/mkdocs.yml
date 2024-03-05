@@ -1,4 +1,4 @@
-site_name: Manufacturer Center v5.0.3+20230123
+site_name: Manufacturer Center v5.0.4+20240205
 site_url: http://byron.github.io/google-apis-rs/google-manufacturers1-cli
 site_description: A complete library to interact with Manufacturer Center (protocol v1)
 
@@ -10,6 +10,10 @@ site_dir: build_html
 nav:
 - Home: 'index.md'
 - 'Accounts':
+    - 'Languages Product Certifications Delete': 'accounts_languages-product-certifications-delete.md'
+    - 'Languages Product Certifications Get': 'accounts_languages-product-certifications-get.md'
+    - 'Languages Product Certifications List': 'accounts_languages-product-certifications-list.md'
+    - 'Languages Product Certifications Patch': 'accounts_languages-product-certifications-patch.md'
     - 'Products Delete': 'accounts_products-delete.md'
     - 'Products Get': 'accounts_products-get.md'
     - 'Products List': 'accounts_products-list.md'

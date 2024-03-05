@@ -2,10 +2,10 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *BigQuery Connection Service* crate version *5.0.3+20230115*, where *20230115* is the exact revision of the *bigqueryconnection:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *BigQuery Connection Service* crate version *5.0.4+20240214*, where *20240214* is the exact revision of the *bigqueryconnection:v1beta1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *BigQuery Connection Service* *v1_beta1* API can be found at the
-//! [official documentation site](https://cloud.google.com/bigquery/).
+//! [official documentation site](https://cloud.google.com/bigquery/docs/connections-api-intro).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/bigqueryconnection1_beta1).
 //! # Features
 //! 

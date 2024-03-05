@@ -4,12 +4,12 @@
 [package]
 
 name = "google-cloudprofiler2"
-version = "5.0.3+20230123"
+version = "5.0.4+20240219"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Profiler (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudprofiler2"
 homepage = "https://cloud.google.com/profiler/"
-documentation = "https://docs.rs/google-cloudprofiler2/5.0.3+20230123"
+documentation = "https://docs.rs/google-cloudprofiler2/5.0.4+20240219"
 license = "MIT"
 keywords = ["cloudprofiler", "google", "protocol", "web", "api"]
 autobins = false

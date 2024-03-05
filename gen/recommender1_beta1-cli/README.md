@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Recommender* API at revision *20230108*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Recommender* API at revision *20240226*. The CLI is at version *5.0.4*.
 
 ```bash
 recommender1-beta1 [options]
@@ -35,6 +35,7 @@ recommender1-beta1 [options]
                 locations-insight-types-insights-list <parent> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-mark-accepted <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-insight-types-update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-list <name> [-p <v>]... [-o <out>]
                 locations-recommenders-get-config <name> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-get <name> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-list <parent> [-p <v>]... [-o <out>]
@@ -47,18 +48,22 @@ recommender1-beta1 [options]
                 locations-insight-types-insights-get <name> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-list <parent> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-mark-accepted <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-list <name> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-get <name> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-list <parent> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-claimed <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-dismissed <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-failed <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-succeeded <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        insight-types
+                list [-p <v>]... [-o <out>]
         organizations
                 locations-insight-types-get-config <name> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-get <name> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-list <parent> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-mark-accepted <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-insight-types-update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-list <name> [-p <v>]... [-o <out>]
                 locations-recommenders-get-config <name> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-get <name> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-list <parent> [-p <v>]... [-o <out>]
@@ -73,6 +78,7 @@ recommender1-beta1 [options]
                 locations-insight-types-insights-list <parent> [-p <v>]... [-o <out>]
                 locations-insight-types-insights-mark-accepted <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-insight-types-update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-list <name> [-p <v>]... [-o <out>]
                 locations-recommenders-get-config <name> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-get <name> [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-list <parent> [-p <v>]... [-o <out>]
@@ -81,6 +87,8 @@ recommender1-beta1 [options]
                 locations-recommenders-recommendations-mark-failed <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-recommenders-recommendations-mark-succeeded <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-recommenders-update-config <name> (-r <kv>)... [-p <v>]... [-o <out>]
+        recommenders
+                list [-p <v>]... [-o <out>]
   recommender1-beta1 --help
 
 Configuration:

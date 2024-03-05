@@ -4,12 +4,12 @@
 [package]
 
 name = "google-datastore1"
-version = "5.0.3+20230118"
+version = "5.0.4+20240226"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with datastore (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/datastore1"
 homepage = "https://cloud.google.com/datastore/"
-documentation = "https://docs.rs/google-datastore1/5.0.3+20230118"
+documentation = "https://docs.rs/google-datastore1/5.0.4+20240226"
 license = "MIT"
 keywords = ["datastore", "google", "protocol", "web", "api"]
 autobins = false

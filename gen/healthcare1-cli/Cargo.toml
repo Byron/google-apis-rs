@@ -4,7 +4,7 @@
 [package]
 
 name = "google-healthcare1-cli"
-version = "5.0.3+20221220"
+version = "5.0.4+20240228"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Healthcare (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/healthcare1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-healthcare1]
 path = "../healthcare1"
-version = "5.0.3+20221220"
+version = "5.0.4+20240228"
 

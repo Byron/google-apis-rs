@@ -103,7 +103,7 @@ impl<'a, S> CloudSecurityToken<S> {
         CloudSecurityToken {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://sts.googleapis.com/".to_string(),
             _root_url: "https://sts.googleapis.com/".to_string(),
         }
@@ -114,7 +114,7 @@ impl<'a, S> CloudSecurityToken<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -201,13 +201,16 @@ pub struct GoogleIdentityStsV1ExchangeOauthTokenResponse {
     /// The amount of time, in seconds, between the time when the access token was issued and the time when the access token will expires.
     
     pub expires_in: Option<i32>,
+    /// Google issued ID token in response to the OAuth token exchange request for ID token flow.
+    
+    pub id_token: Option<String>,
     /// A refresh token, issued by Google, in response to the OAuth token exchange request for refresh token flow
     
     pub refresh_token: Option<String>,
     /// A list of scopes associated with the returned token.
     
     pub scope: Option<String>,
-    /// The type of token. Field reserved for RFC compliance. See https://www.rfc-editor.org/rfc/rfc6749#section-5.1 Note: No token_type is returned for current implementation
+    /// The type of token. Field reserved for RFC compliance. See https://www.rfc-editor.org/rfc/rfc6749#section-5.1
     
     pub token_type: Option<String>,
 }

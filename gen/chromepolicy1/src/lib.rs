@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Chrome Policy* crate version *5.0.3+20230123*, where *20230123* is the exact revision of the *chromepolicy:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Chrome Policy* crate version *5.0.4+20240303*, where *20240303* is the exact revision of the *chromepolicy:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Chrome Policy* *v1* API can be found at the
 //! [official documentation site](http://developers.google.com/chrome/policy).

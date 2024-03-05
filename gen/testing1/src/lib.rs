@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *testing* crate version *5.0.3+20230119*, where *20230119* is the exact revision of the *testing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *testing* crate version *5.0.4+20240227*, where *20240227* is the exact revision of the *testing:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *testing* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/cloud-test-lab/).
@@ -14,7 +14,7 @@
 //! * application detail service
 //!  * [*get apk details*](api::ApplicationDetailServiceGetApkDetailCall)
 //! * projects
-//!  * [*test matrices cancel*](api::ProjectTestMatriceCancelCall), [*test matrices create*](api::ProjectTestMatriceCreateCall) and [*test matrices get*](api::ProjectTestMatriceGetCall)
+//!  * [*device sessions cancel*](api::ProjectDeviceSessionCancelCall), [*device sessions create*](api::ProjectDeviceSessionCreateCall), [*device sessions get*](api::ProjectDeviceSessionGetCall), [*device sessions list*](api::ProjectDeviceSessionListCall), [*device sessions patch*](api::ProjectDeviceSessionPatchCall), [*test matrices cancel*](api::ProjectTestMatriceCancelCall), [*test matrices create*](api::ProjectTestMatriceCreateCall) and [*test matrices get*](api::ProjectTestMatriceGetCall)
 //! * [test environment catalog](api::TestEnvironmentCatalog)
 //!  * [*get*](api::TestEnvironmentCatalogGetCall)
 //! 
@@ -51,8 +51,9 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.projects().test_matrices_create(...).doit().await
-//! let r = hub.projects().test_matrices_get(...).doit().await
+//! let r = hub.projects().device_sessions_create(...).doit().await
+//! let r = hub.projects().device_sessions_get(...).doit().await
+//! let r = hub.projects().device_sessions_patch(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -79,7 +80,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_testing1 as testing1;
-//! use testing1::api::TestMatrix;
+//! use testing1::api::DeviceSession;
 //! use testing1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -101,13 +102,13 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = TestMatrix::default();
+//! let mut req = DeviceSession::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().test_matrices_create(req, "projectId")
-//!              .request_id("ipsum")
+//! let result = hub.projects().device_sessions_patch(req, "name")
+//!              .update_mask(&Default::default())
 //!              .doit().await;
 //! 
 //! match result {

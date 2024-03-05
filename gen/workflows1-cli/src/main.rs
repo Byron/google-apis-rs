@@ -353,7 +353,9 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "call-log-level" => Some(("callLogLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "crypto-key-name" => Some(("cryptoKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -362,9 +364,12 @@ where
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-contents" => Some(("sourceContents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-error.details" => Some(("stateError.details", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-error.type" => Some(("stateError.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-env-vars" => Some(("userEnvVars", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "labels", "name", "revision-create-time", "revision-id", "service-account", "source-contents", "state", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["call-log-level", "create-time", "crypto-key-name", "description", "details", "labels", "name", "revision-create-time", "revision-id", "service-account", "source-contents", "state", "state-error", "type", "update-time", "user-env-vars"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -486,6 +491,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "revision-id" => {
+                    call = call.revision_id(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -499,6 +507,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["revision-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -597,6 +606,65 @@ where
         }
     }
 
+    async fn _projects_locations_workflows_list_revisions(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_workflows_list_revisions(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_workflows_patch(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -620,7 +688,9 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "call-log-level" => Some(("callLogLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "crypto-key-name" => Some(("cryptoKeyName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "description" => Some(("description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -629,9 +699,12 @@ where
                     "service-account" => Some(("serviceAccount", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-contents" => Some(("sourceContents", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-error.details" => Some(("stateError.details", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-error.type" => Some(("stateError.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "user-env-vars" => Some(("userEnvVars", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["create-time", "description", "labels", "name", "revision-create-time", "revision-id", "service-account", "source-contents", "state", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["call-log-level", "create-time", "crypto-key-name", "description", "details", "labels", "name", "revision-create-time", "revision-id", "service-account", "source-contents", "state", "state-error", "type", "update-time", "user-env-vars"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -729,6 +802,9 @@ where
                     ("locations-workflows-list", Some(opt)) => {
                         call_result = self._projects_locations_workflows_list(opt, dry_run, &mut err).await;
                     },
+                    ("locations-workflows-list-revisions", Some(opt)) => {
+                        call_result = self._projects_locations_workflows_list_revisions(opt, dry_run, &mut err).await;
+                    },
                     ("locations-workflows-patch", Some(opt)) => {
                         call_result = self._projects_locations_workflows_patch(opt, dry_run, &mut err).await;
                     },
@@ -811,7 +887,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-get', 'locations-list', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-workflows-create', 'locations-workflows-delete', 'locations-workflows-get', 'locations-workflows-list' and 'locations-workflows-patch'", vec![
+        ("projects", "methods: 'locations-get', 'locations-list', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-workflows-create', 'locations-workflows-delete', 'locations-workflows-get', 'locations-workflows-list', 'locations-workflows-list-revisions' and 'locations-workflows-patch'", vec![
             ("locations-get",
                     Some(r##"Gets information about a location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_workflows1_cli/projects_locations-get",
@@ -901,7 +977,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_workflows1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -1016,13 +1092,35 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-workflows-list-revisions",
+                    Some(r##"Lists revisions for a given workflow."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_workflows1_cli/projects_locations-workflows-list-revisions",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Workflow for which the revisions should be listed. Format: projects/{project}/locations/{location}/workflows/{workflow}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-workflows-patch",
                     Some(r##"Updates an existing workflow. Running this method has no impact on already running executions of the workflow. A new revision of the workflow might be created as a result of a successful update operation. In that case, the new revision is used in new workflow executions."##),
                     "Details at http://byron.github.io/google-apis-rs/google_workflows1_cli/projects_locations-workflows-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"The resource name of the workflow. Format: projects/{project}/locations/{location}/workflows/{workflow}"##),
+                     Some(r##"The resource name of the workflow. Format: projects/{project}/locations/{location}/workflows/{workflow}. This is a workflow-wide field and is not tied to a specific revision."##),
                      Some(true),
                      Some(false)),
         
@@ -1050,7 +1148,7 @@ async fn main() {
     
     let mut app = App::new("workflows1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230105")
+           .version("5.0.4+20240207")
            .about("Manage workflow definitions. To execute workflows and manage executions, see the Workflows Executions API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_workflows1_cli")
            .arg(Arg::with_name("url")

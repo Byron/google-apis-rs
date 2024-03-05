@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Container Analysis* API at revision *20230106*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Container Analysis* API at revision *20240223*. The CLI is at version *5.0.4*.
 
 ```bash
 containeranalysis1 [options]
@@ -51,6 +51,7 @@ containeranalysis1 [options]
                 occurrences-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 occurrences-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 occurrences-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                resources-export-sbom <name> (-r <kv>)... [-p <v>]... [-o <out>]
   containeranalysis1 --help
 
 Configuration:

@@ -25,12 +25,17 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Firebaseappcheck* API at revision *20230116*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Firebaseappcheck* API at revision *20240226*. The CLI is at version *5.0.4*.
 
 ```bash
 firebaseappcheck1-beta [options]
         jwks
                 get <name> [-p <v>]... [-o <out>]
+        oauth-clients
+                exchange-app-attest-assertion <app> (-r <kv>)... [-p <v>]... [-o <out>]
+                exchange-app-attest-attestation <app> (-r <kv>)... [-p <v>]... [-o <out>]
+                exchange-debug-token <app> (-r <kv>)... [-p <v>]... [-o <out>]
+                generate-app-attest-challenge <app> (-r <kv>)... [-p <v>]... [-o <out>]
         projects
                 apps-app-attest-config-batch-get <parent> [-p <v>]... [-o <out>]
                 apps-app-attest-config-get <name> [-p <v>]... [-o <out>]
@@ -74,6 +79,13 @@ firebaseappcheck1-beta [options]
                 services-get <name> [-p <v>]... [-o <out>]
                 services-list <parent> [-p <v>]... [-o <out>]
                 services-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                services-resource-policies-batch-update <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                services-resource-policies-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                services-resource-policies-delete <name> [-p <v>]... [-o <out>]
+                services-resource-policies-get <name> [-p <v>]... [-o <out>]
+                services-resource-policies-list <parent> [-p <v>]... [-o <out>]
+                services-resource-policies-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                verify-app-check-token <project> (-r <kv>)... [-p <v>]... [-o <out>]
   firebaseappcheck1-beta --help
 
 Configuration:

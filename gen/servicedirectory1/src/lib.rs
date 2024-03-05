@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Service Directory* crate version *5.0.3+20230105*, where *20230105* is the exact revision of the *servicedirectory:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Service Directory* crate version *5.0.4+20240226*, where *20240226* is the exact revision of the *servicedirectory:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Service Directory* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/service-directory).

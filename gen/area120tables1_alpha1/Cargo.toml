@@ -4,12 +4,12 @@
 [package]
 
 name = "google-area120tables1_alpha1"
-version = "5.0.3+20230123"
+version = "5.0.4+20240304"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Area120 Tables (protocol v1alpha1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/area120tables1_alpha1"
 homepage = "https://support.google.com/area120-tables/answer/10011390"
-documentation = "https://docs.rs/google-area120tables1_alpha1/5.0.3+20230123"
+documentation = "https://docs.rs/google-area120tables1_alpha1/5.0.4+20240304"
 license = "MIT"
 keywords = ["area120tables", "google", "protocol", "web", "api"]
 autobins = false

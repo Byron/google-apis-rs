@@ -622,6 +622,7 @@ where
                     "config.subject-config.subject-alt-name.email-addresses" => Some(("config.subjectConfig.subjectAltName.emailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.subject-config.subject-alt-name.ip-addresses" => Some(("config.subjectConfig.subjectAltName.ipAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.subject-config.subject-alt-name.uris" => Some(("config.subjectConfig.subjectAltName.uris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.subject-key-id.key-id" => Some(("config.subjectKeyId.keyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.x509-config.aia-ocsp-servers" => Some(("config.x509Config.aiaOcspServers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.x509-config.ca-options.is-ca" => Some(("config.x509Config.caOptions.isCa", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.x509-config.ca-options.max-issuer-path-length" => Some(("config.x509Config.caOptions.maxIssuerPathLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -640,6 +641,15 @@ where
                     "config.x509-config.key-usage.extended-key-usage.ocsp-signing" => Some(("config.x509Config.keyUsage.extendedKeyUsage.ocspSigning", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.x509-config.key-usage.extended-key-usage.server-auth" => Some(("config.x509Config.keyUsage.extendedKeyUsage.serverAuth", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.x509-config.key-usage.extended-key-usage.time-stamping" => Some(("config.x509Config.keyUsage.extendedKeyUsage.timeStamping", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.x509-config.name-constraints.critical" => Some(("config.x509Config.nameConstraints.critical", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.x509-config.name-constraints.excluded-dns-names" => Some(("config.x509Config.nameConstraints.excludedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.excluded-email-addresses" => Some(("config.x509Config.nameConstraints.excludedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.excluded-ip-ranges" => Some(("config.x509Config.nameConstraints.excludedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.excluded-uris" => Some(("config.x509Config.nameConstraints.excludedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-dns-names" => Some(("config.x509Config.nameConstraints.permittedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-email-addresses" => Some(("config.x509Config.nameConstraints.permittedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-ip-ranges" => Some(("config.x509Config.nameConstraints.permittedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-uris" => Some(("config.x509Config.nameConstraints.permittedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delete-time" => Some(("deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -657,7 +667,7 @@ where
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-urls", "aia-ocsp-servers", "algorithm", "base-key-usage", "ca-certificate-access-url", "ca-options", "cert-sign", "certificate-authority", "client-auth", "cloud-kms-key-version", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "crl-access-urls", "crl-sign", "data-encipherment", "decipher-only", "delete-time", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "expire-time", "extended-key-usage", "format", "gcs-bucket", "ip-addresses", "is-ca", "key", "key-agreement", "key-encipherment", "key-spec", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "ocsp-signing", "organization", "organizational-unit", "pem-ca-certificates", "pem-certificates", "pem-issuer-chain", "postal-code", "province", "public-key", "server-auth", "state", "street-address", "subject", "subject-alt-name", "subject-config", "subordinate-config", "tier", "time-stamping", "type", "update-time", "uris", "x509-config"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-urls", "aia-ocsp-servers", "algorithm", "base-key-usage", "ca-certificate-access-url", "ca-options", "cert-sign", "certificate-authority", "client-auth", "cloud-kms-key-version", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "critical", "crl-access-urls", "crl-sign", "data-encipherment", "decipher-only", "delete-time", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "expire-time", "extended-key-usage", "format", "gcs-bucket", "ip-addresses", "is-ca", "key", "key-agreement", "key-encipherment", "key-id", "key-spec", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "name-constraints", "ocsp-signing", "organization", "organizational-unit", "pem-ca-certificates", "pem-certificates", "pem-issuer-chain", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "postal-code", "province", "public-key", "server-auth", "state", "street-address", "subject", "subject-alt-name", "subject-config", "subject-key-id", "subordinate-config", "tier", "time-stamping", "type", "update-time", "uris", "x509-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -736,6 +746,9 @@ where
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
                 },
+                "ignore-dependent-resources" => {
+                    call = call.ignore_dependent_resources(        value.map(|v| arg_from_str(v, err, "ignore-dependent-resources", "boolean")).unwrap_or(false));
+                },
                 "ignore-active-certificates" => {
                     call = call.ignore_active_certificates(        value.map(|v| arg_from_str(v, err, "ignore-active-certificates", "boolean")).unwrap_or(false));
                 },
@@ -752,7 +765,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["ignore-active-certificates", "request-id", "skip-grace-period"].iter().map(|v|*v));
+                                                                           v.extend(["ignore-active-certificates", "ignore-dependent-resources", "request-id", "skip-grace-period"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -809,9 +822,10 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "ignore-dependent-resources" => Some(("ignoreDependentResources", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "request-id" => Some(("requestId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["request-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["ignore-dependent-resources", "request-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1164,6 +1178,7 @@ where
                     "config.subject-config.subject-alt-name.email-addresses" => Some(("config.subjectConfig.subjectAltName.emailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.subject-config.subject-alt-name.ip-addresses" => Some(("config.subjectConfig.subjectAltName.ipAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.subject-config.subject-alt-name.uris" => Some(("config.subjectConfig.subjectAltName.uris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.subject-key-id.key-id" => Some(("config.subjectKeyId.keyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.x509-config.aia-ocsp-servers" => Some(("config.x509Config.aiaOcspServers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.x509-config.ca-options.is-ca" => Some(("config.x509Config.caOptions.isCa", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.x509-config.ca-options.max-issuer-path-length" => Some(("config.x509Config.caOptions.maxIssuerPathLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1182,6 +1197,15 @@ where
                     "config.x509-config.key-usage.extended-key-usage.ocsp-signing" => Some(("config.x509Config.keyUsage.extendedKeyUsage.ocspSigning", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.x509-config.key-usage.extended-key-usage.server-auth" => Some(("config.x509Config.keyUsage.extendedKeyUsage.serverAuth", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.x509-config.key-usage.extended-key-usage.time-stamping" => Some(("config.x509Config.keyUsage.extendedKeyUsage.timeStamping", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.x509-config.name-constraints.critical" => Some(("config.x509Config.nameConstraints.critical", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.x509-config.name-constraints.excluded-dns-names" => Some(("config.x509Config.nameConstraints.excludedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.excluded-email-addresses" => Some(("config.x509Config.nameConstraints.excludedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.excluded-ip-ranges" => Some(("config.x509Config.nameConstraints.excludedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.excluded-uris" => Some(("config.x509Config.nameConstraints.excludedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-dns-names" => Some(("config.x509Config.nameConstraints.permittedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-email-addresses" => Some(("config.x509Config.nameConstraints.permittedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-ip-ranges" => Some(("config.x509Config.nameConstraints.permittedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-uris" => Some(("config.x509Config.nameConstraints.permittedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "delete-time" => Some(("deleteTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1199,7 +1223,7 @@ where
                     "type" => Some(("type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-urls", "aia-ocsp-servers", "algorithm", "base-key-usage", "ca-certificate-access-url", "ca-options", "cert-sign", "certificate-authority", "client-auth", "cloud-kms-key-version", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "crl-access-urls", "crl-sign", "data-encipherment", "decipher-only", "delete-time", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "expire-time", "extended-key-usage", "format", "gcs-bucket", "ip-addresses", "is-ca", "key", "key-agreement", "key-encipherment", "key-spec", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "ocsp-signing", "organization", "organizational-unit", "pem-ca-certificates", "pem-certificates", "pem-issuer-chain", "postal-code", "province", "public-key", "server-auth", "state", "street-address", "subject", "subject-alt-name", "subject-config", "subordinate-config", "tier", "time-stamping", "type", "update-time", "uris", "x509-config"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["access-urls", "aia-ocsp-servers", "algorithm", "base-key-usage", "ca-certificate-access-url", "ca-options", "cert-sign", "certificate-authority", "client-auth", "cloud-kms-key-version", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "critical", "crl-access-urls", "crl-sign", "data-encipherment", "decipher-only", "delete-time", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "expire-time", "extended-key-usage", "format", "gcs-bucket", "ip-addresses", "is-ca", "key", "key-agreement", "key-encipherment", "key-id", "key-spec", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "name-constraints", "ocsp-signing", "organization", "organizational-unit", "pem-ca-certificates", "pem-certificates", "pem-issuer-chain", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "postal-code", "province", "public-key", "server-auth", "state", "street-address", "subject", "subject-alt-name", "subject-config", "subject-key-id", "subordinate-config", "tier", "time-stamping", "type", "update-time", "uris", "x509-config"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1415,6 +1439,15 @@ where
                     "certificate-description.x509-description.key-usage.extended-key-usage.ocsp-signing" => Some(("certificateDescription.x509Description.keyUsage.extendedKeyUsage.ocspSigning", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "certificate-description.x509-description.key-usage.extended-key-usage.server-auth" => Some(("certificateDescription.x509Description.keyUsage.extendedKeyUsage.serverAuth", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "certificate-description.x509-description.key-usage.extended-key-usage.time-stamping" => Some(("certificateDescription.x509Description.keyUsage.extendedKeyUsage.timeStamping", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "certificate-description.x509-description.name-constraints.critical" => Some(("certificateDescription.x509Description.nameConstraints.critical", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "certificate-description.x509-description.name-constraints.excluded-dns-names" => Some(("certificateDescription.x509Description.nameConstraints.excludedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "certificate-description.x509-description.name-constraints.excluded-email-addresses" => Some(("certificateDescription.x509Description.nameConstraints.excludedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "certificate-description.x509-description.name-constraints.excluded-ip-ranges" => Some(("certificateDescription.x509Description.nameConstraints.excludedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "certificate-description.x509-description.name-constraints.excluded-uris" => Some(("certificateDescription.x509Description.nameConstraints.excludedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "certificate-description.x509-description.name-constraints.permitted-dns-names" => Some(("certificateDescription.x509Description.nameConstraints.permittedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "certificate-description.x509-description.name-constraints.permitted-email-addresses" => Some(("certificateDescription.x509Description.nameConstraints.permittedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "certificate-description.x509-description.name-constraints.permitted-ip-ranges" => Some(("certificateDescription.x509Description.nameConstraints.permittedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "certificate-description.x509-description.name-constraints.permitted-uris" => Some(("certificateDescription.x509Description.nameConstraints.permittedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "certificate-template" => Some(("certificateTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.public-key.format" => Some(("config.publicKey.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.public-key.key" => Some(("config.publicKey.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1430,6 +1463,7 @@ where
                     "config.subject-config.subject-alt-name.email-addresses" => Some(("config.subjectConfig.subjectAltName.emailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.subject-config.subject-alt-name.ip-addresses" => Some(("config.subjectConfig.subjectAltName.ipAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.subject-config.subject-alt-name.uris" => Some(("config.subjectConfig.subjectAltName.uris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.subject-key-id.key-id" => Some(("config.subjectKeyId.keyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.x509-config.aia-ocsp-servers" => Some(("config.x509Config.aiaOcspServers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.x509-config.ca-options.is-ca" => Some(("config.x509Config.caOptions.isCa", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.x509-config.ca-options.max-issuer-path-length" => Some(("config.x509Config.caOptions.maxIssuerPathLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1448,6 +1482,15 @@ where
                     "config.x509-config.key-usage.extended-key-usage.ocsp-signing" => Some(("config.x509Config.keyUsage.extendedKeyUsage.ocspSigning", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.x509-config.key-usage.extended-key-usage.server-auth" => Some(("config.x509Config.keyUsage.extendedKeyUsage.serverAuth", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.x509-config.key-usage.extended-key-usage.time-stamping" => Some(("config.x509Config.keyUsage.extendedKeyUsage.timeStamping", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.x509-config.name-constraints.critical" => Some(("config.x509Config.nameConstraints.critical", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.x509-config.name-constraints.excluded-dns-names" => Some(("config.x509Config.nameConstraints.excludedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.excluded-email-addresses" => Some(("config.x509Config.nameConstraints.excludedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.excluded-ip-ranges" => Some(("config.x509Config.nameConstraints.excludedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.excluded-uris" => Some(("config.x509Config.nameConstraints.excludedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-dns-names" => Some(("config.x509Config.nameConstraints.permittedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-email-addresses" => Some(("config.x509Config.nameConstraints.permittedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-ip-ranges" => Some(("config.x509Config.nameConstraints.permittedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-uris" => Some(("config.x509Config.nameConstraints.permittedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "issuer-certificate-authority" => Some(("issuerCertificateAuthority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -1461,7 +1504,7 @@ where
                     "subject-mode" => Some(("subjectMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-issuing-certificate-urls", "aia-ocsp-servers", "authority-key-id", "base-key-usage", "ca-options", "cert-fingerprint", "cert-sign", "certificate-description", "certificate-template", "client-auth", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "crl-distribution-points", "crl-sign", "data-encipherment", "decipher-only", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "extended-key-usage", "format", "hex-serial-number", "ip-addresses", "is-ca", "issuer-certificate-authority", "key", "key-agreement", "key-encipherment", "key-id", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "not-after-time", "not-before-time", "ocsp-signing", "organization", "organizational-unit", "pem-certificate", "pem-certificate-chain", "pem-csr", "postal-code", "province", "public-key", "revocation-details", "revocation-state", "revocation-time", "server-auth", "sha256-hash", "street-address", "subject", "subject-alt-name", "subject-config", "subject-description", "subject-key-id", "subject-mode", "time-stamping", "update-time", "uris", "x509-config", "x509-description"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-issuing-certificate-urls", "aia-ocsp-servers", "authority-key-id", "base-key-usage", "ca-options", "cert-fingerprint", "cert-sign", "certificate-description", "certificate-template", "client-auth", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "critical", "crl-distribution-points", "crl-sign", "data-encipherment", "decipher-only", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "extended-key-usage", "format", "hex-serial-number", "ip-addresses", "is-ca", "issuer-certificate-authority", "key", "key-agreement", "key-encipherment", "key-id", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "name-constraints", "not-after-time", "not-before-time", "ocsp-signing", "organization", "organizational-unit", "pem-certificate", "pem-certificate-chain", "pem-csr", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "postal-code", "province", "public-key", "revocation-details", "revocation-state", "revocation-time", "server-auth", "sha256-hash", "street-address", "subject", "subject-alt-name", "subject-config", "subject-description", "subject-key-id", "subject-mode", "time-stamping", "update-time", "uris", "x509-config", "x509-description"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1715,6 +1758,15 @@ where
                     "certificate-description.x509-description.key-usage.extended-key-usage.ocsp-signing" => Some(("certificateDescription.x509Description.keyUsage.extendedKeyUsage.ocspSigning", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "certificate-description.x509-description.key-usage.extended-key-usage.server-auth" => Some(("certificateDescription.x509Description.keyUsage.extendedKeyUsage.serverAuth", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "certificate-description.x509-description.key-usage.extended-key-usage.time-stamping" => Some(("certificateDescription.x509Description.keyUsage.extendedKeyUsage.timeStamping", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "certificate-description.x509-description.name-constraints.critical" => Some(("certificateDescription.x509Description.nameConstraints.critical", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "certificate-description.x509-description.name-constraints.excluded-dns-names" => Some(("certificateDescription.x509Description.nameConstraints.excludedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "certificate-description.x509-description.name-constraints.excluded-email-addresses" => Some(("certificateDescription.x509Description.nameConstraints.excludedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "certificate-description.x509-description.name-constraints.excluded-ip-ranges" => Some(("certificateDescription.x509Description.nameConstraints.excludedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "certificate-description.x509-description.name-constraints.excluded-uris" => Some(("certificateDescription.x509Description.nameConstraints.excludedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "certificate-description.x509-description.name-constraints.permitted-dns-names" => Some(("certificateDescription.x509Description.nameConstraints.permittedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "certificate-description.x509-description.name-constraints.permitted-email-addresses" => Some(("certificateDescription.x509Description.nameConstraints.permittedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "certificate-description.x509-description.name-constraints.permitted-ip-ranges" => Some(("certificateDescription.x509Description.nameConstraints.permittedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "certificate-description.x509-description.name-constraints.permitted-uris" => Some(("certificateDescription.x509Description.nameConstraints.permittedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "certificate-template" => Some(("certificateTemplate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.public-key.format" => Some(("config.publicKey.format", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.public-key.key" => Some(("config.publicKey.key", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1730,6 +1782,7 @@ where
                     "config.subject-config.subject-alt-name.email-addresses" => Some(("config.subjectConfig.subjectAltName.emailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.subject-config.subject-alt-name.ip-addresses" => Some(("config.subjectConfig.subjectAltName.ipAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.subject-config.subject-alt-name.uris" => Some(("config.subjectConfig.subjectAltName.uris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.subject-key-id.key-id" => Some(("config.subjectKeyId.keyId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "config.x509-config.aia-ocsp-servers" => Some(("config.x509Config.aiaOcspServers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "config.x509-config.ca-options.is-ca" => Some(("config.x509Config.caOptions.isCa", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.x509-config.ca-options.max-issuer-path-length" => Some(("config.x509Config.caOptions.maxIssuerPathLength", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -1748,6 +1801,15 @@ where
                     "config.x509-config.key-usage.extended-key-usage.ocsp-signing" => Some(("config.x509Config.keyUsage.extendedKeyUsage.ocspSigning", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.x509-config.key-usage.extended-key-usage.server-auth" => Some(("config.x509Config.keyUsage.extendedKeyUsage.serverAuth", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "config.x509-config.key-usage.extended-key-usage.time-stamping" => Some(("config.x509Config.keyUsage.extendedKeyUsage.timeStamping", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.x509-config.name-constraints.critical" => Some(("config.x509Config.nameConstraints.critical", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "config.x509-config.name-constraints.excluded-dns-names" => Some(("config.x509Config.nameConstraints.excludedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.excluded-email-addresses" => Some(("config.x509Config.nameConstraints.excludedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.excluded-ip-ranges" => Some(("config.x509Config.nameConstraints.excludedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.excluded-uris" => Some(("config.x509Config.nameConstraints.excludedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-dns-names" => Some(("config.x509Config.nameConstraints.permittedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-email-addresses" => Some(("config.x509Config.nameConstraints.permittedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-ip-ranges" => Some(("config.x509Config.nameConstraints.permittedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "config.x509-config.name-constraints.permitted-uris" => Some(("config.x509Config.nameConstraints.permittedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "issuer-certificate-authority" => Some(("issuerCertificateAuthority", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
@@ -1761,7 +1823,7 @@ where
                     "subject-mode" => Some(("subjectMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-issuing-certificate-urls", "aia-ocsp-servers", "authority-key-id", "base-key-usage", "ca-options", "cert-fingerprint", "cert-sign", "certificate-description", "certificate-template", "client-auth", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "crl-distribution-points", "crl-sign", "data-encipherment", "decipher-only", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "extended-key-usage", "format", "hex-serial-number", "ip-addresses", "is-ca", "issuer-certificate-authority", "key", "key-agreement", "key-encipherment", "key-id", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "not-after-time", "not-before-time", "ocsp-signing", "organization", "organizational-unit", "pem-certificate", "pem-certificate-chain", "pem-csr", "postal-code", "province", "public-key", "revocation-details", "revocation-state", "revocation-time", "server-auth", "sha256-hash", "street-address", "subject", "subject-alt-name", "subject-config", "subject-description", "subject-key-id", "subject-mode", "time-stamping", "update-time", "uris", "x509-config", "x509-description"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-issuing-certificate-urls", "aia-ocsp-servers", "authority-key-id", "base-key-usage", "ca-options", "cert-fingerprint", "cert-sign", "certificate-description", "certificate-template", "client-auth", "code-signing", "common-name", "config", "content-commitment", "country-code", "create-time", "critical", "crl-distribution-points", "crl-sign", "data-encipherment", "decipher-only", "digital-signature", "dns-names", "email-addresses", "email-protection", "encipher-only", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "extended-key-usage", "format", "hex-serial-number", "ip-addresses", "is-ca", "issuer-certificate-authority", "key", "key-agreement", "key-encipherment", "key-id", "key-usage", "labels", "lifetime", "locality", "max-issuer-path-length", "name", "name-constraints", "not-after-time", "not-before-time", "ocsp-signing", "organization", "organizational-unit", "pem-certificate", "pem-certificate-chain", "pem-csr", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "postal-code", "province", "public-key", "revocation-details", "revocation-state", "revocation-time", "server-auth", "sha256-hash", "street-address", "subject", "subject-alt-name", "subject-config", "subject-description", "subject-key-id", "subject-mode", "time-stamping", "update-time", "uris", "x509-config", "x509-description"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1957,6 +2019,15 @@ where
                     "issuance-policy.baseline-values.key-usage.extended-key-usage.ocsp-signing" => Some(("issuancePolicy.baselineValues.keyUsage.extendedKeyUsage.ocspSigning", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "issuance-policy.baseline-values.key-usage.extended-key-usage.server-auth" => Some(("issuancePolicy.baselineValues.keyUsage.extendedKeyUsage.serverAuth", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "issuance-policy.baseline-values.key-usage.extended-key-usage.time-stamping" => Some(("issuancePolicy.baselineValues.keyUsage.extendedKeyUsage.timeStamping", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "issuance-policy.baseline-values.name-constraints.critical" => Some(("issuancePolicy.baselineValues.nameConstraints.critical", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "issuance-policy.baseline-values.name-constraints.excluded-dns-names" => Some(("issuancePolicy.baselineValues.nameConstraints.excludedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "issuance-policy.baseline-values.name-constraints.excluded-email-addresses" => Some(("issuancePolicy.baselineValues.nameConstraints.excludedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "issuance-policy.baseline-values.name-constraints.excluded-ip-ranges" => Some(("issuancePolicy.baselineValues.nameConstraints.excludedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "issuance-policy.baseline-values.name-constraints.excluded-uris" => Some(("issuancePolicy.baselineValues.nameConstraints.excludedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "issuance-policy.baseline-values.name-constraints.permitted-dns-names" => Some(("issuancePolicy.baselineValues.nameConstraints.permittedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "issuance-policy.baseline-values.name-constraints.permitted-email-addresses" => Some(("issuancePolicy.baselineValues.nameConstraints.permittedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "issuance-policy.baseline-values.name-constraints.permitted-ip-ranges" => Some(("issuancePolicy.baselineValues.nameConstraints.permittedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "issuance-policy.baseline-values.name-constraints.permitted-uris" => Some(("issuancePolicy.baselineValues.nameConstraints.permittedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "issuance-policy.identity-constraints.allow-subject-alt-names-passthrough" => Some(("issuancePolicy.identityConstraints.allowSubjectAltNamesPassthrough", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "issuance-policy.identity-constraints.allow-subject-passthrough" => Some(("issuancePolicy.identityConstraints.allowSubjectPassthrough", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "issuance-policy.identity-constraints.cel-expression.description" => Some(("issuancePolicy.identityConstraints.celExpression.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1967,11 +2038,12 @@ where
                     "issuance-policy.passthrough-extensions.known-extensions" => Some(("issuancePolicy.passthroughExtensions.knownExtensions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "publishing-options.encoding-format" => Some(("publishingOptions.encodingFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "publishing-options.publish-ca-cert" => Some(("publishingOptions.publishCaCert", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "publishing-options.publish-crl" => Some(("publishingOptions.publishCrl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "tier" => Some(("tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-ocsp-servers", "allow-config-based-issuance", "allow-csr-based-issuance", "allow-subject-alt-names-passthrough", "allow-subject-passthrough", "allowed-issuance-modes", "base-key-usage", "baseline-values", "ca-options", "cel-expression", "cert-sign", "client-auth", "code-signing", "content-commitment", "crl-sign", "data-encipherment", "decipher-only", "description", "digital-signature", "email-protection", "encipher-only", "expression", "extended-key-usage", "identity-constraints", "is-ca", "issuance-policy", "key-agreement", "key-encipherment", "key-usage", "known-extensions", "labels", "location", "max-issuer-path-length", "maximum-lifetime", "name", "ocsp-signing", "passthrough-extensions", "publish-ca-cert", "publish-crl", "publishing-options", "server-auth", "tier", "time-stamping", "title"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-ocsp-servers", "allow-config-based-issuance", "allow-csr-based-issuance", "allow-subject-alt-names-passthrough", "allow-subject-passthrough", "allowed-issuance-modes", "base-key-usage", "baseline-values", "ca-options", "cel-expression", "cert-sign", "client-auth", "code-signing", "content-commitment", "critical", "crl-sign", "data-encipherment", "decipher-only", "description", "digital-signature", "email-protection", "encipher-only", "encoding-format", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "expression", "extended-key-usage", "identity-constraints", "is-ca", "issuance-policy", "key-agreement", "key-encipherment", "key-usage", "known-extensions", "labels", "location", "max-issuer-path-length", "maximum-lifetime", "name", "name-constraints", "ocsp-signing", "passthrough-extensions", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "publish-ca-cert", "publish-crl", "publishing-options", "server-auth", "tier", "time-stamping", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2047,6 +2119,9 @@ where
                 "request-id" => {
                     call = call.request_id(value.unwrap_or(""));
                 },
+                "ignore-dependent-resources" => {
+                    call = call.ignore_dependent_resources(        value.map(|v| arg_from_str(v, err, "ignore-dependent-resources", "boolean")).unwrap_or(false));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2060,7 +2135,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["request-id"].iter().map(|v|*v));
+                                                                           v.extend(["ignore-dependent-resources", "request-id"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2395,6 +2470,15 @@ where
                     "issuance-policy.baseline-values.key-usage.extended-key-usage.ocsp-signing" => Some(("issuancePolicy.baselineValues.keyUsage.extendedKeyUsage.ocspSigning", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "issuance-policy.baseline-values.key-usage.extended-key-usage.server-auth" => Some(("issuancePolicy.baselineValues.keyUsage.extendedKeyUsage.serverAuth", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "issuance-policy.baseline-values.key-usage.extended-key-usage.time-stamping" => Some(("issuancePolicy.baselineValues.keyUsage.extendedKeyUsage.timeStamping", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "issuance-policy.baseline-values.name-constraints.critical" => Some(("issuancePolicy.baselineValues.nameConstraints.critical", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "issuance-policy.baseline-values.name-constraints.excluded-dns-names" => Some(("issuancePolicy.baselineValues.nameConstraints.excludedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "issuance-policy.baseline-values.name-constraints.excluded-email-addresses" => Some(("issuancePolicy.baselineValues.nameConstraints.excludedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "issuance-policy.baseline-values.name-constraints.excluded-ip-ranges" => Some(("issuancePolicy.baselineValues.nameConstraints.excludedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "issuance-policy.baseline-values.name-constraints.excluded-uris" => Some(("issuancePolicy.baselineValues.nameConstraints.excludedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "issuance-policy.baseline-values.name-constraints.permitted-dns-names" => Some(("issuancePolicy.baselineValues.nameConstraints.permittedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "issuance-policy.baseline-values.name-constraints.permitted-email-addresses" => Some(("issuancePolicy.baselineValues.nameConstraints.permittedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "issuance-policy.baseline-values.name-constraints.permitted-ip-ranges" => Some(("issuancePolicy.baselineValues.nameConstraints.permittedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "issuance-policy.baseline-values.name-constraints.permitted-uris" => Some(("issuancePolicy.baselineValues.nameConstraints.permittedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "issuance-policy.identity-constraints.allow-subject-alt-names-passthrough" => Some(("issuancePolicy.identityConstraints.allowSubjectAltNamesPassthrough", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "issuance-policy.identity-constraints.allow-subject-passthrough" => Some(("issuancePolicy.identityConstraints.allowSubjectPassthrough", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "issuance-policy.identity-constraints.cel-expression.description" => Some(("issuancePolicy.identityConstraints.celExpression.description", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2405,11 +2489,12 @@ where
                     "issuance-policy.passthrough-extensions.known-extensions" => Some(("issuancePolicy.passthroughExtensions.knownExtensions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "publishing-options.encoding-format" => Some(("publishingOptions.encodingFormat", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "publishing-options.publish-ca-cert" => Some(("publishingOptions.publishCaCert", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "publishing-options.publish-crl" => Some(("publishingOptions.publishCrl", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "tier" => Some(("tier", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-ocsp-servers", "allow-config-based-issuance", "allow-csr-based-issuance", "allow-subject-alt-names-passthrough", "allow-subject-passthrough", "allowed-issuance-modes", "base-key-usage", "baseline-values", "ca-options", "cel-expression", "cert-sign", "client-auth", "code-signing", "content-commitment", "crl-sign", "data-encipherment", "decipher-only", "description", "digital-signature", "email-protection", "encipher-only", "expression", "extended-key-usage", "identity-constraints", "is-ca", "issuance-policy", "key-agreement", "key-encipherment", "key-usage", "known-extensions", "labels", "location", "max-issuer-path-length", "maximum-lifetime", "name", "ocsp-signing", "passthrough-extensions", "publish-ca-cert", "publish-crl", "publishing-options", "server-auth", "tier", "time-stamping", "title"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-ocsp-servers", "allow-config-based-issuance", "allow-csr-based-issuance", "allow-subject-alt-names-passthrough", "allow-subject-passthrough", "allowed-issuance-modes", "base-key-usage", "baseline-values", "ca-options", "cel-expression", "cert-sign", "client-auth", "code-signing", "content-commitment", "critical", "crl-sign", "data-encipherment", "decipher-only", "description", "digital-signature", "email-protection", "encipher-only", "encoding-format", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "expression", "extended-key-usage", "identity-constraints", "is-ca", "issuance-policy", "key-agreement", "key-encipherment", "key-usage", "known-extensions", "labels", "location", "max-issuer-path-length", "maximum-lifetime", "name", "name-constraints", "ocsp-signing", "passthrough-extensions", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "publish-ca-cert", "publish-crl", "publishing-options", "server-auth", "tier", "time-stamping", "title"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2680,6 +2765,7 @@ where
                     "identity-constraints.cel-expression.location" => Some(("identityConstraints.celExpression.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "identity-constraints.cel-expression.title" => Some(("identityConstraints.celExpression.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "maximum-lifetime" => Some(("maximumLifetime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "passthrough-extensions.known-extensions" => Some(("passthroughExtensions.knownExtensions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "predefined-values.aia-ocsp-servers" => Some(("predefinedValues.aiaOcspServers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -2700,9 +2786,18 @@ where
                     "predefined-values.key-usage.extended-key-usage.ocsp-signing" => Some(("predefinedValues.keyUsage.extendedKeyUsage.ocspSigning", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "predefined-values.key-usage.extended-key-usage.server-auth" => Some(("predefinedValues.keyUsage.extendedKeyUsage.serverAuth", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "predefined-values.key-usage.extended-key-usage.time-stamping" => Some(("predefinedValues.keyUsage.extendedKeyUsage.timeStamping", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "predefined-values.name-constraints.critical" => Some(("predefinedValues.nameConstraints.critical", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "predefined-values.name-constraints.excluded-dns-names" => Some(("predefinedValues.nameConstraints.excludedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "predefined-values.name-constraints.excluded-email-addresses" => Some(("predefinedValues.nameConstraints.excludedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "predefined-values.name-constraints.excluded-ip-ranges" => Some(("predefinedValues.nameConstraints.excludedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "predefined-values.name-constraints.excluded-uris" => Some(("predefinedValues.nameConstraints.excludedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "predefined-values.name-constraints.permitted-dns-names" => Some(("predefinedValues.nameConstraints.permittedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "predefined-values.name-constraints.permitted-email-addresses" => Some(("predefinedValues.nameConstraints.permittedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "predefined-values.name-constraints.permitted-ip-ranges" => Some(("predefinedValues.nameConstraints.permittedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "predefined-values.name-constraints.permitted-uris" => Some(("predefinedValues.nameConstraints.permittedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-ocsp-servers", "allow-subject-alt-names-passthrough", "allow-subject-passthrough", "base-key-usage", "ca-options", "cel-expression", "cert-sign", "client-auth", "code-signing", "content-commitment", "create-time", "crl-sign", "data-encipherment", "decipher-only", "description", "digital-signature", "email-protection", "encipher-only", "expression", "extended-key-usage", "identity-constraints", "is-ca", "key-agreement", "key-encipherment", "key-usage", "known-extensions", "labels", "location", "max-issuer-path-length", "name", "ocsp-signing", "passthrough-extensions", "predefined-values", "server-auth", "time-stamping", "title", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-ocsp-servers", "allow-subject-alt-names-passthrough", "allow-subject-passthrough", "base-key-usage", "ca-options", "cel-expression", "cert-sign", "client-auth", "code-signing", "content-commitment", "create-time", "critical", "crl-sign", "data-encipherment", "decipher-only", "description", "digital-signature", "email-protection", "encipher-only", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "expression", "extended-key-usage", "identity-constraints", "is-ca", "key-agreement", "key-encipherment", "key-usage", "known-extensions", "labels", "location", "max-issuer-path-length", "maximum-lifetime", "name", "name-constraints", "ocsp-signing", "passthrough-extensions", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "predefined-values", "server-auth", "time-stamping", "title", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -3030,6 +3125,7 @@ where
                     "identity-constraints.cel-expression.location" => Some(("identityConstraints.celExpression.location", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "identity-constraints.cel-expression.title" => Some(("identityConstraints.celExpression.title", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "maximum-lifetime" => Some(("maximumLifetime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "passthrough-extensions.known-extensions" => Some(("passthroughExtensions.knownExtensions", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "predefined-values.aia-ocsp-servers" => Some(("predefinedValues.aiaOcspServers", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
@@ -3050,9 +3146,18 @@ where
                     "predefined-values.key-usage.extended-key-usage.ocsp-signing" => Some(("predefinedValues.keyUsage.extendedKeyUsage.ocspSigning", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "predefined-values.key-usage.extended-key-usage.server-auth" => Some(("predefinedValues.keyUsage.extendedKeyUsage.serverAuth", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "predefined-values.key-usage.extended-key-usage.time-stamping" => Some(("predefinedValues.keyUsage.extendedKeyUsage.timeStamping", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "predefined-values.name-constraints.critical" => Some(("predefinedValues.nameConstraints.critical", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "predefined-values.name-constraints.excluded-dns-names" => Some(("predefinedValues.nameConstraints.excludedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "predefined-values.name-constraints.excluded-email-addresses" => Some(("predefinedValues.nameConstraints.excludedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "predefined-values.name-constraints.excluded-ip-ranges" => Some(("predefinedValues.nameConstraints.excludedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "predefined-values.name-constraints.excluded-uris" => Some(("predefinedValues.nameConstraints.excludedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "predefined-values.name-constraints.permitted-dns-names" => Some(("predefinedValues.nameConstraints.permittedDnsNames", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "predefined-values.name-constraints.permitted-email-addresses" => Some(("predefinedValues.nameConstraints.permittedEmailAddresses", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "predefined-values.name-constraints.permitted-ip-ranges" => Some(("predefinedValues.nameConstraints.permittedIpRanges", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "predefined-values.name-constraints.permitted-uris" => Some(("predefinedValues.nameConstraints.permittedUris", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-ocsp-servers", "allow-subject-alt-names-passthrough", "allow-subject-passthrough", "base-key-usage", "ca-options", "cel-expression", "cert-sign", "client-auth", "code-signing", "content-commitment", "create-time", "crl-sign", "data-encipherment", "decipher-only", "description", "digital-signature", "email-protection", "encipher-only", "expression", "extended-key-usage", "identity-constraints", "is-ca", "key-agreement", "key-encipherment", "key-usage", "known-extensions", "labels", "location", "max-issuer-path-length", "name", "ocsp-signing", "passthrough-extensions", "predefined-values", "server-auth", "time-stamping", "title", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aia-ocsp-servers", "allow-subject-alt-names-passthrough", "allow-subject-passthrough", "base-key-usage", "ca-options", "cel-expression", "cert-sign", "client-auth", "code-signing", "content-commitment", "create-time", "critical", "crl-sign", "data-encipherment", "decipher-only", "description", "digital-signature", "email-protection", "encipher-only", "excluded-dns-names", "excluded-email-addresses", "excluded-ip-ranges", "excluded-uris", "expression", "extended-key-usage", "identity-constraints", "is-ca", "key-agreement", "key-encipherment", "key-usage", "known-extensions", "labels", "location", "max-issuer-path-length", "maximum-lifetime", "name", "name-constraints", "ocsp-signing", "passthrough-extensions", "permitted-dns-names", "permitted-email-addresses", "permitted-ip-ranges", "permitted-uris", "predefined-values", "server-auth", "time-stamping", "title", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -4459,7 +4564,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-ca-pools-fetch-ca-certs",
-                    Some(r##"FetchCaCerts returns the current trust anchor for the CaPool. This will include CA certificate chains for all ACTIVE CertificateAuthority resources in the CaPool."##),
+                    Some(r##"FetchCaCerts returns the current trust anchor for the CaPool. This will include CA certificate chains for all Certificate Authorities in the ENABLED, DISABLED, or STAGED states."##),
                     "Details at http://byron.github.io/google-apis-rs/google_privateca1_cli/projects_locations-ca-pools-fetch-ca-certs",
                   vec![
                     (Some(r##"ca-pool"##),
@@ -4953,7 +5058,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_privateca1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -4980,7 +5085,7 @@ async fn main() {
     
     let mut app = App::new("privateca1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230105")
+           .version("5.0.4+20240221")
            .about("The Certificate Authority Service API is a highly-available, scalable service that enables you to simplify and automate the management of private certificate authorities (CAs) while staying in control of your private keys. ")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_privateca1_cli")
            .arg(Arg::with_name("url")

@@ -2,9 +2,9 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *bigquery* crate version *5.0.3+20230114*, where *20230114* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Bigquery* crate version *5.0.3+20240214*, where *20240214* is the exact revision of the *bigquery:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
 //! 
-//! Everything else about the *bigquery* *v2* API can be found at the
+//! Everything else about the *Bigquery* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/bigquery/).
 //! The original source code is [on github](https://github.com/Byron/google-apis-rs/tree/main/gen/bigquery2).
 //! # Features
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Bigquery) ... 
 //! 
 //! * [datasets](api::Dataset)
-//!  * [*delete*](api::DatasetDeleteCall), [*get*](api::DatasetGetCall), [*insert*](api::DatasetInsertCall), [*list*](api::DatasetListCall), [*patch*](api::DatasetPatchCall) and [*update*](api::DatasetUpdateCall)
+//!  * [*delete*](api::DatasetDeleteCall), [*get*](api::DatasetGetCall), [*insert*](api::DatasetInsertCall), [*list*](api::DatasetListCall), [*patch*](api::DatasetPatchCall), [*undelete*](api::DatasetUndeleteCall) and [*update*](api::DatasetUpdateCall)
 //! * [jobs](api::Job)
 //!  * [*cancel*](api::JobCancelCall), [*delete*](api::JobDeleteCall), [*get*](api::JobGetCall), [*get query results*](api::JobGetQueryResultCall), [*insert*](api::JobInsertCall), [*list*](api::JobListCall) and [*query*](api::JobQueryCall)
 //! * [models](api::Model)
@@ -22,7 +22,7 @@
 //! * [routines](api::Routine)
 //!  * [*delete*](api::RoutineDeleteCall), [*get*](api::RoutineGetCall), [*insert*](api::RoutineInsertCall), [*list*](api::RoutineListCall) and [*update*](api::RoutineUpdateCall)
 //! * [row access policies](api::RowAccessPolicy)
-//!  * [*get iam policy*](api::RowAccessPolicyGetIamPolicyCall), [*list*](api::RowAccessPolicyListCall), [*set iam policy*](api::RowAccessPolicySetIamPolicyCall) and [*test iam permissions*](api::RowAccessPolicyTestIamPermissionCall)
+//!  * [*get iam policy*](api::RowAccessPolicyGetIamPolicyCall), [*list*](api::RowAccessPolicyListCall) and [*test iam permissions*](api::RowAccessPolicyTestIamPermissionCall)
 //! * tabledata
 //!  * [*insert all*](api::TabledataInsertAllCall) and [*list*](api::TabledataListCall)
 //! * [tables](api::Table)

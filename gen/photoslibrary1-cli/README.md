@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Photos Library* API at revision *20230117*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Photos Library* API at revision *20240223*. The CLI is at version *5.0.4*.
 
 ```bash
 photoslibrary1 [options]

@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Manufacturer Center* crate version *5.0.3+20230123*, where *20230123* is the exact revision of the *manufacturers:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Manufacturer Center* crate version *5.0.4+20240205*, where *20240205* is the exact revision of the *manufacturers:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Manufacturer Center* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/manufacturers/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](ManufacturerCenter) ... 
 //! 
 //! * accounts
-//!  * [*products delete*](api::AccountProductDeleteCall), [*products get*](api::AccountProductGetCall), [*products list*](api::AccountProductListCall) and [*products update*](api::AccountProductUpdateCall)
+//!  * [*languages product certifications delete*](api::AccountLanguageProductCertificationDeleteCall), [*languages product certifications get*](api::AccountLanguageProductCertificationGetCall), [*languages product certifications list*](api::AccountLanguageProductCertificationListCall), [*languages product certifications patch*](api::AccountLanguageProductCertificationPatchCall), [*products delete*](api::AccountProductDeleteCall), [*products get*](api::AccountProductGetCall), [*products list*](api::AccountProductListCall) and [*products update*](api::AccountProductUpdateCall)
 //! 
 //! 
 //! 
@@ -47,6 +47,7 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.accounts().languages_product_certifications_delete(...).doit().await
 //! let r = hub.accounts().products_delete(...).doit().await
 //! let r = hub.accounts().products_update(...).doit().await
 //! ```

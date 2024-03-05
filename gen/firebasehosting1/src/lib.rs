@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Firebase Hosting* crate version *5.0.3+20230123*, where *20230123* is the exact revision of the *firebasehosting:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Firebase Hosting* crate version *5.0.4+20240303*, where *20240303* is the exact revision of the *firebasehosting:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Firebase Hosting* *v1* API can be found at the
 //! [official documentation site](https://firebase.google.com/docs/hosting/).
@@ -13,6 +13,8 @@
 //! 
 //! * [operations](api::Operation)
 //!  * [*cancel*](api::OperationCancelCall), [*delete*](api::OperationDeleteCall) and [*list*](api::OperationListCall)
+//! * projects
+//!  * [*sites custom domains operations cancel*](api::ProjectSiteCustomDomainOperationCancelCall) and [*sites custom domains operations delete*](api::ProjectSiteCustomDomainOperationDeleteCall)
 //! 
 //! 
 //! 
@@ -49,7 +51,8 @@
 //! ```ignore
 //! let r = hub.operations().cancel(...).doit().await
 //! let r = hub.operations().delete(...).doit().await
-//! let r = hub.operations().list(...).doit().await
+//! let r = hub.projects().sites_custom_domains_operations_cancel(...).doit().await
+//! let r = hub.projects().sites_custom_domains_operations_delete(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -76,6 +79,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_firebasehosting1 as firebasehosting1;
+//! use firebasehosting1::api::CancelOperationRequest;
 //! use firebasehosting1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -94,13 +98,15 @@
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = FirebaseHosting::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
+//! // Values shown here are possibly random and not representative !
+//! let mut req = CancelOperationRequest::default();
+//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.operations().list("name")
-//!              .page_token("At")
-//!              .page_size(-8)
-//!              .filter("sed")
+//! let result = hub.operations().cancel(req, "name")
 //!              .doit().await;
 //! 
 //! match result {

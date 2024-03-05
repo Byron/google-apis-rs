@@ -25,13 +25,28 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Secret Manager* API at revision *20230114*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Secret Manager* API at revision *20240223*. The CLI is at version *5.0.4*.
 
 ```bash
 secretmanager1 [options]
         projects
                 locations-get <name> [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
+                locations-secrets-add-version <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-secrets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-secrets-delete <name> [-p <v>]... [-o <out>]
+                locations-secrets-get <name> [-p <v>]... [-o <out>]
+                locations-secrets-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-secrets-list <parent> [-p <v>]... [-o <out>]
+                locations-secrets-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-secrets-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-secrets-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-secrets-versions-access <name> [-p <v>]... [-o <out>]
+                locations-secrets-versions-destroy <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-secrets-versions-disable <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-secrets-versions-enable <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-secrets-versions-get <name> [-p <v>]... [-o <out>]
+                locations-secrets-versions-list <parent> [-p <v>]... [-o <out>]
                 secrets-add-version <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 secrets-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 secrets-delete <name> [-p <v>]... [-o <out>]

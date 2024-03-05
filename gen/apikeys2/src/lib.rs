@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Api Keys Service* crate version *5.0.3+20230118*, where *20230118* is the exact revision of the *apikeys:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Api Keys Service* crate version *5.0.4+20240303*, where *20240303* is the exact revision of the *apikeys:v2* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Api Keys Service* *v2* API can be found at the
 //! [official documentation site](https://cloud.google.com/api-keys/docs).

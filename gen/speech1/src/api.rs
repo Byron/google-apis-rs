@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account.
     CloudPlatform,
@@ -59,6 +59,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_speech1 as speech1;
+/// use speech1::api::CustomClass;
 /// use speech1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
@@ -77,14 +78,16 @@ impl Default for Scope {
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = CustomClass::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.operations().list()
-///              .page_token("amet.")
-///              .page_size(-59)
-///              .name("amet.")
-///              .filter("duo")
+/// let result = hub.projects().locations_custom_classes_patch(req, "name")
+///              .update_mask(&Default::default())
 ///              .doit().await;
 /// 
 /// match result {
@@ -123,7 +126,7 @@ impl<'a, S> Speech<S> {
         Speech {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://speech.googleapis.com/".to_string(),
             _root_url: "https://speech.googleapis.com/".to_string(),
         }
@@ -140,7 +143,7 @@ impl<'a, S> Speech<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -260,16 +263,51 @@ impl client::RequestValue for CreatePhraseSetRequest {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CustomClass {
+    /// Output only. Allows users to store small amounts of arbitrary data. Both the key and the value must be 63 characters or less each. At most 100 annotations. This field is not used.
+    
+    pub annotations: Option<HashMap<String, String>>,
     /// If this custom class is a resource, the custom_class_id is the resource id of the CustomClass. Case sensitive.
     #[serde(rename="customClassId")]
     
     pub custom_class_id: Option<String>,
+    /// Output only. The time at which this resource was requested for deletion. This field is not used.
+    #[serde(rename="deleteTime")]
+    
+    pub delete_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Output only. User-settable, human-readable name for the CustomClass. Must be 63 characters or less. This field is not used.
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
+    /// Output only. This checksum is computed by the server based on the value of other fields. This may be sent on update, undelete, and delete requests to ensure the client has an up-to-date value before proceeding. This field is not used.
+    
+    pub etag: Option<String>,
+    /// Output only. The time at which this resource will be purged. This field is not used.
+    #[serde(rename="expireTime")]
+    
+    pub expire_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
     /// A collection of class items.
     
     pub items: Option<Vec<ClassItem>>,
+    /// Output only. The [KMS key name](https://cloud.google.com/kms/docs/resource-hierarchy#keys) with which the content of the ClassItem is encrypted. The expected format is `projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}`.
+    #[serde(rename="kmsKeyName")]
+    
+    pub kms_key_name: Option<String>,
+    /// Output only. The [KMS key version name](https://cloud.google.com/kms/docs/resource-hierarchy#key_versions) with which content of the ClassItem is encrypted. The expected format is `projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}/cryptoKeyVersions/{crypto_key_version}`.
+    #[serde(rename="kmsKeyVersionName")]
+    
+    pub kms_key_version_name: Option<String>,
     /// The resource name of the custom class.
     
     pub name: Option<String>,
+    /// Output only. Whether or not this CustomClass is in the process of being updated. This field is not used.
+    
+    pub reconciling: Option<bool>,
+    /// Output only. The CustomClass lifecycle state. This field is not used.
+    
+    pub state: Option<String>,
+    /// Output only. System-assigned unique identifier for the CustomClass. This field is not used.
+    
+    pub uid: Option<String>,
 }
 
 impl client::RequestValue for CustomClass {}
@@ -290,6 +328,28 @@ impl client::ResponseResult for CustomClass {}
 pub struct Empty { _never_set: Option<bool> }
 
 impl client::ResponseResult for Empty {}
+
+
+/// A single replacement configuration.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct Entry {
+    /// Whether the search is case sensitive.
+    #[serde(rename="caseSensitive")]
+    
+    pub case_sensitive: Option<bool>,
+    /// What to replace with. Max length is 100 characters.
+    
+    pub replace: Option<String>,
+    /// What to replace. Max length is 100 characters.
+    
+    pub search: Option<String>,
+}
+
+impl client::Part for Entry {}
 
 
 /// Message returned to the client by the `ListCustomClasses` method.
@@ -414,7 +474,7 @@ pub struct Operation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -454,15 +514,50 @@ impl client::Part for Phrase {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PhraseSet {
+    /// Output only. Allows users to store small amounts of arbitrary data. Both the key and the value must be 63 characters or less each. At most 100 annotations. This field is not used.
+    
+    pub annotations: Option<HashMap<String, String>>,
     /// Hint Boost. Positive value will increase the probability that a specific phrase will be recognized over other similar sounding phrases. The higher the boost, the higher the chance of false positive recognition as well. Negative boost values would correspond to anti-biasing. Anti-biasing is not enabled, so negative boost will simply be ignored. Though `boost` can accept a wide range of positive values, most use cases are best served with values between 0 (exclusive) and 20. We recommend using a binary search approach to finding the optimal value for your use case as well as adding phrases both with and without boost to your requests.
     
     pub boost: Option<f32>,
+    /// Output only. The time at which this resource was requested for deletion. This field is not used.
+    #[serde(rename="deleteTime")]
+    
+    pub delete_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Output only. User-settable, human-readable name for the PhraseSet. Must be 63 characters or less. This field is not used.
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
+    /// Output only. This checksum is computed by the server based on the value of other fields. This may be sent on update, undelete, and delete requests to ensure the client has an up-to-date value before proceeding. This field is not used.
+    
+    pub etag: Option<String>,
+    /// Output only. The time at which this resource will be purged. This field is not used.
+    #[serde(rename="expireTime")]
+    
+    pub expire_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Output only. The [KMS key name](https://cloud.google.com/kms/docs/resource-hierarchy#keys) with which the content of the PhraseSet is encrypted. The expected format is `projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}`.
+    #[serde(rename="kmsKeyName")]
+    
+    pub kms_key_name: Option<String>,
+    /// Output only. The [KMS key version name](https://cloud.google.com/kms/docs/resource-hierarchy#key_versions) with which content of the PhraseSet is encrypted. The expected format is `projects/{project}/locations/{location}/keyRings/{key_ring}/cryptoKeys/{crypto_key}/cryptoKeyVersions/{crypto_key_version}`.
+    #[serde(rename="kmsKeyVersionName")]
+    
+    pub kms_key_version_name: Option<String>,
     /// The resource name of the phrase set.
     
     pub name: Option<String>,
     /// A list of word and phrases.
     
     pub phrases: Option<Vec<Phrase>>,
+    /// Output only. Whether or not this PhraseSet is in the process of being updated. This field is not used.
+    
+    pub reconciling: Option<bool>,
+    /// Output only. The CustomClass lifecycle state. This field is not used.
+    
+    pub state: Option<String>,
+    /// Output only. System-assigned unique identifier for the PhraseSet. This field is not used.
+    
+    pub uid: Option<String>,
 }
 
 impl client::RequestValue for PhraseSet {}
@@ -478,7 +573,7 @@ impl client::ResponseResult for PhraseSet {}
 pub struct RecognitionAudio {
     /// The audio data bytes encoded as specified in `RecognitionConfig`. Note: as with all bytes fields, proto buffers use a pure binary representation, whereas JSON representations use base64.
     
-    #[serde_as(as = "Option<::client::serde::urlsafe_base64::Wrapper>")]
+    #[serde_as(as = "Option<::client::serde::standard_base64::Wrapper>")]
     pub content: Option<Vec<u8>>,
     /// URI that points to a file that contains audio data bytes as specified in `RecognitionConfig`. The file must not be compressed (for example, gzip). Currently, only Google Cloud Storage URIs are supported, which must be specified in the following format: `gs://bucket_name/object_name` (other URI formats return google.rpc.Code.INVALID_ARGUMENT). For more information, see [Request URIs](https://cloud.google.com/storage/docs/reference-uris).
     
@@ -563,6 +658,10 @@ pub struct RecognitionConfig {
     #[serde(rename="speechContexts")]
     
     pub speech_contexts: Option<Vec<SpeechContext>>,
+    /// Optional. Use transcription normalization to automatically replace parts of the transcript with phrases of your choosing. For StreamingRecognize, this normalization only applies to stable partial transcripts (stability > 0.8) and final transcripts.
+    #[serde(rename="transcriptNormalization")]
+    
+    pub transcript_normalization: Option<TranscriptNormalization>,
     /// Set to true to use an enhanced model for speech recognition. If `use_enhanced` is set to true and the `model` field is not set, then an appropriate enhanced model is chosen if an enhanced model exists for the audio. If `use_enhanced` is true and an enhanced version of the specified model does not exist, then the speech is recognized using the standard version of the specified model.
     #[serde(rename="useEnhanced")]
     
@@ -666,6 +765,10 @@ pub struct RecognizeResponse {
     
     #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
     pub total_billed_time: Option<client::chrono::Duration>,
+    /// Whether request used legacy asr models (was not automatically migrated to use conformer models).
+    #[serde(rename="usingLegacyModels")]
+    
+    pub using_legacy_models: Option<bool>,
 }
 
 impl client::ResponseResult for RecognizeResponse {}
@@ -678,7 +781,7 @@ impl client::ResponseResult for RecognizeResponse {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SpeakerDiarizationConfig {
-    /// If 'true', enables speaker detection for each recognized word in the top alternative of the recognition result using a speaker_tag provided in the WordInfo.
+    /// If 'true', enables speaker detection for each recognized word in the top alternative of the recognition result using a speaker_label provided in the WordInfo.
     #[serde(rename="enableSpeakerDiarization")]
     
     pub enable_speaker_diarization: Option<bool>,
@@ -835,6 +938,21 @@ pub struct Status {
 impl client::Part for Status {}
 
 
+/// Transcription normalization configuration. Use transcription normalization to automatically replace parts of the transcript with phrases of your choosing. For StreamingRecognize, this normalization only applies to stable partial transcripts (stability > 0.8) and final transcripts.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TranscriptNormalization {
+    /// A list of replacement entries. We will perform replacement with one entry at a time. For example, the second entry in ["cat" => "dog", "mountain cat" => "mountain dog"] will never be applied because we will always process the first entry before it. At most 100 entries.
+    
+    pub entries: Option<Vec<Entry>>,
+}
+
+impl client::Part for TranscriptNormalization {}
+
+
 /// Specifies an optional destination for the recognition results.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
@@ -866,7 +984,11 @@ pub struct WordInfo {
     
     #[serde_as(as = "Option<::client::serde::duration::Wrapper>")]
     pub end_time: Option<client::chrono::Duration>,
-    /// Output only. A distinct integer value is assigned for every speaker within the audio. This field specifies which one of those speakers was detected to have spoken this word. Value ranges from '1' to diarization_speaker_count. speaker_tag is set if enable_speaker_diarization = 'true' and only in the top alternative.
+    /// Output only. A label value assigned for every unique speaker within the audio. This field specifies which speaker was detected to have spoken this word. For some models, like medical_conversation this can be actual speaker role, for example "patient" or "provider", but generally this would be a number identifying a speaker. This field is only set if enable_speaker_diarization = 'true' and only for the top alternative.
+    #[serde(rename="speakerLabel")]
+    
+    pub speaker_label: Option<String>,
+    /// Output only. A distinct integer value is assigned for every speaker within the audio. This field specifies which one of those speakers was detected to have spoken this word. Value ranges from '1' to diarization_speaker_count. speaker_tag is set if enable_speaker_diarization = 'true' and only for the top alternative. Note: Use speaker_label instead.
     #[serde(rename="speakerTag")]
     
     pub speaker_tag: Option<i32>,
@@ -945,7 +1067,7 @@ impl<'a, S> OperationMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+    /// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
     pub fn list(&self) -> OperationListCall<'a, S> {
         OperationListCall {
             hub: self.hub,
@@ -1099,7 +1221,7 @@ impl<'a, S> ProjectMethods<'a, S> {
     /// # Arguments
     ///
     /// * `request` - No description provided.
-    /// * `parent` - Required. The parent resource where this phrase set will be created. Format: `projects/{project}/locations/{location}/phraseSets` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](https://cloud.google.com/speech-to-text/docs/endpoints) with matching `us` or `eu` location value.
+    /// * `parent` - Required. The parent resource where this phrase set will be created. Format: `projects/{project}/locations/{location}` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](https://cloud.google.com/speech-to-text/docs/endpoints) with matching `us` or `eu` location value.
     pub fn locations_phrase_sets_create(&self, request: CreatePhraseSetRequest, parent: &str) -> ProjectLocationPhraseSetCreateCall<'a, S> {
         ProjectLocationPhraseSetCreateCall {
             hub: self.hub,
@@ -1530,7 +1652,7 @@ where
 }
 
 
-/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.
+/// Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.
 ///
 /// A builder for the *list* method supported by a *operation* resource.
 /// It is not used directly, but through a [`OperationMethods`] instance.
@@ -1557,10 +1679,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.operations().list()
-///              .page_token("gubergren")
-///              .page_size(-51)
-///              .name("gubergren")
-///              .filter("eos")
+///              .page_token("voluptua.")
+///              .page_size(-27)
+///              .name("sanctus")
+///              .filter("sed")
 ///              .doit().await;
 /// # }
 /// ```
@@ -2664,8 +2786,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_custom_classes_list("parent")
-///              .page_token("amet")
-///              .page_size(-20)
+///              .page_token("ipsum")
+///              .page_size(-62)
 ///              .doit().await;
 /// # }
 /// ```
@@ -3433,7 +3555,7 @@ where
         self._request = new_value;
         self
     }
-    /// Required. The parent resource where this phrase set will be created. Format: `projects/{project}/locations/{location}/phraseSets` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](https://cloud.google.com/speech-to-text/docs/endpoints) with matching `us` or `eu` location value.
+    /// Required. The parent resource where this phrase set will be created. Format: `projects/{project}/locations/{location}` Speech-to-Text supports three locations: `global`, `us` (US North America), and `eu` (Europe). If you are calling the `speech.googleapis.com` endpoint, use the `global` location. To specify a region, use a [regional endpoint](https://cloud.google.com/speech-to-text/docs/endpoints) with matching `us` or `eu` location value.
     ///
     /// Sets the *parent* path property to the given value.
     ///
@@ -4070,8 +4192,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().locations_phrase_sets_list("parent")
-///              .page_token("est")
-///              .page_size(-50)
+///              .page_token("ipsum")
+///              .page_size(-88)
 ///              .doit().await;
 /// # }
 /// ```

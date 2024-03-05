@@ -56,8 +56,17 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "subset" => {
+                    call = call.subset(value.unwrap_or(""));
+                },
                 "sort" => {
                     call = call.sort(value.unwrap_or(""));
+                },
+                "family" => {
+                    call = call.add_family(value.unwrap_or(""));
+                },
+                "capability" => {
+                    call = call.add_capability(value.unwrap_or(""));
                 },
                 _ => {
                     let mut found = false;
@@ -72,7 +81,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["sort"].iter().map(|v|*v));
+                                                                           v.extend(["capability", "family", "sort", "subset"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -215,7 +224,7 @@ async fn main() {
     
     let mut app = App::new("webfonts1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20221206")
+           .version("5.0.4+20240227")
            .about("The Google Web Fonts Developer API lets you retrieve information about web fonts served by Google.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_webfonts1_cli")
            .arg(Arg::with_name("folder")

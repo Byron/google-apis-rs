@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// See, upload, and organize items in your Google Photos library
     Full,
@@ -142,7 +142,7 @@ impl<'a, S> PhotosLibrary<S> {
         PhotosLibrary {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://photoslibrary.googleapis.com/".to_string(),
             _root_url: "https://photoslibrary.googleapis.com/".to_string(),
         }
@@ -159,7 +159,7 @@ impl<'a, S> PhotosLibrary<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -530,7 +530,7 @@ pub struct Date {
 impl client::Part for Date {}
 
 
-/// This filter defines the allowed dates or date ranges for the media returned. It's possible to pick a set of specific dates and a set of date ranges.
+/// This filter defines the allowed dates or date ranges for the media returned. It's possible to pick a set of specific dates and a set of date ranges. Media items uploaded without metadata specifying the date the media item was captured will not be returned in queries using date filters. Google Photos server upload time is not used as a fallback in this case.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 

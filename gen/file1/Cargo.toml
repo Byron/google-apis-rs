@@ -4,12 +4,12 @@
 [package]
 
 name = "google-file1"
-version = "5.0.3+20230103"
+version = "5.0.4+20240126"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Filestore (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/file1"
 homepage = "https://cloud.google.com/filestore/"
-documentation = "https://docs.rs/google-file1/5.0.3+20230103"
+documentation = "https://docs.rs/google-file1/5.0.4+20240126"
 license = "MIT"
 keywords = ["file", "google", "protocol", "web", "api"]
 autobins = false

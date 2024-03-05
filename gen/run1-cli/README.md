@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Run* API at revision *20230113*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud Run* API at revision *20240225*. The CLI is at version *5.0.4*.
 
 ```bash
 run1 [options]
@@ -72,6 +72,10 @@ run1 [options]
                 locations-jobs-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-jobs-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-list <name> [-p <v>]... [-o <out>]
+                locations-operations-delete <name> [-p <v>]... [-o <out>]
+                locations-operations-get <name> [-p <v>]... [-o <out>]
+                locations-operations-list <name> [-p <v>]... [-o <out>]
+                locations-operations-wait <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-revisions-delete <name> [-p <v>]... [-o <out>]
                 locations-revisions-get <name> [-p <v>]... [-o <out>]
                 locations-revisions-list <parent> [-p <v>]... [-o <out>]

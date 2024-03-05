@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud IAP* API at revision *20230118*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud IAP* API at revision *20240224*. The CLI is at version *5.0.4*.
 
 ```bash
 iap1 [options]
@@ -35,6 +35,7 @@ iap1 [options]
                 set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 update-iap-settings <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                validate-attribute-expression <name> [-p <v>]... [-o <out>]
         projects
                 brands-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 brands-get <name> [-p <v>]... [-o <out>]

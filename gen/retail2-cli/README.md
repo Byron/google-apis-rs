@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Retail* API at revision *20230117*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud Retail* API at revision *20240222*. The CLI is at version *5.0.4*.
 
 ```bash
 retail2 [options]
@@ -42,6 +42,7 @@ retail2 [options]
                 locations-catalogs-branches-products-import <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-catalogs-branches-products-list <parent> [-p <v>]... [-o <out>]
                 locations-catalogs-branches-products-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-catalogs-branches-products-purge <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-catalogs-branches-products-remove-fulfillment-places <product> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-catalogs-branches-products-remove-local-inventories <product> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-catalogs-branches-products-set-inventory <name> (-r <kv>)... [-p <v>]... [-o <out>]
@@ -52,10 +53,19 @@ retail2 [options]
                 locations-catalogs-controls-get <name> [-p <v>]... [-o <out>]
                 locations-catalogs-controls-list <parent> [-p <v>]... [-o <out>]
                 locations-catalogs-controls-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-catalogs-export-analytics-metrics <catalog> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-catalogs-get-attributes-config <name> [-p <v>]... [-o <out>]
                 locations-catalogs-get-completion-config <name> [-p <v>]... [-o <out>]
                 locations-catalogs-get-default-branch <catalog> [-p <v>]... [-o <out>]
                 locations-catalogs-list <parent> [-p <v>]... [-o <out>]
+                locations-catalogs-models-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-catalogs-models-delete <name> [-p <v>]... [-o <out>]
+                locations-catalogs-models-get <name> [-p <v>]... [-o <out>]
+                locations-catalogs-models-list <parent> [-p <v>]... [-o <out>]
+                locations-catalogs-models-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-catalogs-models-pause <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-catalogs-models-resume <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-catalogs-models-tune <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-catalogs-operations-get <name> [-p <v>]... [-o <out>]
                 locations-catalogs-operations-list <name> [-p <v>]... [-o <out>]
                 locations-catalogs-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]

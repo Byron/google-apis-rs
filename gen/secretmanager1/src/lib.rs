@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Secret Manager* crate version *5.0.3+20230114*, where *20230114* is the exact revision of the *secretmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Secret Manager* crate version *5.0.4+20240223*, where *20240223* is the exact revision of the *secretmanager:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Secret Manager* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/secret-manager/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](SecretManager) ... 
 //! 
 //! * projects
-//!  * [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*secrets add version*](api::ProjectSecretAddVersionCall), [*secrets create*](api::ProjectSecretCreateCall), [*secrets delete*](api::ProjectSecretDeleteCall), [*secrets get*](api::ProjectSecretGetCall), [*secrets get iam policy*](api::ProjectSecretGetIamPolicyCall), [*secrets list*](api::ProjectSecretListCall), [*secrets patch*](api::ProjectSecretPatchCall), [*secrets set iam policy*](api::ProjectSecretSetIamPolicyCall), [*secrets test iam permissions*](api::ProjectSecretTestIamPermissionCall), [*secrets versions access*](api::ProjectSecretVersionAccesCall), [*secrets versions destroy*](api::ProjectSecretVersionDestroyCall), [*secrets versions disable*](api::ProjectSecretVersionDisableCall), [*secrets versions enable*](api::ProjectSecretVersionEnableCall), [*secrets versions get*](api::ProjectSecretVersionGetCall) and [*secrets versions list*](api::ProjectSecretVersionListCall)
+//!  * [*locations get*](api::ProjectLocationGetCall), [*locations list*](api::ProjectLocationListCall), [*locations secrets add version*](api::ProjectLocationSecretAddVersionCall), [*locations secrets create*](api::ProjectLocationSecretCreateCall), [*locations secrets delete*](api::ProjectLocationSecretDeleteCall), [*locations secrets get*](api::ProjectLocationSecretGetCall), [*locations secrets get iam policy*](api::ProjectLocationSecretGetIamPolicyCall), [*locations secrets list*](api::ProjectLocationSecretListCall), [*locations secrets patch*](api::ProjectLocationSecretPatchCall), [*locations secrets set iam policy*](api::ProjectLocationSecretSetIamPolicyCall), [*locations secrets test iam permissions*](api::ProjectLocationSecretTestIamPermissionCall), [*locations secrets versions access*](api::ProjectLocationSecretVersionAccesCall), [*locations secrets versions destroy*](api::ProjectLocationSecretVersionDestroyCall), [*locations secrets versions disable*](api::ProjectLocationSecretVersionDisableCall), [*locations secrets versions enable*](api::ProjectLocationSecretVersionEnableCall), [*locations secrets versions get*](api::ProjectLocationSecretVersionGetCall), [*locations secrets versions list*](api::ProjectLocationSecretVersionListCall), [*secrets add version*](api::ProjectSecretAddVersionCall), [*secrets create*](api::ProjectSecretCreateCall), [*secrets delete*](api::ProjectSecretDeleteCall), [*secrets get*](api::ProjectSecretGetCall), [*secrets get iam policy*](api::ProjectSecretGetIamPolicyCall), [*secrets list*](api::ProjectSecretListCall), [*secrets patch*](api::ProjectSecretPatchCall), [*secrets set iam policy*](api::ProjectSecretSetIamPolicyCall), [*secrets test iam permissions*](api::ProjectSecretTestIamPermissionCall), [*secrets versions access*](api::ProjectSecretVersionAccesCall), [*secrets versions destroy*](api::ProjectSecretVersionDestroyCall), [*secrets versions disable*](api::ProjectSecretVersionDisableCall), [*secrets versions enable*](api::ProjectSecretVersionEnableCall), [*secrets versions get*](api::ProjectSecretVersionGetCall) and [*secrets versions list*](api::ProjectSecretVersionListCall)
 //! 
 //! 
 //! 
@@ -47,6 +47,11 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.projects().locations_secrets_versions_destroy(...).doit().await
+//! let r = hub.projects().locations_secrets_versions_disable(...).doit().await
+//! let r = hub.projects().locations_secrets_versions_enable(...).doit().await
+//! let r = hub.projects().locations_secrets_versions_get(...).doit().await
+//! let r = hub.projects().locations_secrets_add_version(...).doit().await
 //! let r = hub.projects().secrets_versions_destroy(...).doit().await
 //! let r = hub.projects().secrets_versions_disable(...).doit().await
 //! let r = hub.projects().secrets_versions_enable(...).doit().await
@@ -105,7 +110,7 @@
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.projects().secrets_versions_destroy(req, "name")
+//! let result = hub.projects().locations_secrets_versions_destroy(req, "name")
 //!              .doit().await;
 //! 
 //! match result {

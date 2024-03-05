@@ -1,4 +1,4 @@
-site_name: Service Directory v5.0.3+20230105
+site_name: Service Directory v5.0.4+20240226
 site_url: http://byron.github.io/google-apis-rs/google-servicedirectory1_beta1-cli
 site_description: A complete library to interact with Service Directory (protocol v1beta1)
 
@@ -18,9 +18,6 @@ nav:
     - 'Locations Namespaces Get Iam Policy': 'projects_locations-namespaces-get-iam-policy.md'
     - 'Locations Namespaces List': 'projects_locations-namespaces-list.md'
     - 'Locations Namespaces Patch': 'projects_locations-namespaces-patch.md'
-    - 'Locations Namespaces Service Workloads Get Iam Policy': 'projects_locations-namespaces-service-workloads-get-iam-policy.md'
-    - 'Locations Namespaces Service Workloads Set Iam Policy': 'projects_locations-namespaces-service-workloads-set-iam-policy.md'
-    - 'Locations Namespaces Service Workloads Test Iam Permissions': 'projects_locations-namespaces-service-workloads-test-iam-permissions.md'
     - 'Locations Namespaces Services Create': 'projects_locations-namespaces-services-create.md'
     - 'Locations Namespaces Services Delete': 'projects_locations-namespaces-services-delete.md'
     - 'Locations Namespaces Services Endpoints Create': 'projects_locations-namespaces-services-endpoints-create.md'
@@ -37,9 +34,9 @@ nav:
     - 'Locations Namespaces Services Test Iam Permissions': 'projects_locations-namespaces-services-test-iam-permissions.md'
     - 'Locations Namespaces Set Iam Policy': 'projects_locations-namespaces-set-iam-policy.md'
     - 'Locations Namespaces Test Iam Permissions': 'projects_locations-namespaces-test-iam-permissions.md'
-    - 'Locations Registration Policies Get Iam Policy': 'projects_locations-registration-policies-get-iam-policy.md'
-    - 'Locations Registration Policies Set Iam Policy': 'projects_locations-registration-policies-set-iam-policy.md'
-    - 'Locations Registration Policies Test Iam Permissions': 'projects_locations-registration-policies-test-iam-permissions.md'
+    - 'Locations Namespaces Workloads Get Iam Policy': 'projects_locations-namespaces-workloads-get-iam-policy.md'
+    - 'Locations Namespaces Workloads Set Iam Policy': 'projects_locations-namespaces-workloads-set-iam-policy.md'
+    - 'Locations Namespaces Workloads Test Iam Permissions': 'projects_locations-namespaces-workloads-test-iam-permissions.md'
 
 theme: readthedocs
 

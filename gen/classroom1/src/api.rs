@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// View and manage announcements in Google Classroom
     Announcement,
@@ -208,7 +208,7 @@ impl<'a, S> Classroom<S> {
         Classroom {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://classroom.googleapis.com/".to_string(),
             _root_url: "https://classroom.googleapis.com/".to_string(),
         }
@@ -228,7 +228,7 @@ impl<'a, S> Classroom<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -453,7 +453,7 @@ pub struct Course {
     #[serde(rename="alternateLink")]
     
     pub alternate_link: Option<String>,
-    /// The Calendar ID for a calendar that all course members can see, to which Classroom adds events for course work and announcements in the course. Read-only.
+    /// The Calendar ID for a calendar that all course members can see, to which Classroom adds events for course work and announcements in the course. The Calendar for a course is created asynchronously when the course is set to `CourseState.ACTIVE` for the first time (at creation time or when it is updated to `ACTIVE` through the UI or the API). The Calendar ID will not be populated until the creation process is completed. Read-only.
     #[serde(rename="calendarId")]
     
     pub calendar_id: Option<String>,
@@ -932,7 +932,7 @@ pub struct Form {
     #[serde(rename="formUrl")]
     
     pub form_url: Option<String>,
-    /// URL of the form responses document. Only set if respsonses have been recorded and only when the requesting user is an editor of the form. Read-only.
+    /// URL of the form responses document. Only set if responses have been recorded and only when the requesting user is an editor of the form. Read-only.
     #[serde(rename="responseUrl")]
     
     pub response_url: Option<String>,
@@ -1791,7 +1791,7 @@ impl client::RequestValue for Student {}
 impl client::ResponseResult for Student {}
 
 
-/// Student submission for course work. StudentSubmission items are generated when a CourseWork item is created. StudentSubmissions that have never been accessed (i.e. with `state` = NEW) may not have a creation time or update time.
+/// Student submission for course work. `StudentSubmission` items are generated when a `CourseWork` item is created. Student submissions that have never been accessed (i.e. with `state` = NEW) may not have a creation time or update time.
 /// 
 /// # Activities
 /// 
@@ -9967,7 +9967,7 @@ where
         self._id = new_value.to_string();
         self
     }
-    /// Mask that identifies which fields on the course work to update. This field is required to do an update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the CourseWork object. If a field that does not support empty values is included in the update mask and not set in the CourseWork object, an `INVALID_ARGUMENT` error is returned. The following fields may be specified by teachers: * `title` * `description` * `state` * `due_date` * `due_time` * `max_points` * `scheduled_time` * `submission_modification_mode` * `topic_id`
+    /// Mask that identifies which fields on the course work to update. This field is required to do an update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the `CourseWork` object. If a field that does not support empty values is included in the update mask and not set in the `CourseWork` object, an `INVALID_ARGUMENT` error is returned. The following fields may be specified by teachers: * `title` * `description` * `state` * `due_date` * `due_time` * `max_points` * `scheduled_time` * `submission_modification_mode` * `topic_id`
     ///
     /// Sets the *update mask* query property to the given value.
     pub fn update_mask(mut self, new_value: client::FieldMask) -> CourseCourseWorkPatchCall<'a, S> {

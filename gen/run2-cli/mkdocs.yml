@@ -1,4 +1,4 @@
-site_name: Cloud Run v5.0.3+20230113
+site_name: Cloud Run v5.0.4+20240225
 site_url: http://byron.github.io/google-apis-rs/google-run2-cli
 site_description: A complete library to interact with Cloud Run (protocol v2)
 
@@ -12,6 +12,7 @@ nav:
 - 'Projects':
     - 'Locations Jobs Create': 'projects_locations-jobs-create.md'
     - 'Locations Jobs Delete': 'projects_locations-jobs-delete.md'
+    - 'Locations Jobs Executions Cancel': 'projects_locations-jobs-executions-cancel.md'
     - 'Locations Jobs Executions Delete': 'projects_locations-jobs-executions-delete.md'
     - 'Locations Jobs Executions Get': 'projects_locations-jobs-executions-get.md'
     - 'Locations Jobs Executions List': 'projects_locations-jobs-executions-list.md'

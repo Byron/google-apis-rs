@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Speech* crate version *5.0.3+20230119*, where *20230119* is the exact revision of the *speech:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Speech* crate version *5.0.4+20240222*, where *20240222* is the exact revision of the *speech:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Speech* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/speech-to-text/docs/quickstart-protocol).
@@ -51,9 +51,9 @@
 //! Or specifically ...
 //! 
 //! ```ignore
-//! let r = hub.operations().get(...).doit().await
-//! let r = hub.operations().list(...).doit().await
-//! let r = hub.speech().longrunningrecognize(...).doit().await
+//! let r = hub.projects().locations_custom_classes_create(...).doit().await
+//! let r = hub.projects().locations_custom_classes_get(...).doit().await
+//! let r = hub.projects().locations_custom_classes_patch(...).doit().await
 //! ```
 //! 
 //! The `resource()` and `activity(...)` calls create [builders][builder-pattern]. The second one dealing with `Activities` 
@@ -80,6 +80,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_speech1 as speech1;
+//! use speech1::api::CustomClass;
 //! use speech1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -98,14 +99,16 @@
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
 //! let mut hub = Speech::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
+//! // Values shown here are possibly random and not representative !
+//! let mut req = CustomClass::default();
+//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.operations().list()
-//!              .page_token("voluptua.")
-//!              .page_size(-27)
-//!              .name("sanctus")
-//!              .filter("sed")
+//! let result = hub.projects().locations_custom_classes_patch(req, "name")
+//!              .update_mask(&Default::default())
 //!              .doit().await;
 //! 
 //! match result {

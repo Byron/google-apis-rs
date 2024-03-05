@@ -141,6 +141,7 @@ where
                     "dry-run-spec.inherit-from-parent" => Some(("dryRunSpec.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dry-run-spec.reset" => Some(("dryRunSpec.reset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dry-run-spec.update-time" => Some(("dryRunSpec.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.etag" => Some(("spec.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.inherit-from-parent" => Some(("spec.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -213,6 +214,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "etag" => {
+                    call = call.etag(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -226,6 +230,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["etag"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -454,6 +459,7 @@ where
                     "dry-run-spec.inherit-from-parent" => Some(("dryRunSpec.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dry-run-spec.reset" => Some(("dryRunSpec.reset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dry-run-spec.update-time" => Some(("dryRunSpec.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.etag" => Some(("spec.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.inherit-from-parent" => Some(("spec.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -962,6 +968,7 @@ where
                     "dry-run-spec.inherit-from-parent" => Some(("dryRunSpec.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dry-run-spec.reset" => Some(("dryRunSpec.reset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dry-run-spec.update-time" => Some(("dryRunSpec.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.etag" => Some(("spec.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.inherit-from-parent" => Some(("spec.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1034,6 +1041,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "etag" => {
+                    call = call.etag(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1047,6 +1057,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["etag"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1275,6 +1286,7 @@ where
                     "dry-run-spec.inherit-from-parent" => Some(("dryRunSpec.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dry-run-spec.reset" => Some(("dryRunSpec.reset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dry-run-spec.update-time" => Some(("dryRunSpec.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.etag" => Some(("spec.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.inherit-from-parent" => Some(("spec.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1436,6 +1448,7 @@ where
                     "dry-run-spec.inherit-from-parent" => Some(("dryRunSpec.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dry-run-spec.reset" => Some(("dryRunSpec.reset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dry-run-spec.update-time" => Some(("dryRunSpec.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.etag" => Some(("spec.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.inherit-from-parent" => Some(("spec.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -1508,6 +1521,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "etag" => {
+                    call = call.etag(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1521,6 +1537,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["etag"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -1749,6 +1766,7 @@ where
                     "dry-run-spec.inherit-from-parent" => Some(("dryRunSpec.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dry-run-spec.reset" => Some(("dryRunSpec.reset", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "dry-run-spec.update-time" => Some(("dryRunSpec.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "etag" => Some(("etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.etag" => Some(("spec.etag", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "spec.inherit-from-parent" => Some(("spec.inheritFromParent", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
@@ -2001,12 +2019,12 @@ async fn main() {
     let arg_data = [
         ("folders", "methods: 'constraints-list', 'policies-create', 'policies-delete', 'policies-get', 'policies-get-effective-policy', 'policies-list' and 'policies-patch'", vec![
             ("constraints-list",
-                    Some(r##"Lists `Constraints` that could be applied on the specified resource."##),
+                    Some(r##"Lists constraints that could be applied on the specified resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/folders_constraints-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
+                     Some(r##"Required. The Google Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2023,12 +2041,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-create",
-                    Some(r##"Creates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Cloud resource."##),
+                    Some(r##"Creates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Google Cloud resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/folders_policies-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The Cloud resource that will parent the new Policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
+                     Some(r##"Required. The Google Cloud resource that will parent the new policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2051,12 +2069,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-delete",
-                    Some(r##"Deletes a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or Org Policy does not exist."##),
+                    Some(r##"Deletes a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or organization policy does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/folders_policies-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the policy to delete. See `Policy` for naming rules."##),
+                     Some(r##"Required. Name of the policy to delete. See the policy entry for naming rules."##),
                      Some(true),
                      Some(false)),
         
@@ -2073,12 +2091,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-get",
-                    Some(r##"Gets a `Policy` on a resource. If no `Policy` is set on the resource, NOT_FOUND is returned. The `etag` value can be used with `UpdatePolicy()` to update a `Policy` during read-modify-write."##),
+                    Some(r##"Gets a policy on a resource. If no policy is set on the resource, `NOT_FOUND` is returned. The `etag` value can be used with `UpdatePolicy()` to update a policy during read-modify-write."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/folders_policies-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the policy. See `Policy` for naming requirements."##),
+                     Some(r##"Required. Resource name of the policy. See Policy for naming requirements."##),
                      Some(true),
                      Some(false)),
         
@@ -2095,12 +2113,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-get-effective-policy",
-                    Some(r##"Gets the effective `Policy` on a resource. This is the result of merging `Policies` in the resource hierarchy and evaluating conditions. The returned `Policy` will not have an `etag` or `condition` set because it is a computed `Policy` across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded."##),
+                    Some(r##"Gets the effective policy on a resource. This is the result of merging policies in the resource hierarchy and evaluating conditions. The returned policy will not have an `etag` or `condition` set because it is an evaluated policy across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/folders_policies-get-effective-policy",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The effective policy to compute. See `Policy` for naming rules."##),
+                     Some(r##"Required. The effective policy to compute. See Policy for naming requirements."##),
                      Some(true),
                      Some(false)),
         
@@ -2117,12 +2135,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-list",
-                    Some(r##"Retrieves all of the `Policies` that exist on a particular resource."##),
+                    Some(r##"Retrieves all of the policies that exist on a particular resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/folders_policies-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The target Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
+                     Some(r##"Required. The target Google Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2139,12 +2157,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-patch",
-                    Some(r##"Updates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields."##),
+                    Some(r##"Updates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/folders_policies-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Immutable. The resource name of the Policy. Must be one of the following forms, where constraint_name is the name of the constraint which this Policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, "projects/123/policies/compute.disableSerialPortAccess". Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number."##),
+                     Some(r##"Immutable. The resource name of the policy. Must be one of the following forms, where `constraint_name` is the name of the constraint which this policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, `projects/123/policies/compute.disableSerialPortAccess`. Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number."##),
                      Some(true),
                      Some(false)),
         
@@ -2170,12 +2188,12 @@ async fn main() {
         
         ("organizations", "methods: 'constraints-list', 'custom-constraints-create', 'custom-constraints-delete', 'custom-constraints-get', 'custom-constraints-list', 'custom-constraints-patch', 'policies-create', 'policies-delete', 'policies-get', 'policies-get-effective-policy', 'policies-list' and 'policies-patch'", vec![
             ("constraints-list",
-                    Some(r##"Lists `Constraints` that could be applied on the specified resource."##),
+                    Some(r##"Lists constraints that could be applied on the specified resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/organizations_constraints-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
+                     Some(r##"Required. The Google Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2192,7 +2210,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("custom-constraints-create",
-                    Some(r##"Creates a CustomConstraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the organization does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the constraint already exists on the given organization."##),
+                    Some(r##"Creates a custom constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the organization does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the constraint already exists on the given organization."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/organizations_custom-constraints-create",
                   vec![
                     (Some(r##"parent"##),
@@ -2220,12 +2238,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("custom-constraints-delete",
-                    Some(r##"Deletes a Custom Constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist."##),
+                    Some(r##"Deletes a custom constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/organizations_custom-constraints-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the custom constraint to delete. See `CustomConstraint` for naming rules."##),
+                     Some(r##"Required. Name of the custom constraint to delete. See the custom constraint entry for naming rules."##),
                      Some(true),
                      Some(false)),
         
@@ -2242,12 +2260,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("custom-constraints-get",
-                    Some(r##"Gets a CustomConstraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the CustomConstraint does not exist."##),
+                    Some(r##"Gets a custom constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the custom constraint does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/organizations_custom-constraints-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the custom constraint. See `CustomConstraint` for naming requirements."##),
+                     Some(r##"Required. Resource name of the custom constraint. See the custom constraint entry for naming requirements."##),
                      Some(true),
                      Some(false)),
         
@@ -2264,12 +2282,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("custom-constraints-list",
-                    Some(r##"Retrieves all of the `CustomConstraints` that exist on a particular organization resource."##),
+                    Some(r##"Retrieves all of the custom constraints that exist on a particular organization resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/organizations_custom-constraints-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The target Cloud resource that parents the set of custom constraints that will be returned from this call. Must be in one of the following forms: * `organizations/{organization_id}`"##),
+                     Some(r##"Required. The target Google Cloud resource that parents the set of custom constraints that will be returned from this call. Must be in one of the following forms: * `organizations/{organization_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2286,12 +2304,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("custom-constraints-patch",
-                    Some(r##"Updates a Custom Constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Note: the supplied policy will perform a full overwrite of all fields."##),
+                    Some(r##"Updates a custom constraint. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Note: the supplied policy will perform a full overwrite of all fields."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/organizations_custom-constraints-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Immutable. Name of the constraint. This is unique within the organization. Format of the name should be * `organizations/{organization_id}/customConstraints/{custom_constraint_id}` Example : "organizations/123/customConstraints/custom.createOnlyE2TypeVms" The max length is 70 characters and the min length is 1. Note that the prefix "organizations/{organization_id}/customConstraints/" is not counted."##),
+                     Some(r##"Immutable. Name of the constraint. This is unique within the organization. Format of the name should be * `organizations/{organization_id}/customConstraints/{custom_constraint_id}` Example: `organizations/123/customConstraints/custom.createOnlyE2TypeVms` The max length is 70 characters and the minimum length is 1. Note that the prefix `organizations/{organization_id}/customConstraints/` is not counted."##),
                      Some(true),
                      Some(false)),
         
@@ -2314,12 +2332,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-create",
-                    Some(r##"Creates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Cloud resource."##),
+                    Some(r##"Creates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Google Cloud resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/organizations_policies-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The Cloud resource that will parent the new Policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
+                     Some(r##"Required. The Google Cloud resource that will parent the new policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2342,12 +2360,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-delete",
-                    Some(r##"Deletes a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or Org Policy does not exist."##),
+                    Some(r##"Deletes a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or organization policy does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/organizations_policies-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the policy to delete. See `Policy` for naming rules."##),
+                     Some(r##"Required. Name of the policy to delete. See the policy entry for naming rules."##),
                      Some(true),
                      Some(false)),
         
@@ -2364,12 +2382,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-get",
-                    Some(r##"Gets a `Policy` on a resource. If no `Policy` is set on the resource, NOT_FOUND is returned. The `etag` value can be used with `UpdatePolicy()` to update a `Policy` during read-modify-write."##),
+                    Some(r##"Gets a policy on a resource. If no policy is set on the resource, `NOT_FOUND` is returned. The `etag` value can be used with `UpdatePolicy()` to update a policy during read-modify-write."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/organizations_policies-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the policy. See `Policy` for naming requirements."##),
+                     Some(r##"Required. Resource name of the policy. See Policy for naming requirements."##),
                      Some(true),
                      Some(false)),
         
@@ -2386,12 +2404,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-get-effective-policy",
-                    Some(r##"Gets the effective `Policy` on a resource. This is the result of merging `Policies` in the resource hierarchy and evaluating conditions. The returned `Policy` will not have an `etag` or `condition` set because it is a computed `Policy` across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded."##),
+                    Some(r##"Gets the effective policy on a resource. This is the result of merging policies in the resource hierarchy and evaluating conditions. The returned policy will not have an `etag` or `condition` set because it is an evaluated policy across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/organizations_policies-get-effective-policy",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The effective policy to compute. See `Policy` for naming rules."##),
+                     Some(r##"Required. The effective policy to compute. See Policy for naming requirements."##),
                      Some(true),
                      Some(false)),
         
@@ -2408,12 +2426,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-list",
-                    Some(r##"Retrieves all of the `Policies` that exist on a particular resource."##),
+                    Some(r##"Retrieves all of the policies that exist on a particular resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/organizations_policies-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The target Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
+                     Some(r##"Required. The target Google Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2430,12 +2448,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-patch",
-                    Some(r##"Updates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields."##),
+                    Some(r##"Updates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/organizations_policies-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Immutable. The resource name of the Policy. Must be one of the following forms, where constraint_name is the name of the constraint which this Policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, "projects/123/policies/compute.disableSerialPortAccess". Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number."##),
+                     Some(r##"Immutable. The resource name of the policy. Must be one of the following forms, where `constraint_name` is the name of the constraint which this policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, `projects/123/policies/compute.disableSerialPortAccess`. Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number."##),
                      Some(true),
                      Some(false)),
         
@@ -2461,12 +2479,12 @@ async fn main() {
         
         ("projects", "methods: 'constraints-list', 'policies-create', 'policies-delete', 'policies-get', 'policies-get-effective-policy', 'policies-list' and 'policies-patch'", vec![
             ("constraints-list",
-                    Some(r##"Lists `Constraints` that could be applied on the specified resource."##),
+                    Some(r##"Lists constraints that could be applied on the specified resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/projects_constraints-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
+                     Some(r##"Required. The Google Cloud resource that parents the constraint. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2483,12 +2501,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-create",
-                    Some(r##"Creates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Cloud resource."##),
+                    Some(r##"Creates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint does not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ALREADY_EXISTS` if the policy already exists on the given Google Cloud resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/projects_policies-create",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The Cloud resource that will parent the new Policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
+                     Some(r##"Required. The Google Cloud resource that will parent the new policy. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2511,12 +2529,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-delete",
-                    Some(r##"Deletes a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or Org Policy does not exist."##),
+                    Some(r##"Deletes a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or organization policy does not exist."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/projects_policies-delete",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Name of the policy to delete. See `Policy` for naming rules."##),
+                     Some(r##"Required. Name of the policy to delete. See the policy entry for naming rules."##),
                      Some(true),
                      Some(false)),
         
@@ -2533,12 +2551,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-get",
-                    Some(r##"Gets a `Policy` on a resource. If no `Policy` is set on the resource, NOT_FOUND is returned. The `etag` value can be used with `UpdatePolicy()` to update a `Policy` during read-modify-write."##),
+                    Some(r##"Gets a policy on a resource. If no policy is set on the resource, `NOT_FOUND` is returned. The `etag` value can be used with `UpdatePolicy()` to update a policy during read-modify-write."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/projects_policies-get",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. Resource name of the policy. See `Policy` for naming requirements."##),
+                     Some(r##"Required. Resource name of the policy. See Policy for naming requirements."##),
                      Some(true),
                      Some(false)),
         
@@ -2555,12 +2573,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-get-effective-policy",
-                    Some(r##"Gets the effective `Policy` on a resource. This is the result of merging `Policies` in the resource hierarchy and evaluating conditions. The returned `Policy` will not have an `etag` or `condition` set because it is a computed `Policy` across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded."##),
+                    Some(r##"Gets the effective policy on a resource. This is the result of merging policies in the resource hierarchy and evaluating conditions. The returned policy will not have an `etag` or `condition` set because it is an evaluated policy across multiple resources. Subtrees of Resource Manager resource hierarchy with 'under:' prefix will not be expanded."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/projects_policies-get-effective-policy",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Required. The effective policy to compute. See `Policy` for naming rules."##),
+                     Some(r##"Required. The effective policy to compute. See Policy for naming requirements."##),
                      Some(true),
                      Some(false)),
         
@@ -2577,12 +2595,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-list",
-                    Some(r##"Retrieves all of the `Policies` that exist on a particular resource."##),
+                    Some(r##"Retrieves all of the policies that exist on a particular resource."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/projects_policies-list",
                   vec![
                     (Some(r##"parent"##),
                      None,
-                     Some(r##"Required. The target Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
+                     Some(r##"Required. The target Google Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * `projects/{project_number}` * `projects/{project_id}` * `folders/{folder_id}` * `organizations/{organization_id}`"##),
                      Some(true),
                      Some(false)),
         
@@ -2599,12 +2617,12 @@ async fn main() {
                      Some(false)),
                   ]),
             ("policies-patch",
-                    Some(r##"Updates a Policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields."##),
+                    Some(r##"Updates a policy. Returns a `google.rpc.Status` with `google.rpc.Code.NOT_FOUND` if the constraint or the policy do not exist. Returns a `google.rpc.Status` with `google.rpc.Code.ABORTED` if the etag supplied in the request does not match the persisted etag of the policy Note: the supplied policy will perform a full overwrite of all fields."##),
                     "Details at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli/projects_policies-patch",
                   vec![
                     (Some(r##"name"##),
                      None,
-                     Some(r##"Immutable. The resource name of the Policy. Must be one of the following forms, where constraint_name is the name of the constraint which this Policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, "projects/123/policies/compute.disableSerialPortAccess". Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number."##),
+                     Some(r##"Immutable. The resource name of the policy. Must be one of the following forms, where `constraint_name` is the name of the constraint which this policy configures: * `projects/{project_number}/policies/{constraint_name}` * `folders/{folder_id}/policies/{constraint_name}` * `organizations/{organization_id}/policies/{constraint_name}` For example, `projects/123/policies/compute.disableSerialPortAccess`. Note: `projects/{project_id}/policies/{constraint_name}` is also an acceptable name for API requests, but responses will return the name using the equivalent project number."##),
                      Some(true),
                      Some(false)),
         
@@ -2632,8 +2650,8 @@ async fn main() {
     
     let mut app = App::new("orgpolicy2")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230123")
-           .about("The Org Policy API allows users to configure governance rules on their GCP resources across the Cloud Resource Hierarchy.")
+           .version("5.0.4+20240226")
+           .about("The Organization Policy API allows users to configure governance rules on their Google Cloud resources across the resource hierarchy.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_orgpolicy2_cli")
            .arg(Arg::with_name("url")
                    .long("scope")

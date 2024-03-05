@@ -1,4 +1,4 @@
-site_name: Firestore v5.0.3+20230118
+site_name: Firestore v5.0.4+20240226
 site_url: http://byron.github.io/google-apis-rs/google-firestore1-cli
 site_description: A complete library to interact with Firestore (protocol v1)
 
@@ -10,6 +10,11 @@ site_dir: build_html
 nav:
 - Home: 'index.md'
 - 'Projects':
+    - 'Databases Backup Schedules Create': 'projects_databases-backup-schedules-create.md'
+    - 'Databases Backup Schedules Delete': 'projects_databases-backup-schedules-delete.md'
+    - 'Databases Backup Schedules Get': 'projects_databases-backup-schedules-get.md'
+    - 'Databases Backup Schedules List': 'projects_databases-backup-schedules-list.md'
+    - 'Databases Backup Schedules Patch': 'projects_databases-backup-schedules-patch.md'
     - 'Databases Collection Groups Fields Get': 'projects_databases-collection-groups-fields-get.md'
     - 'Databases Collection Groups Fields List': 'projects_databases-collection-groups-fields-list.md'
     - 'Databases Collection Groups Fields Patch': 'projects_databases-collection-groups-fields-patch.md'
@@ -45,6 +50,10 @@ nav:
     - 'Databases Operations Get': 'projects_databases-operations-get.md'
     - 'Databases Operations List': 'projects_databases-operations-list.md'
     - 'Databases Patch': 'projects_databases-patch.md'
+    - 'Databases Restore': 'projects_databases-restore.md'
+    - 'Locations Backups Delete': 'projects_locations-backups-delete.md'
+    - 'Locations Backups Get': 'projects_locations-backups-get.md'
+    - 'Locations Backups List': 'projects_locations-backups-list.md'
     - 'Locations Get': 'projects_locations-get.md'
     - 'Locations List': 'projects_locations-list.md'
 

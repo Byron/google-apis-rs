@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// Create, edit, organize, and delete all your tasks
     Full,
@@ -133,7 +133,7 @@ impl<'a, S> TasksHub<S> {
         TasksHub {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://tasks.googleapis.com/".to_string(),
             _root_url: "https://tasks.googleapis.com/".to_string(),
         }
@@ -147,7 +147,7 @@ impl<'a, S> TasksHub<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -3741,7 +3741,7 @@ where
         self._page_token = Some(new_value.to_string());
         self
     }
-    /// Maximum number of task lists returned on one page. Optional. The default is 20 (max allowed: 100).
+    /// Maximum number of tasks returned on one page. Optional. The default is 20 (max allowed: 100).
     ///
     /// Sets the *max results* query property to the given value.
     pub fn max_results(mut self, new_value: i32) -> TaskListCall<'a, S> {

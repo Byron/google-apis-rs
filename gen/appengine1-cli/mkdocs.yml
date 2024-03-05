@@ -1,4 +1,4 @@
-site_name: appengine v5.0.3+20230114
+site_name: appengine v5.0.4+20240226
 site_url: http://byron.github.io/google-apis-rs/google-appengine1-cli
 site_description: A complete library to interact with appengine (protocol v1)
 
@@ -29,6 +29,7 @@ nav:
     - 'Firewall Ingress Rules List': 'apps_firewall-ingress-rules-list.md'
     - 'Firewall Ingress Rules Patch': 'apps_firewall-ingress-rules-patch.md'
     - 'Get': 'apps_get.md'
+    - 'List Runtimes': 'apps_list-runtimes.md'
     - 'Locations Get': 'apps_locations-get.md'
     - 'Locations List': 'apps_locations-list.md'
     - 'Operations Get': 'apps_operations-get.md'
@@ -49,7 +50,7 @@ nav:
     - 'Services Versions List': 'apps_services-versions-list.md'
     - 'Services Versions Patch': 'apps_services-versions-patch.md'
 - 'Projects':
-    - 'Locations Applications Get': 'projects_locations-applications-get.md'
+    - 'Locations Applications Authorized Domains List': 'projects_locations-applications-authorized-domains-list.md'
 
 theme: readthedocs
 

@@ -602,8 +602,11 @@ where
                     "invalid-key-version" => Some(("invalidKeyVersion", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-emails" => Some(("notificationEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "prefer-no-broad-approval-requests" => Some(("preferNoBroadApprovalRequests", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "preferred-request-expiration-days" => Some(("preferredRequestExpirationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-key-version", "ancestor-has-active-key-version", "enrolled-ancestor", "invalid-key-version", "name", "notification-emails"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-key-version", "ancestor-has-active-key-version", "enrolled-ancestor", "invalid-key-version", "name", "notification-emails", "notification-pubsub-topic", "prefer-no-broad-approval-requests", "preferred-request-expiration-days"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1219,8 +1222,11 @@ where
                     "invalid-key-version" => Some(("invalidKeyVersion", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-emails" => Some(("notificationEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "prefer-no-broad-approval-requests" => Some(("preferNoBroadApprovalRequests", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "preferred-request-expiration-days" => Some(("preferredRequestExpirationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-key-version", "ancestor-has-active-key-version", "enrolled-ancestor", "invalid-key-version", "name", "notification-emails"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-key-version", "ancestor-has-active-key-version", "enrolled-ancestor", "invalid-key-version", "name", "notification-emails", "notification-pubsub-topic", "prefer-no-broad-approval-requests", "preferred-request-expiration-days"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1836,8 +1842,11 @@ where
                     "invalid-key-version" => Some(("invalidKeyVersion", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "notification-emails" => Some(("notificationEmails", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
+                    "notification-pubsub-topic" => Some(("notificationPubsubTopic", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "prefer-no-broad-approval-requests" => Some(("preferNoBroadApprovalRequests", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
+                    "preferred-request-expiration-days" => Some(("preferredRequestExpirationDays", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-key-version", "ancestor-has-active-key-version", "enrolled-ancestor", "invalid-key-version", "name", "notification-emails"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["active-key-version", "ancestor-has-active-key-version", "enrolled-ancestor", "invalid-key-version", "name", "notification-emails", "notification-pubsub-topic", "prefer-no-broad-approval-requests", "preferred-request-expiration-days"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2763,7 +2772,7 @@ async fn main() {
     
     let mut app = App::new("accessapproval1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230120")
+           .version("5.0.4+20240223")
            .about("An API for controlling access to data by Google personnel.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_accessapproval1_cli")
            .arg(Arg::with_name("url")

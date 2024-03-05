@@ -50,6 +50,65 @@ where
     S::Future: Send + Unpin + 'static,
     S::Error: Into<Box<dyn StdError + Send + Sync>>,
 {
+    async fn _projects_locations_workflows_executions_callbacks_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_workflows_executions_callbacks_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
     async fn _projects_locations_workflows_executions_cancel(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
         
@@ -159,17 +218,22 @@ where
                 match &temp_cursor.to_string()[..] {
                     "argument" => Some(("argument", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "call-log-level" => Some(("callLogLevel", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "create-time" => Some(("createTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "disable-concurrency-quota-overflow-buffering" => Some(("disableConcurrencyQuotaOverflowBuffering", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "duration" => Some(("duration", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "end-time" => Some(("endTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "error.context" => Some(("error.context", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "error.payload" => Some(("error.payload", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "result" => Some(("result", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "start-time" => Some(("startTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-error.details" => Some(("stateError.details", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "state-error.type" => Some(("stateError.type", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "workflow-revision-id" => Some(("workflowRevisionId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["argument", "call-log-level", "context", "duration", "end-time", "error", "name", "payload", "result", "start-time", "state", "workflow-revision-id"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["argument", "call-log-level", "context", "create-time", "details", "disable-concurrency-quota-overflow-buffering", "duration", "end-time", "error", "labels", "name", "payload", "result", "start-time", "state", "state-error", "type", "workflow-revision-id"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -180,6 +244,58 @@ where
         }
         let mut request: api::Execution = json::value::from_value(object).unwrap();
         let mut call = self.hub.projects().locations_workflows_executions_create(request, opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_workflows_executions_export_data(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_workflows_executions_export_data(opt.value_of("name").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
@@ -300,6 +416,12 @@ where
                 "page-size" => {
                     call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
                 },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -313,7 +435,127 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
-                                                                           v.extend(["page-size", "page-token", "view"].iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token", "view"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_workflows_executions_step_entries_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_workflows_executions_step_entries_get(opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_workflows_executions_step_entries_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.projects().locations_workflows_executions_step_entries_list(opt.value_of("parent").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "skip" => {
+                    call = call.skip(        value.map(|v| arg_from_str(v, err, "skip", "int32")).unwrap_or(-0));
+                },
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
+                "order-by" => {
+                    call = call.order_by(value.unwrap_or(""));
+                },
+                "filter" => {
+                    call = call.filter(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["filter", "order-by", "page-size", "page-token", "skip"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -371,6 +613,7 @@ where
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
                     "gcp-cloud-events-mode" => Some(("GCPCloudEventsMode", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "delivery-attempt" => Some(("deliveryAttempt", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "message.attributes" => Some(("message.attributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "message.data" => Some(("message.data", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "message.message-id" => Some(("message.messageId", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -378,7 +621,7 @@ where
                     "message.publish-time" => Some(("message.publishTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "subscription" => Some(("subscription", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["gcp-cloud-events-mode", "attributes", "data", "message", "message-id", "ordering-key", "publish-time", "subscription"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["gcp-cloud-events-mode", "attributes", "data", "delivery-attempt", "message", "message-id", "ordering-key", "publish-time", "subscription"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -445,17 +688,29 @@ where
         match self.opt.subcommand() {
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
+                    ("locations-workflows-executions-callbacks-list", Some(opt)) => {
+                        call_result = self._projects_locations_workflows_executions_callbacks_list(opt, dry_run, &mut err).await;
+                    },
                     ("locations-workflows-executions-cancel", Some(opt)) => {
                         call_result = self._projects_locations_workflows_executions_cancel(opt, dry_run, &mut err).await;
                     },
                     ("locations-workflows-executions-create", Some(opt)) => {
                         call_result = self._projects_locations_workflows_executions_create(opt, dry_run, &mut err).await;
                     },
+                    ("locations-workflows-executions-export-data", Some(opt)) => {
+                        call_result = self._projects_locations_workflows_executions_export_data(opt, dry_run, &mut err).await;
+                    },
                     ("locations-workflows-executions-get", Some(opt)) => {
                         call_result = self._projects_locations_workflows_executions_get(opt, dry_run, &mut err).await;
                     },
                     ("locations-workflows-executions-list", Some(opt)) => {
                         call_result = self._projects_locations_workflows_executions_list(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-workflows-executions-step-entries-get", Some(opt)) => {
+                        call_result = self._projects_locations_workflows_executions_step_entries_get(opt, dry_run, &mut err).await;
+                    },
+                    ("locations-workflows-executions-step-entries-list", Some(opt)) => {
+                        call_result = self._projects_locations_workflows_executions_step_entries_list(opt, dry_run, &mut err).await;
                     },
                     ("locations-workflows-trigger-pubsub-execution", Some(opt)) => {
                         call_result = self._projects_locations_workflows_trigger_pubsub_execution(opt, dry_run, &mut err).await;
@@ -539,7 +794,29 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-workflows-executions-cancel', 'locations-workflows-executions-create', 'locations-workflows-executions-get', 'locations-workflows-executions-list' and 'locations-workflows-trigger-pubsub-execution'", vec![
+        ("projects", "methods: 'locations-workflows-executions-callbacks-list', 'locations-workflows-executions-cancel', 'locations-workflows-executions-create', 'locations-workflows-executions-export-data', 'locations-workflows-executions-get', 'locations-workflows-executions-list', 'locations-workflows-executions-step-entries-get', 'locations-workflows-executions-step-entries-list' and 'locations-workflows-trigger-pubsub-execution'", vec![
+            ("locations-workflows-executions-callbacks-list",
+                    Some(r##"Returns a list of active callbacks that belong to the execution with the given name. The returned callbacks are ordered by callback ID."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_workflowexecutions1_cli/projects_locations-workflows-executions-callbacks-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the execution for which the callbacks should be listed. Format: projects/{project}/locations/{location}/workflows/{workflow}/executions/{execution}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-workflows-executions-cancel",
                     Some(r##"Cancels an execution of the given name."##),
                     "Details at http://byron.github.io/google-apis-rs/google_workflowexecutions1_cli/projects_locations-workflows-executions-cancel",
@@ -569,7 +846,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-workflows-executions-create",
-                    Some(r##"Creates a new execution using the latest revision of the given workflow."##),
+                    Some(r##"Creates a new execution using the latest revision of the given workflow. For more information, see Execute a workflow."##),
                     "Details at http://byron.github.io/google-apis-rs/google_workflowexecutions1_cli/projects_locations-workflows-executions-create",
                   vec![
                     (Some(r##"parent"##),
@@ -583,6 +860,28 @@ async fn main() {
                      Some(r##"Set various fields of the request structure, matching the key=value form"##),
                      Some(true),
                      Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workflows-executions-export-data",
+                    Some(r##"Returns all metadata stored about an execution, excluding most data that is already accessible using other API methods."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_workflowexecutions1_cli/projects_locations-workflows-executions-export-data",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the execution for which data is to be exported. Format: projects/{project}/locations/{location}/workflows/{workflow}/executions/{execution}"##),
+                     Some(true),
+                     Some(false)),
         
                     (Some(r##"v"##),
                      Some(r##"p"##),
@@ -640,6 +939,50 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-workflows-executions-step-entries-get",
+                    Some(r##"Gets a step entry."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_workflowexecutions1_cli/projects_locations-workflows-executions-step-entries-get",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. The name of the step entry to retrieve. Format: projects/{project}/locations/{location}/workflows/{workflow}/executions/{execution}/stepEntries/{step_entry}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
+            ("locations-workflows-executions-step-entries-list",
+                    Some(r##"Lists step entries for the corresponding workflow execution. Returned entries are ordered by their create_time."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_workflowexecutions1_cli/projects_locations-workflows-executions-step-entries-list",
+                  vec![
+                    (Some(r##"parent"##),
+                     None,
+                     Some(r##"Required. Name of the workflow execution to list entries for. Format: projects/{project}/locations/{location}/workflows/{workflow}/executions/{execution}/stepEntries/"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-workflows-trigger-pubsub-execution",
                     Some(r##"Triggers a new execution using the latest revision of the given workflow by a Pub/Sub push notification."##),
                     "Details at http://byron.github.io/google-apis-rs/google_workflowexecutions1_cli/projects_locations-workflows-trigger-pubsub-execution",
@@ -674,7 +1017,7 @@ async fn main() {
     
     let mut app = App::new("workflowexecutions1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230110")
+           .version("5.0.4+20240220")
            .about("Execute workflows created with Workflows API.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_workflowexecutions1_cli")
            .arg(Arg::with_name("url")

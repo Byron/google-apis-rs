@@ -97,7 +97,7 @@ impl<'a, S> Discovery<S> {
         Discovery {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://www.googleapis.com/discovery/v1/".to_string(),
             _root_url: "https://www.googleapis.com/".to_string(),
         }
@@ -108,7 +108,7 @@ impl<'a, S> Discovery<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -183,6 +183,9 @@ pub struct JsonSchema {
     /// The default value of this property (if one exists).
     
     pub default: Option<String>,
+    /// Whether the parameter is deprecated.
+    
+    pub deprecated: Option<bool>,
     /// A description of this object.
     
     pub description: Option<String>,
@@ -190,6 +193,10 @@ pub struct JsonSchema {
     #[serde(rename="enum")]
     
     pub enum_: Option<Vec<String>>,
+    /// The deprecation status for the enums. Each position maps to the corresponding value in the "enum" array.
+    #[serde(rename="enumDeprecated")]
+    
+    pub enum_deprecated: Option<Vec<bool>>,
     /// The descriptions for the enums. Each position maps to the corresponding value in the "enum" array.
     #[serde(rename="enumDescriptions")]
     
@@ -281,6 +288,9 @@ pub struct RestDescription {
     #[serde(rename="documentationLink")]
     
     pub documentation_link: Option<String>,
+    /// A list of location-based endpoint objects for this API. Each object contains the endpoint URL, location, description and deprecation status.
+    
+    pub endpoints: Option<Vec<RestDescriptionEndpoints>>,
     /// The ETag for this response.
     
     pub etag: Option<String>,
@@ -365,6 +375,9 @@ impl client::ResponseResult for RestDescription {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestMethod {
+    /// Whether this method is deprecated.
+    
+    pub deprecated: Option<bool>,
     /// Description of this method.
     
     pub description: Option<String>,
@@ -434,6 +447,9 @@ impl client::Part for RestMethod {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct RestResource {
+    /// Whether this resource is deprecated.
+    
+    pub deprecated: Option<bool>,
     /// Methods on this resource.
     
     pub methods: Option<HashMap<String, RestMethod>>,
@@ -617,6 +633,32 @@ pub struct RestDescriptionAuthOauth2Scopes {
 
 impl client::NestedType for RestDescriptionAuthOauth2Scopes {}
 impl client::Part for RestDescriptionAuthOauth2Scopes {}
+
+
+/// A single endpoint object
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct RestDescriptionEndpoints {
+    /// Whether this endpoint is deprecated
+    
+    pub deprecated: Option<bool>,
+    /// A string describing the host designated by the URL
+    
+    pub description: Option<String>,
+    /// The URL of the endpoint target host
+    #[serde(rename="endpointUrl")]
+    
+    pub endpoint_url: Option<String>,
+    /// The location of the endpoint
+    
+    pub location: Option<String>,
+}
+
+impl client::NestedType for RestDescriptionEndpoints {}
+impl client::Part for RestDescriptionEndpoints {}
 
 
 /// Links to 16x16 and 32x32 icons representing the API.

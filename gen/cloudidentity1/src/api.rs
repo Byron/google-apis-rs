@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// Private Service: https://www.googleapis.com/auth/cloud-identity.devices
     CloudIdentityDevice,
@@ -147,7 +147,7 @@ impl<'a, S> CloudIdentity<S> {
         CloudIdentity {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://cloudidentity.googleapis.com/".to_string(),
             _root_url: "https://cloudidentity.googleapis.com/".to_string(),
         }
@@ -170,7 +170,7 @@ impl<'a, S> CloudIdentity<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -276,7 +276,7 @@ impl client::Part for DsaPublicKeyInfo {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DynamicGroupMetadata {
-    /// Memberships will be the union of all queries. Only one entry with USER resource is currently supported. Customers can create up to 100 dynamic groups.
+    /// Memberships will be the union of all queries. Only one entry with USER resource is currently supported. Customers can create up to 500 dynamic groups.
     
     pub queries: Option<Vec<DynamicGroupQuery>>,
     /// Output only. Status of the dynamic group.
@@ -332,7 +332,7 @@ impl client::Part for DynamicGroupStatus {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct EntityKey {
-    /// The ID of the entity. For Google-managed entities, the `id` should be the email address of an existing group or user. For external-identity-mapped entities, the `id` must be a string conforming to the Identity Source's requirements. Must be unique within a `namespace`.
+    /// The ID of the entity. For Google-managed entities, the `id` should be the email address of an existing group or user. Email addresses need to adhere to [name guidelines for users and groups](https://support.google.com/a/answer/9193374). For external-identity-mapped entities, the `id` must be a string conforming to the Identity Source's requirements. Must be unique within a `namespace`.
     
     pub id: Option<String>,
     /// The namespace in which the entity exists. If not specified, the `EntityKey` represents a Google-managed entity such as a Google user or a Google Group. If specified, the `EntityKey` represents an external-identity-mapped group. The namespace must correspond to an identity source created in Admin Console and must be in the form of `identitysources/{identity_source}`.
@@ -366,10 +366,18 @@ impl client::Part for ExpiryDetail {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleAppsCloudidentityDevicesV1AndroidAttributes {
+    /// Whether the device passes Android CTS compliance.
+    #[serde(rename="ctsProfileMatch")]
+    
+    pub cts_profile_match: Option<bool>,
     /// Whether applications from unknown sources can be installed on device.
     #[serde(rename="enabledUnknownSources")]
     
     pub enabled_unknown_sources: Option<bool>,
+    /// Whether any potentially harmful apps were detected on the device.
+    #[serde(rename="hasPotentiallyHarmfulApps")]
+    
+    pub has_potentially_harmful_apps: Option<bool>,
     /// Whether this account is on an owner/primary profile. For phones, only true for owner profiles. Android 4+ devices can have secondary or restricted user profiles.
     #[serde(rename="ownerProfileAccount")]
     
@@ -382,6 +390,14 @@ pub struct GoogleAppsCloudidentityDevicesV1AndroidAttributes {
     #[serde(rename="supportsWorkProfile")]
     
     pub supports_work_profile: Option<bool>,
+    /// Whether Android verified boot status is GREEN.
+    #[serde(rename="verifiedBoot")]
+    
+    pub verified_boot: Option<bool>,
+    /// Whether Google Play Protect Verify Apps is enabled.
+    #[serde(rename="verifyAppsEnabled")]
+    
+    pub verify_apps_enabled: Option<bool>,
 }
 
 impl client::Part for GoogleAppsCloudidentityDevicesV1AndroidAttributes {}
@@ -613,6 +629,9 @@ pub struct GoogleAppsCloudidentityDevicesV1Device {
     #[serde(rename="encryptionState")]
     
     pub encryption_state: Option<String>,
+    /// Host name of the device.
+    
+    pub hostname: Option<String>,
     /// Output only. IMEI number of device if GSM device; empty otherwise.
     
     pub imei: Option<String>,
@@ -887,6 +906,7 @@ impl client::RequestValue for GoogleAppsCloudidentityDevicesV1WipeDeviceUserRequ
 /// * [memberships list groups](GroupMembershipListCall) (none)
 /// * [memberships lookup groups](GroupMembershipLookupCall) (none)
 /// * [memberships modify membership roles groups](GroupMembershipModifyMembershipRoleCall) (none)
+/// * [memberships search direct groups groups](GroupMembershipSearchDirectGroupCall) (none)
 /// * [memberships search transitive groups groups](GroupMembershipSearchTransitiveGroupCall) (none)
 /// * [memberships search transitive memberships groups](GroupMembershipSearchTransitiveMembershipCall) (none)
 /// * [create groups](GroupCreateCall) (request)
@@ -901,6 +921,10 @@ impl client::RequestValue for GoogleAppsCloudidentityDevicesV1WipeDeviceUserRequ
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Group {
+    /// Output only. Additional group keys associated with the Group.
+    #[serde(rename="additionalGroupKeys")]
+    
+    pub additional_group_keys: Option<Vec<EntityKey>>,
     /// Output only. The time when the `Group` was created.
     #[serde(rename="createTime")]
     
@@ -1359,6 +1383,10 @@ pub struct Membership {
     #[serde(rename="createTime")]
     
     pub create_time: Option<client::chrono::DateTime<client::chrono::offset::Utc>>,
+    /// Output only. Delivery setting associated with the membership.
+    #[serde(rename="deliverySetting")]
+    
+    pub delivery_setting: Option<String>,
     /// Output only. The [resource name](https://cloud.google.com/apis/design/resource_names) of the `Membership`. Shall be of the form `groups/{group}/memberships/{membership}`.
     
     pub name: Option<String>,
@@ -1381,6 +1409,41 @@ pub struct Membership {
 
 impl client::RequestValue for Membership {}
 impl client::ResponseResult for Membership {}
+
+
+/// Message containing membership relation.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct MembershipRelation {
+    /// An extended description to help users determine the purpose of a `Group`.
+    
+    pub description: Option<String>,
+    /// The display name of the `Group`.
+    #[serde(rename="displayName")]
+    
+    pub display_name: Option<String>,
+    /// The [resource name](https://cloud.google.com/apis/design/resource_names) of the `Group`. Shall be of the form `groups/{group_id}`.
+    
+    pub group: Option<String>,
+    /// The `EntityKey` of the `Group`.
+    #[serde(rename="groupKey")]
+    
+    pub group_key: Option<EntityKey>,
+    /// One or more label entries that apply to the Group. Currently supported labels contain a key with an empty value.
+    
+    pub labels: Option<HashMap<String, String>>,
+    /// The [resource name](https://cloud.google.com/apis/design/resource_names) of the `Membership`. Shall be of the form `groups/{group_id}/memberships/{membership_id}`.
+    
+    pub membership: Option<String>,
+    /// The `MembershipRole`s that apply to the `Membership`.
+    
+    pub roles: Option<Vec<MembershipRole>>,
+}
+
+impl client::Part for MembershipRelation {}
 
 
 /// A membership role within the Cloud Identity Groups API. A `MembershipRole` defines the privileges granted to a `Membership`.
@@ -1517,7 +1580,7 @@ pub struct Operation {
     /// The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.
     
     pub name: Option<String>,
-    /// The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
+    /// The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.
     
     pub response: Option<HashMap<String, json::Value>>,
 }
@@ -1587,11 +1650,11 @@ pub struct SamlIdpConfig {
     #[serde(rename="entityId")]
     
     pub entity_id: Option<String>,
-    /// The **Logout Redirect URL** (sign-out page URL) of the identity provider. When a user clicks the sign-out link on a Google page, they will be redirected to this URL. This is a pure redirect with no attached SAML `LogoutRequest` i.e. SAML single logout is currently not supported. Must use `HTTPS`.
+    /// The **Logout Redirect URL** (sign-out page URL) of the identity provider. When a user clicks the sign-out link on a Google page, they will be redirected to this URL. This is a pure redirect with no attached SAML `LogoutRequest` i.e. SAML single logout is not supported. Must use `HTTPS`.
     #[serde(rename="logoutRedirectUri")]
     
     pub logout_redirect_uri: Option<String>,
-    /// Required. The `SingleSignOnService` endpoint location (sign-in page URL) of the identity provider. This is the URL where the `AuthnRequest` will be sent. Must use `HTTPS`. Currently assumed to accept the `HTTP-Redirect` binding.
+    /// Required. The `SingleSignOnService` endpoint location (sign-in page URL) of the identity provider. This is the URL where the `AuthnRequest` will be sent. Must use `HTTPS`. Assumed to accept the `HTTP-Redirect` binding.
     #[serde(rename="singleSignOnServiceUri")]
     
     pub single_sign_on_service_uri: Option<String>,
@@ -1607,7 +1670,7 @@ impl client::Part for SamlIdpConfig {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SamlSpConfig {
-    /// Output only. The SAML **Assertion Consumer Service (ACS) URL** to be used for the IDP-initiated login. Currently assumed to accept response messages via the `HTTP-POST` binding.
+    /// Output only. The SAML **Assertion Consumer Service (ACS) URL** to be used for the IDP-initiated login. Assumed to accept response messages via the `HTTP-POST` binding.
     #[serde(rename="assertionConsumerServiceUri")]
     
     pub assertion_consumer_service_uri: Option<String>,
@@ -1634,6 +1697,29 @@ pub struct SamlSsoInfo {
 }
 
 impl client::Part for SamlSsoInfo {}
+
+
+/// The response message for MembershipsService.SearchDirectGroups.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [memberships search direct groups groups](GroupMembershipSearchDirectGroupCall) (response)
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct SearchDirectGroupsResponse {
+    /// List of direct groups satisfying the query.
+    
+    pub memberships: Option<Vec<MembershipRelation>>,
+    /// Token to retrieve the next page of results, or empty if there are no more results available for listing.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+}
+
+impl client::ResponseResult for SearchDirectGroupsResponse {}
 
 
 /// The response message for GroupsService.SearchGroups.
@@ -2372,7 +2458,7 @@ impl<'a, S> DeviceMethods<'a, S> {
 ///     ).build().await.unwrap();
 /// let mut hub = CloudIdentity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `create(...)`, `delete(...)`, `get(...)`, `get_security_settings(...)`, `list(...)`, `lookup(...)`, `memberships_check_transitive_membership(...)`, `memberships_create(...)`, `memberships_delete(...)`, `memberships_get(...)`, `memberships_get_membership_graph(...)`, `memberships_list(...)`, `memberships_lookup(...)`, `memberships_modify_membership_roles(...)`, `memberships_search_transitive_groups(...)`, `memberships_search_transitive_memberships(...)`, `patch(...)`, `search(...)` and `update_security_settings(...)`
+/// // like `create(...)`, `delete(...)`, `get(...)`, `get_security_settings(...)`, `list(...)`, `lookup(...)`, `memberships_check_transitive_membership(...)`, `memberships_create(...)`, `memberships_delete(...)`, `memberships_get(...)`, `memberships_get_membership_graph(...)`, `memberships_list(...)`, `memberships_lookup(...)`, `memberships_modify_membership_roles(...)`, `memberships_search_direct_groups(...)`, `memberships_search_transitive_groups(...)`, `memberships_search_transitive_memberships(...)`, `patch(...)`, `search(...)` and `update_security_settings(...)`
 /// // to build up your call.
 /// let rb = hub.groups();
 /// # }
@@ -2528,6 +2614,27 @@ impl<'a, S> GroupMethods<'a, S> {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Searches direct groups of a member.
+    /// 
+    /// # Arguments
+    ///
+    /// * `parent` - [Resource name](https://cloud.google.com/apis/design/resource_names) of the group to search transitive memberships in. Format: groups/{group_id}, where group_id is always '-' as this API will search across all groups for a given member.
+    pub fn memberships_search_direct_groups(&self, parent: &str) -> GroupMembershipSearchDirectGroupCall<'a, S> {
+        GroupMembershipSearchDirectGroupCall {
+            hub: self.hub,
+            _parent: parent.to_string(),
+            _query: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _order_by: Default::default(),
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
@@ -7121,7 +7228,7 @@ where
         self._user_id = Some(new_value.to_string());
         self
     }
-    /// Raw Resource Id used by Google Endpoint Verification. If the user is enrolled into Google Endpoint Verification, this id will be saved as the 'device_resource_id' field in the following platform dependent files. Mac: ~/.secureConnect/context_aware_config.json Windows: C:\Users\%USERPROFILE%\.secureConnect\context_aware_config.json Linux: ~/.secureConnect/context_aware_config.json
+    /// Raw Resource Id used by Google Endpoint Verification. If the user is enrolled into Google Endpoint Verification, this id will be saved as the 'device_resource_id' field in the following platform dependent files. * macOS: ~/.secureConnect/context_aware_config.json * Windows: %USERPROFILE%\AppData\Local\Google\Endpoint Verification\accounts.json * Linux: ~/.secureConnect/context_aware_config.json
     ///
     /// Sets the *raw resource id* query property to the given value.
     pub fn raw_resource_id(mut self, new_value: &str) -> DeviceDeviceUserLookupCall<'a, S> {
@@ -11114,7 +11221,7 @@ where
         self._member_key_namespace = Some(new_value.to_string());
         self
     }
-    /// The ID of the entity. For Google-managed entities, the `id` should be the email address of an existing group or user. For external-identity-mapped entities, the `id` must be a string conforming to the Identity Source's requirements. Must be unique within a `namespace`.
+    /// The ID of the entity. For Google-managed entities, the `id` should be the email address of an existing group or user. Email addresses need to adhere to [name guidelines for users and groups](https://support.google.com/a/answer/9193374). For external-identity-mapped entities, the `id` must be a string conforming to the Identity Source's requirements. Must be unique within a `namespace`.
     ///
     /// Sets the *member key.id* query property to the given value.
     pub fn member_key_id(mut self, new_value: &str) -> GroupMembershipLookupCall<'a, S> {
@@ -11489,6 +11596,316 @@ where
 }
 
 
+/// Searches direct groups of a member.
+///
+/// A builder for the *memberships.searchDirectGroups* method supported by a *group* resource.
+/// It is not used directly, but through a [`GroupMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_cloudidentity1 as cloudidentity1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use cloudidentity1::{CloudIdentity, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = CloudIdentity::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.groups().memberships_search_direct_groups("parent")
+///              .query("no")
+///              .page_token("ipsum")
+///              .page_size(-23)
+///              .order_by("takimata")
+///              .doit().await;
+/// # }
+/// ```
+pub struct GroupMembershipSearchDirectGroupCall<'a, S>
+    where S: 'a {
+
+    hub: &'a CloudIdentity<S>,
+    _parent: String,
+    _query: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _order_by: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for GroupMembershipSearchDirectGroupCall<'a, S> {}
+
+impl<'a, S> GroupMembershipSearchDirectGroupCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, SearchDirectGroupsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "cloudidentity.groups.memberships.searchDirectGroups",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "parent", "query", "pageToken", "pageSize", "orderBy"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("parent", self._parent);
+        if let Some(value) = self._query.as_ref() {
+            params.push("query", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._order_by.as_ref() {
+            params.push("orderBy", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/{+parent}/memberships:searchDirectGroups";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::CloudIdentityGroupReadonly.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{+parent}", "parent")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, true);
+        }
+        {
+            let to_remove = ["parent"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// [Resource name](https://cloud.google.com/apis/design/resource_names) of the group to search transitive memberships in. Format: groups/{group_id}, where group_id is always '-' as this API will search across all groups for a given member.
+    ///
+    /// Sets the *parent* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn parent(mut self, new_value: &str) -> GroupMembershipSearchDirectGroupCall<'a, S> {
+        self._parent = new_value.to_string();
+        self
+    }
+    /// Required. A CEL expression that MUST include member specification AND label(s). Users can search on label attributes of groups. CONTAINS match ('in') is supported on labels. Identity-mapped groups are uniquely identified by both a `member_key_id` and a `member_key_namespace`, which requires an additional query input: `member_key_namespace`. Example query: `member_key_id == 'member_key_id_value' && 'label_value' in labels`
+    ///
+    /// Sets the *query* query property to the given value.
+    pub fn query(mut self, new_value: &str) -> GroupMembershipSearchDirectGroupCall<'a, S> {
+        self._query = Some(new_value.to_string());
+        self
+    }
+    /// The next_page_token value returned from a previous list request, if any
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> GroupMembershipSearchDirectGroupCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The default page size is 200 (max 1000).
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> GroupMembershipSearchDirectGroupCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The ordering of membership relation for the display name or email in the response. The syntax for this field can be found at https://cloud.google.com/apis/design/design_patterns#sorting_order. Example: Sort by the ascending display name: order_by="group_name" or order_by="group_name asc". Sort by the descending display name: order_by="group_name desc". Sort by the ascending group key: order_by="group_key" or order_by="group_key asc". Sort by the descending group key: order_by="group_key desc".
+    ///
+    /// Sets the *order by* query property to the given value.
+    pub fn order_by(mut self, new_value: &str) -> GroupMembershipSearchDirectGroupCall<'a, S> {
+        self._order_by = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> GroupMembershipSearchDirectGroupCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> GroupMembershipSearchDirectGroupCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::CloudIdentityGroupReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> GroupMembershipSearchDirectGroupCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> GroupMembershipSearchDirectGroupCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> GroupMembershipSearchDirectGroupCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
 /// Search transitive groups of a member. **Note:** This feature is only available to Google Workspace Enterprise Standard, Enterprise Plus, and Enterprise for Education; and Cloud Identity Premium accounts. If the account of the member is not one of these, a 403 (PERMISSION_DENIED) HTTP status code will be returned. A transitive group is any group that has a direct or indirect membership to the member. Actor must have view permissions all transitive groups.
 ///
 /// A builder for the *memberships.searchTransitiveGroups* method supported by a *group* resource.
@@ -11516,9 +11933,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().memberships_search_transitive_groups("parent")
-///              .query("no")
-///              .page_token("ipsum")
-///              .page_size(-23)
+///              .query("voluptua.")
+///              .page_token("et")
+///              .page_size(-31)
 ///              .doit().await;
 /// # }
 /// ```
@@ -11690,7 +12107,7 @@ where
         self._parent = new_value.to_string();
         self
     }
-    /// Required. A CEL expression that MUST include member specification AND label(s). This is a `required` field. Users can search on label attributes of groups. CONTAINS match ('in') is supported on labels. Identity-mapped groups are uniquely identified by both a `member_key_id` and a `member_key_namespace`, which requires an additional query input: `member_key_namespace`. Example query: `member_key_id == 'member_key_id_value' && in labels`
+    /// Required. A CEL expression that MUST include member specification AND label(s). This is a `required` field. Users can search on label attributes of groups. CONTAINS match ('in') is supported on labels. Identity-mapped groups are uniquely identified by both a `member_key_id` and a `member_key_namespace`, which requires an additional query input: `member_key_namespace`. Example query: `member_key_id == 'member_key_id_value' && in labels` Query may optionally contain equality operators on the parent of the group restricting the search within a particular customer, e.g. `parent == 'customers/{customer_id}'`. The `customer_id` must begin with "C" (for example, 'C046psxkn'). This filtering is only supported for Admins with groups read permissons on the input customer. Example query: `member_key_id == 'member_key_id_value' && in labels && parent == 'customers/C046psxkn'`
     ///
     /// Sets the *query* query property to the given value.
     pub fn query(mut self, new_value: &str) -> GroupMembershipSearchTransitiveGroupCall<'a, S> {
@@ -11814,8 +12231,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().memberships_search_transitive_memberships("parent")
-///              .page_token("consetetur")
-///              .page_size(-28)
+///              .page_token("amet.")
+///              .page_size(-30)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12106,7 +12523,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().create(req)
-///              .initial_group_config("et")
+///              .initial_group_config("takimata")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13183,10 +13600,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().list()
-///              .view("sed")
-///              .parent("takimata")
-///              .page_token("dolores")
-///              .page_size(-62)
+///              .view("accusam")
+///              .parent("voluptua.")
+///              .page_token("dolore")
+///              .page_size(-34)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13474,8 +13891,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().lookup()
-///              .group_key_namespace("et")
-///              .group_key_id("accusam")
+///              .group_key_namespace("dolore")
+///              .group_key_id("voluptua.")
 ///              .doit().await;
 /// # }
 /// ```
@@ -13631,7 +14048,7 @@ where
         self._group_key_namespace = Some(new_value.to_string());
         self
     }
-    /// The ID of the entity. For Google-managed entities, the `id` should be the email address of an existing group or user. For external-identity-mapped entities, the `id` must be a string conforming to the Identity Source's requirements. Must be unique within a `namespace`.
+    /// The ID of the entity. For Google-managed entities, the `id` should be the email address of an existing group or user. Email addresses need to adhere to [name guidelines for users and groups](https://support.google.com/a/answer/9193374). For external-identity-mapped entities, the `id` must be a string conforming to the Identity Source's requirements. Must be unique within a `namespace`.
     ///
     /// Sets the *group key.id* query property to the given value.
     pub fn group_key_id(mut self, new_value: &str) -> GroupLookupCall<'a, S> {
@@ -14045,10 +14462,10 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.groups().search()
-///              .view("dolore")
-///              .query("dolore")
-///              .page_token("dolore")
-///              .page_size(-78)
+///              .view("ea")
+///              .query("sadipscing")
+///              .page_token("Lorem")
+///              .page_size(-38)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14212,7 +14629,7 @@ where
         self._view = Some(new_value.to_string());
         self
     }
-    /// Required. The search query. Must be specified in [Common Expression Language](https://opensource.google/projects/cel). May only contain equality operators on the parent and inclusion operators on labels (e.g., `parent == 'customers/{customer_id}' && 'cloudidentity.googleapis.com/groups.discussion_forum' in labels`). The `customer_id` must begin with "C" (for example, 'C046psxkn'). [Find your customer ID.] (https://support.google.com/cloudidentity/answer/10070793)
+    /// Required. The search query. * Must be specified in [Common Expression Language](https://opensource.google/projects/cel). * Must contain equality operators on the parent, e.g. `parent == 'customers/{customer_id}'`. The `customer_id` must begin with "C" (for example, 'C046psxkn'). [Find your customer ID.] (https://support.google.com/cloudidentity/answer/10070793) * Can contain optional inclusion operators on `labels` such as `'cloudidentity.googleapis.com/groups.discussion_forum' in labels`). * Can contain an optional equality operator on `domain_name`. e.g. `domain_name == 'examplepetstore.com'` * Can contain optional `startsWith/contains/equality` operators on `group_key`, e.g. `group_key.startsWith('dev')`, `group_key.contains('dev'), group_key == 'dev@examplepetstore.com'` * Can contain optional `startsWith/contains/equality` operators on `display_name`, such as `display_name.startsWith('dev')` , `display_name.contains('dev')`, `display_name == 'dev'`
     ///
     /// Sets the *query* query property to the given value.
     pub fn query(mut self, new_value: &str) -> GroupSearchCall<'a, S> {
@@ -15456,8 +15873,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inbound_saml_sso_profiles().idp_credentials_list("parent")
-///              .page_token("no")
-///              .page_size(-7)
+///              .page_token("et")
+///              .page_size(-39)
 ///              .doit().await;
 /// # }
 /// ```
@@ -16539,9 +16956,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inbound_saml_sso_profiles().list()
-///              .page_token("sit")
-///              .page_size(-35)
-///              .filter("tempor")
+///              .page_token("et")
+///              .page_size(-8)
+///              .filter("Lorem")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16708,7 +17125,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// A [Common Expression Language](https://github.com/google/cel-spec) expression to filter the results. The only currently-supported filter is filtering by customer. For example: `customer=="customers/C0123abc"`. Omitting the filter or specifying a filter of `customer=="customers/my_customer"` will return the profiles for the customer that the caller (authenticated user) belongs to.
+    /// A [Common Expression Language](https://github.com/google/cel-spec) expression to filter the results. The only supported filter is filtering by customer. For example: `customer=="customers/C0123abc"`. Omitting the filter or specifying a filter of `customer=="customers/my_customer"` will return the profiles for the customer that the caller (authenticated user) belongs to.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> InboundSamlSsoProfileListCall<'a, S> {
@@ -17919,9 +18336,9 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.inbound_sso_assignments().list()
-///              .page_token("sanctus")
-///              .page_size(-56)
-///              .filter("est")
+///              .page_token("dolores")
+///              .page_size(-69)
+///              .filter("et")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18088,7 +18505,7 @@ where
         self._page_size = Some(new_value);
         self
     }
-    /// A CEL expression to filter the results. The only currently-supported filter is filtering by customer. For example: `customer==customers/C0123abc`. Omitting the filter or specifying a filter of `customer==customers/my_customer` will return the assignments for the customer that the caller (authenticated user) belongs to.
+    /// A CEL expression to filter the results. The only supported filter is filtering by customer. For example: `customer==customers/C0123abc`. Omitting the filter or specifying a filter of `customer==customers/my_customer` will return the assignments for the customer that the caller (authenticated user) belongs to.
     ///
     /// Sets the *filter* query property to the given value.
     pub fn filter(mut self, new_value: &str) -> InboundSsoAssignmentListCall<'a, S> {

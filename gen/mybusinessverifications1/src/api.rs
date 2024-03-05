@@ -37,6 +37,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_mybusinessverifications1 as mybusinessverifications1;
+/// use mybusinessverifications1::api::VerifyLocationRequest;
 /// use mybusinessverifications1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
@@ -55,12 +56,15 @@ use crate::{client, client::GetToken, client::serde_with};
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
 /// let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = VerifyLocationRequest::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.locations().verifications_list("parent")
-///              .page_token("sed")
-///              .page_size(-2)
+/// let result = hub.locations().verify(req, "name")
 ///              .doit().await;
 /// 
 /// match result {
@@ -99,7 +103,7 @@ impl<'a, S> MyBusinessVerifications<S> {
         MyBusinessVerifications {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://mybusinessverifications.googleapis.com/".to_string(),
             _root_url: "https://mybusinessverifications.googleapis.com/".to_string(),
         }
@@ -108,12 +112,9 @@ impl<'a, S> MyBusinessVerifications<S> {
     pub fn locations(&'a self) -> LocationMethods<'a, S> {
         LocationMethods { hub: &self }
     }
-    pub fn verification_tokens(&'a self) -> VerificationTokenMethods<'a, S> {
-        VerificationTokenMethods { hub: &self }
-    }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -281,44 +282,6 @@ pub struct FetchVerificationOptionsResponse {
 impl client::ResponseResult for FetchVerificationOptionsResponse {}
 
 
-/// Request message for Verifications.GenerateVerificationToken.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [generate verification tokens](VerificationTokenGenerateCall) (request)
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GenerateVerificationTokenRequest {
-    /// Required. The target location. Note: The location information should exactly match the target Location, otherwise the generated verification token won't be able to verify the target Location.
-    
-    pub location: Option<Location>,
-}
-
-impl client::RequestValue for GenerateVerificationTokenRequest {}
-
-
-/// Response message for Verifications.GenerateVerificationToken.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [generate verification tokens](VerificationTokenGenerateCall) (response)
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct GenerateVerificationTokenResponse {
-    /// The generated token to verify the location.
-    
-    pub token: Option<VerificationToken>,
-}
-
-impl client::ResponseResult for GenerateVerificationTokenResponse {}
-
-
 /// Response message for Verifications.ListVerifications.
 /// 
 /// # Activities
@@ -340,44 +303,6 @@ pub struct ListVerificationsResponse {
 }
 
 impl client::ResponseResult for ListVerificationsResponse {}
-
-
-/// A subset of location info. See the \[help center article\] (https://support.google.com/business/answer/3038177) for a detailed description of these fields, or the [category endpoint](https://developers.google.com/my-business/reference/rest/v4/categories) for a list of valid business categories.
-/// 
-/// # Activities
-/// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [verifications complete locations](LocationVerificationCompleteCall) (none)
-/// * [verifications list locations](LocationVerificationListCall) (none)
-/// * [fetch verification options locations](LocationFetchVerificationOptionCall) (none)
-/// * [get voice of merchant state locations](LocationGetVoiceOfMerchantStateCall) (none)
-/// * [verify locations](LocationVerifyCall) (none)
-#[serde_with::serde_as(crate = "::client::serde_with")]
-#[derive(Default, Clone, Debug, Serialize, Deserialize)]
-pub struct Location {
-    /// Required. A precise, accurate address to describe your business location. PO boxes or mailboxes located at remote locations are not acceptable. At this time, you can specify a maximum of five `address_lines` values in the address.
-    
-    pub address: Option<PostalAddress>,
-    /// Required. Location name should reflect your business's real-world name, as used consistently on your storefront, website, and stationery, and as known to customers. Any additional information, when relevant, can be included in other fields of the resource (for example, `Address`, `Categories`). Don't add unnecessary information to your name (for example, prefer "Google" over "Google Inc. - Mountain View Corporate Headquarters"). Don't include marketing taglines, store codes, special characters, hours or closed/open status, phone numbers, website URLs, service/product information, location/address or directions, or containment information (for example, "Chase ATM in Duane Reade").
-    
-    pub name: Option<String>,
-    /// Required. Id of the category that best describes the core business this location engages in. e.g. gcid:bakery.
-    #[serde(rename="primaryCategoryId")]
-    
-    pub primary_category_id: Option<String>,
-    /// Optional. A phone number that connects to your individual business location as directly as possible. Use a local phone number instead of a central, call center helpline number whenever possible.
-    #[serde(rename="primaryPhone")]
-    
-    pub primary_phone: Option<String>,
-    /// Optional. A URL for this business. If possible, use a URL that represents this individual business location instead of a generic website/URL that represents all locations, or the brand.
-    #[serde(rename="websiteUri")]
-    
-    pub website_uri: Option<String>,
-}
-
-impl client::Resource for Location {}
 
 
 /// Represents a postal address, e.g. for postal delivery or payments addresses. Given a postal address, a postal service can deliver items to a premise, P.O. Box or similar. It is not intended to model geographical locations (roads, towns, mountains). In typical usage an address would be created via user input or from importing existing data, depending on the type of process. Advice on address input / editing: - Use an internationalization-ready address widget such as https://github.com/google/libaddressinput) - Users should not be presented with UI elements for input or editing of fields outside countries where that field is used. For more guidance on how to use this schema, please see: https://support.google.com/business/answer/6397478
@@ -464,6 +389,9 @@ impl client::Part for ServiceBusinessContext {}
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Verification {
+    /// Optional. Response announcement set only if the method is VETTED_PARTNER.
+    
+    pub announcement: Option<String>,
     /// The timestamp when the verification is requested.
     #[serde(rename="createTime")]
     
@@ -493,6 +421,9 @@ pub struct VerificationOption {
     #[serde(rename="addressData")]
     
     pub address_data: Option<AddressVerificationData>,
+    /// Set only if the method is VETTED_PARTNER.
+    
+    pub announcement: Option<String>,
     /// Set only if the method is EMAIL.
     #[serde(rename="emailData")]
     
@@ -512,12 +443,8 @@ impl client::Part for VerificationOption {}
 
 /// Token generated by a vetted [partner](https://support.google.com/business/answer/7674102).
 /// 
-/// # Activities
+/// This type is not used in any activity, and only used as *part* of another schema.
 /// 
-/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
-/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
-/// 
-/// * [generate verification tokens](VerificationTokenGenerateCall) (none)
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct VerificationToken {
@@ -527,7 +454,7 @@ pub struct VerificationToken {
     pub token_string: Option<String>,
 }
 
-impl client::Resource for VerificationToken {}
+impl client::Part for VerificationToken {}
 
 
 /// Indicates that the location requires verification. Contains information about the current verification actions performed on the location.
@@ -782,63 +709,6 @@ impl<'a, S> LocationMethods<'a, S> {
             hub: self.hub,
             _request: request,
             _name: name.to_string(),
-            _delegate: Default::default(),
-            _additional_params: Default::default(),
-        }
-    }
-}
-
-
-
-/// A builder providing access to all methods supported on *verificationToken* resources.
-/// It is not used directly, but through the [`MyBusinessVerifications`] hub.
-///
-/// # Example
-///
-/// Instantiate a resource builder
-///
-/// ```test_harness,no_run
-/// extern crate hyper;
-/// extern crate hyper_rustls;
-/// extern crate google_mybusinessverifications1 as mybusinessverifications1;
-/// 
-/// # async fn dox() {
-/// use std::default::Default;
-/// use mybusinessverifications1::{MyBusinessVerifications, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// let secret: oauth2::ApplicationSecret = Default::default();
-/// let auth = oauth2::InstalledFlowAuthenticator::builder(
-///         secret,
-///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-///     ).build().await.unwrap();
-/// let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
-/// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `generate(...)`
-/// // to build up your call.
-/// let rb = hub.verification_tokens();
-/// # }
-/// ```
-pub struct VerificationTokenMethods<'a, S>
-    where S: 'a {
-
-    hub: &'a MyBusinessVerifications<S>,
-}
-
-impl<'a, S> client::MethodsBuilder for VerificationTokenMethods<'a, S> {}
-
-impl<'a, S> VerificationTokenMethods<'a, S> {
-    
-    /// Create a builder to help you perform the following task:
-    ///
-    /// Generates a token for the provided location data as a vetted [partner](https://support.google.com/business/answer/7674102). Throws PERMISSION_DENIED if the caller is not a vetted partner account. Throws FAILED_PRECONDITION if the caller's VettedStatus is INVALID.
-    /// 
-    /// # Arguments
-    ///
-    /// * `request` - No description provided.
-    pub fn generate(&self, request: GenerateVerificationTokenRequest) -> VerificationTokenGenerateCall<'a, S> {
-        VerificationTokenGenerateCall {
-            hub: self.hub,
-            _request: request,
             _delegate: Default::default(),
             _additional_params: Default::default(),
         }
@@ -1127,8 +997,8 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.locations().verifications_list("parent")
-///              .page_token("duo")
-///              .page_size(-55)
+///              .page_token("At")
+///              .page_size(-8)
 ///              .doit().await;
 /// # }
 /// ```
@@ -2044,234 +1914,6 @@ where
     /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
     /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
     pub fn param<T>(mut self, name: T, value: T) -> LocationVerifyCall<'a, S>
-                                                        where T: AsRef<str> {
-        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
-        self
-    }
-
-}
-
-
-/// Generates a token for the provided location data as a vetted [partner](https://support.google.com/business/answer/7674102). Throws PERMISSION_DENIED if the caller is not a vetted partner account. Throws FAILED_PRECONDITION if the caller's VettedStatus is INVALID.
-///
-/// A builder for the *generate* method supported by a *verificationToken* resource.
-/// It is not used directly, but through a [`VerificationTokenMethods`] instance.
-///
-/// # Example
-///
-/// Instantiate a resource method builder
-///
-/// ```test_harness,no_run
-/// # extern crate hyper;
-/// # extern crate hyper_rustls;
-/// # extern crate google_mybusinessverifications1 as mybusinessverifications1;
-/// use mybusinessverifications1::api::GenerateVerificationTokenRequest;
-/// # async fn dox() {
-/// # use std::default::Default;
-/// # use mybusinessverifications1::{MyBusinessVerifications, oauth2, hyper, hyper_rustls, chrono, FieldMask};
-/// 
-/// # let secret: oauth2::ApplicationSecret = Default::default();
-/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
-/// #         secret,
-/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
-/// #     ).build().await.unwrap();
-/// # let mut hub = MyBusinessVerifications::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
-/// // As the method needs a request, you would usually fill it with the desired information
-/// // into the respective structure. Some of the parts shown here might not be applicable !
-/// // Values shown here are possibly random and not representative !
-/// let mut req = GenerateVerificationTokenRequest::default();
-/// 
-/// // You can configure optional parameters by calling the respective setters at will, and
-/// // execute the final call using `doit()`.
-/// // Values shown here are possibly random and not representative !
-/// let result = hub.verification_tokens().generate(req)
-///              .doit().await;
-/// # }
-/// ```
-pub struct VerificationTokenGenerateCall<'a, S>
-    where S: 'a {
-
-    hub: &'a MyBusinessVerifications<S>,
-    _request: GenerateVerificationTokenRequest,
-    _delegate: Option<&'a mut dyn client::Delegate>,
-    _additional_params: HashMap<String, String>,
-}
-
-impl<'a, S> client::CallBuilder for VerificationTokenGenerateCall<'a, S> {}
-
-impl<'a, S> VerificationTokenGenerateCall<'a, S>
-where
-    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
-    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
-    S::Future: Send + Unpin + 'static,
-    S::Error: Into<Box<dyn StdError + Send + Sync>>,
-{
-
-
-    /// Perform the operation you have build so far.
-    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, GenerateVerificationTokenResponse)> {
-        use std::io::{Read, Seek};
-        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
-        use client::{ToParts, url::Params};
-        use std::borrow::Cow;
-
-        let mut dd = client::DefaultDelegate;
-        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
-        dlg.begin(client::MethodInfo { id: "mybusinessverifications.verificationTokens.generate",
-                               http_method: hyper::Method::POST });
-
-        for &field in ["alt"].iter() {
-            if self._additional_params.contains_key(field) {
-                dlg.finished(false);
-                return Err(client::Error::FieldClash(field));
-            }
-        }
-
-        let mut params = Params::with_capacity(3 + self._additional_params.len());
-
-        params.extend(self._additional_params.iter());
-
-        params.push("alt", "json");
-        let mut url = self.hub._base_url.clone() + "v1/verificationTokens:generate";
-        
-        match dlg.api_key() {
-            Some(value) => params.push("key", value),
-            None => {
-                dlg.finished(false);
-                return Err(client::Error::MissingAPIKey)
-            }
-        }
-
-
-        let url = params.parse_with_url(&url);
-
-        let mut json_mime_type = mime::APPLICATION_JSON;
-        let mut request_value_reader =
-            {
-                let mut value = json::value::to_value(&self._request).expect("serde to work");
-                client::remove_json_null_values(&mut value);
-                let mut dst = io::Cursor::new(Vec::with_capacity(128));
-                json::to_writer(&mut dst, &value).unwrap();
-                dst
-            };
-        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
-        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-
-
-        loop {
-            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
-            let mut req_result = {
-                let client = &self.hub.client;
-                dlg.pre_request();
-                let mut req_builder = hyper::Request::builder()
-                    .method(hyper::Method::POST)
-                    .uri(url.as_str())
-                    .header(USER_AGENT, self.hub._user_agent.clone());
-
-
-
-                        let request = req_builder
-                        .header(CONTENT_TYPE, json_mime_type.to_string())
-                        .header(CONTENT_LENGTH, request_size as u64)
-                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
-
-                client.request(request.unwrap()).await
-
-            };
-
-            match req_result {
-                Err(err) => {
-                    if let client::Retry::After(d) = dlg.http_error(&err) {
-                        sleep(d).await;
-                        continue;
-                    }
-                    dlg.finished(false);
-                    return Err(client::Error::HttpError(err))
-                }
-                Ok(mut res) => {
-                    if !res.status().is_success() {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-                        let (parts, _) = res.into_parts();
-                        let body = hyper::Body::from(res_body_string.clone());
-                        let restored_response = hyper::Response::from_parts(parts, body);
-
-                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
-
-                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
-                            sleep(d).await;
-                            continue;
-                        }
-
-                        dlg.finished(false);
-
-                        return match server_response {
-                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
-                            None => Err(client::Error::Failure(restored_response)),
-                        }
-                    }
-                    let result_value = {
-                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
-
-                        match json::from_str(&res_body_string) {
-                            Ok(decoded) => (res, decoded),
-                            Err(err) => {
-                                dlg.response_json_decode_error(&res_body_string, &err);
-                                return Err(client::Error::JsonDecodeError(res_body_string, err));
-                            }
-                        }
-                    };
-
-                    dlg.finished(true);
-                    return Ok(result_value)
-                }
-            }
-        }
-    }
-
-
-    ///
-    /// Sets the *request* property to the given value.
-    ///
-    /// Even though the property as already been set when instantiating this call,
-    /// we provide this method for API completeness.
-    pub fn request(mut self, new_value: GenerateVerificationTokenRequest) -> VerificationTokenGenerateCall<'a, S> {
-        self._request = new_value;
-        self
-    }
-    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
-    /// while executing the actual API request.
-    /// 
-    /// ````text
-    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
-    /// ````
-    ///
-    /// Sets the *delegate* property to the given value.
-    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> VerificationTokenGenerateCall<'a, S> {
-        self._delegate = Some(new_value);
-        self
-    }
-
-    /// Set any additional parameter of the query string used in the request.
-    /// It should be used to set parameters which are not yet available through their own
-    /// setters.
-    ///
-    /// Please note that this method must not be used to set any of the known parameters
-    /// which have their own setter method. If done anyway, the request will fail.
-    ///
-    /// # Additional Parameters
-    ///
-    /// * *$.xgafv* (query-string) - V1 error format.
-    /// * *access_token* (query-string) - OAuth access token.
-    /// * *alt* (query-string) - Data format for response.
-    /// * *callback* (query-string) - JSONP
-    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
-    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
-    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
-    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
-    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
-    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
-    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
-    pub fn param<T>(mut self, name: T, value: T) -> VerificationTokenGenerateCall<'a, S>
                                                         where T: AsRef<str> {
         self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
         self

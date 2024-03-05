@@ -1,4 +1,4 @@
-site_name: Cloud Memorystore for Memcached v5.0.3+20230103
+site_name: Cloud Memorystore for Memcached v5.0.4+20240222
 site_url: http://byron.github.io/google-apis-rs/google-memcache1_beta2-cli
 site_description: A complete library to interact with Cloud Memorystore for Memcached (protocol v1beta2)
 
@@ -20,6 +20,7 @@ nav:
     - 'Locations Instances Patch': 'projects_locations-instances-patch.md'
     - 'Locations Instances Reschedule Maintenance': 'projects_locations-instances-reschedule-maintenance.md'
     - 'Locations Instances Update Parameters': 'projects_locations-instances-update-parameters.md'
+    - 'Locations Instances Upgrade': 'projects_locations-instances-upgrade.md'
     - 'Locations List': 'projects_locations-list.md'
     - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
     - 'Locations Operations Delete': 'projects_locations-operations-delete.md'

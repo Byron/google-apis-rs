@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dfareporting2d8-cli"
-version = "5.0.3+20180830"
+version = "5.0.4+20180830"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with dfareporting (protocol v2.8)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/dfareporting2d8-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-dfareporting2d8]
 path = "../dfareporting2d8"
-version = "5.0.3+20180830"
+version = "5.0.4+20180830"
 

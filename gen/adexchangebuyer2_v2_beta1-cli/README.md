@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *AdExchangeBuyerII* API at revision *20230124*. The CLI is at version *5.0.3*.
+This documentation was generated from the *AdExchangeBuyerII* API at revision *20240305*. The CLI is at version *5.0.4*.
 
 ```bash
 adexchangebuyer2-v2-beta1 [options]
@@ -81,6 +81,21 @@ adexchangebuyer2-v2-beta1 [options]
                 accounts-filter-sets-list <owner-name> [-p <v>]... [-o <out>]
                 accounts-filter-sets-losing-bids-list <filter-set-name> [-p <v>]... [-o <out>]
                 accounts-filter-sets-non-billable-winning-bids-list <filter-set-name> [-p <v>]... [-o <out>]
+                filter-sets-bid-metrics-list <filter-set-name> [-p <v>]... [-o <out>]
+                filter-sets-bid-response-errors-list <filter-set-name> [-p <v>]... [-o <out>]
+                filter-sets-bid-responses-without-bids-list <filter-set-name> [-p <v>]... [-o <out>]
+                filter-sets-create <owner-name> (-r <kv>)... [-p <v>]... [-o <out>]
+                filter-sets-delete <name> [-p <v>]... [-o <out>]
+                filter-sets-filtered-bid-requests-list <filter-set-name> [-p <v>]... [-o <out>]
+                filter-sets-filtered-bids-creatives-list <filter-set-name> <creative-status-id> [-p <v>]... [-o <out>]
+                filter-sets-filtered-bids-details-list <filter-set-name> <creative-status-id> [-p <v>]... [-o <out>]
+                filter-sets-filtered-bids-list <filter-set-name> [-p <v>]... [-o <out>]
+                filter-sets-get <name> [-p <v>]... [-o <out>]
+                filter-sets-impression-metrics-list <filter-set-name> [-p <v>]... [-o <out>]
+                filter-sets-list <owner-name> [-p <v>]... [-o <out>]
+                filter-sets-losing-bids-list <filter-set-name> [-p <v>]... [-o <out>]
+                filter-sets-non-billable-winning-bids-list <filter-set-name> [-p <v>]... [-o <out>]
+        buyers
                 filter-sets-bid-metrics-list <filter-set-name> [-p <v>]... [-o <out>]
                 filter-sets-bid-response-errors-list <filter-set-name> [-p <v>]... [-o <out>]
                 filter-sets-bid-responses-without-bids-list <filter-set-name> [-p <v>]... [-o <out>]

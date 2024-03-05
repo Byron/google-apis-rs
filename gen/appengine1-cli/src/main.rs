@@ -1360,6 +1360,9 @@ where
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "include-extra-data" => {
+                    call = call.include_extra_data(value.unwrap_or(""));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -1373,6 +1376,63 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["include-extra-data"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _apps_list_runtimes(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        let mut call = self.hub.apps().list_runtimes(opt.value_of("apps-id").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                "environment" => {
+                    call = call.environment(value.unwrap_or(""));
+                },
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["environment"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2157,6 +2217,8 @@ where
                     "entrypoint.shell" => Some(("entrypoint.shell", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "env" => Some(("env", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "env-variables" => Some(("envVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "flexible-runtime-settings.operating-system" => Some(("flexibleRuntimeSettings.operatingSystem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flexible-runtime-settings.runtime-version" => Some(("flexibleRuntimeSettings.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "health-check.check-interval" => Some(("healthCheck.checkInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "health-check.disable-health-check" => Some(("healthCheck.disableHealthCheck", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "health-check.healthy-threshold" => Some(("healthCheck.healthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2207,7 +2269,7 @@ where
                     "vpc-access-connector.name" => Some(("vpcAccessConnector.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zones" => Some(("zones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-window-length", "api-config", "app-engine-apis", "app-start-timeout", "app-yaml-path", "auth-fail-action", "automatic-scaling", "basic-scaling", "beta-settings", "build-env-variables", "check-interval", "cloud-build-options", "cloud-build-timeout", "config-id", "container", "cool-down-period", "cpu", "cpu-utilization", "create-time", "created-by", "default-expiration", "deployment", "disable-health-check", "disable-trace-sampling", "disk-gb", "disk-usage-bytes", "disk-utilization", "egress-setting", "endpoints-api-service", "entrypoint", "env", "env-variables", "failure-threshold", "files-count", "forwarded-ports", "health-check", "healthy-threshold", "host", "id", "idle-timeout", "image", "inbound-services", "initial-delay", "instance-class", "instance-ip-mode", "instance-tag", "instances", "kms-key-reference", "liveness-check", "login", "manual-scaling", "max-concurrent-requests", "max-idle-instances", "max-instances", "max-pending-latency", "max-total-instances", "memory-gb", "min-idle-instances", "min-instances", "min-pending-latency", "min-total-instances", "name", "network", "network-utilization", "nobuild-files-regex", "path", "readiness-check", "request-utilization", "resources", "restart-threshold", "rollout-strategy", "runtime", "runtime-api-version", "runtime-channel", "runtime-main-executable-path", "script", "security-level", "service-account", "serving-status", "session-affinity", "shell", "source-url", "standard-scheduler-settings", "subnetwork-name", "success-threshold", "target-concurrent-requests", "target-cpu-utilization", "target-read-bytes-per-second", "target-read-ops-per-second", "target-received-bytes-per-second", "target-received-packets-per-second", "target-request-count-per-second", "target-sent-bytes-per-second", "target-sent-packets-per-second", "target-throughput-utilization", "target-utilization", "target-write-bytes-per-second", "target-write-ops-per-second", "threadsafe", "timeout", "unhealthy-threshold", "url", "version-url", "vm", "vpc-access-connector", "zip", "zones"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-window-length", "api-config", "app-engine-apis", "app-start-timeout", "app-yaml-path", "auth-fail-action", "automatic-scaling", "basic-scaling", "beta-settings", "build-env-variables", "check-interval", "cloud-build-options", "cloud-build-timeout", "config-id", "container", "cool-down-period", "cpu", "cpu-utilization", "create-time", "created-by", "default-expiration", "deployment", "disable-health-check", "disable-trace-sampling", "disk-gb", "disk-usage-bytes", "disk-utilization", "egress-setting", "endpoints-api-service", "entrypoint", "env", "env-variables", "failure-threshold", "files-count", "flexible-runtime-settings", "forwarded-ports", "health-check", "healthy-threshold", "host", "id", "idle-timeout", "image", "inbound-services", "initial-delay", "instance-class", "instance-ip-mode", "instance-tag", "instances", "kms-key-reference", "liveness-check", "login", "manual-scaling", "max-concurrent-requests", "max-idle-instances", "max-instances", "max-pending-latency", "max-total-instances", "memory-gb", "min-idle-instances", "min-instances", "min-pending-latency", "min-total-instances", "name", "network", "network-utilization", "nobuild-files-regex", "operating-system", "path", "readiness-check", "request-utilization", "resources", "restart-threshold", "rollout-strategy", "runtime", "runtime-api-version", "runtime-channel", "runtime-main-executable-path", "runtime-version", "script", "security-level", "service-account", "serving-status", "session-affinity", "shell", "source-url", "standard-scheduler-settings", "subnetwork-name", "success-threshold", "target-concurrent-requests", "target-cpu-utilization", "target-read-bytes-per-second", "target-read-ops-per-second", "target-received-bytes-per-second", "target-received-packets-per-second", "target-request-count-per-second", "target-sent-bytes-per-second", "target-sent-packets-per-second", "target-throughput-utilization", "target-utilization", "target-write-bytes-per-second", "target-write-ops-per-second", "threadsafe", "timeout", "unhealthy-threshold", "url", "version-url", "vm", "vpc-access-connector", "zip", "zones"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2758,6 +2820,8 @@ where
                     "entrypoint.shell" => Some(("entrypoint.shell", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "env" => Some(("env", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "env-variables" => Some(("envVariables", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "flexible-runtime-settings.operating-system" => Some(("flexibleRuntimeSettings.operatingSystem", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "flexible-runtime-settings.runtime-version" => Some(("flexibleRuntimeSettings.runtimeVersion", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "health-check.check-interval" => Some(("healthCheck.checkInterval", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "health-check.disable-health-check" => Some(("healthCheck.disableHealthCheck", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "health-check.healthy-threshold" => Some(("healthCheck.healthyThreshold", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
@@ -2808,7 +2872,7 @@ where
                     "vpc-access-connector.name" => Some(("vpcAccessConnector.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "zones" => Some(("zones", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-window-length", "api-config", "app-engine-apis", "app-start-timeout", "app-yaml-path", "auth-fail-action", "automatic-scaling", "basic-scaling", "beta-settings", "build-env-variables", "check-interval", "cloud-build-options", "cloud-build-timeout", "config-id", "container", "cool-down-period", "cpu", "cpu-utilization", "create-time", "created-by", "default-expiration", "deployment", "disable-health-check", "disable-trace-sampling", "disk-gb", "disk-usage-bytes", "disk-utilization", "egress-setting", "endpoints-api-service", "entrypoint", "env", "env-variables", "failure-threshold", "files-count", "forwarded-ports", "health-check", "healthy-threshold", "host", "id", "idle-timeout", "image", "inbound-services", "initial-delay", "instance-class", "instance-ip-mode", "instance-tag", "instances", "kms-key-reference", "liveness-check", "login", "manual-scaling", "max-concurrent-requests", "max-idle-instances", "max-instances", "max-pending-latency", "max-total-instances", "memory-gb", "min-idle-instances", "min-instances", "min-pending-latency", "min-total-instances", "name", "network", "network-utilization", "nobuild-files-regex", "path", "readiness-check", "request-utilization", "resources", "restart-threshold", "rollout-strategy", "runtime", "runtime-api-version", "runtime-channel", "runtime-main-executable-path", "script", "security-level", "service-account", "serving-status", "session-affinity", "shell", "source-url", "standard-scheduler-settings", "subnetwork-name", "success-threshold", "target-concurrent-requests", "target-cpu-utilization", "target-read-bytes-per-second", "target-read-ops-per-second", "target-received-bytes-per-second", "target-received-packets-per-second", "target-request-count-per-second", "target-sent-bytes-per-second", "target-sent-packets-per-second", "target-throughput-utilization", "target-utilization", "target-write-bytes-per-second", "target-write-ops-per-second", "threadsafe", "timeout", "unhealthy-threshold", "url", "version-url", "vm", "vpc-access-connector", "zip", "zones"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["aggregation-window-length", "api-config", "app-engine-apis", "app-start-timeout", "app-yaml-path", "auth-fail-action", "automatic-scaling", "basic-scaling", "beta-settings", "build-env-variables", "check-interval", "cloud-build-options", "cloud-build-timeout", "config-id", "container", "cool-down-period", "cpu", "cpu-utilization", "create-time", "created-by", "default-expiration", "deployment", "disable-health-check", "disable-trace-sampling", "disk-gb", "disk-usage-bytes", "disk-utilization", "egress-setting", "endpoints-api-service", "entrypoint", "env", "env-variables", "failure-threshold", "files-count", "flexible-runtime-settings", "forwarded-ports", "health-check", "healthy-threshold", "host", "id", "idle-timeout", "image", "inbound-services", "initial-delay", "instance-class", "instance-ip-mode", "instance-tag", "instances", "kms-key-reference", "liveness-check", "login", "manual-scaling", "max-concurrent-requests", "max-idle-instances", "max-instances", "max-pending-latency", "max-total-instances", "memory-gb", "min-idle-instances", "min-instances", "min-pending-latency", "min-total-instances", "name", "network", "network-utilization", "nobuild-files-regex", "operating-system", "path", "readiness-check", "request-utilization", "resources", "restart-threshold", "rollout-strategy", "runtime", "runtime-api-version", "runtime-channel", "runtime-main-executable-path", "runtime-version", "script", "security-level", "service-account", "serving-status", "session-affinity", "shell", "source-url", "standard-scheduler-settings", "subnetwork-name", "success-threshold", "target-concurrent-requests", "target-cpu-utilization", "target-read-bytes-per-second", "target-read-ops-per-second", "target-received-bytes-per-second", "target-received-packets-per-second", "target-request-count-per-second", "target-sent-bytes-per-second", "target-sent-packets-per-second", "target-throughput-utilization", "target-utilization", "target-write-bytes-per-second", "target-write-ops-per-second", "threadsafe", "timeout", "unhealthy-threshold", "url", "version-url", "vm", "vpc-access-connector", "zip", "zones"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2872,12 +2936,18 @@ where
         }
     }
 
-    async fn _projects_locations_applications_get(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+    async fn _projects_locations_applications_authorized_domains_list(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
                                                     -> Result<(), DoitError> {
-        let mut call = self.hub.projects().locations_applications_get(opt.value_of("projects-id").unwrap_or(""), opt.value_of("locations-id").unwrap_or(""), opt.value_of("applications-id").unwrap_or(""));
+        let mut call = self.hub.projects().locations_applications_authorized_domains_list(opt.value_of("projects-id").unwrap_or(""), opt.value_of("locations-id").unwrap_or(""), opt.value_of("applications-id").unwrap_or(""));
         for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
             let (key, value) = parse_kv_arg(&*parg, err, false);
             match key {
+                "page-token" => {
+                    call = call.page_token(value.unwrap_or(""));
+                },
+                "page-size" => {
+                    call = call.page_size(        value.map(|v| arg_from_str(v, err, "page-size", "int32")).unwrap_or(-0));
+                },
                 _ => {
                     let mut found = false;
                     for param in &self.gp {
@@ -2891,6 +2961,7 @@ where
                         err.issues.push(CLIError::UnknownParameter(key.to_string(),
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
+                                                                           v.extend(["page-size", "page-token"].iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2988,6 +3059,9 @@ where
                     ("get", Some(opt)) => {
                         call_result = self._apps_get(opt, dry_run, &mut err).await;
                     },
+                    ("list-runtimes", Some(opt)) => {
+                        call_result = self._apps_list_runtimes(opt, dry_run, &mut err).await;
+                    },
                     ("locations-get", Some(opt)) => {
                         call_result = self._apps_locations_get(opt, dry_run, &mut err).await;
                     },
@@ -3053,8 +3127,8 @@ where
             },
             ("projects", Some(opt)) => {
                 match opt.subcommand() {
-                    ("locations-applications-get", Some(opt)) => {
-                        call_result = self._projects_locations_applications_get(opt, dry_run, &mut err).await;
+                    ("locations-applications-authorized-domains-list", Some(opt)) => {
+                        call_result = self._projects_locations_applications_authorized_domains_list(opt, dry_run, &mut err).await;
                     },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
@@ -3135,7 +3209,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("apps", "methods: 'authorized-certificates-create', 'authorized-certificates-delete', 'authorized-certificates-get', 'authorized-certificates-list', 'authorized-certificates-patch', 'authorized-domains-list', 'create', 'domain-mappings-create', 'domain-mappings-delete', 'domain-mappings-get', 'domain-mappings-list', 'domain-mappings-patch', 'firewall-ingress-rules-batch-update', 'firewall-ingress-rules-create', 'firewall-ingress-rules-delete', 'firewall-ingress-rules-get', 'firewall-ingress-rules-list', 'firewall-ingress-rules-patch', 'get', 'locations-get', 'locations-list', 'operations-get', 'operations-list', 'patch', 'repair', 'services-delete', 'services-get', 'services-list', 'services-patch', 'services-versions-create', 'services-versions-delete', 'services-versions-get', 'services-versions-instances-debug', 'services-versions-instances-delete', 'services-versions-instances-get', 'services-versions-instances-list', 'services-versions-list' and 'services-versions-patch'", vec![
+        ("apps", "methods: 'authorized-certificates-create', 'authorized-certificates-delete', 'authorized-certificates-get', 'authorized-certificates-list', 'authorized-certificates-patch', 'authorized-domains-list', 'create', 'domain-mappings-create', 'domain-mappings-delete', 'domain-mappings-get', 'domain-mappings-list', 'domain-mappings-patch', 'firewall-ingress-rules-batch-update', 'firewall-ingress-rules-create', 'firewall-ingress-rules-delete', 'firewall-ingress-rules-get', 'firewall-ingress-rules-list', 'firewall-ingress-rules-patch', 'get', 'list-runtimes', 'locations-get', 'locations-list', 'operations-get', 'operations-list', 'patch', 'repair', 'services-delete', 'services-get', 'services-list', 'services-patch', 'services-versions-create', 'services-versions-delete', 'services-versions-get', 'services-versions-instances-debug', 'services-versions-instances-delete', 'services-versions-instances-get', 'services-versions-instances-list', 'services-versions-list' and 'services-versions-patch'", vec![
             ("authorized-certificates-create",
                     Some(r##"Uploads the specified SSL certificate."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_authorized-certificates-create",
@@ -3650,6 +3724,28 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("list-runtimes",
+                    Some(r##"Lists all the available runtimes for the application."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_list-runtimes",
+                  vec![
+                    (Some(r##"apps-id"##),
+                     None,
+                     Some(r##"Part of `parent`. Required. Name of the parent Application resource. Example: apps/myapp."##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ("locations-get",
                     Some(r##"Gets information about a location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_locations-get",
@@ -3729,7 +3825,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED.NOTE: the name binding allows API services to override the binding to use different resource name schemes, such as users/*/operations. To override the binding, API services can add a binding such as "/v1/{name=users/*}/operations" to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns UNIMPLEMENTED."##),
                     "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/apps_operations-list",
                   vec![
                     (Some(r##"apps-id"##),
@@ -4250,26 +4346,26 @@ async fn main() {
                   ]),
             ]),
         
-        ("projects", "methods: 'locations-applications-get'", vec![
-            ("locations-applications-get",
-                    Some(r##"Gets information about an application."##),
-                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-get",
+        ("projects", "methods: 'locations-applications-authorized-domains-list'", vec![
+            ("locations-applications-authorized-domains-list",
+                    Some(r##"Lists all domains the user is authorized to administer."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_appengine1_cli/projects_locations-applications-authorized-domains-list",
                   vec![
                     (Some(r##"projects-id"##),
                      None,
-                     Some(r##"Part of `name`. Name of the Application resource to get. Example: apps/myapp."##),
+                     Some(r##"Part of `parent`. Name of the parent Application resource. Example: apps/myapp."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"locations-id"##),
                      None,
-                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(r##"Part of `parent`. See documentation of `projectsId`."##),
                      Some(true),
                      Some(false)),
         
                     (Some(r##"applications-id"##),
                      None,
-                     Some(r##"Part of `name`. See documentation of `projectsId`."##),
+                     Some(r##"Part of `parent`. See documentation of `projectsId`."##),
                      Some(true),
                      Some(false)),
         
@@ -4291,7 +4387,7 @@ async fn main() {
     
     let mut app = App::new("appengine1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230114")
+           .version("5.0.4+20240226")
            .about("Provisions and manages developers' App Engine applications.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_appengine1_cli")
            .arg(Arg::with_name("url")

@@ -23,7 +23,7 @@ use crate::{client, client::GetToken, client::serde_with};
 /// Identifies the an OAuth2 authorization scope.
 /// A scope is needed when requesting an
 /// [authorization token](https://developers.google.com/youtube/v3/guides/authentication).
-#[derive(PartialEq, Eq, Hash)]
+#[derive(PartialEq, Eq, Ord, PartialOrd, Hash, Debug, Clone, Copy)]
 pub enum Scope {
     /// View and administer all your Firebase data and settings
     Firebase,
@@ -125,7 +125,7 @@ impl<'a, S> FirebaseDynamicLinks<S> {
         FirebaseDynamicLinks {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.3".to_string(),
+            _user_agent: "google-api-rust-client/5.0.4".to_string(),
             _base_url: "https://firebasedynamiclinks.googleapis.com/".to_string(),
             _root_url: "https://firebasedynamiclinks.googleapis.com/".to_string(),
         }
@@ -142,7 +142,7 @@ impl<'a, S> FirebaseDynamicLinks<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.3`.
+    /// It defaults to `google-api-rust-client/5.0.4`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -542,7 +542,7 @@ pub struct GetIosPostInstallAttributionRequest {
     #[serde(rename="sdkVersion")]
     
     pub sdk_version: Option<String>,
-    /// Possible unique matched link that server need to check before performing fingerprint match. If passed link is short server need to expand the link. If link is long server need to vslidate the link.
+    /// Possible unique matched link that server need to check before performing device heuristics match. If passed link is short server need to expand the link. If link is long server need to vslidate the link.
     #[serde(rename="uniqueMatchLinkToCheck")]
     
     pub unique_match_link_to_check: Option<String>,
@@ -555,7 +555,7 @@ pub struct GetIosPostInstallAttributionRequest {
 impl client::RequestValue for GetIosPostInstallAttributionRequest {}
 
 
-/// Response for iSDK to execute strong match flow for post-install attribution.
+/// Response for iSDK to execute strong match flow for post-install attribution. Information of the resolved FDL link.
 /// 
 /// # Activities
 /// 
@@ -574,7 +574,7 @@ pub struct GetIosPostInstallAttributionResponse {
     #[serde(rename="attributionConfidence")]
     
     pub attribution_confidence: Option<String>,
-    /// The deep-link attributed post-install via one of several techniques (fingerprint, copy unique).
+    /// The deep-link attributed post-install via one of several techniques (device heuristics, copy unique).
     #[serde(rename="deepLink")]
     
     pub deep_link: Option<String>,
@@ -586,7 +586,7 @@ pub struct GetIosPostInstallAttributionResponse {
     #[serde(rename="fallbackLink")]
     
     pub fallback_link: Option<String>,
-    /// Invitation ID attributed post-install via one of several techniques (fingerprint, copy unique).
+    /// Invitation ID attributed post-install via one of several techniques (device heuristics, copy unique).
     #[serde(rename="invitationId")]
     
     pub invitation_id: Option<String>,
@@ -602,7 +602,7 @@ pub struct GetIosPostInstallAttributionResponse {
     #[serde(rename="requestIpVersion")]
     
     pub request_ip_version: Option<String>,
-    /// Entire FDL (short or long) attributed post-install via one of several techniques (fingerprint, copy unique).
+    /// Entire FDL (short or long) attributed post-install via one of several techniques (device heuristics, copy unique).
     #[serde(rename="requestedLink")]
     
     pub requested_link: Option<String>,

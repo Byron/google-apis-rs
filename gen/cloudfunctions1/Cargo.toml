@@ -4,12 +4,12 @@
 [package]
 
 name = "google-cloudfunctions1"
-version = "5.0.3+20230119"
+version = "5.0.4+20240229"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Functions (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudfunctions1"
 homepage = "https://cloud.google.com/functions"
-documentation = "https://docs.rs/google-cloudfunctions1/5.0.3+20230119"
+documentation = "https://docs.rs/google-cloudfunctions1/5.0.4+20240229"
 license = "MIT"
 keywords = ["cloudfunctions", "google", "protocol", "web", "api"]
 autobins = false

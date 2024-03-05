@@ -1,4 +1,4 @@
-site_name: Workflows v5.0.3+20230105
+site_name: Workflows v5.0.4+20240207
 site_url: http://byron.github.io/google-apis-rs/google-workflows1-cli
 site_description: A complete library to interact with Workflows (protocol v1)
 
@@ -19,6 +19,7 @@ nav:
     - 'Locations Workflows Delete': 'projects_locations-workflows-delete.md'
     - 'Locations Workflows Get': 'projects_locations-workflows-get.md'
     - 'Locations Workflows List': 'projects_locations-workflows-list.md'
+    - 'Locations Workflows List Revisions': 'projects_locations-workflows-list-revisions.md'
     - 'Locations Workflows Patch': 'projects_locations-workflows-patch.md'
 
 theme: readthedocs

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-sqladmin1-cli"
-version = "5.0.3+20221209"
+version = "5.0.4+20240219"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with SQL Admin (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/sqladmin1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-sqladmin1]
 path = "../sqladmin1"
-version = "5.0.3+20221209"
+version = "5.0.4+20240219"
 

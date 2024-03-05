@@ -233,7 +233,7 @@ async fn main() {
     
     let mut app = App::new("appsactivity1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20200628")
+           .version("5.0.4+20200628")
            .about("Provides a historical view of activity.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_appsactivity1_cli")
            .arg(Arg::with_name("url")

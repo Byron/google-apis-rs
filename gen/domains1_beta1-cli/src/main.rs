@@ -520,11 +520,12 @@ where
         
             let type_info: Option<(&'static str, JsonTypeInfo)> =
                 match &temp_cursor.to_string()[..] {
+                    "management-settings.preferred-renewal-method" => Some(("managementSettings.preferredRenewalMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "management-settings.renewal-method" => Some(("managementSettings.renewalMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "management-settings.transfer-lock-state" => Some(("managementSettings.transferLockState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-mask" => Some(("updateMask", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["management-settings", "renewal-method", "transfer-lock-state", "update-mask"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["management-settings", "preferred-renewal-method", "renewal-method", "transfer-lock-state", "update-mask"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1050,6 +1051,7 @@ where
                     "expire-time" => Some(("expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "issues" => Some(("issues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "management-settings.preferred-renewal-method" => Some(("managementSettings.preferredRenewalMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "management-settings.renewal-method" => Some(("managementSettings.renewalMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "management-settings.transfer-lock-state" => Some(("managementSettings.transferLockState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1101,7 +1103,7 @@ where
                     "supported-privacy" => Some(("supportedPrivacy", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "transfer-failure-reason" => Some(("transferFailureReason", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-contact", "administrative-area", "contact-settings", "create-time", "custom-dns", "dns-settings", "domain-name", "ds-state", "email", "expire-time", "fax-number", "google-domains-dns", "issues", "labels", "language-code", "locality", "management-settings", "name", "name-servers", "organization", "pending-contact-settings", "phone-number", "postal-address", "postal-code", "privacy", "recipients", "region-code", "register-failure-reason", "registrant-contact", "renewal-method", "revision", "sorting-code", "state", "sublocality", "supported-privacy", "technical-contact", "transfer-failure-reason", "transfer-lock-state"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-contact", "administrative-area", "contact-settings", "create-time", "custom-dns", "dns-settings", "domain-name", "ds-state", "email", "expire-time", "fax-number", "google-domains-dns", "issues", "labels", "language-code", "locality", "management-settings", "name", "name-servers", "organization", "pending-contact-settings", "phone-number", "postal-address", "postal-code", "preferred-renewal-method", "privacy", "recipients", "region-code", "register-failure-reason", "registrant-contact", "renewal-method", "revision", "sorting-code", "state", "sublocality", "supported-privacy", "technical-contact", "transfer-failure-reason", "transfer-lock-state"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1241,6 +1243,7 @@ where
                     "registration.expire-time" => Some(("registration.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "registration.issues" => Some(("registration.issues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "registration.labels" => Some(("registration.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "registration.management-settings.preferred-renewal-method" => Some(("registration.managementSettings.preferredRenewalMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "registration.management-settings.renewal-method" => Some(("registration.managementSettings.renewalMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "registration.management-settings.transfer-lock-state" => Some(("registration.managementSettings.transferLockState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "registration.name" => Some(("registration.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -1296,7 +1299,7 @@ where
                     "yearly-price.nanos" => Some(("yearlyPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "yearly-price.units" => Some(("yearlyPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-contact", "administrative-area", "contact-notices", "contact-settings", "create-time", "currency-code", "custom-dns", "dns-settings", "domain-name", "domain-notices", "ds-state", "email", "expire-time", "fax-number", "google-domains-dns", "issues", "labels", "language-code", "locality", "management-settings", "name", "name-servers", "nanos", "organization", "pending-contact-settings", "phone-number", "postal-address", "postal-code", "privacy", "recipients", "region-code", "register-failure-reason", "registrant-contact", "registration", "renewal-method", "revision", "sorting-code", "state", "sublocality", "supported-privacy", "technical-contact", "transfer-failure-reason", "transfer-lock-state", "units", "validate-only", "yearly-price"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-contact", "administrative-area", "contact-notices", "contact-settings", "create-time", "currency-code", "custom-dns", "dns-settings", "domain-name", "domain-notices", "ds-state", "email", "expire-time", "fax-number", "google-domains-dns", "issues", "labels", "language-code", "locality", "management-settings", "name", "name-servers", "nanos", "organization", "pending-contact-settings", "phone-number", "postal-address", "postal-code", "preferred-renewal-method", "privacy", "recipients", "region-code", "register-failure-reason", "registrant-contact", "registration", "renewal-method", "revision", "sorting-code", "state", "sublocality", "supported-privacy", "technical-contact", "transfer-failure-reason", "transfer-lock-state", "units", "validate-only", "yearly-price"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1967,6 +1970,7 @@ where
                     "registration.expire-time" => Some(("registration.expireTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "registration.issues" => Some(("registration.issues", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Vec })),
                     "registration.labels" => Some(("registration.labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "registration.management-settings.preferred-renewal-method" => Some(("registration.managementSettings.preferredRenewalMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "registration.management-settings.renewal-method" => Some(("registration.managementSettings.renewalMethod", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "registration.management-settings.transfer-lock-state" => Some(("registration.managementSettings.transferLockState", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "registration.name" => Some(("registration.name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -2022,7 +2026,7 @@ where
                     "yearly-price.nanos" => Some(("yearlyPrice.nanos", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "yearly-price.units" => Some(("yearlyPrice.units", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-contact", "administrative-area", "authorization-code", "code", "contact-notices", "contact-settings", "create-time", "currency-code", "custom-dns", "dns-settings", "domain-name", "ds-state", "email", "expire-time", "fax-number", "google-domains-dns", "issues", "labels", "language-code", "locality", "management-settings", "name", "name-servers", "nanos", "organization", "pending-contact-settings", "phone-number", "postal-address", "postal-code", "privacy", "recipients", "region-code", "register-failure-reason", "registrant-contact", "registration", "renewal-method", "revision", "sorting-code", "state", "sublocality", "supported-privacy", "technical-contact", "transfer-failure-reason", "transfer-lock-state", "units", "validate-only", "yearly-price"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["address-lines", "admin-contact", "administrative-area", "authorization-code", "code", "contact-notices", "contact-settings", "create-time", "currency-code", "custom-dns", "dns-settings", "domain-name", "ds-state", "email", "expire-time", "fax-number", "google-domains-dns", "issues", "labels", "language-code", "locality", "management-settings", "name", "name-servers", "nanos", "organization", "pending-contact-settings", "phone-number", "postal-address", "postal-code", "preferred-renewal-method", "privacy", "recipients", "region-code", "register-failure-reason", "registrant-contact", "registration", "renewal-method", "revision", "sorting-code", "state", "sublocality", "supported-privacy", "technical-contact", "transfer-failure-reason", "transfer-lock-state", "units", "validate-only", "yearly-price"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2308,7 +2312,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_domains1_beta1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -2414,7 +2418,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-registrations-delete",
-                    Some(r##"Deletes a `Registration` resource. This method works on any `Registration` resource using [Subscription or Commitment billing](/domains/pricing#billing-models), provided that the resource was created at least 1 day in the past. For `Registration` resources using [Monthly billing](/domains/pricing#billing-models), this method works if: * `state` is `EXPORTED` with `expire_time` in the past * `state` is `REGISTRATION_FAILED` * `state` is `TRANSFER_FAILED` When an active registration is successfully deleted, you can continue to use the domain in [Google Domains](https://domains.google/) until it expires. The calling user becomes the domain's sole owner in Google Domains, and permissions for the domain are subsequently managed there. The domain does not renew automatically unless the new owner sets up billing in Google Domains."##),
+                    Some(r##"Deletes a `Registration` resource. This method works on any `Registration` resource using [Subscription or Commitment billing](/domains/pricing#billing-models), provided that the resource was created at least 1 day in the past. When an active registration is successfully deleted, you can continue to use the domain in [Google Domains](https://domains.google/) until it expires. The calling user becomes the domain's sole owner in Google Domains, and permissions for the domain are subsequently managed there. The domain does not renew automatically unless the new owner sets up billing in Google Domains. After January 2024 you will only be able to delete `Registration` resources when `state` is one of: `EXPORTED`, `EXPIRED`,`REGISTRATION_FAILED` or `TRANSFER_FAILED`. See [Cloud Domains feature deprecation](https://cloud.google.com/domains/docs/deprecations/feature-deprecations) for more details."##),
                     "Details at http://byron.github.io/google-apis-rs/google_domains1_beta1_cli/projects_locations-registrations-delete",
                   vec![
                     (Some(r##"name"##),
@@ -2436,7 +2440,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-registrations-export",
-                    Some(r##"Exports a `Registration` resource, such that it is no longer managed by Cloud Domains. When an active domain is successfully exported, you can continue to use the domain in [Google Domains](https://domains.google/) until it expires. The calling user becomes the domain's sole owner in Google Domains, and permissions for the domain are subsequently managed there. The domain does not renew automatically unless the new owner sets up billing in Google Domains."##),
+                    Some(r##"Deprecated: For more information, see [Cloud Domains feature deprecation](https://cloud.google.com/domains/docs/deprecations/feature-deprecations) Exports a `Registration` resource, such that it is no longer managed by Cloud Domains. When an active domain is successfully exported, you can continue to use the domain in [Google Domains](https://domains.google/) until it expires. The calling user becomes the domain's sole owner in Google Domains, and permissions for the domain are subsequently managed there. The domain does not renew automatically unless the new owner sets up billing in Google Domains."##),
                     "Details at http://byron.github.io/google-apis-rs/google_domains1_beta1_cli/projects_locations-registrations-export",
                   vec![
                     (Some(r##"name"##),
@@ -2508,7 +2512,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-registrations-import",
-                    Some(r##"Imports a domain name from [Google Domains](https://domains.google/) for use in Cloud Domains. To transfer a domain from another registrar, use the `TransferDomain` method instead. Since individual users can own domains in Google Domains, the calling user must have ownership permission on the domain."##),
+                    Some(r##"Deprecated: For more information, see [Cloud Domains feature deprecation](https://cloud.google.com/domains/docs/deprecations/feature-deprecations) Imports a domain name from [Google Domains](https://domains.google/) for use in Cloud Domains. To transfer a domain from another registrar, use the `TransferDomain` method instead. Since individual users can own domains in Google Domains, the calling user must have ownership permission on the domain."##),
                     "Details at http://byron.github.io/google-apis-rs/google_domains1_beta1_cli/projects_locations-registrations-import",
                   vec![
                     (Some(r##"parent"##),
@@ -2664,7 +2668,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-registrations-retrieve-importable-domains",
-                    Some(r##"Lists domain names from [Google Domains](https://domains.google/) that can be imported to Cloud Domains using the `ImportDomain` method. Since individual users can own domains in Google Domains, the list of domains returned depends on the individual user making the call. Domains already managed by Cloud Domains are not returned."##),
+                    Some(r##"Deprecated: For more information, see [Cloud Domains feature deprecation](https://cloud.google.com/domains/docs/deprecations/feature-deprecations) Lists domain names from [Google Domains](https://domains.google/) that can be imported to Cloud Domains using the `ImportDomain` method. Since individual users can own domains in Google Domains, the list of domains returned depends on the individual user making the call. Domains already managed by Cloud Domains are not returned."##),
                     "Details at http://byron.github.io/google-apis-rs/google_domains1_beta1_cli/projects_locations-registrations-retrieve-importable-domains",
                   vec![
                     (Some(r##"location"##),
@@ -2708,7 +2712,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-registrations-retrieve-transfer-parameters",
-                    Some(r##"Gets parameters needed to transfer a domain name from another registrar to Cloud Domains. For domains already managed by [Google Domains](https://domains.google/), use `ImportDomain` instead. Use the returned values to call `TransferDomain`."##),
+                    Some(r##"Deprecated: For more information, see [Cloud Domains feature deprecation](https://cloud.google.com/domains/docs/deprecations/feature-deprecations) Gets parameters needed to transfer a domain name from another registrar to Cloud Domains. For domains already managed by [Google Domains](https://domains.google/), use `ImportDomain` instead. Use the returned values to call `TransferDomain`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_domains1_beta1_cli/projects_locations-registrations-retrieve-transfer-parameters",
                   vec![
                     (Some(r##"location"##),
@@ -2808,7 +2812,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-registrations-transfer",
-                    Some(r##"Transfers a domain name from another registrar to Cloud Domains. For domains already managed by [Google Domains](https://domains.google/), use `ImportDomain` instead. Before calling this method, go to the domain's current registrar to unlock the domain for transfer and retrieve the domain's transfer authorization code. Then call `RetrieveTransferParameters` to confirm that the domain is unlocked and to get values needed to build a call to this method. A successful call creates a `Registration` resource in state `TRANSFER_PENDING`. It can take several days to complete the transfer process. The registrant can often speed up this process by approving the transfer through the current registrar, either by clicking a link in an email from the registrar or by visiting the registrar's website. A few minutes after transfer approval, the resource transitions to state `ACTIVE`, indicating that the transfer was successful. If the transfer is rejected or the request expires without being approved, the resource can end up in state `TRANSFER_FAILED`. If transfer fails, you can safely delete the resource and retry the transfer."##),
+                    Some(r##"Deprecated: For more information, see [Cloud Domains feature deprecation](https://cloud.google.com/domains/docs/deprecations/feature-deprecations) Transfers a domain name from another registrar to Cloud Domains. For domains already managed by [Google Domains](https://domains.google/), use `ImportDomain` instead. Before calling this method, go to the domain's current registrar to unlock the domain for transfer and retrieve the domain's transfer authorization code. Then call `RetrieveTransferParameters` to confirm that the domain is unlocked and to get values needed to build a call to this method. A successful call creates a `Registration` resource in state `TRANSFER_PENDING`. It can take several days to complete the transfer process. The registrant can often speed up this process by approving the transfer through the current registrar, either by clicking a link in an email from the registrar or by visiting the registrar's website. A few minutes after transfer approval, the resource transitions to state `ACTIVE`, indicating that the transfer was successful. If the transfer is rejected or the request expires without being approved, the resource can end up in state `TRANSFER_FAILED`. If transfer fails, you can safely delete the resource and retry the transfer."##),
                     "Details at http://byron.github.io/google-apis-rs/google_domains1_beta1_cli/projects_locations-registrations-transfer",
                   vec![
                     (Some(r##"parent"##),
@@ -2841,7 +2845,7 @@ async fn main() {
     
     let mut app = App::new("domains1-beta1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230105")
+           .version("5.0.4+20240221")
            .about("Enables management and configuration of domain names.")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_domains1_beta1_cli")
            .arg(Arg::with_name("url")

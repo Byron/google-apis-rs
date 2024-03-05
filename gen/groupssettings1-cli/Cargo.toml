@@ -4,7 +4,7 @@
 [package]
 
 name = "google-groupssettings1-cli"
-version = "5.0.3+20220614"
+version = "5.0.4+20220614"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with groupssettings (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/groupssettings1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-groupssettings1]
 path = "../groupssettings1"
-version = "5.0.3+20220614"
+version = "5.0.4+20220614"
 

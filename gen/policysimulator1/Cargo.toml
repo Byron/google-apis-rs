@@ -4,12 +4,12 @@
 [package]
 
 name = "google-policysimulator1"
-version = "5.0.3+20230115"
+version = "5.0.4+20240303"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Policy Simulator (protocol v1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/policysimulator1"
 homepage = "https://cloud.google.com/iam/docs/simulating-access"
-documentation = "https://docs.rs/google-policysimulator1/5.0.3+20230115"
+documentation = "https://docs.rs/google-policysimulator1/5.0.4+20240303"
 license = "MIT"
 keywords = ["policysimulator", "google", "protocol", "web", "api"]
 autobins = false

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-cloudprivatecatalog1_beta1-cli"
-version = "5.0.3+20200405"
+version = "5.0.4+20200405"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Cloud Private Catalog (protocol v1beta1)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/cloudprivatecatalog1_beta1-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-cloudprivatecatalog1_beta1]
 path = "../cloudprivatecatalog1_beta1"
-version = "5.0.3+20200405"
+version = "5.0.4+20200405"
 

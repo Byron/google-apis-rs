@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Policy Simulator* crate version *5.0.3+20230115*, where *20230115* is the exact revision of the *policysimulator:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.3*.
+//! This documentation was generated from *Policy Simulator* crate version *5.0.4+20240303*, where *20240303* is the exact revision of the *policysimulator:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
 //! 
 //! Everything else about the *Policy Simulator* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/iam/docs/simulating-access).
@@ -12,13 +12,13 @@
 //! Handle the following *Resources* with ease from the central [hub](PolicySimulator) ... 
 //! 
 //! * folders
-//!  * [*locations replays create*](api::FolderLocationReplayCreateCall), [*locations replays get*](api::FolderLocationReplayGetCall), [*locations replays operations get*](api::FolderLocationReplayOperationGetCall), [*locations replays operations list*](api::FolderLocationReplayOperationListCall) and [*locations replays results list*](api::FolderLocationReplayResultListCall)
+//!  * [*locations org policy violations previews operations get*](api::FolderLocationOrgPolicyViolationsPreviewOperationGetCall), [*locations replays create*](api::FolderLocationReplayCreateCall), [*locations replays get*](api::FolderLocationReplayGetCall), [*locations replays operations get*](api::FolderLocationReplayOperationGetCall), [*locations replays operations list*](api::FolderLocationReplayOperationListCall) and [*locations replays results list*](api::FolderLocationReplayResultListCall)
 //! * operations
 //!  * [*get*](api::OperationGetCall) and [*list*](api::OperationListCall)
 //! * organizations
-//!  * [*locations replays create*](api::OrganizationLocationReplayCreateCall), [*locations replays get*](api::OrganizationLocationReplayGetCall), [*locations replays operations get*](api::OrganizationLocationReplayOperationGetCall), [*locations replays operations list*](api::OrganizationLocationReplayOperationListCall) and [*locations replays results list*](api::OrganizationLocationReplayResultListCall)
+//!  * [*locations org policy violations previews create*](api::OrganizationLocationOrgPolicyViolationsPreviewCreateCall), [*locations org policy violations previews get*](api::OrganizationLocationOrgPolicyViolationsPreviewGetCall), [*locations org policy violations previews list*](api::OrganizationLocationOrgPolicyViolationsPreviewListCall), [*locations org policy violations previews operations get*](api::OrganizationLocationOrgPolicyViolationsPreviewOperationGetCall), [*locations org policy violations previews org policy violations list*](api::OrganizationLocationOrgPolicyViolationsPreviewOrgPolicyViolationListCall), [*locations replays create*](api::OrganizationLocationReplayCreateCall), [*locations replays get*](api::OrganizationLocationReplayGetCall), [*locations replays operations get*](api::OrganizationLocationReplayOperationGetCall), [*locations replays operations list*](api::OrganizationLocationReplayOperationListCall) and [*locations replays results list*](api::OrganizationLocationReplayResultListCall)
 //! * projects
-//!  * [*locations replays create*](api::ProjectLocationReplayCreateCall), [*locations replays get*](api::ProjectLocationReplayGetCall), [*locations replays operations get*](api::ProjectLocationReplayOperationGetCall), [*locations replays operations list*](api::ProjectLocationReplayOperationListCall) and [*locations replays results list*](api::ProjectLocationReplayResultListCall)
+//!  * [*locations org policy violations previews operations get*](api::ProjectLocationOrgPolicyViolationsPreviewOperationGetCall), [*locations replays create*](api::ProjectLocationReplayCreateCall), [*locations replays get*](api::ProjectLocationReplayGetCall), [*locations replays operations get*](api::ProjectLocationReplayOperationGetCall), [*locations replays operations list*](api::ProjectLocationReplayOperationListCall) and [*locations replays results list*](api::ProjectLocationReplayResultListCall)
 //! 
 //! 
 //! 
@@ -53,11 +53,15 @@
 //! Or specifically ...
 //! 
 //! ```ignore
+//! let r = hub.folders().locations_org_policy_violations_previews_operations_get(...).doit().await
 //! let r = hub.folders().locations_replays_operations_get(...).doit().await
 //! let r = hub.folders().locations_replays_create(...).doit().await
 //! let r = hub.operations().get(...).doit().await
+//! let r = hub.organizations().locations_org_policy_violations_previews_operations_get(...).doit().await
+//! let r = hub.organizations().locations_org_policy_violations_previews_create(...).doit().await
 //! let r = hub.organizations().locations_replays_operations_get(...).doit().await
 //! let r = hub.organizations().locations_replays_create(...).doit().await
+//! let r = hub.projects().locations_org_policy_violations_previews_operations_get(...).doit().await
 //! let r = hub.projects().locations_replays_operations_get(...).doit().await
 //! let r = hub.projects().locations_replays_create(...).doit().await
 //! ```
@@ -86,7 +90,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_policysimulator1 as policysimulator1;
-//! use policysimulator1::api::GoogleCloudPolicysimulatorV1Replay;
+//! use policysimulator1::api::GoogleCloudPolicysimulatorV1OrgPolicyViolationsPreview;
 //! use policysimulator1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -108,12 +112,13 @@
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
-//! let mut req = GoogleCloudPolicysimulatorV1Replay::default();
+//! let mut req = GoogleCloudPolicysimulatorV1OrgPolicyViolationsPreview::default();
 //! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.folders().locations_replays_create(req, "parent")
+//! let result = hub.organizations().locations_org_policy_violations_previews_create(req, "parent")
+//!              .org_policy_violations_preview_id("ipsum")
 //!              .doit().await;
 //! 
 //! match result {

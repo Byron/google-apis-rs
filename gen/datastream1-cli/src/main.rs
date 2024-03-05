@@ -97,6 +97,8 @@ where
                     "oracle-profile.connection-attributes" => Some(("oracleProfile.connectionAttributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "oracle-profile.database-service" => Some(("oracleProfile.databaseService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "oracle-profile.hostname" => Some(("oracleProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-ssl-config.ca-certificate" => Some(("oracleProfile.oracleSslConfig.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-ssl-config.ca-certificate-set" => Some(("oracleProfile.oracleSslConfig.caCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "oracle-profile.password" => Some(("oracleProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "oracle-profile.port" => Some(("oracleProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "oracle-profile.username" => Some(("oracleProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -106,9 +108,14 @@ where
                     "postgresql-profile.port" => Some(("postgresqlProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "postgresql-profile.username" => Some(("postgresqlProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-connectivity.private-connection" => Some(("privateConnectivity.privateConnection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.database" => Some(("sqlServerProfile.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.hostname" => Some(("sqlServerProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.password" => Some(("sqlServerProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.port" => Some(("sqlServerProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sql-server-profile.username" => Some(("sqlServerProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "ca-certificate", "ca-certificate-set", "client-certificate", "client-certificate-set", "client-key", "client-key-set", "connection-attributes", "create-time", "database", "database-service", "display-name", "forward-ssh-connectivity", "gcs-profile", "hostname", "labels", "mysql-profile", "name", "oracle-profile", "password", "port", "postgresql-profile", "private-connection", "private-connectivity", "private-key", "root-path", "ssl-config", "update-time", "username"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "ca-certificate", "ca-certificate-set", "client-certificate", "client-certificate-set", "client-key", "client-key-set", "connection-attributes", "create-time", "database", "database-service", "display-name", "forward-ssh-connectivity", "gcs-profile", "hostname", "labels", "mysql-profile", "name", "oracle-profile", "oracle-ssl-config", "password", "port", "postgresql-profile", "private-connection", "private-connectivity", "private-key", "root-path", "sql-server-profile", "ssl-config", "update-time", "username"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -284,6 +291,8 @@ where
                     "connection-profile.oracle-profile.connection-attributes" => Some(("connectionProfile.oracleProfile.connectionAttributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "connection-profile.oracle-profile.database-service" => Some(("connectionProfile.oracleProfile.databaseService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connection-profile.oracle-profile.hostname" => Some(("connectionProfile.oracleProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.oracle-ssl-config.ca-certificate" => Some(("connectionProfile.oracleProfile.oracleSslConfig.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.oracle-profile.oracle-ssl-config.ca-certificate-set" => Some(("connectionProfile.oracleProfile.oracleSslConfig.caCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "connection-profile.oracle-profile.password" => Some(("connectionProfile.oracleProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connection-profile.oracle-profile.port" => Some(("connectionProfile.oracleProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "connection-profile.oracle-profile.username" => Some(("connectionProfile.oracleProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -293,12 +302,17 @@ where
                     "connection-profile.postgresql-profile.port" => Some(("connectionProfile.postgresqlProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "connection-profile.postgresql-profile.username" => Some(("connectionProfile.postgresqlProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connection-profile.private-connectivity.private-connection" => Some(("connectionProfile.privateConnectivity.privateConnection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.sql-server-profile.database" => Some(("connectionProfile.sqlServerProfile.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.sql-server-profile.hostname" => Some(("connectionProfile.sqlServerProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.sql-server-profile.password" => Some(("connectionProfile.sqlServerProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "connection-profile.sql-server-profile.port" => Some(("connectionProfile.sqlServerProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "connection-profile.sql-server-profile.username" => Some(("connectionProfile.sqlServerProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connection-profile.update-time" => Some(("connectionProfile.updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "connection-profile-name" => Some(("connectionProfileName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "full-hierarchy" => Some(("fullHierarchy", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "hierarchy-depth" => Some(("hierarchyDepth", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "ca-certificate", "ca-certificate-set", "client-certificate", "client-certificate-set", "client-key", "client-key-set", "connection-attributes", "connection-profile", "connection-profile-name", "create-time", "database", "database-service", "display-name", "forward-ssh-connectivity", "full-hierarchy", "gcs-profile", "hierarchy-depth", "hostname", "labels", "mysql-profile", "name", "oracle-profile", "password", "port", "postgresql-profile", "private-connection", "private-connectivity", "private-key", "root-path", "ssl-config", "update-time", "username"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "ca-certificate", "ca-certificate-set", "client-certificate", "client-certificate-set", "client-key", "client-key-set", "connection-attributes", "connection-profile", "connection-profile-name", "create-time", "database", "database-service", "display-name", "forward-ssh-connectivity", "full-hierarchy", "gcs-profile", "hierarchy-depth", "hostname", "labels", "mysql-profile", "name", "oracle-profile", "oracle-ssl-config", "password", "port", "postgresql-profile", "private-connection", "private-connectivity", "private-key", "root-path", "sql-server-profile", "ssl-config", "update-time", "username"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -522,6 +536,8 @@ where
                     "oracle-profile.connection-attributes" => Some(("oracleProfile.connectionAttributes", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
                     "oracle-profile.database-service" => Some(("oracleProfile.databaseService", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "oracle-profile.hostname" => Some(("oracleProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-ssl-config.ca-certificate" => Some(("oracleProfile.oracleSslConfig.caCertificate", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "oracle-profile.oracle-ssl-config.ca-certificate-set" => Some(("oracleProfile.oracleSslConfig.caCertificateSet", JsonTypeInfo { jtype: JsonType::Boolean, ctype: ComplexType::Pod })),
                     "oracle-profile.password" => Some(("oracleProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "oracle-profile.port" => Some(("oracleProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "oracle-profile.username" => Some(("oracleProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
@@ -531,9 +547,14 @@ where
                     "postgresql-profile.port" => Some(("postgresqlProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "postgresql-profile.username" => Some(("postgresqlProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "private-connectivity.private-connection" => Some(("privateConnectivity.privateConnection", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.database" => Some(("sqlServerProfile.database", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.hostname" => Some(("sqlServerProfile.hostname", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.password" => Some(("sqlServerProfile.password", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "sql-server-profile.port" => Some(("sqlServerProfile.port", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "sql-server-profile.username" => Some(("sqlServerProfile.username", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "ca-certificate", "ca-certificate-set", "client-certificate", "client-certificate-set", "client-key", "client-key-set", "connection-attributes", "create-time", "database", "database-service", "display-name", "forward-ssh-connectivity", "gcs-profile", "hostname", "labels", "mysql-profile", "name", "oracle-profile", "password", "port", "postgresql-profile", "private-connection", "private-connectivity", "private-key", "root-path", "ssl-config", "update-time", "username"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bucket", "ca-certificate", "ca-certificate-set", "client-certificate", "client-certificate-set", "client-key", "client-key-set", "connection-attributes", "create-time", "database", "database-service", "display-name", "forward-ssh-connectivity", "gcs-profile", "hostname", "labels", "mysql-profile", "name", "oracle-profile", "oracle-ssl-config", "password", "port", "postgresql-profile", "private-connection", "private-connectivity", "private-key", "root-path", "sql-server-profile", "ssl-config", "update-time", "username"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -1621,16 +1642,22 @@ where
                     "destination-config.gcs-destination-config.path" => Some(("destinationConfig.gcsDestinationConfig.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "last-recovery-time" => Some(("lastRecoveryTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-config.mysql-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.mysqlSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.mysql-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.mysqlSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "source-config.oracle-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.oracleSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.oracle-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.oracleSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "source-config.postgresql-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.postgresqlSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.postgresql-source-config.publication" => Some(("sourceConfig.postgresqlSourceConfig.publication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-config.postgresql-source-config.replication-slot" => Some(("sourceConfig.postgresqlSourceConfig.replicationSlot", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-config.source-connection-profile" => Some(("sourceConfig.sourceConnectionProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-config.sql-server-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.sqlServerSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "source-config.sql-server-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.sqlServerSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-destination-config", "compression", "create-time", "customer-managed-encryption-key", "data-freshness", "dataset-id", "dataset-id-prefix", "dataset-template", "destination-config", "destination-connection-profile", "display-name", "file-rotation-interval", "file-rotation-mb", "gcs-destination-config", "json-file-format", "kms-key-name", "labels", "location", "max-concurrent-cdc-tasks", "mysql-source-config", "name", "oracle-source-config", "path", "postgresql-source-config", "publication", "replication-slot", "schema-file-format", "single-target-dataset", "source-config", "source-connection-profile", "source-hierarchy-datasets", "state", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-destination-config", "compression", "create-time", "customer-managed-encryption-key", "data-freshness", "dataset-id", "dataset-id-prefix", "dataset-template", "destination-config", "destination-connection-profile", "display-name", "file-rotation-interval", "file-rotation-mb", "gcs-destination-config", "json-file-format", "kms-key-name", "labels", "last-recovery-time", "location", "max-concurrent-backfill-tasks", "max-concurrent-cdc-tasks", "mysql-source-config", "name", "oracle-source-config", "path", "postgresql-source-config", "publication", "replication-slot", "schema-file-format", "single-target-dataset", "source-config", "source-connection-profile", "source-hierarchy-datasets", "sql-server-source-config", "state", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2016,8 +2043,10 @@ where
                     "source-object-identifier.oracle-identifier.table" => Some(("sourceObjectIdentifier.oracleIdentifier.table", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-object-identifier.postgresql-identifier.schema" => Some(("sourceObjectIdentifier.postgresqlIdentifier.schema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-object-identifier.postgresql-identifier.table" => Some(("sourceObjectIdentifier.postgresqlIdentifier.table", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-object-identifier.sql-server-identifier.schema" => Some(("sourceObjectIdentifier.sqlServerIdentifier.schema", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-object-identifier.sql-server-identifier.table" => Some(("sourceObjectIdentifier.sqlServerIdentifier.table", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["database", "mysql-identifier", "oracle-identifier", "postgresql-identifier", "schema", "source-object-identifier", "table"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["database", "mysql-identifier", "oracle-identifier", "postgresql-identifier", "schema", "source-object-identifier", "sql-server-identifier", "table"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2283,16 +2312,22 @@ where
                     "destination-config.gcs-destination-config.path" => Some(("destinationConfig.gcsDestinationConfig.path", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "display-name" => Some(("displayName", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "labels" => Some(("labels", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Map })),
+                    "last-recovery-time" => Some(("lastRecoveryTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "name" => Some(("name", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-config.mysql-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.mysqlSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.mysql-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.mysqlSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "source-config.oracle-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.oracleSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.oracle-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.oracleSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "source-config.postgresql-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.postgresqlSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "source-config.postgresql-source-config.publication" => Some(("sourceConfig.postgresqlSourceConfig.publication", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-config.postgresql-source-config.replication-slot" => Some(("sourceConfig.postgresqlSourceConfig.replicationSlot", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "source-config.source-connection-profile" => Some(("sourceConfig.sourceConnectionProfile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "source-config.sql-server-source-config.max-concurrent-backfill-tasks" => Some(("sourceConfig.sqlServerSourceConfig.maxConcurrentBackfillTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "source-config.sql-server-source-config.max-concurrent-cdc-tasks" => Some(("sourceConfig.sqlServerSourceConfig.maxConcurrentCdcTasks", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
                     "state" => Some(("state", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     "update-time" => Some(("updateTime", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
                     _ => {
-                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-destination-config", "compression", "create-time", "customer-managed-encryption-key", "data-freshness", "dataset-id", "dataset-id-prefix", "dataset-template", "destination-config", "destination-connection-profile", "display-name", "file-rotation-interval", "file-rotation-mb", "gcs-destination-config", "json-file-format", "kms-key-name", "labels", "location", "max-concurrent-cdc-tasks", "mysql-source-config", "name", "oracle-source-config", "path", "postgresql-source-config", "publication", "replication-slot", "schema-file-format", "single-target-dataset", "source-config", "source-connection-profile", "source-hierarchy-datasets", "state", "update-time"]);
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["bigquery-destination-config", "compression", "create-time", "customer-managed-encryption-key", "data-freshness", "dataset-id", "dataset-id-prefix", "dataset-template", "destination-config", "destination-connection-profile", "display-name", "file-rotation-interval", "file-rotation-mb", "gcs-destination-config", "json-file-format", "kms-key-name", "labels", "last-recovery-time", "location", "max-concurrent-backfill-tasks", "max-concurrent-cdc-tasks", "mysql-source-config", "name", "oracle-source-config", "path", "postgresql-source-config", "publication", "replication-slot", "schema-file-format", "single-target-dataset", "source-config", "source-connection-profile", "source-hierarchy-datasets", "sql-server-source-config", "state", "update-time"]);
                         err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
                         None
                     }
@@ -2332,6 +2367,93 @@ where
                                                                   {let mut v = Vec::new();
                                                                            v.extend(self.gp.iter().map(|v|*v));
                                                                            v.extend(["force", "request-id", "update-mask", "validate-only"].iter().map(|v|*v));
+                                                                           v } ));
+                    }
+                }
+            }
+        }
+        let protocol = CallType::Standard;
+        if dry_run {
+            Ok(())
+        } else {
+            assert!(err.issues.len() == 0);
+            for scope in self.opt.values_of("url").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+                call = call.add_scope(scope);
+            }
+            let mut ostream = match writer_from_opts(opt.value_of("out")) {
+                Ok(mut f) => f,
+                Err(io_err) => return Err(DoitError::IoError(opt.value_of("out").unwrap_or("-").to_string(), io_err)),
+            };
+            match match protocol {
+                CallType::Standard => call.doit().await,
+                _ => unreachable!()
+            } {
+                Err(api_err) => Err(DoitError::ApiError(api_err)),
+                Ok((mut response, output_schema)) => {
+                    let mut value = json::value::to_value(&output_schema).expect("serde to work");
+                    remove_json_null_values(&mut value);
+                    json::to_writer_pretty(&mut ostream, &value).unwrap();
+                    ostream.flush().unwrap();
+                    Ok(())
+                }
+            }
+        }
+    }
+
+    async fn _projects_locations_streams_run(&self, opt: &ArgMatches<'n>, dry_run: bool, err: &mut InvalidOptionsError)
+                                                    -> Result<(), DoitError> {
+        
+        let mut field_cursor = FieldCursor::default();
+        let mut object = json::value::Value::Object(Default::default());
+        
+        for kvarg in opt.values_of("kv").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let last_errc = err.issues.len();
+            let (key, value) = parse_kv_arg(&*kvarg, err, false);
+            let mut temp_cursor = field_cursor.clone();
+            if let Err(field_err) = temp_cursor.set(&*key) {
+                err.issues.push(field_err);
+            }
+            if value.is_none() {
+                field_cursor = temp_cursor.clone();
+                if err.issues.len() > last_errc {
+                    err.issues.remove(last_errc);
+                }
+                continue;
+            }
+        
+            let type_info: Option<(&'static str, JsonTypeInfo)> =
+                match &temp_cursor.to_string()[..] {
+                    "cdc-strategy.specific-start-position.mysql-log-position.log-file" => Some(("cdcStrategy.specificStartPosition.mysqlLogPosition.logFile", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    "cdc-strategy.specific-start-position.mysql-log-position.log-position" => Some(("cdcStrategy.specificStartPosition.mysqlLogPosition.logPosition", JsonTypeInfo { jtype: JsonType::Int, ctype: ComplexType::Pod })),
+                    "cdc-strategy.specific-start-position.oracle-scn-position.scn" => Some(("cdcStrategy.specificStartPosition.oracleScnPosition.scn", JsonTypeInfo { jtype: JsonType::String, ctype: ComplexType::Pod })),
+                    _ => {
+                        let suggestion = FieldCursor::did_you_mean(key, &vec!["cdc-strategy", "log-file", "log-position", "mysql-log-position", "oracle-scn-position", "scn", "specific-start-position"]);
+                        err.issues.push(CLIError::Field(FieldError::Unknown(temp_cursor.to_string(), suggestion, value.map(|v| v.to_string()))));
+                        None
+                    }
+                };
+            if let Some((field_cursor_str, type_info)) = type_info {
+                FieldCursor::from(field_cursor_str).set_json_value(&mut object, value.unwrap(), type_info, err, &temp_cursor);
+            }
+        }
+        let mut request: api::RunStreamRequest = json::value::from_value(object).unwrap();
+        let mut call = self.hub.projects().locations_streams_run(request, opt.value_of("name").unwrap_or(""));
+        for parg in opt.values_of("v").map(|i|i.collect()).unwrap_or(Vec::new()).iter() {
+            let (key, value) = parse_kv_arg(&*parg, err, false);
+            match key {
+                _ => {
+                    let mut found = false;
+                    for param in &self.gp {
+                        if key == *param {
+                            found = true;
+                            call = call.param(self.gpm.iter().find(|t| t.0 == key).unwrap_or(&("", key)).1, value.unwrap_or("unset"));
+                            break;
+                        }
+                    }
+                    if !found {
+                        err.issues.push(CLIError::UnknownParameter(key.to_string(),
+                                                                  {let mut v = Vec::new();
+                                                                           v.extend(self.gp.iter().map(|v|*v));
                                                                            v } ));
                     }
                 }
@@ -2465,6 +2587,9 @@ where
                     ("locations-streams-patch", Some(opt)) => {
                         call_result = self._projects_locations_streams_patch(opt, dry_run, &mut err).await;
                     },
+                    ("locations-streams-run", Some(opt)) => {
+                        call_result = self._projects_locations_streams_run(opt, dry_run, &mut err).await;
+                    },
                     _ => {
                         err.issues.push(CLIError::MissingMethodError("projects".to_string()));
                         writeln!(io::stderr(), "{}\n", opt.usage()).ok();
@@ -2544,7 +2669,7 @@ where
 async fn main() {
     let mut exit_status = 0i32;
     let arg_data = [
-        ("projects", "methods: 'locations-connection-profiles-create', 'locations-connection-profiles-delete', 'locations-connection-profiles-discover', 'locations-connection-profiles-get', 'locations-connection-profiles-list', 'locations-connection-profiles-patch', 'locations-fetch-static-ips', 'locations-get', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-private-connections-create', 'locations-private-connections-delete', 'locations-private-connections-get', 'locations-private-connections-list', 'locations-private-connections-routes-create', 'locations-private-connections-routes-delete', 'locations-private-connections-routes-get', 'locations-private-connections-routes-list', 'locations-streams-create', 'locations-streams-delete', 'locations-streams-get', 'locations-streams-list', 'locations-streams-objects-get', 'locations-streams-objects-list', 'locations-streams-objects-lookup', 'locations-streams-objects-start-backfill-job', 'locations-streams-objects-stop-backfill-job' and 'locations-streams-patch'", vec![
+        ("projects", "methods: 'locations-connection-profiles-create', 'locations-connection-profiles-delete', 'locations-connection-profiles-discover', 'locations-connection-profiles-get', 'locations-connection-profiles-list', 'locations-connection-profiles-patch', 'locations-fetch-static-ips', 'locations-get', 'locations-list', 'locations-operations-cancel', 'locations-operations-delete', 'locations-operations-get', 'locations-operations-list', 'locations-private-connections-create', 'locations-private-connections-delete', 'locations-private-connections-get', 'locations-private-connections-list', 'locations-private-connections-routes-create', 'locations-private-connections-routes-delete', 'locations-private-connections-routes-get', 'locations-private-connections-routes-list', 'locations-streams-create', 'locations-streams-delete', 'locations-streams-get', 'locations-streams-list', 'locations-streams-objects-get', 'locations-streams-objects-list', 'locations-streams-objects-lookup', 'locations-streams-objects-start-backfill-job', 'locations-streams-objects-stop-backfill-job', 'locations-streams-patch' and 'locations-streams-run'", vec![
             ("locations-connection-profiles-create",
                     Some(r##"Use this method to create a connection profile in a project and location."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datastream1_cli/projects_locations-connection-profiles-create",
@@ -2834,7 +2959,7 @@ async fn main() {
                      Some(false)),
                   ]),
             ("locations-operations-list",
-                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `"/v1/{name=users/*}/operations"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id."##),
+                    Some(r##"Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."##),
                     "Details at http://byron.github.io/google-apis-rs/google_datastream1_cli/projects_locations-operations-list",
                   vec![
                     (Some(r##"name"##),
@@ -3293,13 +3418,41 @@ async fn main() {
                      Some(false),
                      Some(false)),
                   ]),
+            ("locations-streams-run",
+                    Some(r##"Use this method to start, resume or recover a stream with a non default CDC strategy. NOTE: This feature is currently experimental."##),
+                    "Details at http://byron.github.io/google-apis-rs/google_datastream1_cli/projects_locations-streams-run",
+                  vec![
+                    (Some(r##"name"##),
+                     None,
+                     Some(r##"Required. Name of the stream resource to start, in the format: projects/{project_id}/locations/{location}/streams/{stream_name}"##),
+                     Some(true),
+                     Some(false)),
+        
+                    (Some(r##"kv"##),
+                     Some(r##"r"##),
+                     Some(r##"Set various fields of the request structure, matching the key=value form"##),
+                     Some(true),
+                     Some(true)),
+        
+                    (Some(r##"v"##),
+                     Some(r##"p"##),
+                     Some(r##"Set various optional parameters, matching the key=value form"##),
+                     Some(false),
+                     Some(true)),
+        
+                    (Some(r##"out"##),
+                     Some(r##"o"##),
+                     Some(r##"Specify the file into which to write the program's output"##),
+                     Some(false),
+                     Some(false)),
+                  ]),
             ]),
         
     ];
     
     let mut app = App::new("datastream1")
            .author("Sebastian Thiel <byronimo@gmail.com>")
-           .version("5.0.3+20230111")
+           .version("5.0.4+20240221")
            .about("")
            .after_help("All documentation details can be found at http://byron.github.io/google-apis-rs/google_datastream1_cli")
            .arg(Arg::with_name("url")

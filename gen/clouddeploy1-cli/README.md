@@ -25,11 +25,26 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *Cloud Deploy* API at revision *20230105*. The CLI is at version *5.0.3*.
+This documentation was generated from the *Cloud Deploy* API at revision *20240221*. The CLI is at version *5.0.4*.
 
 ```bash
 clouddeploy1 [options]
         projects
+                locations-custom-target-types-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-custom-target-types-delete <name> [-p <v>]... [-o <out>]
+                locations-custom-target-types-get <name> [-p <v>]... [-o <out>]
+                locations-custom-target-types-get-iam-policy <resource> [-p <v>]... [-o <out>]
+                locations-custom-target-types-list <parent> [-p <v>]... [-o <out>]
+                locations-custom-target-types-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-custom-target-types-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-automation-runs-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-automation-runs-get <name> [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-automation-runs-list <parent> [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-automations-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-automations-delete <name> [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-automations-get <name> [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-automations-list <parent> [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-automations-patch <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-delete <name> [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-get <name> [-p <v>]... [-o <out>]
@@ -40,13 +55,18 @@ clouddeploy1 [options]
                 locations-delivery-pipelines-releases-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-get <name> [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-list <parent> [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-releases-rollouts-advance <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-rollouts-approve <name> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-releases-rollouts-cancel <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-rollouts-create <parent> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-rollouts-get <name> [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-releases-rollouts-ignore-job <rollout> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-rollouts-job-runs-get <name> [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-rollouts-job-runs-list <parent> [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-releases-rollouts-job-runs-terminate <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-rollouts-list <parent> [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-releases-rollouts-retry-job <rollout> (-r <kv>)... [-p <v>]... [-o <out>]
+                locations-delivery-pipelines-rollback-target <name> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-set-iam-policy <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-delivery-pipelines-test-iam-permissions <resource> (-r <kv>)... [-p <v>]... [-o <out>]
                 locations-get <name> [-p <v>]... [-o <out>]

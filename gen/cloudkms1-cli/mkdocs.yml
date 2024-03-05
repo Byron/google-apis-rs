@@ -1,4 +1,4 @@
-site_name: Cloud KMS v5.0.3+20230106
+site_name: Cloud KMS v5.0.4+20240219
 site_url: http://byron.github.io/google-apis-rs/google-cloudkms1-cli
 site_description: A complete library to interact with Cloud KMS (protocol v1)
 
@@ -20,8 +20,10 @@ nav:
     - 'Locations Ekm Connections Patch': 'projects_locations-ekm-connections-patch.md'
     - 'Locations Ekm Connections Set Iam Policy': 'projects_locations-ekm-connections-set-iam-policy.md'
     - 'Locations Ekm Connections Test Iam Permissions': 'projects_locations-ekm-connections-test-iam-permissions.md'
+    - 'Locations Ekm Connections Verify Connectivity': 'projects_locations-ekm-connections-verify-connectivity.md'
     - 'Locations Generate Random Bytes': 'projects_locations-generate-random-bytes.md'
     - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations Get Ekm Config': 'projects_locations-get-ekm-config.md'
     - 'Locations Key Rings Create': 'projects_locations-key-rings-create.md'
     - 'Locations Key Rings Crypto Keys Create': 'projects_locations-key-rings-crypto-keys-create.md'
     - 'Locations Key Rings Crypto Keys Crypto Key Versions Asymmetric Decrypt': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt.md'
@@ -35,6 +37,8 @@ nav:
     - 'Locations Key Rings Crypto Keys Crypto Key Versions Mac Sign': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-sign.md'
     - 'Locations Key Rings Crypto Keys Crypto Key Versions Mac Verify': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-verify.md'
     - 'Locations Key Rings Crypto Keys Crypto Key Versions Patch': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-patch.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Raw Decrypt': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-raw-decrypt.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Raw Encrypt': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-raw-encrypt.md'
     - 'Locations Key Rings Crypto Keys Crypto Key Versions Restore': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-restore.md'
     - 'Locations Key Rings Crypto Keys Decrypt': 'projects_locations-key-rings-crypto-keys-decrypt.md'
     - 'Locations Key Rings Crypto Keys Encrypt': 'projects_locations-key-rings-crypto-keys-encrypt.md'
@@ -57,6 +61,7 @@ nav:
     - 'Locations Key Rings Set Iam Policy': 'projects_locations-key-rings-set-iam-policy.md'
     - 'Locations Key Rings Test Iam Permissions': 'projects_locations-key-rings-test-iam-permissions.md'
     - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Update Ekm Config': 'projects_locations-update-ekm-config.md'
 
 theme: readthedocs
 

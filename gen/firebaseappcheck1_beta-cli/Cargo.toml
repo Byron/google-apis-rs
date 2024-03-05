@@ -4,7 +4,7 @@
 [package]
 
 name = "google-firebaseappcheck1_beta-cli"
-version = "5.0.3+20230116"
+version = "5.0.4+20240226"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Firebaseappcheck (protocol v1beta)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/firebaseappcheck1_beta-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-firebaseappcheck1_beta]
 path = "../firebaseappcheck1_beta"
-version = "5.0.3+20230116"
+version = "5.0.4+20240226"
 

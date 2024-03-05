@@ -1,4 +1,4 @@
-site_name: Dns v5.0.3+20230119
+site_name: Dns v5.0.4+20240229
 site_url: http://byron.github.io/google-apis-rs/google-dns2-cli
 site_description: A complete library to interact with Dns (protocol v2)
 

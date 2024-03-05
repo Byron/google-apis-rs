@@ -11,7 +11,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.
 
 Everything else about the *BigQuery Connection Service* API can be found at the
-[official documentation site](https://cloud.google.com/bigquery/).
+[official documentation site](https://cloud.google.com/bigquery/docs/connections-api-intro).
 
 # Installation and Source Code
 
@@ -25,7 +25,7 @@ Find the source code [on github](https://github.com/Byron/google-apis-rs/tree/ma
 
 # Usage
 
-This documentation was generated from the *BigQuery Connection Service* API at revision *20230115*. The CLI is at version *5.0.3*.
+This documentation was generated from the *BigQuery Connection Service* API at revision *20240214*. The CLI is at version *5.0.4*.
 
 ```bash
 bigqueryconnection1-beta1 [options]

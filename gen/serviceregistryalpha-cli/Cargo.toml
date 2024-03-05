@@ -4,7 +4,7 @@
 [package]
 
 name = "google-serviceregistryalpha-cli"
-version = "5.0.3+20160401"
+version = "5.0.4+20160401"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Service Registry (protocol alpha)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/serviceregistryalpha-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-serviceregistryalpha]
 path = "../serviceregistryalpha"
-version = "5.0.3+20160401"
+version = "5.0.4+20160401"
 

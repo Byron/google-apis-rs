@@ -4,7 +4,7 @@
 [package]
 
 name = "google-content2_sandbox-cli"
-version = "5.0.3+20181009"
+version = "5.0.4+20181009"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Shopping Content (protocol v2sandbox)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/content2_sandbox-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-content2_sandbox]
 path = "../content2_sandbox"
-version = "5.0.3+20181009"
+version = "5.0.4+20181009"
 

@@ -4,7 +4,7 @@
 [package]
 
 name = "google-dns2-cli"
-version = "5.0.3+20230119"
+version = "5.0.4+20240229"
 authors = ["Sebastian Thiel <byronimo@gmail.com>"]
 description = "A complete library to interact with Dns (protocol v2)"
 repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/dns2-cli"
@@ -38,5 +38,5 @@ tower-service = "^0.3.1"
 
 [dependencies.google-dns2]
 path = "../dns2"
-version = "5.0.3+20230119"
+version = "5.0.4+20240229"
 

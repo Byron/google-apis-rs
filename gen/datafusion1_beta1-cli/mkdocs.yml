@@ -1,4 +1,4 @@
-site_name: Data Fusion v5.0.3+20221213
+site_name: Data Fusion v5.0.4+20240111
 site_url: http://byron.github.io/google-apis-rs/google-datafusion1_beta1-cli
 site_description: A complete library to interact with Data Fusion (protocol v1beta1)
 
