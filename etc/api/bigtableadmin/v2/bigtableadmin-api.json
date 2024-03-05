@@ -131,66 +131,6 @@
     "resources": {
         "operations": {
             "methods": {
-                "cancel": {
-                    "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
-                    "flatPath": "v2/operations/{operationsId}:cancel",
-                    "httpMethod": "POST",
-                    "id": "bigtableadmin.operations.cancel",
-                    "parameterOrder": [
-                        "name"
-                    ],
-                    "parameters": {
-                        "name": {
-                            "description": "The name of the operation resource to be cancelled.",
-                            "location": "path",
-                            "pattern": "^operations/.*$",
-                            "required": true,
-                            "type": "string"
-                        }
-                    },
-                    "path": "v2/{+name}:cancel",
-                    "response": {
-                        "$ref": "Empty"
-                    },
-                    "scopes": [
-                        "https://www.googleapis.com/auth/bigtable.admin",
-                        "https://www.googleapis.com/auth/bigtable.admin.cluster",
-                        "https://www.googleapis.com/auth/bigtable.admin.instance",
-                        "https://www.googleapis.com/auth/cloud-bigtable.admin",
-                        "https://www.googleapis.com/auth/cloud-bigtable.admin.cluster",
-                        "https://www.googleapis.com/auth/cloud-platform"
-                    ]
-                },
-                "delete": {
-                    "description": "Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`.",
-                    "flatPath": "v2/operations/{operationsId}",
-                    "httpMethod": "DELETE",
-                    "id": "bigtableadmin.operations.delete",
-                    "parameterOrder": [
-                        "name"
-                    ],
-                    "parameters": {
-                        "name": {
-                            "description": "The name of the operation resource to be deleted.",
-                            "location": "path",
-                            "pattern": "^operations/.*$",
-                            "required": true,
-                            "type": "string"
-                        }
-                    },
-                    "path": "v2/{+name}",
-                    "response": {
-                        "$ref": "Empty"
-                    },
-                    "scopes": [
-                        "https://www.googleapis.com/auth/bigtable.admin",
-                        "https://www.googleapis.com/auth/bigtable.admin.cluster",
-                        "https://www.googleapis.com/auth/bigtable.admin.instance",
-                        "https://www.googleapis.com/auth/cloud-bigtable.admin",
-                        "https://www.googleapis.com/auth/cloud-bigtable.admin.cluster",
-                        "https://www.googleapis.com/auth/cloud-platform"
-                    ]
-                },
                 "get": {
                     "description": "Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.",
                     "flatPath": "v2/operations/{operationsId}",
@@ -229,7 +169,7 @@
                         "operations": {
                             "methods": {
                                 "list": {
-                                    "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `\"/v1/{name=users/*}/operations\"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.",
+                                    "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.",
                                     "flatPath": "v2/operations/projects/{projectsId}/operations",
                                     "httpMethod": "GET",
                                     "id": "bigtableadmin.operations.projects.operations.list",
@@ -1127,7 +1067,7 @@
                                             ]
                                         },
                                         "getIamPolicy": {
-                                            "description": "Gets the access control policy for a Table resource. Returns an empty policy if the resource exists but does not have a policy set.",
+                                            "description": "Gets the access control policy for a Table or Backup resource. Returns an empty policy if the resource exists but does not have a policy set.",
                                             "flatPath": "v2/projects/{projectsId}/instances/{instancesId}/clusters/{clustersId}/backups/{backupsId}:getIamPolicy",
                                             "httpMethod": "POST",
                                             "id": "bigtableadmin.projects.instances.clusters.backups.getIamPolicy",
@@ -1247,7 +1187,7 @@
                                             ]
                                         },
                                         "setIamPolicy": {
-                                            "description": "Sets the access control policy on a Table resource. Replaces any existing policy.",
+                                            "description": "Sets the access control policy on a Table or Backup resource. Replaces any existing policy.",
                                             "flatPath": "v2/projects/{projectsId}/instances/{instancesId}/clusters/{clustersId}/backups/{backupsId}:setIamPolicy",
                                             "httpMethod": "POST",
                                             "id": "bigtableadmin.projects.instances.clusters.backups.setIamPolicy",
@@ -1279,7 +1219,7 @@
                                             ]
                                         },
                                         "testIamPermissions": {
-                                            "description": "Returns permissions that the caller has on the specified table resource.",
+                                            "description": "Returns permissions that the caller has on the specified Table or Backup resource.",
                                             "flatPath": "v2/projects/{projectsId}/instances/{instancesId}/clusters/{clustersId}/backups/{backupsId}:testIamPermissions",
                                             "httpMethod": "POST",
                                             "id": "bigtableadmin.projects.instances.clusters.backups.testIamPermissions",
@@ -1467,7 +1407,7 @@
                                     ]
                                 },
                                 "dropRowRange": {
-                                    "description": "Permanently drop/delete a row range from a specified table. The request can specify whether to delete all rows in a table, or only those that match a particular prefix.",
+                                    "description": "Permanently drop/delete a row range from a specified table. The request can specify whether to delete all rows in a table, or only those that match a particular prefix. Note that row key prefixes used here are treated as service data. For more information about how service data is handled, see the [Google Cloud Privacy Notice](https://cloud.google.com/terms/cloud-privacy-notice).",
                                     "flatPath": "v2/projects/{projectsId}/instances/{instancesId}/tables/{tablesId}:dropRowRange",
                                     "httpMethod": "POST",
                                     "id": "bigtableadmin.projects.instances.tables.dropRowRange",
@@ -1584,7 +1524,7 @@
                                     ]
                                 },
                                 "getIamPolicy": {
-                                    "description": "Gets the access control policy for a Table resource. Returns an empty policy if the resource exists but does not have a policy set.",
+                                    "description": "Gets the access control policy for a Table or Backup resource. Returns an empty policy if the resource exists but does not have a policy set.",
                                     "flatPath": "v2/projects/{projectsId}/instances/{instancesId}/tables/{tablesId}:getIamPolicy",
                                     "httpMethod": "POST",
                                     "id": "bigtableadmin.projects.instances.tables.getIamPolicy",
@@ -1782,7 +1722,7 @@
                                     ]
                                 },
                                 "setIamPolicy": {
-                                    "description": "Sets the access control policy on a Table resource. Replaces any existing policy.",
+                                    "description": "Sets the access control policy on a Table or Backup resource. Replaces any existing policy.",
                                     "flatPath": "v2/projects/{projectsId}/instances/{instancesId}/tables/{tablesId}:setIamPolicy",
                                     "httpMethod": "POST",
                                     "id": "bigtableadmin.projects.instances.tables.setIamPolicy",
@@ -1814,7 +1754,7 @@
                                     ]
                                 },
                                 "testIamPermissions": {
-                                    "description": "Returns permissions that the caller has on the specified table resource.",
+                                    "description": "Returns permissions that the caller has on the specified Table or Backup resource.",
                                     "flatPath": "v2/projects/{projectsId}/instances/{instancesId}/tables/{tablesId}:testIamPermissions",
                                     "httpMethod": "POST",
                                     "id": "bigtableadmin.projects.instances.tables.testIamPermissions",
@@ -1883,37 +1823,6 @@
                 },
                 "locations": {
                     "methods": {
-                        "get": {
-                            "description": "Gets information about a location.",
-                            "flatPath": "v2/projects/{projectsId}/locations/{locationsId}",
-                            "httpMethod": "GET",
-                            "id": "bigtableadmin.projects.locations.get",
-                            "parameterOrder": [
-                                "name"
-                            ],
-                            "parameters": {
-                                "name": {
-                                    "description": "Resource name for the location.",
-                                    "location": "path",
-                                    "pattern": "^projects/[^/]+/locations/[^/]+$",
-                                    "required": true,
-                                    "type": "string"
-                                }
-                            },
-                            "path": "v2/{+name}",
-                            "response": {
-                                "$ref": "Location"
-                            },
-                            "scopes": [
-                                "https://www.googleapis.com/auth/bigtable.admin",
-                                "https://www.googleapis.com/auth/bigtable.admin.cluster",
-                                "https://www.googleapis.com/auth/bigtable.admin.instance",
-                                "https://www.googleapis.com/auth/cloud-bigtable.admin",
-                                "https://www.googleapis.com/auth/cloud-bigtable.admin.cluster",
-                                "https://www.googleapis.com/auth/cloud-platform",
-                                "https://www.googleapis.com/auth/cloud-platform.read-only"
-                            ]
-                        },
                         "list": {
                             "description": "Lists information about the supported locations for this service.",
                             "flatPath": "v2/projects/{projectsId}/locations",
@@ -1966,7 +1875,7 @@
             }
         }
     },
-    "revision": "20230110",
+    "revision": "20240221",
     "rootUrl": "https://bigtableadmin.googleapis.com/",
     "schemas": {
         "AppProfile": {
@@ -1989,9 +1898,30 @@
                     "description": "The unique name of the app profile. Values are of the form `projects/{project}/instances/{instance}/appProfiles/_a-zA-Z0-9*`.",
                     "type": "string"
                 },
+                "priority": {
+                    "deprecated": true,
+                    "description": "This field has been deprecated in favor of `standard_isolation.priority`. If you set this field, `standard_isolation.priority` will be set instead. The priority of requests sent using this app profile.",
+                    "enum": [
+                        "PRIORITY_UNSPECIFIED",
+                        "PRIORITY_LOW",
+                        "PRIORITY_MEDIUM",
+                        "PRIORITY_HIGH"
+                    ],
+                    "enumDescriptions": [
+                        "Default value. Mapped to PRIORITY_HIGH (the legacy behavior) on creation.",
+                        "",
+                        "",
+                        ""
+                    ],
+                    "type": "string"
+                },
                 "singleClusterRouting": {
                     "$ref": "SingleClusterRouting",
                     "description": "Use a single-cluster routing policy."
+                },
+                "standardIsolation": {
+                    "$ref": "StandardIsolation",
+                    "description": "The standard options used for isolating this app profile's traffic from other use cases."
                 }
             },
             "type": "object"
@@ -2094,7 +2024,7 @@
                     "type": "string"
                 },
                 "expireTime": {
-                    "description": "Required. The expiration time of the backup, with microseconds granularity that must be at least 6 hours and at most 30 days from the time the request is received. Once the `expire_time` has passed, Cloud Bigtable will delete the backup and free the resources used by the backup.",
+                    "description": "Required. The expiration time of the backup, with microseconds granularity that must be at least 6 hours and at most 90 days from the time the request is received. Once the `expire_time` has passed, Cloud Bigtable will delete the backup and free the resources used by the backup.",
                     "format": "google-datetime",
                     "type": "string"
                 },
@@ -2109,7 +2039,7 @@
                     "type": "string"
                 },
                 "sourceBackup": {
-                    "description": "Output only. Name of the backup from which this backup was copied. If a backup is not created by copying a backup, this field will be empty. Values are of the form: projects//instances//backups/.",
+                    "description": "Output only. Name of the backup from which this backup was copied. If a backup is not created by copying a backup, this field will be empty. Values are of the form: projects//instances//clusters//backups/",
                     "readOnly": true,
                     "type": "string"
                 },
@@ -2157,7 +2087,7 @@
                     "type": "string"
                 },
                 "sourceBackup": {
-                    "description": "Output only. Name of the backup from which this backup was copied. If a backup is not created by copying a backup, this field will be empty. Values are of the form: projects//instances//backups/.",
+                    "description": "Output only. Name of the backup from which this backup was copied. If a backup is not created by copying a backup, this field will be empty. Values are of the form: projects//instances//clusters//backups/",
                     "readOnly": true,
                     "type": "string"
                 },
@@ -2184,14 +2114,26 @@
                     "description": "The condition that is associated with this binding. If the condition evaluates to `true`, then this binding applies to the current request. If the condition evaluates to `false`, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the principals in this binding. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies)."
                 },
                 "members": {
-                    "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. ",
+                    "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workforce identity pool. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/group/{group_id}`: All workforce identities in a group. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All workforce identities with a specific attribute value. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/*`: All identities in a workforce identity pool. * `principal://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workload identity pool. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/group/{group_id}`: A workload identity pool group. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All identities in a workload identity pool with a certain attribute. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/*`: All identities in a workload identity pool. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `deleted:principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: Deleted single identity in a workforce identity pool. For example, `deleted:principal://iam.googleapis.com/locations/global/workforcePools/my-pool-id/subject/my-subject-attribute-value`.",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
                 },
                 "role": {
-                    "description": "Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`.",
+                    "description": "Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`. For an overview of the IAM roles and permissions, see the [IAM documentation](https://cloud.google.com/iam/docs/roles-overview). For a list of the available pre-defined roles, see [here](https://cloud.google.com/iam/docs/understanding-roles).",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ChangeStreamConfig": {
+            "description": "Change stream configuration.",
+            "id": "ChangeStreamConfig",
+            "properties": {
+                "retentionPeriod": {
+                    "description": "How long the change stream should be retained. Change stream data older than the retention period will not be returned when reading the change stream from the table. Values must be at least 1 day and at most 7 days, and will be truncated to microsecond granularity.",
+                    "format": "google-duration",
                     "type": "string"
                 }
             },
@@ -2254,7 +2196,7 @@
                     "type": "string"
                 },
                 "serveNodes": {
-                    "description": "The number of nodes allocated to this cluster. More nodes enable higher throughput and more consistent performance.",
+                    "description": "The number of nodes in the cluster. If no value is set, Cloud Bigtable automatically allocates nodes based on your data footprint and optimized for 50% storage utilization.",
                     "format": "int32",
                     "type": "integer"
                 },
@@ -2352,7 +2294,8 @@
                 },
                 "stats": {
                     "$ref": "ColumnFamilyStats",
-                    "description": "Only available with STATS_VIEW, this includes summary statistics about column family contents. For statistics over an entire table, see TableStats above."
+                    "description": "Output only. Only available with STATS_VIEW, this includes summary statistics about column family contents. For statistics over an entire table, see TableStats above.",
+                    "readOnly": true
                 }
             },
             "type": "object"
@@ -2995,7 +2938,7 @@
             "type": "object"
         },
         "Location": {
-            "description": "A resource that represents Google Cloud Platform location.",
+            "description": "A resource that represents a Google Cloud location.",
             "id": "Location",
             "properties": {
                 "displayName": {
@@ -3055,6 +2998,10 @@
             "description": "Request message for google.bigtable.admin.v2.BigtableTableAdmin.ModifyColumnFamilies",
             "id": "ModifyColumnFamiliesRequest",
             "properties": {
+                "ignoreWarnings": {
+                    "description": "Optional. If true, ignore safety checks when modifying the column families.",
+                    "type": "boolean"
+                },
                 "modifications": {
                     "description": "Required. Modifications to be atomically applied to the specified table's families. Entries are applied in order, meaning that earlier modifications can be masked by later ones (in the case of repeated updates to the same family, for example).",
                     "items": {
@@ -3108,7 +3055,7 @@
                         "description": "Properties of the object. Contains field @type with type URL.",
                         "type": "any"
                     },
-                    "description": "The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.",
+                    "description": "The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.",
                     "type": "object"
                 }
             },
@@ -3205,7 +3152,7 @@
             "type": "object"
         },
         "Policy": {
-            "description": "An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** { \"bindings\": [ { \"role\": \"roles/resourcemanager.organizationAdmin\", \"members\": [ \"user:mike@example.com\", \"group:admins@example.com\", \"domain:google.com\", \"serviceAccount:my-project-id@appspot.gserviceaccount.com\" ] }, { \"role\": \"roles/resourcemanager.organizationViewer\", \"members\": [ \"user:eve@example.com\" ], \"condition\": { \"title\": \"expirable access\", \"description\": \"Does not grant access after Sep 2020\", \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\", } } ], \"etag\": \"BwWWja0YfJA=\", \"version\": 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3 For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).",
+            "description": "An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** ``` { \"bindings\": [ { \"role\": \"roles/resourcemanager.organizationAdmin\", \"members\": [ \"user:mike@example.com\", \"group:admins@example.com\", \"domain:google.com\", \"serviceAccount:my-project-id@appspot.gserviceaccount.com\" ] }, { \"role\": \"roles/resourcemanager.organizationViewer\", \"members\": [ \"user:eve@example.com\" ], \"condition\": { \"title\": \"expirable access\", \"description\": \"Does not grant access after Sep 2020\", \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\", } } ], \"etag\": \"BwWWja0YfJA=\", \"version\": 3 } ``` **YAML example:** ``` bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3 ``` For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).",
             "id": "Policy",
             "properties": {
                 "auditConfigs": {
@@ -3350,6 +3297,29 @@
             },
             "type": "object"
         },
+        "StandardIsolation": {
+            "description": "Standard options for isolating this app profile's traffic from other use cases.",
+            "id": "StandardIsolation",
+            "properties": {
+                "priority": {
+                    "description": "The priority of requests sent using this app profile.",
+                    "enum": [
+                        "PRIORITY_UNSPECIFIED",
+                        "PRIORITY_LOW",
+                        "PRIORITY_MEDIUM",
+                        "PRIORITY_HIGH"
+                    ],
+                    "enumDescriptions": [
+                        "Default value. Mapped to PRIORITY_HIGH (the legacy behavior) on creation.",
+                        "",
+                        "",
+                        ""
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "Status": {
             "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).",
             "id": "Status",
@@ -3381,6 +3351,10 @@
             "description": "A collection of user data indexed by row, column, and timestamp. Each table is served using the resources of its parent cluster.",
             "id": "Table",
             "properties": {
+                "changeStreamConfig": {
+                    "$ref": "ChangeStreamConfig",
+                    "description": "If specified, enable the change stream on this table. Otherwise, the change stream is disabled and the change stream is not retained."
+                },
                 "clusterStates": {
                     "additionalProperties": {
                         "$ref": "ClusterState"
@@ -3423,7 +3397,8 @@
                 },
                 "stats": {
                     "$ref": "TableStats",
-                    "description": "Only available with STATS_VIEW, this includes summary statistics about the entire table contents. For statistics about a specific column family, see ColumnFamilyStats in the mapped ColumnFamily collection above."
+                    "description": "Output only. Only available with STATS_VIEW, this includes summary statistics about the entire table contents. For statistics about a specific column family, see ColumnFamilyStats in the mapped ColumnFamily collection above.",
+                    "readOnly": true
                 }
             },
             "type": "object"

@@ -700,7 +700,7 @@
                                     "type": "string"
                                 },
                                 "rawResourceId": {
-                                    "description": "Raw Resource Id used by Google Endpoint Verification. If the user is enrolled into Google Endpoint Verification, this id will be saved as the 'device_resource_id' field in the following platform dependent files. Mac: ~/.secureConnect/context_aware_config.json Windows: C:\\Users\\%USERPROFILE%\\.secureConnect\\context_aware_config.json Linux: ~/.secureConnect/context_aware_config.json",
+                                    "description": "Raw Resource Id used by Google Endpoint Verification. If the user is enrolled into Google Endpoint Verification, this id will be saved as the 'device_resource_id' field in the following platform dependent files. * macOS: ~/.secureConnect/context_aware_config.json * Windows: %USERPROFILE%\\AppData\\Local\\Google\\Endpoint Verification\\accounts.json * Linux: ~/.secureConnect/context_aware_config.json",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -1052,7 +1052,7 @@
                     "parameterOrder": [],
                     "parameters": {
                         "groupKey.id": {
-                            "description": "The ID of the entity. For Google-managed entities, the `id` should be the email address of an existing group or user. For external-identity-mapped entities, the `id` must be a string conforming to the Identity Source's requirements. Must be unique within a `namespace`.",
+                            "description": "The ID of the entity. For Google-managed entities, the `id` should be the email address of an existing group or user. Email addresses need to adhere to [name guidelines for users and groups](https://support.google.com/a/answer/9193374). For external-identity-mapped entities, the `id` must be a string conforming to the Identity Source's requirements. Must be unique within a `namespace`.",
                             "location": "query",
                             "type": "string"
                         },
@@ -1126,7 +1126,7 @@
                             "type": "string"
                         },
                         "query": {
-                            "description": "Required. The search query. Must be specified in [Common Expression Language](https://opensource.google/projects/cel). May only contain equality operators on the parent and inclusion operators on labels (e.g., `parent == 'customers/{customer_id}' && 'cloudidentity.googleapis.com/groups.discussion_forum' in labels`). The `customer_id` must begin with \"C\" (for example, 'C046psxkn'). [Find your customer ID.] (https://support.google.com/cloudidentity/answer/10070793)",
+                            "description": "Required. The search query. * Must be specified in [Common Expression Language](https://opensource.google/projects/cel). * Must contain equality operators on the parent, e.g. `parent == 'customers/{customer_id}'`. The `customer_id` must begin with \"C\" (for example, 'C046psxkn'). [Find your customer ID.] (https://support.google.com/cloudidentity/answer/10070793) * Can contain optional inclusion operators on `labels` such as `'cloudidentity.googleapis.com/groups.discussion_forum' in labels`). * Can contain an optional equality operator on `domain_name`. e.g. `domain_name == 'examplepetstore.com'` * Can contain optional `startsWith/contains/equality` operators on `group_key`, e.g. `group_key.startsWith('dev')`, `group_key.contains('dev'), group_key == 'dev@examplepetstore.com'` * Can contain optional `startsWith/contains/equality` operators on `display_name`, such as `display_name.startsWith('dev')` , `display_name.contains('dev')`, `display_name == 'dev'`",
                             "location": "query",
                             "type": "string"
                         },
@@ -1404,7 +1404,7 @@
                             ],
                             "parameters": {
                                 "memberKey.id": {
-                                    "description": "The ID of the entity. For Google-managed entities, the `id` should be the email address of an existing group or user. For external-identity-mapped entities, the `id` must be a string conforming to the Identity Source's requirements. Must be unique within a `namespace`.",
+                                    "description": "The ID of the entity. For Google-managed entities, the `id` should be the email address of an existing group or user. Email addresses need to adhere to [name guidelines for users and groups](https://support.google.com/a/answer/9193374). For external-identity-mapped entities, the `id` must be a string conforming to the Identity Source's requirements. Must be unique within a `namespace`.",
                                     "location": "query",
                                     "type": "string"
                                 },
@@ -1460,6 +1460,54 @@
                                 "https://www.googleapis.com/auth/cloud-platform"
                             ]
                         },
+                        "searchDirectGroups": {
+                            "description": "Searches direct groups of a member.",
+                            "flatPath": "v1/groups/{groupsId}/memberships:searchDirectGroups",
+                            "httpMethod": "GET",
+                            "id": "cloudidentity.groups.memberships.searchDirectGroups",
+                            "parameterOrder": [
+                                "parent"
+                            ],
+                            "parameters": {
+                                "orderBy": {
+                                    "description": "The ordering of membership relation for the display name or email in the response. The syntax for this field can be found at https://cloud.google.com/apis/design/design_patterns#sorting_order. Example: Sort by the ascending display name: order_by=\"group_name\" or order_by=\"group_name asc\". Sort by the descending display name: order_by=\"group_name desc\". Sort by the ascending group key: order_by=\"group_key\" or order_by=\"group_key asc\". Sort by the descending group key: order_by=\"group_key desc\".",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "pageSize": {
+                                    "description": "The default page size is 200 (max 1000).",
+                                    "format": "int32",
+                                    "location": "query",
+                                    "type": "integer"
+                                },
+                                "pageToken": {
+                                    "description": "The next_page_token value returned from a previous list request, if any",
+                                    "location": "query",
+                                    "type": "string"
+                                },
+                                "parent": {
+                                    "description": "[Resource name](https://cloud.google.com/apis/design/resource_names) of the group to search transitive memberships in. Format: groups/{group_id}, where group_id is always '-' as this API will search across all groups for a given member.",
+                                    "location": "path",
+                                    "pattern": "^groups/[^/]+$",
+                                    "required": true,
+                                    "type": "string"
+                                },
+                                "query": {
+                                    "description": "Required. A CEL expression that MUST include member specification AND label(s). Users can search on label attributes of groups. CONTAINS match ('in') is supported on labels. Identity-mapped groups are uniquely identified by both a `member_key_id` and a `member_key_namespace`, which requires an additional query input: `member_key_namespace`. Example query: `member_key_id == 'member_key_id_value' && 'label_value' in labels`",
+                                    "location": "query",
+                                    "type": "string"
+                                }
+                            },
+                            "path": "v1/{+parent}/memberships:searchDirectGroups",
+                            "response": {
+                                "$ref": "SearchDirectGroupsResponse"
+                            },
+                            "scopes": [
+                                "https://www.googleapis.com/auth/cloud-identity.groups",
+                                "https://www.googleapis.com/auth/cloud-identity.groups.readonly",
+                                "https://www.googleapis.com/auth/cloud-platform"
+                            ]
+                        },
                         "searchTransitiveGroups": {
                             "description": "Search transitive groups of a member. **Note:** This feature is only available to Google Workspace Enterprise Standard, Enterprise Plus, and Enterprise for Education; and Cloud Identity Premium accounts. If the account of the member is not one of these, a 403 (PERMISSION_DENIED) HTTP status code will be returned. A transitive group is any group that has a direct or indirect membership to the member. Actor must have view permissions all transitive groups.",
                             "flatPath": "v1/groups/{groupsId}/memberships:searchTransitiveGroups",
@@ -1488,7 +1536,7 @@
                                     "type": "string"
                                 },
                                 "query": {
-                                    "description": "Required. A CEL expression that MUST include member specification AND label(s). This is a `required` field. Users can search on label attributes of groups. CONTAINS match ('in') is supported on labels. Identity-mapped groups are uniquely identified by both a `member_key_id` and a `member_key_namespace`, which requires an additional query input: `member_key_namespace`. Example query: `member_key_id == 'member_key_id_value' && in labels`",
+                                    "description": "Required. A CEL expression that MUST include member specification AND label(s). This is a `required` field. Users can search on label attributes of groups. CONTAINS match ('in') is supported on labels. Identity-mapped groups are uniquely identified by both a `member_key_id` and a `member_key_namespace`, which requires an additional query input: `member_key_namespace`. Example query: `member_key_id == 'member_key_id_value' && in labels` Query may optionally contain equality operators on the parent of the group restricting the search within a particular customer, e.g. `parent == 'customers/{customer_id}'`. The `customer_id` must begin with \"C\" (for example, 'C046psxkn'). This filtering is only supported for Admins with groups read permissons on the input customer. Example query: `member_key_id == 'member_key_id_value' && in labels && parent == 'customers/C046psxkn'`",
                                     "location": "query",
                                     "type": "string"
                                 }
@@ -1623,7 +1671,7 @@
                     "parameterOrder": [],
                     "parameters": {
                         "filter": {
-                            "description": "A [Common Expression Language](https://github.com/google/cel-spec) expression to filter the results. The only currently-supported filter is filtering by customer. For example: `customer==\"customers/C0123abc\"`. Omitting the filter or specifying a filter of `customer==\"customers/my_customer\"` will return the profiles for the customer that the caller (authenticated user) belongs to.",
+                            "description": "A [Common Expression Language](https://github.com/google/cel-spec) expression to filter the results. The only supported filter is filtering by customer. For example: `customer==\"customers/C0123abc\"`. Omitting the filter or specifying a filter of `customer==\"customers/my_customer\"` will return the profiles for the customer that the caller (authenticated user) belongs to.",
                             "location": "query",
                             "type": "string"
                         },
@@ -1881,7 +1929,7 @@
                     "parameterOrder": [],
                     "parameters": {
                         "filter": {
-                            "description": "A CEL expression to filter the results. The only currently-supported filter is filtering by customer. For example: `customer==customers/C0123abc`. Omitting the filter or specifying a filter of `customer==customers/my_customer` will return the assignments for the customer that the caller (authenticated user) belongs to.",
+                            "description": "A CEL expression to filter the results. The only supported filter is filtering by customer. For example: `customer==customers/C0123abc`. Omitting the filter or specifying a filter of `customer==customers/my_customer` will return the assignments for the customer that the caller (authenticated user) belongs to.",
                             "location": "query",
                             "type": "string"
                         },
@@ -1942,7 +1990,7 @@
             }
         }
     },
-    "revision": "20230117",
+    "revision": "20240227",
     "rootUrl": "https://cloudidentity.googleapis.com/",
     "schemas": {
         "AddIdpCredentialOperationMetadata": {
@@ -2050,7 +2098,7 @@
             "id": "DynamicGroupMetadata",
             "properties": {
                 "queries": {
-                    "description": "Memberships will be the union of all queries. Only one entry with USER resource is currently supported. Customers can create up to 100 dynamic groups.",
+                    "description": "Memberships will be the union of all queries. Only one entry with USER resource is currently supported. Customers can create up to 500 dynamic groups.",
                     "items": {
                         "$ref": "DynamicGroupQuery"
                     },
@@ -2120,7 +2168,7 @@
             "id": "EntityKey",
             "properties": {
                 "id": {
-                    "description": "The ID of the entity. For Google-managed entities, the `id` should be the email address of an existing group or user. For external-identity-mapped entities, the `id` must be a string conforming to the Identity Source's requirements. Must be unique within a `namespace`.",
+                    "description": "The ID of the entity. For Google-managed entities, the `id` should be the email address of an existing group or user. Email addresses need to adhere to [name guidelines for users and groups](https://support.google.com/a/answer/9193374). For external-identity-mapped entities, the `id` must be a string conforming to the Identity Source's requirements. Must be unique within a `namespace`.",
                     "type": "string"
                 },
                 "namespace": {
@@ -2173,8 +2221,16 @@
             "description": "Resource representing the Android specific attributes of a Device.",
             "id": "GoogleAppsCloudidentityDevicesV1AndroidAttributes",
             "properties": {
+                "ctsProfileMatch": {
+                    "description": "Whether the device passes Android CTS compliance.",
+                    "type": "boolean"
+                },
                 "enabledUnknownSources": {
                     "description": "Whether applications from unknown sources can be installed on device.",
+                    "type": "boolean"
+                },
+                "hasPotentiallyHarmfulApps": {
+                    "description": "Whether any potentially harmful apps were detected on the device.",
                     "type": "boolean"
                 },
                 "ownerProfileAccount": {
@@ -2199,6 +2255,14 @@
                 },
                 "supportsWorkProfile": {
                     "description": "Whether device supports Android work profiles. If false, this service will not block access to corp data even if an administrator turns on the \"Enforce Work Profile\" policy.",
+                    "type": "boolean"
+                },
+                "verifiedBoot": {
+                    "description": "Whether Android verified boot status is GREEN.",
+                    "type": "boolean"
+                },
+                "verifyAppsEnabled": {
+                    "description": "Whether Google Play Protect Verify Apps is enabled.",
                     "type": "boolean"
                 }
             },
@@ -2577,6 +2641,10 @@
                     "readOnly": true,
                     "type": "string"
                 },
+                "hostname": {
+                    "description": "Host name of the device.",
+                    "type": "string"
+                },
                 "imei": {
                     "description": "Output only. IMEI number of device if GSM device; empty otherwise.",
                     "readOnly": true,
@@ -2951,6 +3019,14 @@
             "description": "A group within the Cloud Identity Groups API. A `Group` is a collection of entities, where each entity is either a user, another group, or a service account.",
             "id": "Group",
             "properties": {
+                "additionalGroupKeys": {
+                    "description": "Output only. Additional group keys associated with the Group.",
+                    "items": {
+                        "$ref": "EntityKey"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
                 "createTime": {
                     "description": "Output only. The time when the `Group` was created.",
                     "format": "google-datetime",
@@ -3363,6 +3439,27 @@
                     "readOnly": true,
                     "type": "string"
                 },
+                "deliverySetting": {
+                    "description": "Output only. Delivery setting associated with the membership.",
+                    "enum": [
+                        "DELIVERY_SETTING_UNSPECIFIED",
+                        "ALL_MAIL",
+                        "DIGEST",
+                        "DAILY",
+                        "NONE",
+                        "DISABLED"
+                    ],
+                    "enumDescriptions": [
+                        "Default. Should not be used.",
+                        "Represents each mail should be delivered",
+                        "Represents 1 email for every 25 messages.",
+                        "Represents daily summary of messages.",
+                        "Represents no delivery.",
+                        "Represents disabled state."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
+                },
                 "name": {
                     "description": "Output only. The [resource name](https://cloud.google.com/apis/design/resource_names) of the `Membership`. Shall be of the form `groups/{group}/memberships/{membership}`.",
                     "readOnly": true,
@@ -3423,6 +3520,47 @@
                 "group": {
                     "description": "Resource name of the group that the members belong to.",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "MembershipRelation": {
+            "description": "Message containing membership relation.",
+            "id": "MembershipRelation",
+            "properties": {
+                "description": {
+                    "description": "An extended description to help users determine the purpose of a `Group`.",
+                    "type": "string"
+                },
+                "displayName": {
+                    "description": "The display name of the `Group`.",
+                    "type": "string"
+                },
+                "group": {
+                    "description": "The [resource name](https://cloud.google.com/apis/design/resource_names) of the `Group`. Shall be of the form `groups/{group_id}`.",
+                    "type": "string"
+                },
+                "groupKey": {
+                    "$ref": "EntityKey",
+                    "description": "The `EntityKey` of the `Group`."
+                },
+                "labels": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "One or more label entries that apply to the Group. Currently supported labels contain a key with an empty value.",
+                    "type": "object"
+                },
+                "membership": {
+                    "description": "The [resource name](https://cloud.google.com/apis/design/resource_names) of the `Membership`. Shall be of the form `groups/{group_id}/memberships/{membership_id}`.",
+                    "type": "string"
+                },
+                "roles": {
+                    "description": "The `MembershipRole`s that apply to the `Membership`.",
+                    "items": {
+                        "$ref": "MembershipRole"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -3540,7 +3678,7 @@
                         "description": "Properties of the object. Contains field @type with type URL.",
                         "type": "any"
                     },
-                    "description": "The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.",
+                    "description": "The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.",
                     "type": "object"
                 }
             },
@@ -3608,11 +3746,11 @@
                     "type": "string"
                 },
                 "logoutRedirectUri": {
-                    "description": "The **Logout Redirect URL** (sign-out page URL) of the identity provider. When a user clicks the sign-out link on a Google page, they will be redirected to this URL. This is a pure redirect with no attached SAML `LogoutRequest` i.e. SAML single logout is currently not supported. Must use `HTTPS`.",
+                    "description": "The **Logout Redirect URL** (sign-out page URL) of the identity provider. When a user clicks the sign-out link on a Google page, they will be redirected to this URL. This is a pure redirect with no attached SAML `LogoutRequest` i.e. SAML single logout is not supported. Must use `HTTPS`.",
                     "type": "string"
                 },
                 "singleSignOnServiceUri": {
-                    "description": "Required. The `SingleSignOnService` endpoint location (sign-in page URL) of the identity provider. This is the URL where the `AuthnRequest` will be sent. Must use `HTTPS`. Currently assumed to accept the `HTTP-Redirect` binding.",
+                    "description": "Required. The `SingleSignOnService` endpoint location (sign-in page URL) of the identity provider. This is the URL where the `AuthnRequest` will be sent. Must use `HTTPS`. Assumed to accept the `HTTP-Redirect` binding.",
                     "type": "string"
                 }
             },
@@ -3623,7 +3761,7 @@
             "id": "SamlSpConfig",
             "properties": {
                 "assertionConsumerServiceUri": {
-                    "description": "Output only. The SAML **Assertion Consumer Service (ACS) URL** to be used for the IDP-initiated login. Currently assumed to accept response messages via the `HTTP-POST` binding.",
+                    "description": "Output only. The SAML **Assertion Consumer Service (ACS) URL** to be used for the IDP-initiated login. Assumed to accept response messages via the `HTTP-POST` binding.",
                     "readOnly": true,
                     "type": "string"
                 },
@@ -3641,6 +3779,24 @@
             "properties": {
                 "inboundSamlSsoProfile": {
                     "description": "Required. Name of the `InboundSamlSsoProfile` to use. Must be of the form `inboundSamlSsoProfiles/{inbound_saml_sso_profile}`. ",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SearchDirectGroupsResponse": {
+            "description": "The response message for MembershipsService.SearchDirectGroups.",
+            "id": "SearchDirectGroupsResponse",
+            "properties": {
+                "memberships": {
+                    "description": "List of direct groups satisfying the query.",
+                    "items": {
+                        "$ref": "MembershipRelation"
+                    },
+                    "type": "array"
+                },
+                "nextPageToken": {
+                    "description": "Token to retrieve the next page of results, or empty if there are no more results available for listing.",
                     "type": "string"
                 }
             },

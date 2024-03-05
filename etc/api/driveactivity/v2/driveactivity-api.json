@@ -132,7 +132,7 @@
             }
         }
     },
-    "revision": "20230122",
+    "revision": "20240302",
     "rootUrl": "https://driveactivity.googleapis.com/",
     "schemas": {
         "Action": {
@@ -625,10 +625,12 @@
                 },
                 "file": {
                     "$ref": "File",
+                    "deprecated": true,
                     "description": "This field is deprecated; please use the `driveFile` field instead."
                 },
                 "folder": {
                     "$ref": "Folder",
+                    "deprecated": true,
                     "description": "This field is deprecated; please use the `driveFolder` field instead."
                 },
                 "mimeType": {
@@ -664,10 +666,12 @@
                 },
                 "file": {
                     "$ref": "File",
+                    "deprecated": true,
                     "description": "This field is deprecated; please use the `driveFile` field instead."
                 },
                 "folder": {
                     "$ref": "Folder",
+                    "deprecated": true,
                     "description": "This field is deprecated; please use the `driveFolder` field instead."
                 },
                 "name": {
@@ -765,6 +769,7 @@
             "type": "object"
         },
         "File": {
+            "deprecated": true,
             "description": "This item is deprecated; please see `DriveFile` instead.",
             "id": "File",
             "properties": {},
@@ -794,6 +799,7 @@
             "type": "object"
         },
         "Folder": {
+            "deprecated": true,
             "description": "This item is deprecated; please see `DriveFolder` instead.",
             "id": "Folder",
             "properties": {
@@ -922,6 +928,7 @@
                 },
                 "teamDrive": {
                     "$ref": "TeamDriveReference",
+                    "deprecated": true,
                     "description": "This field is deprecated; please use the `drive` field instead."
                 },
                 "user": {
@@ -1127,14 +1134,16 @@
                         "SHARING_OUTSIDE_DOMAIN",
                         "DIRECT_SHARING",
                         "ITEM_DUPLICATION",
-                        "DRIVE_FILE_STREAM"
+                        "DRIVE_FILE_STREAM",
+                        "FILE_ORGANIZER_CAN_SHARE_FOLDERS"
                     ],
                     "enumDescriptions": [
                         "The feature which changed restriction settings was not available.",
                         "When restricted, this prevents items from being shared outside the domain.",
                         "When restricted, this prevents direct sharing of individual items.",
                         "When restricted, this prevents actions like copy, download, and print that might result in uncontrolled duplicates of items.",
-                        "When restricted, this prevents use of Drive File Stream."
+                        "When restricted, this prevents use of Drive File Stream.",
+                        "When restricted, this limits sharing of folders to managers only."
                     ],
                     "type": "string"
                 },
@@ -1281,6 +1290,7 @@
                 },
                 "teamDrive": {
                     "$ref": "TeamDrive",
+                    "deprecated": true,
                     "description": "This field is deprecated; please use the `drive` field instead."
                 }
             },
@@ -1300,12 +1310,14 @@
                 },
                 "teamDrive": {
                     "$ref": "TeamDriveReference",
+                    "deprecated": true,
                     "description": "This field is deprecated; please use the `drive` field instead."
                 }
             },
             "type": "object"
         },
         "TeamDrive": {
+            "deprecated": true,
             "description": "This item is deprecated; please see `Drive` instead.",
             "id": "TeamDrive",
             "properties": {
@@ -1325,6 +1337,7 @@
             "type": "object"
         },
         "TeamDriveReference": {
+            "deprecated": true,
             "description": "This item is deprecated; please see `DriveReference` instead.",
             "id": "TeamDriveReference",
             "properties": {

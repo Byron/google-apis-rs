@@ -216,7 +216,7 @@
                                         "reports": {
                                             "methods": {
                                                 "get": {
-                                                    "description": "Get the OS policy asssignment report for the specified Compute Engine VM instance.",
+                                                    "description": "Get the OS policy assignment report for the specified Compute Engine VM instance.",
                                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/instances/{instancesId}/osPolicyAssignments/{osPolicyAssignmentsId}/report",
                                                     "httpMethod": "GET",
                                                     "id": "osconfig.projects.locations.instances.osPolicyAssignments.reports.get",
@@ -241,7 +241,7 @@
                                                     ]
                                                 },
                                                 "list": {
-                                                    "description": "List OS policy asssignment reports for all Compute Engine VM instances in the specified zone.",
+                                                    "description": "List OS policy assignment reports for all Compute Engine VM instances in the specified zone.",
                                                     "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/instances/{instancesId}/osPolicyAssignments/{osPolicyAssignmentsId}/reports",
                                                     "httpMethod": "GET",
                                                     "id": "osconfig.projects.locations.instances.osPolicyAssignments.reports.list",
@@ -1000,7 +1000,7 @@
             }
         }
     },
-    "revision": "20230121",
+    "revision": "20240304",
     "rootUrl": "https://osconfig.googleapis.com/",
     "schemas": {
         "AptSettings": {
@@ -2837,7 +2837,7 @@
                         "description": "Properties of the object. Contains field @type with type URL.",
                         "type": "any"
                     },
-                    "description": "The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.",
+                    "description": "The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.",
                     "type": "object"
                 }
             },
@@ -3025,7 +3025,7 @@
             "type": "object"
         },
         "PatchJob": {
-            "description": "A high level representation of a patch job that is either in progress or has completed. Instance details are not included in the job. To paginate through instance details, use ListPatchJobInstanceDetails. For more information about patch jobs, see [Creating patch jobs](https://cloud.google.com/compute/docs/os-patch-management/create-patch-job).",
+            "description": "A high level representation of a patch job that is either in progress or has completed. Instance details are not included in the job. To paginate through instance details, use `ListPatchJobInstanceDetails`. For more information about patch jobs, see [Creating patch jobs](https://cloud.google.com/compute/docs/os-patch-management/create-patch-job).",
             "id": "PatchJob",
             "properties": {
                 "createTime": {
@@ -3460,6 +3460,7 @@
             "id": "VulnerabilityReportVulnerability",
             "properties": {
                 "availableInventoryItemIds": {
+                    "deprecated": true,
                     "description": "Corresponds to the `AVAILABLE_PACKAGE` inventory item on the VM. If the vulnerability report was not updated after the VM inventory update, these values might not display in VM inventory. If there is no available fix, the field is empty. The `inventory_item` value specifies the latest `SoftwarePackage` available to the VM that fixes the vulnerability.",
                     "items": {
                         "type": "string"
@@ -3476,6 +3477,7 @@
                     "description": "Contains metadata as per the upstream feed of the operating system and NVD."
                 },
                 "installedInventoryItemIds": {
+                    "deprecated": true,
                     "description": "Corresponds to the `INSTALLED_PACKAGE` inventory item on the VM. This field displays the inventory items affected by this vulnerability. If the vulnerability report was not updated after the VM inventory update, these values might not display in VM inventory. For some distros, this field may be empty.",
                     "items": {
                         "type": "string"
@@ -3599,7 +3601,7 @@
                     "type": "string"
                 },
                 "dayOffset": {
-                    "description": "Optional. Represents the number of days before or after the given week day of month that the patch deployment is scheduled for. For example if `week_ordinal` and `day_of_week` values point to the second day of the month and this `day_offset` value is set to `3`, the patch deployment takes place three days after the second Tuesday of the month. If this value is negative, for example -5, the patches are deployed five days before before the second Tuesday of the month. Allowed values are in range [-30, 30].",
+                    "description": "Optional. Represents the number of days before or after the given week day of month that the patch deployment is scheduled for. For example if `week_ordinal` and `day_of_week` values point to the second Tuesday of the month and the `day_offset` value is set to `3`, patch deployment takes place three days after the second Tuesday of the month. If this value is negative, for example -5, patches are deployed five days before the second Tuesday of the month. Allowed values are in range [-30, 30].",
                     "format": "int32",
                     "type": "integer"
                 },

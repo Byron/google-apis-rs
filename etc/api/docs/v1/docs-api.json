@@ -216,7 +216,7 @@
             }
         }
     },
-    "revision": "20230119",
+    "revision": "20240229",
     "rootUrl": "https://docs.googleapis.com/",
     "schemas": {
         "AutoText": {
@@ -911,6 +911,10 @@
                     "description": "The ID of the header used only for the first page. If not set then a unique header for the first page does not exist. The value of use_first_page_header_footer determines whether to use the default_header_id or this value for the header on the first page. If not set, there's no first page header. This property is read-only.",
                     "type": "string"
                 },
+                "flipPageOrientation": {
+                    "description": "Optional. Indicates whether to flip the dimensions of the page_size, which allows changing the page orientation between portrait and landscape.",
+                    "type": "boolean"
+                },
                 "marginBottom": {
                     "$ref": "Dimension",
                     "description": "The bottom page margin. Updating the bottom page margin on the document style clears the bottom page margin on all section styles."
@@ -989,6 +993,10 @@
                 },
                 "firstPageHeaderIdSuggested": {
                     "description": "Indicates if there was a suggested change to first_page_header_id.",
+                    "type": "boolean"
+                },
+                "flipPageOrientationSuggested": {
+                    "description": "Optional. Indicates if there was a suggested change to flip_page_orientation.",
                     "type": "boolean"
                 },
                 "marginBottomSuggested": {
@@ -1558,7 +1566,7 @@
                     "description": "The size that the image should appear as in the document. This property is optional and the final size of the image in the document is determined by the following rules: * If neither width nor height is specified, then a default size of the image is calculated based on its resolution. * If one dimension is specified then the other dimension is calculated to preserve the aspect ratio of the image. * If both width and height are specified, the image is scaled to fit within the provided dimensions while maintaining its aspect ratio."
                 },
                 "uri": {
-                    "description": "The image URI. The image is fetched once at insertion time and a copy is stored for display inside the document. Images must be less than 50MB in size, cannot exceed 25 megapixels, and must be in one of PNG, JPEG, or GIF format. The provided URI can be at most 2 kB in length. The URI itself is saved with the image, and exposed via the ImageProperties.content_uri field.",
+                    "description": "The image URI. The image is fetched once at insertion time and a copy is stored for display inside the document. Images must be less than 50MB in size, cannot exceed 25 megapixels, and must be in one of PNG, JPEG, or GIF format. The provided URI must be publicly accessible and at most 2 kB in length. The URI itself is saved with the image, and exposed via the ImageProperties.content_uri field.",
                     "type": "string"
                 }
             },
@@ -3191,6 +3199,10 @@
                 "firstPageHeaderId": {
                     "description": "The ID of the header used only for the first page of the section. If use_first_page_header_footer is true, this value is used for the header on the first page of the section. If it's false, the header on the first page of the section uses the default_header_id. If unset, the value inherits from the previous SectionBreak's SectionStyle. If the value is unset in the first SectionBreak, it inherits from DocumentStyle's first_page_header_id. This property is read-only.",
                     "type": "string"
+                },
+                "flipPageOrientation": {
+                    "description": "Optional. Indicates whether to flip the dimensions of DocumentStyle's page_size for this section, which allows changing the page orientation between portrait and landscape. If unset, the value inherits from DocumentStyle's flip_page_orientation. When updating this property, setting a concrete value is required. Unsetting this property results in a 400 bad request error.",
+                    "type": "boolean"
                 },
                 "marginBottom": {
                     "$ref": "Dimension",

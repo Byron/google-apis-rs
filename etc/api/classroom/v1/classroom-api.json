@@ -895,7 +895,7 @@
                                     "type": "string"
                                 },
                                 "updateMask": {
-                                    "description": "Mask that identifies which fields on the course work to update. This field is required to do an update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the CourseWork object. If a field that does not support empty values is included in the update mask and not set in the CourseWork object, an `INVALID_ARGUMENT` error is returned. The following fields may be specified by teachers: * `title` * `description` * `state` * `due_date` * `due_time` * `max_points` * `scheduled_time` * `submission_modification_mode` * `topic_id`",
+                                    "description": "Mask that identifies which fields on the course work to update. This field is required to do an update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the `CourseWork` object. If a field that does not support empty values is included in the update mask and not set in the `CourseWork` object, an `INVALID_ARGUMENT` error is returned. The following fields may be specified by teachers: * `title` * `description` * `state` * `due_date` * `due_time` * `max_points` * `scheduled_time` * `submission_modification_mode` * `topic_id`",
                                     "format": "google-fieldmask",
                                     "location": "query",
                                     "type": "string"
@@ -1383,7 +1383,7 @@
                                     "enumDescriptions": [
                                         "No state specified. This is never returned.",
                                         "Status for course work material that has been published. This is the default state.",
-                                        "Status for an course work material that is not yet published. Course work material in this state is visible only to course teachers and domain administrators.",
+                                        "Status for a course work material that is not yet published. Course work material in this state is visible only to course teachers and domain administrators.",
                                         "Status for course work material that was published but is now deleted. Course work material in this state is visible only to course teachers and domain administrators. Course work material in this state is deleted after some time."
                                     ],
                                     "location": "query",
@@ -2400,7 +2400,7 @@
             }
         }
     },
-    "revision": "20230119",
+    "revision": "20240227",
     "rootUrl": "https://classroom.googleapis.com/",
     "schemas": {
         "Announcement": {
@@ -2554,7 +2554,7 @@
                     "type": "string"
                 },
                 "calendarId": {
-                    "description": "The Calendar ID for a calendar that all course members can see, to which Classroom adds events for course work and announcements in the course. Read-only.",
+                    "description": "The Calendar ID for a calendar that all course members can see, to which Classroom adds events for course work and announcements in the course. The Calendar for a course is created asynchronously when the course is set to `CourseState.ACTIVE` for the first time (at creation time or when it is updated to `ACTIVE` through the UI or the API). The Calendar ID will not be populated until the creation process is completed. Read-only.",
                     "type": "string"
                 },
                 "courseGroupEmail": {
@@ -2562,6 +2562,7 @@
                     "type": "string"
                 },
                 "courseMaterialSets": {
+                    "deprecated": true,
                     "description": "Sets of materials that appear on the \"about\" page of this course. Read-only.",
                     "items": {
                         "$ref": "CourseMaterialSet"
@@ -2943,7 +2944,7 @@
                     "enumDescriptions": [
                         "No state specified. This is never returned.",
                         "Status for course work material that has been published. This is the default state.",
-                        "Status for an course work material that is not yet published. Course work material in this state is visible only to course teachers and domain administrators.",
+                        "Status for a course work material that is not yet published. Course work material in this state is visible only to course teachers and domain administrators.",
                         "Status for course work material that was published but is now deleted. Course work material in this state is visible only to course teachers and domain administrators. Course work material in this state is deleted after some time."
                     ],
                     "type": "string"
@@ -3074,7 +3075,7 @@
                     "type": "string"
                 },
                 "responseUrl": {
-                    "description": "URL of the form responses document. Only set if respsonses have been recorded and only when the requesting user is an editor of the form. Read-only.",
+                    "description": "URL of the form responses document. Only set if responses have been recorded and only when the requesting user is an editor of the form. Read-only.",
                     "type": "string"
                 },
                 "thumbnailUrl": {
@@ -3849,7 +3850,7 @@
             "type": "object"
         },
         "StudentSubmission": {
-            "description": "Student submission for course work. StudentSubmission items are generated when a CourseWork item is created. StudentSubmissions that have never been accessed (i.e. with `state` = NEW) may not have a creation time or update time.",
+            "description": "Student submission for course work. `StudentSubmission` items are generated when a `CourseWork` item is created. Student submissions that have never been accessed (i.e. with `state` = NEW) may not have a creation time or update time.",
             "id": "StudentSubmission",
             "properties": {
                 "alternateLink": {

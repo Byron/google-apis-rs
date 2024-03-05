@@ -21,6 +21,13 @@
     "description": "Cloud Spanner is a managed, mission-critical, globally consistent and scalable relational database service.",
     "discoveryVersion": "v1",
     "documentationLink": "https://cloud.google.com/spanner/",
+    "endpoints": [
+        {
+            "description": "Regional Endpoint",
+            "endpointUrl": "https://spanner.me-central2.rep.googleapis.com/",
+            "location": "me-central2"
+        }
+    ],
     "fullyEncodeReservedExpansion": true,
     "icons": {
         "x16": "http://www.google.com/images/icons/product/search-16.gif",
@@ -401,7 +408,7 @@
                                     ]
                                 },
                                 "list": {
-                                    "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `\"/v1/{name=users/*}/operations\"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.",
+                                    "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.",
                                     "flatPath": "v1/projects/{projectsId}/instanceConfigs/{instanceConfigsId}/operations",
                                     "httpMethod": "GET",
                                     "id": "spanner.projects.instanceConfigs.operations.list",
@@ -441,6 +448,134 @@
                                         "https://www.googleapis.com/auth/cloud-platform",
                                         "https://www.googleapis.com/auth/spanner.admin"
                                     ]
+                                }
+                            }
+                        },
+                        "ssdCaches": {
+                            "resources": {
+                                "operations": {
+                                    "methods": {
+                                        "cancel": {
+                                            "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                            "flatPath": "v1/projects/{projectsId}/instanceConfigs/{instanceConfigsId}/ssdCaches/{ssdCachesId}/operations/{operationsId}:cancel",
+                                            "httpMethod": "POST",
+                                            "id": "spanner.projects.instanceConfigs.ssdCaches.operations.cancel",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "The name of the operation resource to be cancelled.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/instanceConfigs/[^/]+/ssdCaches/[^/]+/operations/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}:cancel",
+                                            "response": {
+                                                "$ref": "Empty"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform",
+                                                "https://www.googleapis.com/auth/spanner.admin"
+                                            ]
+                                        },
+                                        "delete": {
+                                            "description": "Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`.",
+                                            "flatPath": "v1/projects/{projectsId}/instanceConfigs/{instanceConfigsId}/ssdCaches/{ssdCachesId}/operations/{operationsId}",
+                                            "httpMethod": "DELETE",
+                                            "id": "spanner.projects.instanceConfigs.ssdCaches.operations.delete",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "The name of the operation resource to be deleted.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/instanceConfigs/[^/]+/ssdCaches/[^/]+/operations/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}",
+                                            "response": {
+                                                "$ref": "Empty"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform",
+                                                "https://www.googleapis.com/auth/spanner.admin"
+                                            ]
+                                        },
+                                        "get": {
+                                            "description": "Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.",
+                                            "flatPath": "v1/projects/{projectsId}/instanceConfigs/{instanceConfigsId}/ssdCaches/{ssdCachesId}/operations/{operationsId}",
+                                            "httpMethod": "GET",
+                                            "id": "spanner.projects.instanceConfigs.ssdCaches.operations.get",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "The name of the operation resource.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/instanceConfigs/[^/]+/ssdCaches/[^/]+/operations/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}",
+                                            "response": {
+                                                "$ref": "Operation"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform",
+                                                "https://www.googleapis.com/auth/spanner.admin"
+                                            ]
+                                        },
+                                        "list": {
+                                            "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.",
+                                            "flatPath": "v1/projects/{projectsId}/instanceConfigs/{instanceConfigsId}/ssdCaches/{ssdCachesId}/operations",
+                                            "httpMethod": "GET",
+                                            "id": "spanner.projects.instanceConfigs.ssdCaches.operations.list",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "filter": {
+                                                    "description": "The standard list filter.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "description": "The name of the operation's parent resource.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/instanceConfigs/[^/]+/ssdCaches/[^/]+/operations$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                },
+                                                "pageSize": {
+                                                    "description": "The standard list page size.",
+                                                    "format": "int32",
+                                                    "location": "query",
+                                                    "type": "integer"
+                                                },
+                                                "pageToken": {
+                                                    "description": "The standard list page token.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}",
+                                            "response": {
+                                                "$ref": "ListOperationsResponse"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform",
+                                                "https://www.googleapis.com/auth/spanner.admin"
+                                            ]
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1133,7 +1268,7 @@
                                             ]
                                         },
                                         "list": {
-                                            "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `\"/v1/{name=users/*}/operations\"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.",
+                                            "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.",
                                             "flatPath": "v1/projects/{projectsId}/instances/{instancesId}/backups/{backupsId}/operations",
                                             "httpMethod": "GET",
                                             "id": "spanner.projects.instances.backups.operations.list",
@@ -1452,6 +1587,41 @@
                                         "https://www.googleapis.com/auth/spanner.admin"
                                     ]
                                 },
+                                "patch": {
+                                    "description": "Updates a Cloud Spanner database. The returned long-running operation can be used to track the progress of updating the database. If the named database does not exist, returns `NOT_FOUND`. While the operation is pending: * The database's reconciling field is set to true. * Cancelling the operation is best-effort. If the cancellation succeeds, the operation metadata's cancel_time is set, the updates are reverted, and the operation terminates with a `CANCELLED` status. * New UpdateDatabase requests will return a `FAILED_PRECONDITION` error until the pending operation is done (returns successfully or with error). * Reading the database via the API continues to give the pre-request values. Upon completion of the returned operation: * The new values are in effect and readable via the API. * The database's reconciling field becomes false. The returned long-running operation will have a name of the format `projects//instances//databases//operations/` and can be used to track the database modification. The metadata field type is UpdateDatabaseMetadata. The response field type is Database, if successful.",
+                                    "flatPath": "v1/projects/{projectsId}/instances/{instancesId}/databases/{databasesId}",
+                                    "httpMethod": "PATCH",
+                                    "id": "spanner.projects.instances.databases.patch",
+                                    "parameterOrder": [
+                                        "name"
+                                    ],
+                                    "parameters": {
+                                        "name": {
+                                            "description": "Required. The name of the database. Values are of the form `projects//instances//databases/`, where `` is as specified in the `CREATE DATABASE` statement. This name can be passed to other API methods to identify the database.",
+                                            "location": "path",
+                                            "pattern": "^projects/[^/]+/instances/[^/]+/databases/[^/]+$",
+                                            "required": true,
+                                            "type": "string"
+                                        },
+                                        "updateMask": {
+                                            "description": "Required. The list of fields to update. Currently, only `enable_drop_protection` field can be updated.",
+                                            "format": "google-fieldmask",
+                                            "location": "query",
+                                            "type": "string"
+                                        }
+                                    },
+                                    "path": "v1/{+name}",
+                                    "request": {
+                                        "$ref": "Database"
+                                    },
+                                    "response": {
+                                        "$ref": "Operation"
+                                    },
+                                    "scopes": [
+                                        "https://www.googleapis.com/auth/cloud-platform",
+                                        "https://www.googleapis.com/auth/spanner.admin"
+                                    ]
+                                },
                                 "restore": {
                                     "description": "Create a new database by restoring from a completed backup. The new database must be in the same project and in an instance with the same instance configuration as the instance containing the backup. The returned database long-running operation has a name of the format `projects//instances//databases//operations/`, and can be used to track the progress of the operation, and to cancel it. The metadata field type is RestoreDatabaseMetadata. The response type is Database, if successful. Cancelling the returned operation will stop the restore and delete the database. There can be only one database being restored into an instance at a time. Once the restore operation completes, a new restore operation can be initiated, without waiting for the optimize operation associated with the first restore to complete.",
                                     "flatPath": "v1/projects/{projectsId}/instances/{instancesId}/databases:restore",
@@ -1721,7 +1891,7 @@
                                             ]
                                         },
                                         "list": {
-                                            "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `\"/v1/{name=users/*}/operations\"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.",
+                                            "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.",
                                             "flatPath": "v1/projects/{projectsId}/instances/{instancesId}/databases/{databasesId}/operations",
                                             "httpMethod": "GET",
                                             "id": "spanner.projects.instances.databases.operations.list",
@@ -1789,6 +1959,35 @@
                                             },
                                             "response": {
                                                 "$ref": "BatchCreateSessionsResponse"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform",
+                                                "https://www.googleapis.com/auth/spanner.data"
+                                            ]
+                                        },
+                                        "batchWrite": {
+                                            "description": "Batches the supplied mutation groups in a collection of efficient transactions. All mutations in a group are committed atomically. However, mutations across groups can be committed non-atomically in an unspecified order and thus, they must be independent of each other. Partial failure is possible, i.e., some groups may have been committed successfully, while some may have failed. The results of individual batches are streamed into the response as the batches are applied. BatchWrite requests are not replay protected, meaning that each mutation group may be applied more than once. Replays of non-idempotent mutations may have undesirable effects. For example, replays of an insert mutation may produce an already exists error or if you use generated or commit timestamp-based keys, it may result in additional rows being added to the mutation's table. We recommend structuring your mutation groups to be idempotent to avoid this issue.",
+                                            "flatPath": "v1/projects/{projectsId}/instances/{instancesId}/databases/{databasesId}/sessions/{sessionsId}:batchWrite",
+                                            "httpMethod": "POST",
+                                            "id": "spanner.projects.instances.databases.sessions.batchWrite",
+                                            "parameterOrder": [
+                                                "session"
+                                            ],
+                                            "parameters": {
+                                                "session": {
+                                                    "description": "Required. The session in which the batch request is to be run.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/instances/[^/]+/databases/[^/]+/sessions/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+session}:batchWrite",
+                                            "request": {
+                                                "$ref": "BatchWriteRequest"
+                                            },
+                                            "response": {
+                                                "$ref": "BatchWriteResponse"
                                             },
                                             "scopes": [
                                                 "https://www.googleapis.com/auth/cloud-platform",
@@ -2212,6 +2411,134 @@
                                 }
                             }
                         },
+                        "instancePartitions": {
+                            "resources": {
+                                "operations": {
+                                    "methods": {
+                                        "cancel": {
+                                            "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+                                            "flatPath": "v1/projects/{projectsId}/instances/{instancesId}/instancePartitions/{instancePartitionsId}/operations/{operationsId}:cancel",
+                                            "httpMethod": "POST",
+                                            "id": "spanner.projects.instances.instancePartitions.operations.cancel",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "The name of the operation resource to be cancelled.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/instances/[^/]+/instancePartitions/[^/]+/operations/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}:cancel",
+                                            "response": {
+                                                "$ref": "Empty"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform",
+                                                "https://www.googleapis.com/auth/spanner.admin"
+                                            ]
+                                        },
+                                        "delete": {
+                                            "description": "Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`.",
+                                            "flatPath": "v1/projects/{projectsId}/instances/{instancesId}/instancePartitions/{instancePartitionsId}/operations/{operationsId}",
+                                            "httpMethod": "DELETE",
+                                            "id": "spanner.projects.instances.instancePartitions.operations.delete",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "The name of the operation resource to be deleted.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/instances/[^/]+/instancePartitions/[^/]+/operations/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}",
+                                            "response": {
+                                                "$ref": "Empty"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform",
+                                                "https://www.googleapis.com/auth/spanner.admin"
+                                            ]
+                                        },
+                                        "get": {
+                                            "description": "Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.",
+                                            "flatPath": "v1/projects/{projectsId}/instances/{instancesId}/instancePartitions/{instancePartitionsId}/operations/{operationsId}",
+                                            "httpMethod": "GET",
+                                            "id": "spanner.projects.instances.instancePartitions.operations.get",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "name": {
+                                                    "description": "The name of the operation resource.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/instances/[^/]+/instancePartitions/[^/]+/operations/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}",
+                                            "response": {
+                                                "$ref": "Operation"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform",
+                                                "https://www.googleapis.com/auth/spanner.admin"
+                                            ]
+                                        },
+                                        "list": {
+                                            "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.",
+                                            "flatPath": "v1/projects/{projectsId}/instances/{instancesId}/instancePartitions/{instancePartitionsId}/operations",
+                                            "httpMethod": "GET",
+                                            "id": "spanner.projects.instances.instancePartitions.operations.list",
+                                            "parameterOrder": [
+                                                "name"
+                                            ],
+                                            "parameters": {
+                                                "filter": {
+                                                    "description": "The standard list filter.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "name": {
+                                                    "description": "The name of the operation's parent resource.",
+                                                    "location": "path",
+                                                    "pattern": "^projects/[^/]+/instances/[^/]+/instancePartitions/[^/]+/operations$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                },
+                                                "pageSize": {
+                                                    "description": "The standard list page size.",
+                                                    "format": "int32",
+                                                    "location": "query",
+                                                    "type": "integer"
+                                                },
+                                                "pageToken": {
+                                                    "description": "The standard list page token.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "v1/{+name}",
+                                            "response": {
+                                                "$ref": "ListOperationsResponse"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/cloud-platform",
+                                                "https://www.googleapis.com/auth/spanner.admin"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        },
                         "operations": {
                             "methods": {
                                 "cancel": {
@@ -2293,7 +2620,7 @@
                                     ]
                                 },
                                 "list": {
-                                    "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `\"/v1/{name=users/*}/operations\"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.",
+                                    "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.",
                                     "flatPath": "v1/projects/{projectsId}/instances/{instancesId}/operations",
                                     "httpMethod": "GET",
                                     "id": "spanner.projects.instances.operations.list",
@@ -2402,9 +2729,68 @@
             }
         }
     },
-    "revision": "20230119",
+    "revision": "20240228",
     "rootUrl": "https://spanner.googleapis.com/",
     "schemas": {
+        "AutoscalingConfig": {
+            "description": "Autoscaling config for an instance.",
+            "id": "AutoscalingConfig",
+            "properties": {
+                "autoscalingLimits": {
+                    "$ref": "AutoscalingLimits",
+                    "description": "Required. Autoscaling limits for an instance."
+                },
+                "autoscalingTargets": {
+                    "$ref": "AutoscalingTargets",
+                    "description": "Required. The autoscaling targets for an instance."
+                }
+            },
+            "type": "object"
+        },
+        "AutoscalingLimits": {
+            "description": "The autoscaling limits for the instance. Users can define the minimum and maximum compute capacity allocated to the instance, and the autoscaler will only scale within that range. Users can either use nodes or processing units to specify the limits, but should use the same unit to set both the min_limit and max_limit.",
+            "id": "AutoscalingLimits",
+            "properties": {
+                "maxNodes": {
+                    "description": "Maximum number of nodes allocated to the instance. If set, this number should be greater than or equal to min_nodes.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "maxProcessingUnits": {
+                    "description": "Maximum number of processing units allocated to the instance. If set, this number should be multiples of 1000 and be greater than or equal to min_processing_units.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "minNodes": {
+                    "description": "Minimum number of nodes allocated to the instance. If set, this number should be greater than or equal to 1.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "minProcessingUnits": {
+                    "description": "Minimum number of processing units allocated to the instance. If set, this number should be multiples of 1000.",
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "AutoscalingTargets": {
+            "description": "The autoscaling targets for an instance.",
+            "id": "AutoscalingTargets",
+            "properties": {
+                "highPriorityCpuUtilizationPercent": {
+                    "description": "Required. The target high priority cpu utilization percentage that the autoscaler should be trying to achieve for the instance. This number is on a scale from 0 (no utilization) to 100 (full utilization). The valid range is [10, 90] inclusive.",
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "storageUtilizationPercent": {
+                    "description": "Required. The target storage utilization percentage that the autoscaler should be trying to achieve for the instance. This number is on a scale from 0 (no utilization) to 100 (full utilization). The valid range is [10, 99] inclusive.",
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
         "Backup": {
             "description": "A backup of a Cloud Spanner database.",
             "id": "Backup",
@@ -2428,7 +2814,7 @@
                     ],
                     "enumDescriptions": [
                         "Default value. This value will create a database with the GOOGLE_STANDARD_SQL dialect.",
-                        "Google standard SQL.",
+                        "GoogleSQL supported SQL.",
                         "PostgreSQL supported SQL."
                     ],
                     "readOnly": true,
@@ -2554,6 +2940,48 @@
             },
             "type": "object"
         },
+        "BatchWriteRequest": {
+            "description": "The request for BatchWrite.",
+            "id": "BatchWriteRequest",
+            "properties": {
+                "mutationGroups": {
+                    "description": "Required. The groups of mutations to be applied.",
+                    "items": {
+                        "$ref": "MutationGroup"
+                    },
+                    "type": "array"
+                },
+                "requestOptions": {
+                    "$ref": "RequestOptions",
+                    "description": "Common options for this request."
+                }
+            },
+            "type": "object"
+        },
+        "BatchWriteResponse": {
+            "description": "The result of applying a batch of mutations.",
+            "id": "BatchWriteResponse",
+            "properties": {
+                "commitTimestamp": {
+                    "description": "The commit timestamp of the transaction that applied this batch. Present if `status` is `OK`, absent otherwise.",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "indexes": {
+                    "description": "The mutation groups applied in this batch. The values index into the `mutation_groups` field in the corresponding `BatchWriteRequest`.",
+                    "items": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "type": "array"
+                },
+                "status": {
+                    "$ref": "Status",
+                    "description": "An `OK` status indicates success. Any other status indicates a failure."
+                }
+            },
+            "type": "object"
+        },
         "BeginTransactionRequest": {
             "description": "The request for BeginTransaction.",
             "id": "BeginTransactionRequest",
@@ -2578,14 +3006,14 @@
                     "description": "The condition that is associated with this binding. If the condition evaluates to `true`, then this binding applies to the current request. If the condition evaluates to `false`, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the principals in this binding. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies)."
                 },
                 "members": {
-                    "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. ",
+                    "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workforce identity pool. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/group/{group_id}`: All workforce identities in a group. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All workforce identities with a specific attribute value. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/*`: All identities in a workforce identity pool. * `principal://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workload identity pool. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/group/{group_id}`: A workload identity pool group. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All identities in a workload identity pool with a certain attribute. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/*`: All identities in a workload identity pool. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `deleted:principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: Deleted single identity in a workforce identity pool. For example, `deleted:principal://iam.googleapis.com/locations/global/workforcePools/my-pool-id/subject/my-subject-attribute-value`.",
                     "items": {
                         "type": "string"
                     },
                     "type": "array"
                 },
                 "role": {
-                    "description": "Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`.",
+                    "description": "Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`. For an overview of the IAM roles and permissions, see the [IAM documentation](https://cloud.google.com/iam/docs/roles-overview). For a list of the available pre-defined roles, see [here](https://cloud.google.com/iam/docs/understanding-roles).",
                     "type": "string"
                 }
             },
@@ -2615,6 +3043,11 @@
             "description": "The request for Commit.",
             "id": "CommitRequest",
             "properties": {
+                "maxCommitDelay": {
+                    "description": "Optional. The amount of latency this request is willing to incur in order to improve throughput. If this field is not set, Spanner assumes requests are relatively latency sensitive and automatically determines an appropriate delay time. You can specify a batching delay value between 0 and 500 ms.",
+                    "format": "google-duration",
+                    "type": "string"
+                },
                 "mutations": {
                     "description": "The mutations to be executed when this transaction commits. All mutations are applied atomically, in the order they appear in this list.",
                     "items": {
@@ -2835,7 +3268,7 @@
                     ],
                     "enumDescriptions": [
                         "Default value. This value will create a database with the GOOGLE_STANDARD_SQL dialect.",
-                        "Google standard SQL.",
+                        "GoogleSQL supported SQL.",
                         "PostgreSQL supported SQL."
                     ],
                     "type": "string"
@@ -2852,7 +3285,7 @@
                     "type": "array"
                 },
                 "protoDescriptors": {
-                    "description": "Optional. Proto descriptors used by CREATE/ALTER PROTO BUNDLE statements in 'extra_statements' above. Contains a protobuf-serialized [google.protobuf.FileDescriptorSet](https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/descriptor.proto). To generate it, [install](https://grpc.io/docs/protoc-installation/) and run `protoc` with --include_imports and --descriptor_set_out. For example, to generate for moon/shot/app.proto, run \"\"\" $protoc --proto_path=/app_path --proto_path=/lib_path \\ --include_imports \\ --descriptor_set_out=descriptors.data \\ moon/shot/app.proto \"\"\" For more details, see protobuffer [self description](https://developers.google.com/protocol-buffers/docs/techniques#self-description).",
+                    "description": "Optional. Proto descriptors used by CREATE/ALTER PROTO BUNDLE statements in 'extra_statements' above. Contains a protobuf-serialized [google.protobuf.FileDescriptorSet](https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/descriptor.proto). To generate it, [install](https://grpc.io/docs/protoc-installation/) and run `protoc` with --include_imports and --descriptor_set_out. For example, to generate for moon/shot/app.proto, run ``` $protoc --proto_path=/app_path --proto_path=/lib_path \\ --include_imports \\ --descriptor_set_out=descriptors.data \\ moon/shot/app.proto ``` For more details, see protobuffer [self description](https://developers.google.com/protocol-buffers/docs/techniques#self-description).",
                     "format": "byte",
                     "type": "string"
                 }
@@ -2912,6 +3345,20 @@
                     "format": "google-datetime",
                     "type": "string"
                 },
+                "expectedFulfillmentPeriod": {
+                    "description": "The expected fulfillment period of this create operation.",
+                    "enum": [
+                        "FULFILLMENT_PERIOD_UNSPECIFIED",
+                        "FULFILLMENT_PERIOD_NORMAL",
+                        "FULFILLMENT_PERIOD_EXTENDED"
+                    ],
+                    "enumDescriptions": [
+                        "Not specified.",
+                        "Normal fulfillment period. The operation is expected to complete within minutes.",
+                        "Extended fulfillment period. It can take up to an hour for the operation to complete."
+                    ],
+                    "type": "string"
+                },
                 "instance": {
                     "$ref": "Instance",
                     "description": "The instance being created."
@@ -2969,7 +3416,7 @@
                     ],
                     "enumDescriptions": [
                         "Default value. This value will create a database with the GOOGLE_STANDARD_SQL dialect.",
-                        "Google standard SQL.",
+                        "GoogleSQL supported SQL.",
                         "PostgreSQL supported SQL."
                     ],
                     "readOnly": true,
@@ -2985,6 +3432,10 @@
                     "format": "google-datetime",
                     "readOnly": true,
                     "type": "string"
+                },
+                "enableDropProtection": {
+                    "description": "Whether drop protection is enabled for this database. Defaults to false, if not set. For more details, please see how to [prevent accidental database deletion](https://cloud.google.com/spanner/docs/prevent-database-deletion).",
+                    "type": "boolean"
                 },
                 "encryptionConfig": {
                     "$ref": "EncryptionConfig",
@@ -3002,6 +3453,11 @@
                 "name": {
                     "description": "Required. The name of the database. Values are of the form `projects//instances//databases/`, where `` is as specified in the `CREATE DATABASE` statement. This name can be passed to other API methods to identify the database.",
                     "type": "string"
+                },
+                "reconciling": {
+                    "description": "Output only. If true, the database is being updated. If false, there are no ongoing update operations for the database.",
+                    "readOnly": true,
+                    "type": "boolean"
                 },
                 "restoreInfo": {
                     "$ref": "RestoreInfo",
@@ -3039,6 +3495,28 @@
             "properties": {
                 "name": {
                     "description": "Required. The name of the database role. Values are of the form `projects//instances//databases//databaseRoles/` where `` is as specified in the `CREATE ROLE` DDL statement.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "DdlStatementActionInfo": {
+            "description": "Action information extracted from a DDL statement. This proto is used to display the brief info of the DDL statement for the operation UpdateDatabaseDdl.",
+            "id": "DdlStatementActionInfo",
+            "properties": {
+                "action": {
+                    "description": "The action for the DDL statement, e.g. CREATE, ALTER, DROP, GRANT, etc. This field is a non-empty string.",
+                    "type": "string"
+                },
+                "entityNames": {
+                    "description": "The entity name(s) being operated on the DDL statement. E.g. 1. For statement \"CREATE TABLE t1(...)\", `entity_names` = [\"t1\"]. 2. For statement \"GRANT ROLE r1, r2 ...\", `entity_names` = [\"r1\", \"r2\"]. 3. For statement \"ANALYZE\", `entity_names` = [].",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "entityType": {
+                    "description": "The entity type for the DDL statement, e.g. TABLE, INDEX, VIEW, etc. This field can be empty string for some DDL statement, e.g. for statement \"ANALYZE\", `entity_type` = \"\".",
                     "type": "string"
                 }
             },
@@ -3115,6 +3593,21 @@
             },
             "type": "object"
         },
+        "DirectedReadOptions": {
+            "description": "The DirectedReadOptions can be used to indicate which replicas or regions should be used for non-transactional reads or queries. DirectedReadOptions may only be specified for a read-only transaction, otherwise the API will return an `INVALID_ARGUMENT` error.",
+            "id": "DirectedReadOptions",
+            "properties": {
+                "excludeReplicas": {
+                    "$ref": "ExcludeReplicas",
+                    "description": "Exclude_replicas indicates that specified replicas should be excluded from serving requests. Spanner will not route requests to the replicas in this list."
+                },
+                "includeReplicas": {
+                    "$ref": "IncludeReplicas",
+                    "description": "Include_replicas indicates the order of replicas (as they appear in this list) to process the request. If auto_failover_disabled is set to true and all replicas are exhausted without finding a healthy replica, Spanner will wait for a replica in the list to become available, requests may fail due to `DEADLINE_EXCEEDED` errors."
+                }
+            },
+            "type": "object"
+        },
         "Empty": {
             "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
             "id": "Empty",
@@ -3160,6 +3653,20 @@
                     "description": "Output only. A Cloud KMS key version that is being used to protect the database or backup.",
                     "readOnly": true,
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ExcludeReplicas": {
+            "description": "An ExcludeReplicas contains a repeated set of ReplicaSelection that should be excluded from serving requests.",
+            "id": "ExcludeReplicas",
+            "properties": {
+                "replicaSelections": {
+                    "description": "The directed read replica selector.",
+                    "items": {
+                        "$ref": "ReplicaSelection"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -3213,6 +3720,14 @@
             "description": "The request for ExecuteSql and ExecuteStreamingSql.",
             "id": "ExecuteSqlRequest",
             "properties": {
+                "dataBoostEnabled": {
+                    "description": "If this is for a partitioned query and this field is set to `true`, the request is executed with Spanner Data Boost independent compute resources. If the field is set to `true` but the request does not set `partition_token`, the API returns an `INVALID_ARGUMENT` error.",
+                    "type": "boolean"
+                },
+                "directedReadOptions": {
+                    "$ref": "DirectedReadOptions",
+                    "description": "Directed read options for this request."
+                },
                 "paramTypes": {
                     "additionalProperties": {
                         "$ref": "Type"
@@ -3389,6 +3904,43 @@
             },
             "type": "object"
         },
+        "IncludeReplicas": {
+            "description": "An IncludeReplicas contains a repeated set of ReplicaSelection which indicates the order in which replicas should be considered.",
+            "id": "IncludeReplicas",
+            "properties": {
+                "autoFailoverDisabled": {
+                    "description": "If true, Spanner will not route requests to a replica outside the include_replicas list when all of the specified replicas are unavailable or unhealthy. Default value is `false`.",
+                    "type": "boolean"
+                },
+                "replicaSelections": {
+                    "description": "The directed read replica selector.",
+                    "items": {
+                        "$ref": "ReplicaSelection"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "IndexAdvice": {
+            "description": "Recommendation to add new indexes to run queries more efficiently.",
+            "id": "IndexAdvice",
+            "properties": {
+                "ddl": {
+                    "description": "Optional. DDL statements to add new indexes that will improve the query.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "improvementFactor": {
+                    "description": "Optional. Estimated latency improvement factor. For example if the query currently takes 500 ms to run and the estimated latency with new indexes is 100 ms this field will be 5.",
+                    "format": "double",
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
         "IndexedHotKey": {
             "description": "A message representing a (sparse) collection of hot keys for specific key buckets.",
             "id": "IndexedHotKey",
@@ -3422,6 +3974,10 @@
             "description": "An isolated set of Cloud Spanner resources on which databases can be hosted.",
             "id": "Instance",
             "properties": {
+                "autoscalingConfig": {
+                    "$ref": "AutoscalingConfig",
+                    "description": "Optional. The autoscaling configuration. Autoscaling is enabled if this field is set. When autoscaling is enabled, node_count and processing_units are treated as OUTPUT_ONLY fields and reflect the current compute capacity allocated to the instance."
+                },
                 "config": {
                     "description": "Required. The name of the instance's configuration. Values are of the form `projects//instanceConfigs/`. See also InstanceConfig and ListInstanceConfigs.",
                     "type": "string"
@@ -3473,12 +4029,12 @@
                     "type": "string"
                 },
                 "nodeCount": {
-                    "description": "The number of nodes allocated to this instance. At most one of either node_count or processing_units should be present in the message. This may be zero in API responses for instances that are not yet in state `READY`. See [the documentation](https://cloud.google.com/spanner/docs/compute-capacity) for more information about nodes and processing units.",
+                    "description": "The number of nodes allocated to this instance. At most one of either node_count or processing_units should be present in the message. Users can set the node_count field to specify the target number of nodes allocated to the instance. This may be zero in API responses for instances that are not yet in state `READY`. See [the documentation](https://cloud.google.com/spanner/docs/compute-capacity) for more information about nodes and processing units.",
                     "format": "int32",
                     "type": "integer"
                 },
                 "processingUnits": {
-                    "description": "The number of processing units allocated to this instance. At most one of processing_units or node_count should be present in the message. This may be zero in API responses for instances that are not yet in state `READY`. See [the documentation](https://cloud.google.com/spanner/docs/compute-capacity) for more information about nodes and processing units.",
+                    "description": "The number of processing units allocated to this instance. At most one of processing_units or node_count should be present in the message. Users can set the processing_units field to specify the target number of processing units allocated to the instance. This may be zero in API responses for instances that are not yet in state `READY`. See [the documentation](https://cloud.google.com/spanner/docs/compute-capacity) for more information about nodes and processing units.",
                     "format": "int32",
                     "type": "integer"
                 },
@@ -3595,7 +4151,7 @@
                     "type": "array"
                 },
                 "state": {
-                    "description": "Output only. The current instance config state.",
+                    "description": "Output only. The current instance config state. Applicable only for USER_MANAGED configs.",
                     "enum": [
                         "STATE_UNSPECIFIED",
                         "CREATING",
@@ -3606,6 +4162,12 @@
                         "The instance config is still being created.",
                         "The instance config is fully created and ready to be used to create instances."
                     ],
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "storageLimitPerProcessingUnit": {
+                    "description": "Output only. The storage limit in bytes per processing unit.",
+                    "format": "int64",
                     "readOnly": true,
                     "type": "string"
                 }
@@ -4122,6 +4684,20 @@
             },
             "type": "object"
         },
+        "MutationGroup": {
+            "description": "A group of mutations to be committed together. Related mutations should be placed in a group. For example, two mutations inserting rows with the same primary key prefix in both parent and child tables are related.",
+            "id": "MutationGroup",
+            "properties": {
+                "mutations": {
+                    "description": "Required. The mutations in this group.",
+                    "items": {
+                        "$ref": "Mutation"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "Operation": {
             "description": "This resource represents a long-running operation that is the result of a network API call.",
             "id": "Operation",
@@ -4151,7 +4727,7 @@
                         "description": "Properties of the object. Contains field @type with type URL.",
                         "type": "any"
                     },
-                    "description": "The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.",
+                    "description": "The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.",
                     "type": "object"
                 }
             },
@@ -4278,7 +4854,7 @@
                     "description": "Additional options that affect how many partitions are created."
                 },
                 "sql": {
-                    "description": "Required. The query request to generate partitions for. The request will fail if the query is not root partitionable. The query plan of a root partitionable query has a single distributed union operator. A distributed union operator conceptually divides one or more tables into multiple splits, remotely evaluates a subquery independently on each split, and then unions all results. This must not contain DML commands, such as INSERT, UPDATE, or DELETE. Use ExecuteStreamingSql with a PartitionedDml transaction for large, partition-friendly DML operations.",
+                    "description": "Required. The query request to generate partitions for. The request will fail if the query is not root partitionable. For a query to be root partitionable, it needs to satisfy a few conditions. For example, if the query execution plan contains a distributed union operator, then it must be the first operator in the plan. For more information about other conditions, see [Read data in parallel](https://cloud.google.com/spanner/docs/reads#read_data_in_parallel). The query request must not contain DML commands, such as INSERT, UPDATE, or DELETE. Use ExecuteStreamingSql with a PartitionedDml transaction for large, partition-friendly DML operations.",
                     "type": "string"
                 },
                 "transaction": {
@@ -4404,7 +4980,7 @@
             "type": "object"
         },
         "Policy": {
-            "description": "An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** { \"bindings\": [ { \"role\": \"roles/resourcemanager.organizationAdmin\", \"members\": [ \"user:mike@example.com\", \"group:admins@example.com\", \"domain:google.com\", \"serviceAccount:my-project-id@appspot.gserviceaccount.com\" ] }, { \"role\": \"roles/resourcemanager.organizationViewer\", \"members\": [ \"user:eve@example.com\" ], \"condition\": { \"title\": \"expirable access\", \"description\": \"Does not grant access after Sep 2020\", \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\", } } ], \"etag\": \"BwWWja0YfJA=\", \"version\": 3 } **YAML example:** bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3 For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).",
+            "description": "An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** ``` { \"bindings\": [ { \"role\": \"roles/resourcemanager.organizationAdmin\", \"members\": [ \"user:mike@example.com\", \"group:admins@example.com\", \"domain:google.com\", \"serviceAccount:my-project-id@appspot.gserviceaccount.com\" ] }, { \"role\": \"roles/resourcemanager.organizationViewer\", \"members\": [ \"user:eve@example.com\" ], \"condition\": { \"title\": \"expirable access\", \"description\": \"Does not grant access after Sep 2020\", \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\", } } ], \"etag\": \"BwWWja0YfJA=\", \"version\": 3 } ``` **YAML example:** ``` bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3 ``` For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).",
             "id": "Policy",
             "properties": {
                 "bindings": {
@@ -4457,6 +5033,20 @@
             },
             "type": "object"
         },
+        "QueryAdvisorResult": {
+            "description": "Output of query advisor analysis.",
+            "id": "QueryAdvisorResult",
+            "properties": {
+                "indexAdvice": {
+                    "description": "Optional. Index Recommendation for a query. This is an optional field and the recommendation will only be available when the recommendation guarantees significant improvement in query performance.",
+                    "items": {
+                        "$ref": "IndexAdvice"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "QueryOptions": {
             "description": "Query optimizer configuration.",
             "id": "QueryOptions",
@@ -4482,6 +5072,10 @@
                         "$ref": "PlanNode"
                     },
                     "type": "array"
+                },
+                "queryAdvice": {
+                    "$ref": "QueryAdvisorResult",
+                    "description": "Optional. The advices/recommendations for a query. Currently this field will be serving index recommendations for a query."
                 }
             },
             "type": "object"
@@ -4531,6 +5125,14 @@
                         "type": "string"
                     },
                     "type": "array"
+                },
+                "dataBoostEnabled": {
+                    "description": "If this is for a partitioned read and this field is set to `true`, the request is executed with Spanner Data Boost independent compute resources. If the field is set to `true` but the request does not set `partition_token`, the API returns an `INVALID_ARGUMENT` error.",
+                    "type": "boolean"
+                },
+                "directedReadOptions": {
+                    "$ref": "DirectedReadOptions",
+                    "description": "Directed read options for this request."
                 },
                 "index": {
                     "description": "If non-empty, the name of an index on table. This index is used instead of the table primary key when interpreting key_set and sorting result rows. See key_set for further information.",
@@ -4599,7 +5201,7 @@
                     "type": "boolean"
                 },
                 "location": {
-                    "description": "The location of the serving resources, e.g. \"us-central1\".",
+                    "description": "The location of the serving resources, e.g., \"us-central1\".",
                     "type": "string"
                 },
                 "type": {
@@ -4615,6 +5217,31 @@
                         "Read-write replicas support both reads and writes. These replicas: * Maintain a full copy of your data. * Serve reads. * Can vote whether to commit a write. * Participate in leadership election. * Are eligible to become a leader.",
                         "Read-only replicas only support reads (not writes). Read-only replicas: * Maintain a full copy of your data. * Serve reads. * Do not participate in voting to commit writes. * Are not eligible to become a leader.",
                         "Witness replicas don't support reads but do participate in voting to commit writes. Witness replicas: * Do not maintain a full copy of data. * Do not serve reads. * Vote whether to commit writes. * Participate in leader election but are not eligible to become leader."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ReplicaSelection": {
+            "description": "The directed read replica selector. Callers must provide one or more of the following fields for replica selection: * `location` - The location must be one of the regions within the multi-region configuration of your database. * `type` - The type of the replica. Some examples of using replica_selectors are: * `location:us-east1` --> The \"us-east1\" replica(s) of any available type will be used to process the request. * `type:READ_ONLY` --> The \"READ_ONLY\" type replica(s) in nearest available location will be used to process the request. * `location:us-east1 type:READ_ONLY` --> The \"READ_ONLY\" type replica(s) in location \"us-east1\" will be used to process the request.",
+            "id": "ReplicaSelection",
+            "properties": {
+                "location": {
+                    "description": "The location or region of the serving requests, e.g. \"us-east1\".",
+                    "type": "string"
+                },
+                "type": {
+                    "description": "The type of replica.",
+                    "enum": [
+                        "TYPE_UNSPECIFIED",
+                        "READ_WRITE",
+                        "READ_ONLY"
+                    ],
+                    "enumDescriptions": [
+                        "Not specified.",
+                        "Read-write replicas support both reads and writes.",
+                        "Read-only replicas only support reads (not writes)."
                     ],
                     "type": "string"
                 }
@@ -5132,6 +5759,7 @@
                         "BOOL",
                         "INT64",
                         "FLOAT64",
+                        "FLOAT32",
                         "TIMESTAMP",
                         "DATE",
                         "STRING",
@@ -5147,6 +5775,7 @@
                         "Not specified.",
                         "Encoded as JSON `true` or `false`.",
                         "Encoded as `string`, in decimal format.",
+                        "Encoded as `number`, or the strings `\"NaN\"`, `\"Infinity\"`, or `\"-Infinity\"`.",
                         "Encoded as `number`, or the strings `\"NaN\"`, `\"Infinity\"`, or `\"-Infinity\"`.",
                         "Encoded as `string` in RFC 3339 timestamp format. The time zone must be present, and must be `\"Z\"`. If the schema has the column option `allow_commit_timestamp=true`, the placeholder string `\"spanner.commit_timestamp()\"` can be used to instruct the system to insert the commit timestamp associated with the transaction commit.",
                         "Encoded as `string` in RFC 3339 date format.",
@@ -5190,6 +5819,13 @@
             "description": "Metadata type for the operation returned by UpdateDatabaseDdl.",
             "id": "UpdateDatabaseDdlMetadata",
             "properties": {
+                "actions": {
+                    "description": "The brief action info for the DDL statements. `actions[i]` is the brief info for `statements[i]`.",
+                    "items": {
+                        "$ref": "DdlStatementActionInfo"
+                    },
+                    "type": "array"
+                },
                 "commitTimestamps": {
                     "description": "Reports the commit timestamps of all statements that have succeeded so far, where `commit_timestamps[i]` is the commit timestamp for the statement `statements[i]`.",
                     "items": {
@@ -5203,7 +5839,7 @@
                     "type": "string"
                 },
                 "progress": {
-                    "description": "The progress of the UpdateDatabaseDdl operations. Currently, only index creation statements will have a continuously updating progress. For non-index creation statements, `progress[i]` will have start time and end time populated with commit timestamp of operation, as well as a progress of 100% once the operation has completed. `progress[i]` is the operation progress for `statements[i]`.",
+                    "description": "The progress of the UpdateDatabaseDdl operations. All DDL statements will have continuously updating progress, and `progress[i]` is the operation progress for `statements[i]`. Also, `progress[i]` will have start time and end time populated with commit timestamp of operation, as well as a progress of 100% once the operation has completed.",
                     "items": {
                         "$ref": "OperationProgress"
                     },
@@ -5217,7 +5853,7 @@
                     "type": "array"
                 },
                 "throttled": {
-                    "description": "Output only. When true, indicates that the operation is throttled e.g due to resource constraints. When resources become available the operation will resume and this field will be false again.",
+                    "description": "Output only. When true, indicates that the operation is throttled e.g. due to resource constraints. When resources become available the operation will resume and this field will be false again.",
                     "readOnly": true,
                     "type": "boolean"
                 }
@@ -5233,7 +5869,7 @@
                     "type": "string"
                 },
                 "protoDescriptors": {
-                    "description": "Optional. Proto descriptors used by CREATE/ALTER PROTO BUNDLE statements. Contains a protobuf-serialized [google.protobuf.FileDescriptorSet](https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/descriptor.proto). To generate it, [install](https://grpc.io/docs/protoc-installation/) and run `protoc` with --include_imports and --descriptor_set_out. For example, to generate for moon/shot/app.proto, run \"\"\" $protoc --proto_path=/app_path --proto_path=/lib_path \\ --include_imports \\ --descriptor_set_out=descriptors.data \\ moon/shot/app.proto \"\"\" For more details, see protobuffer [self description](https://developers.google.com/protocol-buffers/docs/techniques#self-description).",
+                    "description": "Optional. Proto descriptors used by CREATE/ALTER PROTO BUNDLE statements. Contains a protobuf-serialized [google.protobuf.FileDescriptorSet](https://github.com/protocolbuffers/protobuf/blob/main/src/google/protobuf/descriptor.proto). To generate it, [install](https://grpc.io/docs/protoc-installation/) and run `protoc` with --include_imports and --descriptor_set_out. For example, to generate for moon/shot/app.proto, run ``` $protoc --proto_path=/app_path --proto_path=/lib_path \\ --include_imports \\ --descriptor_set_out=descriptors.data \\ moon/shot/app.proto ``` For more details, see protobuffer [self description](https://developers.google.com/protocol-buffers/docs/techniques#self-description).",
                     "format": "byte",
                     "type": "string"
                 },
@@ -5243,6 +5879,42 @@
                         "type": "string"
                     },
                     "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "UpdateDatabaseMetadata": {
+            "description": "Metadata type for the operation returned by UpdateDatabase.",
+            "id": "UpdateDatabaseMetadata",
+            "properties": {
+                "cancelTime": {
+                    "description": "The time at which this operation was cancelled. If set, this operation is in the process of undoing itself (which is best-effort).",
+                    "format": "google-datetime",
+                    "type": "string"
+                },
+                "progress": {
+                    "$ref": "OperationProgress",
+                    "description": "The progress of the UpdateDatabase operation."
+                },
+                "request": {
+                    "$ref": "UpdateDatabaseRequest",
+                    "description": "The request for UpdateDatabase."
+                }
+            },
+            "type": "object"
+        },
+        "UpdateDatabaseRequest": {
+            "description": "The request for UpdateDatabase.",
+            "id": "UpdateDatabaseRequest",
+            "properties": {
+                "database": {
+                    "$ref": "Database",
+                    "description": "Required. The database to update. The `name` field of the database is of the form `projects//instances//databases/`."
+                },
+                "updateMask": {
+                    "description": "Required. The list of fields to update. Currently, only `enable_drop_protection` field can be updated.",
+                    "format": "google-fieldmask",
+                    "type": "string"
                 }
             },
             "type": "object"
@@ -5299,6 +5971,20 @@
                 "endTime": {
                     "description": "The time at which this operation failed or was completed successfully.",
                     "format": "google-datetime",
+                    "type": "string"
+                },
+                "expectedFulfillmentPeriod": {
+                    "description": "The expected fulfillment period of this update operation.",
+                    "enum": [
+                        "FULFILLMENT_PERIOD_UNSPECIFIED",
+                        "FULFILLMENT_PERIOD_NORMAL",
+                        "FULFILLMENT_PERIOD_EXTENDED"
+                    ],
+                    "enumDescriptions": [
+                        "Not specified.",
+                        "Normal fulfillment period. The operation is expected to complete within minutes.",
+                        "Extended fulfillment period. It can take up to an hour for the operation to complete."
+                    ],
                     "type": "string"
                 },
                 "instance": {

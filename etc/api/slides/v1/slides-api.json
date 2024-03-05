@@ -313,7 +313,7 @@
             }
         }
     },
-    "revision": "20230119",
+    "revision": "20240227",
     "rootUrl": "https://slides.googleapis.com/",
     "schemas": {
         "AffineTransform": {
@@ -539,7 +539,7 @@
                     "type": "string"
                 },
                 "url": {
-                    "description": "The image URL. The image is fetched once at insertion time and a copy is stored for display inside the presentation. Images must be less than 50 MB in size, can't exceed 25 megapixels, and must be in one of PNG, JPEG, or GIF formats. The provided URL can be up to 2 KB in length. The URL is saved with the image, and exposed through the Image.source_url field.",
+                    "description": "The image URL. The image is fetched once at insertion time and a copy is stored for display inside the presentation. Images must be less than 50 MB in size, can't exceed 25 megapixels, and must be in one of PNG, JPEG, or GIF formats. The provided URL must be publicly accessible and up to 2 KB in length. The URL is saved with the image, and exposed through the Image.source_url field.",
                     "type": "string"
                 }
             },
@@ -581,6 +581,7 @@
                     "description": "The element properties for the line."
                 },
                 "lineCategory": {
+                    "deprecated": true,
                     "description": "The category of the line to be created. *Deprecated*: use `category` instead. The exact line type created is determined based on the category and how it's routed to connect to other page elements. If you specify both a `category` and a `line_category`, the `category` takes precedence.",
                     "enum": [
                         "STRAIGHT",
@@ -2539,6 +2540,7 @@
                     "type": "array"
                 },
                 "replaceMethod": {
+                    "deprecated": true,
                     "description": "The replace method. *Deprecated*: use `image_replace_method` instead. If you specify both a `replace_method` and an `image_replace_method`, the `image_replace_method` takes precedence.",
                     "enum": [
                         "CENTER_INSIDE",

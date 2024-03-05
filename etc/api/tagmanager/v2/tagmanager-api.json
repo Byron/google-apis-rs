@@ -2451,7 +2451,7 @@
                                             ]
                                         },
                                         "move_entities_to_folder": {
-                                            "description": "Moves entities to a GTM Folder.",
+                                            "description": "Moves entities to a GTM Folder. If {folder_id} in the request path equals 0, this will instead move entities out of the folder they currently belong to.",
                                             "flatPath": "tagmanager/v2/accounts/{accountsId}/containers/{containersId}/workspaces/{workspacesId}/folders/{foldersId}:move_entities_to_folder",
                                             "httpMethod": "POST",
                                             "id": "tagmanager.accounts.containers.workspaces.folders.move_entities_to_folder",
@@ -3043,6 +3043,180 @@
                                             },
                                             "response": {
                                                 "$ref": "CustomTemplate"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/tagmanager.edit.containers"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "transformations": {
+                                    "methods": {
+                                        "create": {
+                                            "description": "Creates a GTM Transformation.",
+                                            "flatPath": "tagmanager/v2/accounts/{accountsId}/containers/{containersId}/workspaces/{workspacesId}/transformations",
+                                            "httpMethod": "POST",
+                                            "id": "tagmanager.accounts.containers.workspaces.transformations.create",
+                                            "parameterOrder": [
+                                                "parent"
+                                            ],
+                                            "parameters": {
+                                                "parent": {
+                                                    "description": "GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}",
+                                                    "location": "path",
+                                                    "pattern": "^accounts/[^/]+/containers/[^/]+/workspaces/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "tagmanager/v2/{+parent}/transformations",
+                                            "request": {
+                                                "$ref": "Transformation"
+                                            },
+                                            "response": {
+                                                "$ref": "Transformation"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/tagmanager.edit.containers"
+                                            ]
+                                        },
+                                        "delete": {
+                                            "description": "Deletes a GTM Transformation.",
+                                            "flatPath": "tagmanager/v2/accounts/{accountsId}/containers/{containersId}/workspaces/{workspacesId}/transformations/{transformationsId}",
+                                            "httpMethod": "DELETE",
+                                            "id": "tagmanager.accounts.containers.workspaces.transformations.delete",
+                                            "parameterOrder": [
+                                                "path"
+                                            ],
+                                            "parameters": {
+                                                "path": {
+                                                    "description": "GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}",
+                                                    "location": "path",
+                                                    "pattern": "^accounts/[^/]+/containers/[^/]+/workspaces/[^/]+/transformations/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "tagmanager/v2/{+path}",
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/tagmanager.edit.containers"
+                                            ]
+                                        },
+                                        "get": {
+                                            "description": "Gets a GTM Transformation.",
+                                            "flatPath": "tagmanager/v2/accounts/{accountsId}/containers/{containersId}/workspaces/{workspacesId}/transformations/{transformationsId}",
+                                            "httpMethod": "GET",
+                                            "id": "tagmanager.accounts.containers.workspaces.transformations.get",
+                                            "parameterOrder": [
+                                                "path"
+                                            ],
+                                            "parameters": {
+                                                "path": {
+                                                    "description": "GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}",
+                                                    "location": "path",
+                                                    "pattern": "^accounts/[^/]+/containers/[^/]+/workspaces/[^/]+/transformations/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "tagmanager/v2/{+path}",
+                                            "response": {
+                                                "$ref": "Transformation"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/tagmanager.edit.containers",
+                                                "https://www.googleapis.com/auth/tagmanager.readonly"
+                                            ]
+                                        },
+                                        "list": {
+                                            "description": "Lists all GTM Transformations of a GTM container workspace.",
+                                            "flatPath": "tagmanager/v2/accounts/{accountsId}/containers/{containersId}/workspaces/{workspacesId}/transformations",
+                                            "httpMethod": "GET",
+                                            "id": "tagmanager.accounts.containers.workspaces.transformations.list",
+                                            "parameterOrder": [
+                                                "parent"
+                                            ],
+                                            "parameters": {
+                                                "pageToken": {
+                                                    "description": "Continuation token for fetching the next page of results.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "parent": {
+                                                    "description": "GTM Workspace's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}",
+                                                    "location": "path",
+                                                    "pattern": "^accounts/[^/]+/containers/[^/]+/workspaces/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "tagmanager/v2/{+parent}/transformations",
+                                            "response": {
+                                                "$ref": "ListTransformationsResponse"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/tagmanager.edit.containers",
+                                                "https://www.googleapis.com/auth/tagmanager.readonly"
+                                            ]
+                                        },
+                                        "revert": {
+                                            "description": "Reverts changes to a GTM Transformation in a GTM Workspace.",
+                                            "flatPath": "tagmanager/v2/accounts/{accountsId}/containers/{containersId}/workspaces/{workspacesId}/transformations/{transformationsId}:revert",
+                                            "httpMethod": "POST",
+                                            "id": "tagmanager.accounts.containers.workspaces.transformations.revert",
+                                            "parameterOrder": [
+                                                "path"
+                                            ],
+                                            "parameters": {
+                                                "fingerprint": {
+                                                    "description": "When provided, this fingerprint must match the fingerprint of the transformation in storage.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "path": {
+                                                    "description": "GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}",
+                                                    "location": "path",
+                                                    "pattern": "^accounts/[^/]+/containers/[^/]+/workspaces/[^/]+/transformations/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "tagmanager/v2/{+path}:revert",
+                                            "response": {
+                                                "$ref": "RevertTransformationResponse"
+                                            },
+                                            "scopes": [
+                                                "https://www.googleapis.com/auth/tagmanager.edit.containers"
+                                            ]
+                                        },
+                                        "update": {
+                                            "description": "Updates a GTM Transformation.",
+                                            "flatPath": "tagmanager/v2/accounts/{accountsId}/containers/{containersId}/workspaces/{workspacesId}/transformations/{transformationsId}",
+                                            "httpMethod": "PUT",
+                                            "id": "tagmanager.accounts.containers.workspaces.transformations.update",
+                                            "parameterOrder": [
+                                                "path"
+                                            ],
+                                            "parameters": {
+                                                "fingerprint": {
+                                                    "description": "When provided, this fingerprint must match the fingerprint of the transformation in storage.",
+                                                    "location": "query",
+                                                    "type": "string"
+                                                },
+                                                "path": {
+                                                    "description": "GTM Transformation's API relative path. Example: accounts/{account_id}/containers/{container_id}/workspaces/{workspace_id}/transformations/{transformation_id}",
+                                                    "location": "path",
+                                                    "pattern": "^accounts/[^/]+/containers/[^/]+/workspaces/[^/]+/transformations/[^/]+$",
+                                                    "required": true,
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "path": "tagmanager/v2/{+path}",
+                                            "request": {
+                                                "$ref": "Transformation"
+                                            },
+                                            "response": {
+                                                "$ref": "Transformation"
                                             },
                                             "scopes": [
                                                 "https://www.googleapis.com/auth/tagmanager.edit.containers"
@@ -3716,7 +3890,7 @@
             }
         }
     },
-    "revision": "20230123",
+    "revision": "20240228",
     "rootUrl": "https://tagmanager.googleapis.com/",
     "schemas": {
         "Account": {
@@ -4351,6 +4525,10 @@
                     "description": "Whether this Container supports templates.",
                     "type": "boolean"
                 },
+                "supportTransformations": {
+                    "description": "Whether this Container supports transformations.",
+                    "type": "boolean"
+                },
                 "supportTriggers": {
                     "description": "Whether this Container supports triggers.",
                     "type": "boolean"
@@ -4464,6 +4642,13 @@
                     "description": "Auto generated link to the tag manager UI",
                     "type": "string"
                 },
+                "transformation": {
+                    "description": "The transformations in the container that this version was taken from.",
+                    "items": {
+                        "$ref": "Transformation"
+                    },
+                    "type": "array"
+                },
                 "trigger": {
                     "description": "The triggers in the container that this version was taken from.",
                     "items": {
@@ -4525,15 +4710,21 @@
                     "type": "string"
                 },
                 "numMacros": {
+                    "deprecated": true,
                     "description": "Number of macros in the container version.",
                     "type": "string"
                 },
                 "numRules": {
+                    "deprecated": true,
                     "description": "Number of rules in the container version.",
                     "type": "string"
                 },
                 "numTags": {
                     "description": "Number of tags in the container version.",
+                    "type": "string"
+                },
+                "numTransformations": {
+                    "description": "Number of transformations in the container version.",
                     "type": "string"
                 },
                 "numTriggers": {
@@ -4696,6 +4887,10 @@
             "description": "A workspace entity that may represent a tag, trigger, variable, or folder in addition to its status in the workspace.",
             "id": "Entity",
             "properties": {
+                "builtInVariable": {
+                    "$ref": "BuiltInVariable",
+                    "description": "The built in variable being represented by the entity."
+                },
                 "changeStatus": {
                     "description": "Represents how the entity has been changed in the workspace.",
                     "enum": [
@@ -4718,13 +4913,25 @@
                     "$ref": "Client",
                     "description": "The client being represented by the entity."
                 },
+                "customTemplate": {
+                    "$ref": "CustomTemplate",
+                    "description": "The custom template being represented by the entity."
+                },
                 "folder": {
                     "$ref": "Folder",
                     "description": "The folder being represented by the entity."
                 },
+                "gtagConfig": {
+                    "$ref": "GtagConfig",
+                    "description": "The gtag config being represented by the entity."
+                },
                 "tag": {
                     "$ref": "Tag",
                     "description": "The tag being represented by the entity."
+                },
+                "transformation": {
+                    "$ref": "Transformation",
+                    "description": "The transformation being represented by the entity."
                 },
                 "trigger": {
                     "$ref": "Trigger",
@@ -4733,6 +4940,10 @@
                 "variable": {
                     "$ref": "Variable",
                     "description": "The variable being represented by the entity."
+                },
+                "zone": {
+                    "$ref": "Zone",
+                    "description": "The zone being represented by the entity."
                 }
             },
             "type": "object"
@@ -5206,6 +5417,23 @@
             },
             "type": "object"
         },
+        "ListTransformationsResponse": {
+            "id": "ListTransformationsResponse",
+            "properties": {
+                "nextPageToken": {
+                    "description": "Continuation token for fetching the next page of results.",
+                    "type": "string"
+                },
+                "transformation": {
+                    "description": "All GTM Transformations of a GTM Container.",
+                    "items": {
+                        "$ref": "Transformation"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
         "ListTriggersResponse": {
             "description": "List triggers response.",
             "id": "ListTriggersResponse",
@@ -5314,6 +5542,10 @@
             "description": "Represents a Google Tag Manager Parameter.",
             "id": "Parameter",
             "properties": {
+                "isWeakReference": {
+                    "description": "Whether or not a reference type parameter is strongly or weakly referenced. Only used by Transformations. @mutable tagmanager.accounts.containers.workspaces.transformations.create @mutable tagmanager.accounts.containers.workspaces.transformations.update",
+                    "type": "boolean"
+                },
                 "key": {
                     "description": "The named key that uniquely identifies a parameter. Required for top-level parameters, as well as map values. Ignored for list values. @mutable tagmanager.accounts.containers.workspaces.variables.create @mutable tagmanager.accounts.containers.workspaces.variables.update @mutable tagmanager.accounts.containers.workspaces.triggers.create @mutable tagmanager.accounts.containers.workspaces.triggers.update @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update",
                     "type": "string"
@@ -5462,6 +5694,17 @@
             },
             "type": "object"
         },
+        "RevertTransformationResponse": {
+            "description": "The result of reverting a transformation in a workspace.",
+            "id": "RevertTransformationResponse",
+            "properties": {
+                "transformation": {
+                    "$ref": "Transformation",
+                    "description": "Transformation as it appears in the latest container version since the last workspace synchronization operation. If no transformation is present, that means the transformation was deleted in the latest container version."
+                }
+            },
+            "type": "object"
+        },
         "RevertTriggerResponse": {
             "description": "The result of reverting a trigger in a workspace.",
             "id": "RevertTriggerResponse",
@@ -5552,6 +5795,7 @@
                     "type": "string"
                 },
                 "blockingRuleId": {
+                    "deprecated": true,
                     "description": "Blocking rule IDs. If any of the listed rules evaluate to true, the tag will not fire. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update",
                     "items": {
                         "type": "string"
@@ -5578,6 +5822,7 @@
                     "type": "string"
                 },
                 "firingRuleId": {
+                    "deprecated": true,
                     "description": "Firing rule IDs. A tag will fire when any of the listed rules are true and all of its blockingRuleIds (if any specified) are false. @mutable tagmanager.accounts.containers.workspaces.tags.create @mutable tagmanager.accounts.containers.workspaces.tags.update",
                     "items": {
                         "type": "string"
@@ -5739,6 +5984,76 @@
                 },
                 "tagName": {
                     "description": "The name of the teardown tag.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "Transformation": {
+            "description": "Represents a Google Tag Manager Transformation.",
+            "id": "Transformation",
+            "properties": {
+                "accountId": {
+                    "description": "GTM Account ID.",
+                    "type": "string"
+                },
+                "containerId": {
+                    "description": "GTM Container ID.",
+                    "type": "string"
+                },
+                "fingerprint": {
+                    "description": "The fingerprint of the GTM Transformation as computed at storage time. This value is recomputed whenever the transformation is modified.",
+                    "type": "string"
+                },
+                "name": {
+                    "annotations": {
+                        "required": [
+                            "tagmanager.accounts.containers.workspaces.transformations.create",
+                            "tagmanager.accounts.containers.workspaces.transformations.update"
+                        ]
+                    },
+                    "description": "Transformation display name. @mutable tagmanager.accounts.containers.workspaces.transformations.create @mutable tagmanager.accounts.containers.workspaces.transformations.update",
+                    "type": "string"
+                },
+                "notes": {
+                    "description": "User notes on how to apply this transformation in the container. @mutable tagmanager.accounts.containers.workspaces.transformations.create @mutable tagmanager.accounts.containers.workspaces.transformations.update",
+                    "type": "string"
+                },
+                "parameter": {
+                    "description": "The transformation's parameters. @mutable tagmanager.accounts.containers.workspaces.transformations.create @mutable tagmanager.accounts.containers.workspaces.transformations.update",
+                    "items": {
+                        "$ref": "Parameter"
+                    },
+                    "type": "array"
+                },
+                "parentFolderId": {
+                    "description": "Parent folder id.",
+                    "type": "string"
+                },
+                "path": {
+                    "description": "GTM transformation's API relative path.",
+                    "type": "string"
+                },
+                "tagManagerUrl": {
+                    "description": "Auto generated link to the tag manager UI",
+                    "type": "string"
+                },
+                "transformationId": {
+                    "description": "The Transformation ID uniquely identifies the GTM transformation.",
+                    "type": "string"
+                },
+                "type": {
+                    "annotations": {
+                        "required": [
+                            "tagmanager.accounts.containers.workspaces.transformations.create",
+                            "tagmanager.accounts.containers.workspaces.transformations.update"
+                        ]
+                    },
+                    "description": "Transformation type. @mutable tagmanager.accounts.containers.workspaces.transformations.create @mutable tagmanager.accounts.containers.workspaces.transformations.update",
+                    "type": "string"
+                },
+                "workspaceId": {
+                    "description": "GTM Workspace ID.",
                     "type": "string"
                 }
             },

@@ -423,7 +423,7 @@
             }
         }
     },
-    "revision": "20230123",
+    "revision": "20240304",
     "rootUrl": "https://alertcenter.googleapis.com/",
     "schemas": {
         "AbuseDetected": {
@@ -434,25 +434,83 @@
                     "$ref": "EntityList",
                     "description": "List of abusive users/entities to be displayed in a table in the alert."
                 },
-                "alertDescriptor": {
-                    "description": "Displayed after Customer abuse detected - {alert_descriptor}. If missing, alert name will be displayed as Customer abuse detected.",
-                    "type": "string"
-                },
-                "nextSteps": {
-                    "description": "Customizable text to display in the next steps section of the alert. Will be parsed as HTML to allow new paragraphs and hyperlinks.",
-                    "type": "string"
-                },
                 "product": {
                     "description": "Product that the abuse is originating from.",
                     "type": "string"
                 },
                 "subAlertId": {
-                    "description": "Unique identifier of each alert that is onboarded.",
+                    "description": "Unique identifier of each sub alert that is onboarded.",
                     "type": "string"
                 },
-                "summary": {
-                    "description": "Customizable text to display in the summary section of the alert. Will be parsed as HTML to allow new paragraphs and hyperlinks.",
+                "variationType": {
+                    "description": "Variation of AbuseDetected alerts. The variation_type determines the texts displayed the alert details. This differs from sub_alert_id because each sub alert can have multiple variation_types, representing different stages of the alert.",
+                    "enum": [
+                        "ABUSE_DETECTED_VARIATION_TYPE_UNSPECIFIED",
+                        "DRIVE_ABUSIVE_CONTENT",
+                        "LIMITED_DISABLE"
+                    ],
+                    "enumDescriptions": [
+                        "AbuseDetected alert variation type unspecified. No alert should be unspecified.",
+                        "Variation displayed for Drive abusive content alerts.",
+                        "Variation displayed for Limited Disable alerts, when a Google service is disabled for a user, totally or partially, due to the user's abusive behavior."
+                    ],
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "AccessApproval": {
+            "description": "Alert that is triggered when Google support requests to access customer data.",
+            "id": "AccessApproval",
+            "properties": {
+                "justificationReason": {
+                    "description": "Justification for data access based on justification enums.",
+                    "items": {
+                        "enum": [
+                            "JUSTIFICATION_UNSPECIFIED",
+                            "CUSTOMER_INITIATED_SUPPORT",
+                            "GOOGLE_INITIATED_REVIEW",
+                            "GOOGLE_INITIATED_SERVICE",
+                            "THIRD_PARTY_DATA_REQUEST",
+                            "GOOGLE_RESPONSE_TO_PRODUCTION_ALERT"
+                        ],
+                        "enumDescriptions": [
+                            "Justification unspecified",
+                            "Customer Initiated Support",
+                            "Google Initiated Review",
+                            "Google Initiated Service",
+                            "Third Party Data Request",
+                            "Google Response to Production Alert"
+                        ],
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "officeLocation": {
+                    "description": "Office location of Google staff requesting access such as \"US\".",
+                    "type": "string"
+                },
+                "products": {
+                    "description": "Products within scope of the Access Approvals request.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "requestId": {
+                    "description": "ID of the Access Approvals request. This is a helpful field when requesting support from Google.",
+                    "type": "string"
+                },
+                "scope": {
+                    "description": "Scope of access, also known as a resource. This is further narrowed down by the product field.",
+                    "type": "string"
+                },
+                "tickets": {
+                    "description": "Support tickets related to this Access Approvals request. Populated if there is an associated case number.",
+                    "items": {
+                        "$ref": "SupportTicket"
+                    },
+                    "type": "array"
                 }
             },
             "type": "object"
@@ -764,20 +822,20 @@
             "type": "object"
         },
         "ApnsCertificateExpirationInfo": {
-            "description": "The explanation message associated with ApnsCertificationExpiring and ApnsCertificationExpired alerts.",
+            "description": "The explanation message associated with \"APNS certificate is expiring soon\" and \"APNS certificate has expired\" alerts.",
             "id": "ApnsCertificateExpirationInfo",
             "properties": {
                 "appleId": {
-                    "description": "The Apple ID used for the certificate may be blank if admins didn't enter it.",
+                    "description": "The Apple ID used to create the certificate. It may be blank if admins didn't enter it.",
                     "type": "string"
                 },
                 "expirationTime": {
-                    "description": "The expiration date of the APNS Certificate.",
+                    "description": "The expiration date of the APNS certificate.",
                     "format": "google-datetime",
                     "type": "string"
                 },
                 "uid": {
-                    "description": "The UID for the certificate.",
+                    "description": "The UID of the certificate.",
                     "type": "string"
                 }
             },
@@ -1099,6 +1157,41 @@
             },
             "type": "object"
         },
+        "DeviceManagementRule": {
+            "description": "Alerts from Device Management Rules configured by Admin.",
+            "id": "DeviceManagementRule",
+            "properties": {
+                "deviceId": {
+                    "description": "Required. The device ID.",
+                    "type": "string"
+                },
+                "deviceModel": {
+                    "description": "The model of the device.",
+                    "type": "string"
+                },
+                "deviceType": {
+                    "description": "The type of the device.",
+                    "type": "string"
+                },
+                "email": {
+                    "description": "The email of the user this alert was created for.",
+                    "type": "string"
+                },
+                "iosVendorId": {
+                    "description": "Required for iOS, empty for others.",
+                    "type": "string"
+                },
+                "resourceId": {
+                    "description": "The device resource ID.",
+                    "type": "string"
+                },
+                "serialNumber": {
+                    "description": "The serial number of the device.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "DlpRuleViolation": {
             "description": "Alerts that get triggered on violations of Data Loss Prevention (DLP) rules.",
             "id": "DlpRuleViolation",
@@ -1223,6 +1316,11 @@
                 },
                 "recipient": {
                     "description": "The recipient of this email.",
+                    "type": "string"
+                },
+                "sentTime": {
+                    "description": "The sent time of the email.",
+                    "format": "google-datetime",
                     "type": "string"
                 },
                 "subjectText": {
@@ -1804,6 +1902,21 @@
             "properties": {
                 "userEmail": {
                     "description": "email of person whose password was reset",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "SupportTicket": {
+            "description": "Support ticket related to Access Approvals request",
+            "id": "SupportTicket",
+            "properties": {
+                "ticketId": {
+                    "description": "Support ticket ID",
+                    "type": "string"
+                },
+                "ticketUrl": {
+                    "description": "Link to support ticket",
                     "type": "string"
                 }
             },

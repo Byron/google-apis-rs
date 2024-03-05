@@ -987,7 +987,7 @@
         "installs": {
             "methods": {
                 "delete": {
-                    "description": "Requests to remove an app from a device. A call to get or list will still show the app as installed on the device until it is actually removed.",
+                    "description": "Requests to remove an app from a device. A call to get or list will still show the app as installed on the device until it is actually removed. A successful response indicates that a removal request has been sent to the device. The call will be considered successful even if the app is not present on the device (e.g. it was never installed, or was removed by the user).",
                     "flatPath": "androidenterprise/v1/enterprises/{enterpriseId}/users/{userId}/devices/{deviceId}/installs/{installId}",
                     "httpMethod": "DELETE",
                     "id": "androidenterprise.installs.delete",
@@ -2649,7 +2649,7 @@
             }
         }
     },
-    "revision": "20230123",
+    "revision": "20240304",
     "rootUrl": "https://androidenterprise.googleapis.com/",
     "schemas": {
         "Administrator": {
@@ -2975,6 +2975,11 @@
                     "description": "True if this version is a production APK.",
                     "type": "boolean"
                 },
+                "targetSdkVersion": {
+                    "description": "The SDK version this app targets, as specified in the manifest of the APK. See http://developer.android.com/guide/topics/manifest/uses-sdk-element.html",
+                    "format": "int32",
+                    "type": "integer"
+                },
                 "track": {
                     "description": "Deprecated, use trackId instead.",
                     "enum": [
@@ -3092,7 +3097,7 @@
                     "type": "array"
                 },
                 "autoInstallMode": {
-                    "description": "The auto-install mode. If unset defaults to \"doNotAutoInstall\".",
+                    "description": "The auto-install mode. If unset, defaults to \"doNotAutoInstall\". An app is automatically installed regardless of a set maintenance window.",
                     "enum": [
                         "autoInstallModeUnspecified",
                         "doNotAutoInstall",
@@ -3157,6 +3162,18 @@
                     "description": "The Google Play Services Android ID for the device encoded as a lowercase hex string. For example, \"123456789abcdef0\".",
                     "type": "string"
                 },
+                "device": {
+                    "description": "The internal hardware codename of the device. This comes from android.os.Build.DEVICE. (field named \"device\" per logs/wireless/android/android_checkin.proto)",
+                    "type": "string"
+                },
+                "latestBuildFingerprint": {
+                    "description": "The build fingerprint of the device if known.",
+                    "type": "string"
+                },
+                "maker": {
+                    "description": "The manufacturer of the device. This comes from android.os.Build.MANUFACTURER.",
+                    "type": "string"
+                },
                 "managementType": {
                     "description": "Identifies the extent to which the device is controlled by a managed Google Play EMM in various deployment configurations. Possible values include: - \"managedDevice\", a device that has the EMM's device policy controller (DPC) as the device owner. - \"managedProfile\", a device that has a profile managed by the DPC (DPC is profile owner) in addition to a separate, personal profile that is unavailable to the DPC. - \"containerApp\", no longer used (deprecated). - \"unmanagedProfile\", a device that has been allowed (by the domain's admin, using the Admin Console to enable the privilege) to use managed Google Play, but the profile is itself not owned by a DPC. ",
                     "enum": [
@@ -3173,13 +3190,30 @@
                     ],
                     "type": "string"
                 },
+                "model": {
+                    "description": "The model name of the device. This comes from android.os.Build.MODEL.",
+                    "type": "string"
+                },
                 "policy": {
                     "$ref": "Policy",
                     "description": "The policy enforced on the device."
                 },
+                "product": {
+                    "description": "The product name of the device. This comes from android.os.Build.PRODUCT.",
+                    "type": "string"
+                },
                 "report": {
                     "$ref": "DeviceReport",
                     "description": "The device report updated with the latest app states."
+                },
+                "retailBrand": {
+                    "description": "Retail brand for the device, if set. See android.os.Build.BRAND",
+                    "type": "string"
+                },
+                "sdkVersion": {
+                    "description": "API compatibility version.",
+                    "format": "int32",
+                    "type": "integer"
                 }
             },
             "type": "object"
@@ -3975,7 +4009,8 @@
             "id": "Policy",
             "properties": {
                 "autoUpdatePolicy": {
-                    "description": "Recommended alternative: autoUpdateMode which is set per app, provides greater flexibility around update frequency. When autoUpdateMode is set to AUTO_UPDATE_POSTPONED or AUTO_UPDATE_HIGH_PRIORITY, this field has no effect. \"choiceToTheUser\" allows the device's user to configure the app update policy. \"always\" enables auto updates. \"never\" disables auto updates. \"wifiOnly\" enables auto updates only when the device is connected to wifi.",
+                    "deprecated": true,
+                    "description": "Controls when automatic app updates on the device can be applied. Recommended alternative: autoUpdateMode which is set per app, provides greater flexibility around update frequency. When autoUpdateMode is set to AUTO_UPDATE_POSTPONED or AUTO_UPDATE_HIGH_PRIORITY, autoUpdatePolicy has no effect. \"choiceToTheUser\" allows the device's user to configure the app update policy. \"always\" enables auto updates. \"never\" disables auto updates. \"wifiOnly\" enables auto updates only when the device is connected to wifi.",
                     "enum": [
                         "autoUpdatePolicyUnspecified",
                         "choiceToTheUser",
@@ -4144,6 +4179,10 @@
                         "type": "string"
                     },
                     "type": "array"
+                },
+                "fullDescription": {
+                    "description": "The localized full app store description, if available.",
+                    "type": "string"
                 },
                 "iconUrl": {
                     "description": "A link to an image that can be used as an icon for the product. This image is suitable for use at up to 512px x 512px.",
@@ -4322,7 +4361,7 @@
                     "description": "The auto-install policy for the product."
                 },
                 "autoUpdateMode": {
-                    "description": "The auto-update mode for the product.",
+                    "description": "The auto-update mode for the product. When autoUpdateMode is used, it always takes precedence over the user's choice. So when a user makes changes to the device settings manually, these changes are ignored.",
                     "enum": [
                         "autoUpdateModeUnspecified",
                         "autoUpdateDefault",
@@ -4338,7 +4377,7 @@
                     "type": "string"
                 },
                 "enterpriseAuthenticationAppLinkConfigs": {
-                    "description": "An authentication URL configuration for the authenticator app of an identity provider. This helps to launch the identity provider's authenticator app during the authentication happening in a private app using Android WebView. Authenticator app should already be the [default handler](https://developer.android.com/training/app-links/verify-site-associations) for the authentication url on the device.",
+                    "description": "An authentication URL configuration for the authenticator app of an identity provider. This helps to launch the identity provider's authenticator app during the authentication happening in a private app using Android WebView. Authenticator app should already be the default handler for the authentication url on the device.",
                     "items": {
                         "$ref": "EnterpriseAuthenticationAppLinkConfig"
                     },

@@ -1153,7 +1153,7 @@
                     ]
                 },
                 "list": {
-                    "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`. NOTE: the `name` binding allows API services to override the binding to use different resource name schemes, such as `users/*/operations`. To override the binding, API services can add a binding such as `\"/v1/{name=users/*}/operations\"` to their service configuration. For backwards compatibility, the default name includes the operations collection id, however overriding users must ensure the name binding is the parent resource, without the operations collection id.",
+                    "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.",
                     "flatPath": "v1/operations",
                     "httpMethod": "GET",
                     "id": "vault.operations.list",
@@ -1193,7 +1193,7 @@
             }
         }
     },
-    "revision": "20230123",
+    "revision": "20240220",
     "rootUrl": "https://vault.googleapis.com/",
     "schemas": {
         "AccountCount": {
@@ -1326,6 +1326,83 @@
             },
             "type": "object"
         },
+        "CalendarExportOptions": {
+            "description": "The options for Calendar exports.",
+            "id": "CalendarExportOptions",
+            "properties": {
+                "exportFormat": {
+                    "description": "The file format for exported text messages.",
+                    "enum": [
+                        "EXPORT_FORMAT_UNSPECIFIED",
+                        "MBOX",
+                        "PST",
+                        "ICS"
+                    ],
+                    "enumDescriptions": [
+                        "No export format specified.",
+                        "Export as MBOX. Only available for Gmail, Groups, Hangouts and Voice.",
+                        "Export as PST. Only available for Gmail, Groups, Hangouts, Voice and Calendar.",
+                        "Export as ICS. Only available for Calendar."
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "CalendarOptions": {
+            "description": "Additional options for Calendar search",
+            "id": "CalendarOptions",
+            "properties": {
+                "locationQuery": {
+                    "description": "Matches only those events whose location contains all of the words in the given set. If the string contains quoted phrases, this method only matches those events whose location contain the exact phrase. Entries in the set are considered in \"and\". Word splitting example: [\"New Zealand\"] vs [\"New\",\"Zealand\"] \"New Zealand\": matched by both \"New and better Zealand\": only matched by the later",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "minusWords": {
+                    "description": "Matches only those events that do not contain any of the words in the given set in title, description, location, or attendees. Entries in the set are considered in \"or\".",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "peopleQuery": {
+                    "description": "Matches only those events whose attendees contain all of the words in the given set. Entries in the set are considered in \"and\".",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "responseStatuses": {
+                    "description": "Matches only events for which the custodian gave one of these responses. If the set is empty or contains ATTENDEE_RESPONSE_UNSPECIFIED there will be no filtering on responses.",
+                    "items": {
+                        "enum": [
+                            "ATTENDEE_RESPONSE_UNSPECIFIED",
+                            "ATTENDEE_RESPONSE_NEEDS_ACTION",
+                            "ATTENDEE_RESPONSE_ACCEPTED",
+                            "ATTENDEE_RESPONSE_DECLINED",
+                            "ATTENDEE_RESPONSE_TENTATIVE"
+                        ],
+                        "enumDescriptions": [
+                            "Attendee response unspecified. If this is set no filtering on responses will be done, all other attendee responses that are part of the query options are ignored.",
+                            "The participant has been invited but has not responded yet.",
+                            "The participant plans to attend.",
+                            "The participant does not plan to attend.",
+                            "The participant expects to possibly attend."
+                        ],
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "versionDate": {
+                    "description": "Search the current version of the Calendar event, but export the contents of the last version saved before 12:00 AM UTC on the specified date. Enter the date in UTC.",
+                    "format": "google-datetime",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "CancelOperationRequest": {
             "description": "The request message for Operations.CancelOperation.",
             "id": "CancelOperationRequest",
@@ -1354,7 +1431,7 @@
             "id": "CloudStorageFile",
             "properties": {
                 "bucketName": {
-                    "description": "The name of the Cloud Storage bucket for the export file. You can use this value in the [Cloud Storage JSON or XML APIs](https://cloud.google.com/storage/docs/apis), but not to list the bucket contents. Instead, you can [get individual export files](https://cloud.google.com/storage/docs/json_api/v1/objects/get) by object name.",
+                    "description": "The name of the Cloud Storage bucket for the export file. You can use this value in the Cloud Storage [JSON API](https://cloud.google.com/storage/docs/json_api) or [XML API](https://cloud.google.com/storage/docs/xml-api), but not to list the bucket contents. Instead, you can [get individual export files](https://cloud.google.com/storage/docs/json_api/v1/objects/get) by object name.",
                     "type": "string"
                 },
                 "md5Hash": {
@@ -1362,7 +1439,7 @@
                     "type": "string"
                 },
                 "objectName": {
-                    "description": "The name of the Cloud Storage object for the export file. You can use this value in the [Cloud Storage JSON or XML APIs](https://cloud.google.com/storage/docs/apis).",
+                    "description": "The name of the Cloud Storage object for the export file. You can use this value in the Cloud Storage [JSON API](https://cloud.google.com/storage/docs/json_api) or [XML API](https://cloud.google.com/storage/docs/xml-api).",
                     "type": "string"
                 },
                 "size": {
@@ -1520,6 +1597,7 @@
                     "type": "boolean"
                 },
                 "includeTeamDrives": {
+                    "deprecated": true,
                     "description": "Set to true to include Team Drive.",
                     "type": "boolean"
                 },
@@ -1566,6 +1644,11 @@
                     "description": "The export name. Don't use special characters (~!$'(),;@:/?) in the name, they can prevent you from downloading exports.",
                     "type": "string"
                 },
+                "parentExportId": {
+                    "description": "Output only. Identifies the parent export that spawned this child export. This is only set on child exports.",
+                    "readOnly": true,
+                    "type": "string"
+                },
                 "query": {
                     "$ref": "Query",
                     "description": "The query parameters used to create the export."
@@ -1601,6 +1684,10 @@
             "description": "Additional options for exports",
             "id": "ExportOptions",
             "properties": {
+                "calendarOptions": {
+                    "$ref": "CalendarExportOptions",
+                    "description": "Option available for Calendar export."
+                },
                 "driveOptions": {
                     "$ref": "DriveExportOptions",
                     "description": "Options for Drive exports."
@@ -1709,12 +1796,14 @@
                     "enum": [
                         "EXPORT_FORMAT_UNSPECIFIED",
                         "MBOX",
-                        "PST"
+                        "PST",
+                        "ICS"
                     ],
                     "enumDescriptions": [
                         "No export format specified.",
                         "Export as MBOX. Only available for Gmail, Groups, Hangouts and Voice.",
-                        "Export as PST. Only available for Gmail, Groups, Hangouts, Voice and Calendar."
+                        "Export as PST. Only available for Gmail, Groups, Hangouts, Voice and Calendar.",
+                        "Export as ICS. Only available for Calendar."
                     ],
                     "type": "string"
                 }
@@ -1730,12 +1819,14 @@
                     "enum": [
                         "EXPORT_FORMAT_UNSPECIFIED",
                         "MBOX",
-                        "PST"
+                        "PST",
+                        "ICS"
                     ],
                     "enumDescriptions": [
                         "No export format specified.",
                         "Export as MBOX. Only available for Gmail, Groups, Hangouts and Voice.",
-                        "Export as PST. Only available for Gmail, Groups, Hangouts, Voice and Calendar."
+                        "Export as PST. Only available for Gmail, Groups, Hangouts, Voice and Calendar.",
+                        "Export as ICS. Only available for Calendar."
                     ],
                     "type": "string"
                 }
@@ -1747,7 +1838,7 @@
             "id": "HangoutsChatInfo",
             "properties": {
                 "roomId": {
-                    "description": "A list of Chat spaces IDs, as provided by the [Chat API](https://developers.google.com/hangouts/chat).",
+                    "description": "A list of Chat spaces IDs, as provided by the [Chat API](https://developers.google.com/chat). There is a limit of exporting from 500 Chat spaces per request.",
                     "items": {
                         "type": "string"
                     },
@@ -1804,6 +1895,7 @@
                     "type": "boolean"
                 },
                 "includeTeamDriveFiles": {
+                    "deprecated": true,
                     "description": "To include files in Team Drives in the hold, set to **true**.",
                     "type": "boolean"
                 }
@@ -1924,7 +2016,8 @@
                         "MAIL",
                         "GROUPS",
                         "HANGOUTS_CHAT",
-                        "VOICE"
+                        "VOICE",
+                        "CALENDAR"
                     ],
                     "enumDescriptions": [
                         "No service specified.",
@@ -1932,7 +2025,8 @@
                         "For search, Gmail and classic Hangouts. For holds, Gmail only.",
                         "Groups.",
                         "For export, Google Chat only. For holds, Google Chat and classic Hangouts.",
-                        "Google Voice."
+                        "Google Voice.",
+                        "Calendar."
                     ],
                     "type": "string"
                 },
@@ -2111,14 +2205,20 @@
                     "enum": [
                         "EXPORT_FORMAT_UNSPECIFIED",
                         "MBOX",
-                        "PST"
+                        "PST",
+                        "ICS"
                     ],
                     "enumDescriptions": [
                         "No export format specified.",
                         "Export as MBOX. Only available for Gmail, Groups, Hangouts and Voice.",
-                        "Export as PST. Only available for Gmail, Groups, Hangouts, Voice and Calendar."
+                        "Export as PST. Only available for Gmail, Groups, Hangouts, Voice and Calendar.",
+                        "Export as ICS. Only available for Calendar."
                     ],
                     "type": "string"
+                },
+                "exportLinkedDriveFiles": {
+                    "description": "Optional. To enable exporting linked Drive files, set to **true**.",
+                    "type": "boolean"
                 },
                 "showConfidentialModeContent": {
                     "description": "To export confidential mode content, set to **true**.",
@@ -2135,6 +2235,22 @@
             "description": "Additional options for Gmail search",
             "id": "MailOptions",
             "properties": {
+                "clientSideEncryptedOption": {
+                    "description": "Specifies whether the results should include encrypted content, unencrypted content, or both. Defaults to including both.",
+                    "enum": [
+                        "CLIENT_SIDE_ENCRYPTED_OPTION_UNSPECIFIED",
+                        "CLIENT_SIDE_ENCRYPTED_OPTION_ANY",
+                        "CLIENT_SIDE_ENCRYPTED_OPTION_ENCRYPTED",
+                        "CLIENT_SIDE_ENCRYPTED_OPTION_UNENCRYPTED"
+                    ],
+                    "enumDescriptions": [
+                        "Encryption status unspecified. Results include both client-side encrypted and non-encrypted content.",
+                        "Include both client-side encrypted and unencrypted content in results.",
+                        "Include client-side encrypted content only.",
+                        "Include unencrypted content only."
+                    ],
+                    "type": "string"
+                },
                 "excludeDrafts": {
                     "description": "Set to **true** to exclude drafts.",
                     "type": "boolean"
@@ -2238,7 +2354,7 @@
                         "description": "Properties of the object. Contains field @type with type URL.",
                         "type": "any"
                     },
-                    "description": "The normal response of the operation in case of success. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.",
+                    "description": "The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.",
                     "type": "object"
                 }
             },
@@ -2263,6 +2379,10 @@
                     "$ref": "AccountInfo",
                     "description": "Required when **SearchMethod** is **ACCOUNT**."
                 },
+                "calendarOptions": {
+                    "$ref": "CalendarOptions",
+                    "description": "Set Calendar search-specific options."
+                },
                 "corpus": {
                     "description": "The Google Workspace service to search.",
                     "enum": [
@@ -2271,7 +2391,8 @@
                         "MAIL",
                         "GROUPS",
                         "HANGOUTS_CHAT",
-                        "VOICE"
+                        "VOICE",
+                        "CALENDAR"
                     ],
                     "enumDescriptions": [
                         "No service specified.",
@@ -2279,7 +2400,8 @@
                         "For search, Gmail and classic Hangouts. For holds, Gmail only.",
                         "Groups.",
                         "For export, Google Chat only. For holds, Google Chat and classic Hangouts.",
-                        "Google Voice."
+                        "Google Voice.",
+                        "Calendar."
                     ],
                     "type": "string"
                 },
@@ -2332,6 +2454,16 @@
                         "SITES_URL",
                         "SHARED_DRIVE"
                     ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        false,
+                        true,
+                        false,
+                        false,
+                        false,
+                        false
+                    ],
                     "enumDescriptions": [
                         "A search method must be specified or else it is rejected.",
                         "Search the data of the accounts specified in [AccountInfo](https://developers.google.com/vault/reference/rest/v1/Query#accountinfo).",
@@ -2349,6 +2481,7 @@
                     "description": "Required when **SearchMethod** is **ORG_UNIT**."
                 },
                 "searchMethod": {
+                    "deprecated": true,
                     "description": "The search method to use.",
                     "enum": [
                         "SEARCH_METHOD_UNSPECIFIED",
@@ -2359,6 +2492,16 @@
                         "ROOM",
                         "SITES_URL",
                         "SHARED_DRIVE"
+                    ],
+                    "enumDeprecated": [
+                        false,
+                        false,
+                        false,
+                        true,
+                        false,
+                        false,
+                        false,
+                        false
                     ],
                     "enumDescriptions": [
                         "A search method must be specified or else it is rejected.",
@@ -2387,6 +2530,7 @@
                 },
                 "teamDriveInfo": {
                     "$ref": "TeamDriveInfo",
+                    "deprecated": true,
                     "description": "Required when **SearchMethod** is **TEAM_DRIVE**."
                 },
                 "terms": {
@@ -2544,10 +2688,12 @@
             "type": "object"
         },
         "TeamDriveInfo": {
+            "deprecated": true,
             "description": "Team Drives to search",
             "id": "TeamDriveInfo",
             "properties": {
                 "teamDriveIds": {
+                    "deprecated": true,
                     "description": "List of Team Drive IDs, as provided by the [Drive API](https://developers.google.com/drive).",
                     "items": {
                         "type": "string"
@@ -2587,12 +2733,14 @@
                     "enum": [
                         "EXPORT_FORMAT_UNSPECIFIED",
                         "MBOX",
-                        "PST"
+                        "PST",
+                        "ICS"
                     ],
                     "enumDescriptions": [
                         "No export format specified.",
                         "Export as MBOX. Only available for Gmail, Groups, Hangouts and Voice.",
-                        "Export as PST. Only available for Gmail, Groups, Hangouts, Voice and Calendar."
+                        "Export as PST. Only available for Gmail, Groups, Hangouts, Voice and Calendar.",
+                        "Export as ICS. Only available for Calendar."
                     ],
                     "type": "string"
                 }
