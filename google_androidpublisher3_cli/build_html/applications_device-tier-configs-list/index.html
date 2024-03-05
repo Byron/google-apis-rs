@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-androidpublisher3-cli/applications_device-tier-configs-list/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Device Tier Configs List - Android Publisher v5.0.4+20240229</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Device Tier Configs List";
+        var mkdocs_page_input_path = "applications_device-tier-configs-list.md";
+        var mkdocs_page_url = "/google-apis-rs/google-androidpublisher3-cli/applications_device-tier-configs-list/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Android Publisher v5.0.4+20240229
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Applications</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../applications_data-safety/">Data Safety</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../applications_device-tier-configs-create/">Device Tier Configs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../applications_device-tier-configs-get/">Device Tier Configs Get</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Device Tier Configs List</a>
+    <ul class="current">
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Apprecovery</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../apprecovery_add-targeting/">Add Targeting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../apprecovery_app-recoveries/">App Recoveries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../apprecovery_cancel/">Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../apprecovery_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../apprecovery_deploy/">Deploy</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Edits</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_apks-addexternallyhosted/">Apks Addexternallyhosted</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_apks-list/">Apks List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_apks-upload/">Apks Upload</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_bundles-list/">Bundles List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_bundles-upload/">Bundles Upload</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_commit/">Commit</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_countryavailability-get/">Countryavailability Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_deobfuscationfiles-upload/">Deobfuscationfiles Upload</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_details-get/">Details Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_details-patch/">Details Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_details-update/">Details Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_expansionfiles-get/">Expansionfiles Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_expansionfiles-patch/">Expansionfiles Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_expansionfiles-update/">Expansionfiles Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_expansionfiles-upload/">Expansionfiles Upload</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_images-delete/">Images Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_images-deleteall/">Images Deleteall</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_images-list/">Images List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_images-upload/">Images Upload</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_listings-delete/">Listings Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_listings-deleteall/">Listings Deleteall</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_listings-get/">Listings Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_listings-list/">Listings List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_listings-patch/">Listings Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_listings-update/">Listings Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_testers-get/">Testers Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_testers-patch/">Testers Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_testers-update/">Testers Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_tracks-create/">Tracks Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_tracks-get/">Tracks Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_tracks-list/">Tracks List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_tracks-patch/">Tracks Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_tracks-update/">Tracks Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../edits_validate/">Validate</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Externaltransactions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../externaltransactions_createexternaltransaction/">Createexternaltransaction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../externaltransactions_getexternaltransaction/">Getexternaltransaction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../externaltransactions_refundexternaltransaction/">Refundexternaltransaction</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Generatedapks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../generatedapks_download/">Download</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../generatedapks_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Grants</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../grants_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../grants_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../grants_patch/">Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Inappproducts</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../inappproducts_batch-delete/">Batch Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inappproducts_batch-get/">Batch Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inappproducts_batch-update/">Batch Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inappproducts_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inappproducts_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inappproducts_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inappproducts_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inappproducts_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inappproducts_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Internalappsharingartifacts</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../internalappsharingartifacts_uploadapk/">Uploadapk</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../internalappsharingartifacts_uploadbundle/">Uploadbundle</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Monetization</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_convert-region-prices/">Convert Region Prices</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-archive/">Subscriptions Archive</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-activate/">Subscriptions Base Plans Activate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-batch-migrate-prices/">Subscriptions Base Plans Batch Migrate Prices</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-batch-update-states/">Subscriptions Base Plans Batch Update States</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-deactivate/">Subscriptions Base Plans Deactivate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-delete/">Subscriptions Base Plans Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-migrate-prices/">Subscriptions Base Plans Migrate Prices</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-offers-activate/">Subscriptions Base Plans Offers Activate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-offers-batch-get/">Subscriptions Base Plans Offers Batch Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-offers-batch-update/">Subscriptions Base Plans Offers Batch Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-offers-batch-update-states/">Subscriptions Base Plans Offers Batch Update States</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-offers-create/">Subscriptions Base Plans Offers Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-offers-deactivate/">Subscriptions Base Plans Offers Deactivate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-offers-delete/">Subscriptions Base Plans Offers Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-offers-get/">Subscriptions Base Plans Offers Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-offers-list/">Subscriptions Base Plans Offers List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-base-plans-offers-patch/">Subscriptions Base Plans Offers Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-batch-get/">Subscriptions Batch Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-batch-update/">Subscriptions Batch Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-create/">Subscriptions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-delete/">Subscriptions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-get/">Subscriptions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-list/">Subscriptions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monetization_subscriptions-patch/">Subscriptions Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Orders</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../orders_refund/">Refund</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Purchases</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../purchases_products-acknowledge/">Products Acknowledge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../purchases_products-consume/">Products Consume</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../purchases_products-get/">Products Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../purchases_subscriptions-acknowledge/">Subscriptions Acknowledge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../purchases_subscriptions-cancel/">Subscriptions Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../purchases_subscriptions-defer/">Subscriptions Defer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../purchases_subscriptions-get/">Subscriptions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../purchases_subscriptions-refund/">Subscriptions Refund</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../purchases_subscriptions-revoke/">Subscriptions Revoke</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../purchases_subscriptionsv2-get/">Subscriptionsv2 Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../purchases_subscriptionsv2-revoke/">Subscriptionsv2 Revoke</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../purchases_voidedpurchases-list/">Voidedpurchases List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reviews</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reviews_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../reviews_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../reviews_reply/">Reply</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Systemapks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../systemapks_variants-create/">Variants Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../systemapks_variants-download/">Variants Download</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../systemapks_variants-get/">Variants Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../systemapks_variants-list/">Variants List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Users</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_patch/">Patch</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Android Publisher v5.0.4+20240229</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Applications &raquo;</li>
+      <li>Device Tier Configs List</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/androidpublisher3-cli/edit/master/docs/applications_device-tier-configs-list.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Returns created device tier configs, ordered by descending creation time.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/androidpublisher</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/androidpublisher</em>.
+You can set the scope for this method like this: <code>androidpublisher3 --scope &lt;scope&gt; applications device-tier-configs-list ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;package-name&gt;</strong> <em>(string)</em><ul>
+<li>Package name of the app.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li>
+<p><strong>-p page-size=integer</strong></p>
+<ul>
+<li>The maximum number of device tier configs to return. The service may return fewer than this value. If unspecified, at most 10 device tier configs will be returned. The maximum value for this field is 100; values above 100 will be coerced to 100. Device tier configs will be ordered by descending creation time.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p page-token=string</strong></p>
+<ul>
+<li>A page token, received from a previous <code>ListDeviceTierConfigs</code> call. Provide this to retrieve the subsequent page.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../applications_device-tier-configs-get/" class="btn btn-neutral float-left" title="Device Tier Configs Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../apprecovery_add-targeting/" class="btn btn-neutral float-right" title="Add Targeting">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/androidpublisher3-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../applications_device-tier-configs-get/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../apprecovery_add-targeting/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

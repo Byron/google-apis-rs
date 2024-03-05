@@ -1,659 +1,331 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Insert - YouTube v3.0.0+20220303</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-youtube3-cli/videos_insert/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Insert - YouTube v5.0.4+20240303</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Insert";
+        var mkdocs_page_input_path = "videos_insert.md";
+        var mkdocs_page_url = "/google-apis-rs/google-youtube3-cli/videos_insert/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> YouTube v3.0.0+20220303</a>
-        
+          <a href=".." class="icon icon-home"> YouTube v5.0.4+20240303
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Abuse Reports</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../abuse-reports_insert">Insert</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Activities</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../activities_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Captions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../captions_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../captions_download">Download</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../captions_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../captions_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../captions_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Channel Banners</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channel-banners_insert">Insert</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Channel Sections</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channel-sections_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channel-sections_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channel-sections_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channel-sections_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Channels</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channels_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channels_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Comment Threads</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comment-threads_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comment-threads_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Comments</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_mark-as-spam">Mark As Spam</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_set-moderation-status">Set Moderation Status</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>I18n Languages</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../i18n-languages_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>I18n Regions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../i18n-regions_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Live Broadcasts</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-broadcasts_bind">Bind</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-broadcasts_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-broadcasts_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-broadcasts_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-broadcasts_transition">Transition</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-broadcasts_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Live Chat Bans</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-chat-bans_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-chat-bans_insert">Insert</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Live Chat Messages</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-chat-messages_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-chat-messages_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-chat-messages_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Live Chat Moderators</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-chat-moderators_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-chat-moderators_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-chat-moderators_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Live Streams</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-streams_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-streams_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-streams_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-streams_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Members</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../members_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Memberships Levels</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../memberships-levels_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Playlist Items</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlist-items_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlist-items_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlist-items_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlist-items_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Playlists</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlists_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlists_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlists_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlists_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Search</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../search_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Subscriptions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../subscriptions_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../subscriptions_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../subscriptions_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Super Chat Events</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../super-chat-events_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Tests</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../tests_insert">Insert</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Third Party Links</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../third-party-links_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../third-party-links_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../third-party-links_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../third-party-links_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Thumbnails</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../thumbnails_set">Set</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Video Abuse Report Reasons</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../video-abuse-report-reasons_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Video Categories</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../video-categories_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Videos</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../videos_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../videos_get-rating">Get Rating</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Insert</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-upload-flags">Required Upload Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../videos_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../videos_rate">Rate</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../videos_report-abuse">Report Abuse</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../videos_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Watermarks</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../watermarks_set">Set</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../watermarks_unset">Unset</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Youtube</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../youtube_v3-update-comment-threads">V3 Update Comment Threads</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Abuse Reports</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../abuse-reports_insert/">Insert</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Activities</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../activities_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Captions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../captions_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../captions_download/">Download</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../captions_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../captions_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../captions_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Channel Banners</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../channel-banners_insert/">Insert</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Channel Sections</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../channel-sections_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../channel-sections_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../channel-sections_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../channel-sections_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Channels</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../channels_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../channels_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Comment Threads</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../comment-threads_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comment-threads_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Comments</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_mark-as-spam/">Mark As Spam</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_set-moderation-status/">Set Moderation Status</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">I18n Languages</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../i18n-languages_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">I18n Regions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../i18n-regions_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Live Broadcasts</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-broadcasts_bind/">Bind</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-broadcasts_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-broadcasts_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-broadcasts_insert-cuepoint/">Insert Cuepoint</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-broadcasts_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-broadcasts_transition/">Transition</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-broadcasts_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Live Chat Bans</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-chat-bans_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-chat-bans_insert/">Insert</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Live Chat Messages</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-chat-messages_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-chat-messages_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-chat-messages_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Live Chat Moderators</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-chat-moderators_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-chat-moderators_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-chat-moderators_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Live Streams</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-streams_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-streams_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-streams_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-streams_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Members</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../members_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Memberships Levels</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../memberships-levels_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Playlist Images</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-images_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-images_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-images_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-images_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Playlist Items</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-items_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-items_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-items_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-items_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Playlists</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlists_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlists_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlists_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlists_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Search</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../search_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Subscriptions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../subscriptions_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../subscriptions_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../subscriptions_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Super Chat Events</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../super-chat-events_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tests</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../tests_insert/">Insert</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Third Party Links</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../third-party-links_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../third-party-links_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../third-party-links_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../third-party-links_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Thumbnails</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../thumbnails_set/">Set</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Video Abuse Report Reasons</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../video-abuse-report-reasons_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Video Categories</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../video-categories_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Videos</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../videos_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../videos_get-rating/">Get Rating</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Insert</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../videos_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../videos_rate/">Rate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../videos_report-abuse/">Report Abuse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../videos_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Watermarks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../watermarks_set/">Set</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../watermarks_unset/">Unset</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Youtube</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../youtube_v3-update-comment-threads/">V3 Update Comment Threads</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">YouTube v5.0.4+20240303</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Insert</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/youtube3-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Videos &raquo;</li>
+      <li>Insert</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/youtube3-cli/edit/master/docs/videos_insert.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Inserts a new resource into this collection.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Inserts a new resource into this collection.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -867,442 +539,318 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     topic-ids: [string]
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .age-gating    alcohol-content=false</code><ul>
 <li>Indicates whether or not the video has alcoholic beverage content. Only users of legal purchasing age in a particular country, as identified by ICAP, can view the content.</li>
 </ul>
 </li>
-<li><code>restricted=true</code><ul>
+<li><code>restricted=false</code><ul>
 <li>Age-restricted trailers. For redband trailers and adult-rated video-games. Only users aged 18+ can view the content. The the field is true the content is restricted to viewers aged 18+. Otherwise The field won&#39;t be present.</li>
 </ul>
 </li>
 <li>
-<p><code>video-game-rating=ea</code></p>
+<p><code>video-game-rating=amet.</code></p>
 <ul>
 <li>Video game rating, if any.</li>
 </ul>
 </li>
 <li>
-<p><code>..content-details    caption=ipsum</code></p>
+<p><code>..content-details    caption=et</code></p>
 <ul>
 <li>The value of captions indicates whether the video has captions or not.</li>
 </ul>
 </li>
-<li><code>content-rating    acb-rating=eos</code><ul>
+<li><code>content-rating    acb-rating=ut</code><ul>
 <li>The video&#39;s Australian Classification Board (ACB) or Australian Communications and Media Authority (ACMA) rating. ACMA ratings are used to classify children&#39;s television programming.</li>
 </ul>
 </li>
-<li><code>agcom-rating=vero</code><ul>
+<li><code>agcom-rating=et</code><ul>
 <li>The video&#39;s rating from Italy&#39;s Autorità per le Garanzie nelle Comunicazioni (AGCOM).</li>
 </ul>
 </li>
-<li><code>anatel-rating=sanctus</code><ul>
+<li><code>anatel-rating=et</code><ul>
 <li>The video&#39;s Anatel (Asociación Nacional de Televisión) rating for Chilean television.</li>
 </ul>
 </li>
-<li><code>bbfc-rating=dolores</code><ul>
+<li><code>bbfc-rating=at</code><ul>
 <li>The video&#39;s British Board of Film Classification (BBFC) rating.</li>
 </ul>
 </li>
-<li><code>bfvc-rating=elitr</code><ul>
+<li><code>bfvc-rating=sed</code><ul>
 <li>The video&#39;s rating from Thailand&#39;s Board of Film and Video Censors.</li>
 </ul>
 </li>
-<li><code>bmukk-rating=diam</code><ul>
+<li><code>bmukk-rating=stet</code><ul>
 <li>The video&#39;s rating from the Austrian Board of Media Classification (Bundesministerium für Unterricht, Kunst und Kultur).</li>
 </ul>
 </li>
-<li><code>catv-rating=sed</code><ul>
+<li><code>catv-rating=sadipscing</code><ul>
 <li>Rating system for Canadian TV - Canadian TV Classification System The video&#39;s rating from the Canadian Radio-Television and Telecommunications Commission (CRTC) for Canadian English-language broadcasts. For more information, see the Canadian Broadcast Standards Council website.</li>
 </ul>
 </li>
-<li><code>catvfr-rating=lorem</code><ul>
+<li><code>catvfr-rating=voluptua.</code><ul>
 <li>The video&#39;s rating from the Canadian Radio-Television and Telecommunications Commission (CRTC) for Canadian French-language broadcasts. For more information, see the Canadian Broadcast Standards Council website.</li>
 </ul>
 </li>
-<li><code>cbfc-rating=magna</code><ul>
+<li><code>cbfc-rating=et</code><ul>
 <li>The video&#39;s Central Board of Film Certification (CBFC - India) rating.</li>
 </ul>
 </li>
-<li><code>ccc-rating=duo</code><ul>
+<li><code>ccc-rating=clita</code><ul>
 <li>The video&#39;s Consejo de Calificación Cinematográfica (Chile) rating.</li>
 </ul>
 </li>
-<li><code>cce-rating=et</code><ul>
+<li><code>cce-rating=sit</code><ul>
 <li>The video&#39;s rating from Portugal&#39;s Comissão de Classificação de Espect´culos.</li>
 </ul>
 </li>
-<li><code>chfilm-rating=no</code><ul>
+<li><code>chfilm-rating=rebum.</code><ul>
 <li>The video&#39;s rating in Switzerland.</li>
 </ul>
 </li>
-<li><code>chvrs-rating=sadipscing</code><ul>
+<li><code>chvrs-rating=sanctus</code><ul>
 <li>The video&#39;s Canadian Home Video Rating System (CHVRS) rating.</li>
 </ul>
 </li>
-<li><code>cicf-rating=sit</code><ul>
+<li><code>cicf-rating=no</code><ul>
 <li>The video&#39;s rating from the Commission de Contrôle des Films (Belgium).</li>
 </ul>
 </li>
-<li><code>cna-rating=duo</code><ul>
+<li><code>cna-rating=stet</code><ul>
 <li>The video&#39;s rating from Romania&#39;s CONSILIUL NATIONAL AL AUDIOVIZUALULUI (CNA).</li>
 </ul>
 </li>
-<li><code>cnc-rating=stet</code><ul>
+<li><code>cnc-rating=diam</code><ul>
 <li>Rating system in France - Commission de classification cinematographique</li>
 </ul>
 </li>
-<li><code>csa-rating=diam</code><ul>
+<li><code>csa-rating=ipsum</code><ul>
 <li>The video&#39;s rating from France&#39;s Conseil supérieur de l’audiovisuel, which rates broadcast content.</li>
 </ul>
 </li>
-<li><code>cscf-rating=accusam</code><ul>
+<li><code>cscf-rating=eos</code><ul>
 <li>The video&#39;s rating from Luxembourg&#39;s Commission de surveillance de la classification des films (CSCF).</li>
 </ul>
 </li>
-<li><code>czfilm-rating=dolore</code><ul>
+<li><code>czfilm-rating=erat</code><ul>
 <li>The video&#39;s rating in the Czech Republic.</li>
 </ul>
 </li>
-<li><code>djctq-rating=eirmod</code><ul>
+<li><code>djctq-rating=at</code><ul>
 <li>The video&#39;s Departamento de Justiça, Classificação, Qualificação e Títulos (DJCQT - Brazil) rating.</li>
 </ul>
 </li>
-<li><code>djctq-rating-reasons=lorem</code><ul>
+<li><code>djctq-rating-reasons=amet</code><ul>
 <li>Reasons that explain why the video received its DJCQT (Brazil) rating.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>ecbmct-rating=ut</code><ul>
+<li><code>ecbmct-rating=justo</code><ul>
 <li>Rating system in Turkey - Evaluation and Classification Board of the Ministry of Culture and Tourism</li>
 </ul>
 </li>
-<li><code>eefilm-rating=est</code><ul>
+<li><code>eefilm-rating=justo</code><ul>
 <li>The video&#39;s rating in Estonia.</li>
 </ul>
 </li>
-<li><code>egfilm-rating=sadipscing</code><ul>
+<li><code>egfilm-rating=eirmod</code><ul>
 <li>The video&#39;s rating in Egypt.</li>
 </ul>
 </li>
-<li><code>eirin-rating=sit</code><ul>
+<li><code>eirin-rating=duo</code><ul>
 <li>The video&#39;s Eirin (映倫) rating. Eirin is the Japanese rating system.</li>
 </ul>
 </li>
-<li><code>fcbm-rating=ipsum</code><ul>
+<li><code>fcbm-rating=sanctus</code><ul>
 <li>The video&#39;s rating from Malaysia&#39;s Film Censorship Board.</li>
 </ul>
 </li>
-<li><code>fco-rating=amet.</code><ul>
+<li><code>fco-rating=aliquyam</code><ul>
 <li>The video&#39;s rating from Hong Kong&#39;s Office for Film, Newspaper and Article Administration.</li>
 </ul>
 </li>
-<li><code>fmoc-rating=et</code><ul>
+<li><code>fmoc-rating=voluptua.</code><ul>
 <li>This property has been deprecated. Use the contentDetails.contentRating.cncRating instead.</li>
 </ul>
 </li>
-<li><code>fpb-rating=ut</code><ul>
+<li><code>fpb-rating=eirmod</code><ul>
 <li>The video&#39;s rating from South Africa&#39;s Film and Publication Board.</li>
 </ul>
 </li>
-<li><code>fpb-rating-reasons=et</code><ul>
+<li><code>fpb-rating-reasons=sanctus</code><ul>
 <li>Reasons that explain why the video received its FPB (South Africa) rating.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>fsk-rating=et</code><ul>
+<li><code>fsk-rating=rebum.</code><ul>
 <li>The video&#39;s Freiwillige Selbstkontrolle der Filmwirtschaft (FSK - Germany) rating.</li>
 </ul>
 </li>
-<li><code>grfilm-rating=at</code><ul>
+<li><code>grfilm-rating=kasd</code><ul>
 <li>The video&#39;s rating in Greece.</li>
 </ul>
 </li>
-<li><code>icaa-rating=sed</code><ul>
+<li><code>icaa-rating=voluptua.</code><ul>
 <li>The video&#39;s Instituto de la Cinematografía y de las Artes Audiovisuales (ICAA - Spain) rating.</li>
 </ul>
 </li>
-<li><code>ifco-rating=stet</code><ul>
+<li><code>ifco-rating=erat</code><ul>
 <li>The video&#39;s Irish Film Classification Office (IFCO - Ireland) rating. See the IFCO website for more information.</li>
 </ul>
 </li>
-<li><code>ilfilm-rating=sadipscing</code><ul>
+<li><code>ilfilm-rating=nonumy</code><ul>
 <li>The video&#39;s rating in Israel.</li>
 </ul>
 </li>
-<li><code>incaa-rating=voluptua.</code><ul>
+<li><code>incaa-rating=magna</code><ul>
 <li>The video&#39;s INCAA (Instituto Nacional de Cine y Artes Audiovisuales - Argentina) rating.</li>
 </ul>
 </li>
-<li><code>kfcb-rating=et</code><ul>
+<li><code>kfcb-rating=gubergren</code><ul>
 <li>The video&#39;s rating from the Kenya Film Classification Board.</li>
 </ul>
 </li>
-<li><code>kijkwijzer-rating=clita</code><ul>
+<li><code>kijkwijzer-rating=lorem</code><ul>
 <li>The video&#39;s NICAM/Kijkwijzer rating from the Nederlands Instituut voor de Classificatie van Audiovisuele Media (Netherlands).</li>
 </ul>
 </li>
-<li><code>kmrb-rating=sit</code><ul>
+<li><code>kmrb-rating=aliquyam</code><ul>
 <li>The video&#39;s Korea Media Rating Board (영상물등급위원회) rating. The KMRB rates videos in South Korea.</li>
 </ul>
 </li>
-<li><code>lsf-rating=rebum.</code><ul>
+<li><code>lsf-rating=diam</code><ul>
 <li>The video&#39;s rating from Indonesia&#39;s Lembaga Sensor Film.</li>
 </ul>
 </li>
-<li><code>mccaa-rating=sanctus</code><ul>
+<li><code>mccaa-rating=vero</code><ul>
 <li>The video&#39;s rating from Malta&#39;s Film Age-Classification Board.</li>
 </ul>
 </li>
-<li><code>mccyp-rating=no</code><ul>
+<li><code>mccyp-rating=erat</code><ul>
 <li>The video&#39;s rating from the Danish Film Institute&#39;s (Det Danske Filminstitut) Media Council for Children and Young People.</li>
 </ul>
 </li>
-<li><code>mcst-rating=stet</code><ul>
+<li><code>mcst-rating=dolore</code><ul>
 <li>The video&#39;s rating system for Vietnam - MCST</li>
 </ul>
 </li>
-<li><code>mda-rating=diam</code><ul>
+<li><code>mda-rating=sit</code><ul>
 <li>The video&#39;s rating from Singapore&#39;s Media Development Authority (MDA) and, specifically, it&#39;s Board of Film Censors (BFC).</li>
 </ul>
 </li>
-<li><code>medietilsynet-rating=ipsum</code><ul>
+<li><code>medietilsynet-rating=consetetur</code><ul>
 <li>The video&#39;s rating from Medietilsynet, the Norwegian Media Authority.</li>
 </ul>
 </li>
-<li><code>meku-rating=eos</code><ul>
+<li><code>meku-rating=amet</code><ul>
 <li>The video&#39;s rating from Finland&#39;s Kansallinen Audiovisuaalinen Instituutti (National Audiovisual Institute).</li>
 </ul>
 </li>
-<li><code>mena-mpaa-rating=erat</code><ul>
+<li><code>mena-mpaa-rating=magna</code><ul>
 <li>The rating system for MENA countries, a clone of MPAA. It is needed to prevent titles go live w/o additional QC check, since some of them can be inappropriate for the countries at all. See b/33408548 for more details.</li>
 </ul>
 </li>
-<li><code>mibac-rating=at</code><ul>
+<li><code>mibac-rating=sanctus</code><ul>
 <li>The video&#39;s rating from the Ministero dei Beni e delle Attività Culturali e del Turismo (Italy).</li>
 </ul>
 </li>
-<li><code>moc-rating=amet</code><ul>
+<li><code>moc-rating=clita</code><ul>
 <li>The video&#39;s Ministerio de Cultura (Colombia) rating.</li>
 </ul>
 </li>
-<li><code>moctw-rating=justo</code><ul>
+<li><code>moctw-rating=invidunt</code><ul>
 <li>The video&#39;s rating from Taiwan&#39;s Ministry of Culture (文化部).</li>
 </ul>
 </li>
-<li><code>mpaa-rating=justo</code><ul>
+<li><code>mpaa-rating=accusam</code><ul>
 <li>The video&#39;s Motion Picture Association of America (MPAA) rating.</li>
 </ul>
 </li>
-<li><code>mpaat-rating=eirmod</code><ul>
+<li><code>mpaat-rating=amet.</code><ul>
 <li>The rating system for trailer, DVD, and Ad in the US. See http://movielabs.com/md/ratings/v2.3/html/US_MPAAT_Ratings.html.</li>
 </ul>
 </li>
-<li><code>mtrcb-rating=duo</code><ul>
+<li><code>mtrcb-rating=sanctus</code><ul>
 <li>The video&#39;s rating from the Movie and Television Review and Classification Board (Philippines).</li>
 </ul>
 </li>
-<li><code>nbc-rating=sanctus</code><ul>
+<li><code>nbc-rating=invidunt</code><ul>
 <li>The video&#39;s rating from the Maldives National Bureau of Classification.</li>
 </ul>
 </li>
-<li><code>nbcpl-rating=aliquyam</code><ul>
+<li><code>nbcpl-rating=sit</code><ul>
 <li>The video&#39;s rating in Poland.</li>
 </ul>
 </li>
-<li><code>nfrc-rating=voluptua.</code><ul>
+<li><code>nfrc-rating=sed</code><ul>
 <li>The video&#39;s rating from the Bulgarian National Film Center.</li>
 </ul>
 </li>
-<li><code>nfvcb-rating=eirmod</code><ul>
+<li><code>nfvcb-rating=duo</code><ul>
 <li>The video&#39;s rating from Nigeria&#39;s National Film and Video Censors Board.</li>
 </ul>
 </li>
-<li><code>nkclv-rating=sanctus</code><ul>
+<li><code>nkclv-rating=et</code><ul>
 <li>The video&#39;s rating from the Nacionãlais Kino centrs (National Film Centre of Latvia).</li>
 </ul>
 </li>
-<li><code>nmc-rating=rebum.</code><ul>
+<li><code>nmc-rating=dolor</code><ul>
 <li>The National Media Council ratings system for United Arab Emirates.</li>
 </ul>
 </li>
-<li><code>oflc-rating=kasd</code><ul>
+<li><code>oflc-rating=et</code><ul>
 <li>The video&#39;s Office of Film and Literature Classification (OFLC - New Zealand) rating.</li>
 </ul>
 </li>
-<li><code>pefilm-rating=voluptua.</code><ul>
+<li><code>pefilm-rating=sed</code><ul>
 <li>The video&#39;s rating in Peru.</li>
 </ul>
 </li>
-<li><code>rcnof-rating=erat</code><ul>
+<li><code>rcnof-rating=justo</code><ul>
 <li>The video&#39;s rating from the Hungarian Nemzeti Filmiroda, the Rating Committee of the National Office of Film.</li>
 </ul>
 </li>
-<li><code>resorteviolencia-rating=nonumy</code><ul>
+<li><code>resorteviolencia-rating=sadipscing</code><ul>
 <li>The video&#39;s rating in Venezuela.</li>
 </ul>
 </li>
-<li><code>rtc-rating=magna</code><ul>
+<li><code>rtc-rating=accusam</code><ul>
 <li>The video&#39;s General Directorate of Radio, Television and Cinematography (Mexico) rating.</li>
 </ul>
 </li>
-<li><code>rte-rating=gubergren</code><ul>
+<li><code>rte-rating=takimata</code><ul>
 <li>The video&#39;s rating from Ireland&#39;s Raidió Teilifís Éireann.</li>
 </ul>
 </li>
-<li><code>russia-rating=lorem</code><ul>
+<li><code>russia-rating=invidunt</code><ul>
 <li>The video&#39;s National Film Registry of the Russian Federation (MKRF - Russia) rating.</li>
 </ul>
 </li>
-<li><code>skfilm-rating=aliquyam</code><ul>
+<li><code>skfilm-rating=invidunt</code><ul>
 <li>The video&#39;s rating in Slovakia.</li>
 </ul>
 </li>
-<li><code>smais-rating=diam</code><ul>
+<li><code>smais-rating=gubergren</code><ul>
 <li>The video&#39;s rating in Iceland.</li>
 </ul>
 </li>
-<li><code>smsa-rating=vero</code><ul>
+<li><code>smsa-rating=sed</code><ul>
 <li>The video&#39;s rating from Statens medieråd (Sweden&#39;s National Media Council).</li>
 </ul>
 </li>
-<li><code>tvpg-rating=erat</code><ul>
+<li><code>tvpg-rating=justo</code><ul>
 <li>The video&#39;s TV Parental Guidelines (TVPG) rating.</li>
 </ul>
 </li>
 <li>
-<p><code>yt-rating=dolore</code></p>
+<p><code>yt-rating=amet</code></p>
 <ul>
 <li>A rating that YouTube uses to identify age-restricted content.</li>
 </ul>
 </li>
 <li>
-<p><code>..country-restriction    allowed=true</code></p>
-<ul>
-<li>The value of allowed indicates whether the access to the policy is allowed or denied by default.</li>
-</ul>
-</li>
-<li>
-<p><code>exception=consetetur</code></p>
-<ul>
-<li>A list of region codes that identify countries where the default policy do not apply.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li>
-<p><code>..    definition=amet</code></p>
-<ul>
-<li>The value of definition indicates whether the video is available in high definition or only in standard definition.</li>
-</ul>
-</li>
-<li><code>dimension=magna</code><ul>
-<li>The value of dimension indicates whether the video is available in 3D or in 2D.</li>
-</ul>
-</li>
-<li><code>duration=sanctus</code><ul>
-<li>The length of the video. The tag value is an ISO 8601 duration in the format PT#M#S, in which the letters PT indicate that the value specifies a period of time, and the letters M and S refer to length in minutes and seconds, respectively. The # characters preceding the M and S letters are both integers that specify the number of minutes (or seconds) of the video. For example, a value of PT15M51S indicates that the video is 15 minutes and 51 seconds long.</li>
-</ul>
-</li>
-<li><code>has-custom-thumbnail=false</code><ul>
-<li>Indicates whether the video uploader has provided a custom thumbnail image for the video. This property is only visible to the video uploader.</li>
-</ul>
-</li>
-<li><code>licensed-content=true</code><ul>
-<li>The value of is_license_content indicates whether the video is licensed content.</li>
-</ul>
-</li>
-<li><code>projection=sanctus</code><ul>
-<li>Specifies the projection format of the video.</li>
-</ul>
-</li>
-<li><code>region-restriction    allowed=invidunt</code><ul>
-<li>A list of region codes that identify countries where the video is viewable. If this property is present and a country is not listed in its value, then the video is blocked from appearing in that country. If this property is present and contains an empty list, the video is blocked in all countries.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li>
-<p><code>blocked=sit</code></p>
-<ul>
-<li>A list of region codes that identify countries where the video is blocked. If this property is present and a country is not listed in its value, then the video is viewable in that country. If this property is present and contains an empty list, the video is viewable in all countries.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li>
-<p><code>...    etag=sed</code></p>
-<ul>
-<li>Etag of this resource.</li>
-</ul>
-</li>
-<li><code>file-details    bitrate-bps=duo</code><ul>
-<li>The uploaded video file&#39;s combined (video and audio) bitrate in bits per second.</li>
-</ul>
-</li>
-<li><code>container=et</code><ul>
-<li>The uploaded video file&#39;s container format.</li>
-</ul>
-</li>
-<li><code>creation-time=dolor</code><ul>
-<li>The date and time when the uploaded video file was created. The value is specified in ISO 8601 format. Currently, the following ISO 8601 formats are supported: - Date only: YYYY-MM-DD - Naive time: YYYY-MM-DDTHH:MM:SS - Time with timezone: YYYY-MM-DDTHH:MM:SS+HH:MM </li>
-</ul>
-</li>
-<li><code>duration-ms=et</code><ul>
-<li>The length of the uploaded video in milliseconds.</li>
-</ul>
-</li>
-<li><code>file-name=sed</code><ul>
-<li>The uploaded file&#39;s name. This field is present whether a video file or another type of file was uploaded.</li>
-</ul>
-</li>
-<li><code>file-size=justo</code><ul>
-<li>The uploaded file&#39;s size in bytes. This field is present whether a video file or another type of file was uploaded.</li>
-</ul>
-</li>
-<li>
-<p><code>file-type=sadipscing</code></p>
-<ul>
-<li>The uploaded file&#39;s type as detected by YouTube&#39;s video processing engine. Currently, YouTube only processes video files, but this field is present whether a video file or another type of file was uploaded.</li>
-</ul>
-</li>
-<li>
-<p><code>..    id=accusam</code></p>
-<ul>
-<li>The ID that YouTube uses to uniquely identify the video.</li>
-</ul>
-</li>
-<li><code>kind=takimata</code><ul>
-<li>Identifies what kind of resource this is. Value: the fixed string &#34;youtube#video&#34;.</li>
-</ul>
-</li>
-<li><code>live-streaming-details    active-live-chat-id=invidunt</code><ul>
-<li>The ID of the currently active live chat attached to this video. This field is filled only if the video is a currently live broadcast that has live chat. Once the broadcast transitions to complete this field will be removed and the live chat closed down. For persistent broadcasts that live chat id will no longer be tied to this video but rather to the new video being displayed at the persistent page.</li>
-</ul>
-</li>
-<li><code>actual-end-time=invidunt</code><ul>
-<li>The time that the broadcast actually ended. This value will not be available until the broadcast is over.</li>
-</ul>
-</li>
-<li><code>actual-start-time=gubergren</code><ul>
-<li>The time that the broadcast actually started. This value will not be available until the broadcast begins.</li>
-</ul>
-</li>
-<li><code>concurrent-viewers=sed</code><ul>
-<li>The number of viewers currently watching the broadcast. The property and its value will be present if the broadcast has current viewers and the broadcast owner has not hidden the viewcount for the video. Note that YouTube stops tracking the number of concurrent viewers for a broadcast when the broadcast ends. So, this property would not identify the number of viewers watching an archived video of a live broadcast that already ended.</li>
-</ul>
-</li>
-<li><code>scheduled-end-time=justo</code><ul>
-<li>The time that the broadcast is scheduled to end. If the value is empty or the property is not present, then the broadcast is scheduled to contiue indefinitely.</li>
-</ul>
-</li>
-<li>
-<p><code>scheduled-start-time=amet</code></p>
-<ul>
-<li>The time that the broadcast is scheduled to begin.</li>
-</ul>
-</li>
-<li>
-<p><code>..monetization-details.access    allowed=false</code></p>
+<p><code>..country-restriction    allowed=false</code></p>
 <ul>
 <li>The value of allowed indicates whether the access to the policy is allowed or denied by default.</li>
 </ul>
@@ -1315,120 +863,243 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>...player    embed-height=kasd</code></p>
+<p><code>..    definition=kasd</code></p>
+<ul>
+<li>The value of definition indicates whether the video is available in high definition or only in standard definition.</li>
+</ul>
+</li>
+<li><code>dimension=gubergren</code><ul>
+<li>The value of dimension indicates whether the video is available in 3D or in 2D.</li>
+</ul>
+</li>
+<li><code>duration=et</code><ul>
+<li>The length of the video. The tag value is an ISO 8601 duration in the format PT#M#S, in which the letters PT indicate that the value specifies a period of time, and the letters M and S refer to length in minutes and seconds, respectively. The # characters preceding the M and S letters are both integers that specify the number of minutes (or seconds) of the video. For example, a value of PT15M51S indicates that the video is 15 minutes and 51 seconds long.</li>
+</ul>
+</li>
+<li><code>has-custom-thumbnail=false</code><ul>
+<li>Indicates whether the video uploader has provided a custom thumbnail image for the video. This property is only visible to the video uploader.</li>
+</ul>
+</li>
+<li><code>licensed-content=true</code><ul>
+<li>The value of is_license_content indicates whether the video is licensed content.</li>
+</ul>
+</li>
+<li><code>projection=at</code><ul>
+<li>Specifies the projection format of the video.</li>
+</ul>
+</li>
+<li><code>region-restriction    allowed=et</code><ul>
+<li>A list of region codes that identify countries where the video is viewable. If this property is present and a country is not listed in its value, then the video is blocked from appearing in that country. If this property is present and contains an empty list, the video is blocked in all countries.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>blocked=dolor</code></p>
+<ul>
+<li>A list of region codes that identify countries where the video is blocked. If this property is present and a country is not listed in its value, then the video is viewable in that country. If this property is present and contains an empty list, the video is viewable in all countries.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>...    etag=clita</code></p>
+<ul>
+<li>Etag of this resource.</li>
+</ul>
+</li>
+<li><code>file-details    bitrate-bps=tempor</code><ul>
+<li>The uploaded video file&#39;s combined (video and audio) bitrate in bits per second.</li>
+</ul>
+</li>
+<li><code>container=amet</code><ul>
+<li>The uploaded video file&#39;s container format.</li>
+</ul>
+</li>
+<li><code>creation-time=dolor</code><ul>
+<li>The date and time when the uploaded video file was created. The value is specified in ISO 8601 format. Currently, the following ISO 8601 formats are supported: - Date only: YYYY-MM-DD - Naive time: YYYY-MM-DDTHH:MM:SS - Time with timezone: YYYY-MM-DDTHH:MM:SS+HH:MM </li>
+</ul>
+</li>
+<li><code>duration-ms=dolore</code><ul>
+<li>The length of the uploaded video in milliseconds.</li>
+</ul>
+</li>
+<li><code>file-name=clita</code><ul>
+<li>The uploaded file&#39;s name. This field is present whether a video file or another type of file was uploaded.</li>
+</ul>
+</li>
+<li><code>file-size=et</code><ul>
+<li>The uploaded file&#39;s size in bytes. This field is present whether a video file or another type of file was uploaded.</li>
+</ul>
+</li>
+<li>
+<p><code>file-type=diam</code></p>
+<ul>
+<li>The uploaded file&#39;s type as detected by YouTube&#39;s video processing engine. Currently, YouTube only processes video files, but this field is present whether a video file or another type of file was uploaded.</li>
+</ul>
+</li>
+<li>
+<p><code>..    id=sanctus</code></p>
+<ul>
+<li>The ID that YouTube uses to uniquely identify the video.</li>
+</ul>
+</li>
+<li><code>kind=ipsum</code><ul>
+<li>Identifies what kind of resource this is. Value: the fixed string &#34;youtube#video&#34;.</li>
+</ul>
+</li>
+<li><code>live-streaming-details    active-live-chat-id=lorem</code><ul>
+<li>The ID of the currently active live chat attached to this video. This field is filled only if the video is a currently live broadcast that has live chat. Once the broadcast transitions to complete this field will be removed and the live chat closed down. For persistent broadcasts that live chat id will no longer be tied to this video but rather to the new video being displayed at the persistent page.</li>
+</ul>
+</li>
+<li><code>actual-end-time=sed</code><ul>
+<li>The time that the broadcast actually ended. This value will not be available until the broadcast is over.</li>
+</ul>
+</li>
+<li><code>actual-start-time=tempor</code><ul>
+<li>The time that the broadcast actually started. This value will not be available until the broadcast begins.</li>
+</ul>
+</li>
+<li><code>concurrent-viewers=et</code><ul>
+<li>The number of viewers currently watching the broadcast. The property and its value will be present if the broadcast has current viewers and the broadcast owner has not hidden the viewcount for the video. Note that YouTube stops tracking the number of concurrent viewers for a broadcast when the broadcast ends. So, this property would not identify the number of viewers watching an archived video of a live broadcast that already ended.</li>
+</ul>
+</li>
+<li><code>scheduled-end-time=et</code><ul>
+<li>The time that the broadcast is scheduled to end. If the value is empty or the property is not present, then the broadcast is scheduled to contiue indefinitely.</li>
+</ul>
+</li>
+<li>
+<p><code>scheduled-start-time=sadipscing</code></p>
+<ul>
+<li>The time that the broadcast is scheduled to begin.</li>
+</ul>
+</li>
+<li>
+<p><code>..monetization-details.access    allowed=false</code></p>
+<ul>
+<li>The value of allowed indicates whether the access to the policy is allowed or denied by default.</li>
+</ul>
+</li>
+<li>
+<p><code>exception=sed</code></p>
+<ul>
+<li>A list of region codes that identify countries where the default policy do not apply.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>...player    embed-height=et</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>embed-html=gubergren</code><ul>
+<li><code>embed-html=sea</code><ul>
 <li>An &lt;iframe&gt; tag that embeds a player that will play the video.</li>
 </ul>
 </li>
 <li>
-<p><code>embed-width=et</code></p>
+<p><code>embed-width=ut</code></p>
 <ul>
 <li>The embed width</li>
 </ul>
 </li>
 <li>
-<p><code>..processing-details    editor-suggestions-availability=at</code></p>
+<p><code>..processing-details    editor-suggestions-availability=et</code></p>
 <ul>
 <li>This value indicates whether video editing suggestions, which might improve video quality or the playback experience, are available for the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.</li>
 </ul>
 </li>
-<li><code>file-details-availability=ut</code><ul>
+<li><code>file-details-availability=sanctus</code><ul>
 <li>This value indicates whether file details are available for the uploaded video. You can retrieve a video&#39;s file details by requesting the fileDetails part in your videos.list() request.</li>
 </ul>
 </li>
-<li><code>processing-failure-reason=consetetur</code><ul>
+<li><code>processing-failure-reason=magna</code><ul>
 <li>The reason that YouTube failed to process the video. This property will only have a value if the processingStatus property&#39;s value is failed.</li>
 </ul>
 </li>
-<li><code>processing-issues-availability=at</code><ul>
+<li><code>processing-issues-availability=magna</code><ul>
 <li>This value indicates whether the video processing engine has generated suggestions that might improve YouTube&#39;s ability to process the the video, warnings that explain video processing problems, or errors that cause video processing problems. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.</li>
 </ul>
 </li>
-<li><code>processing-progress    parts-processed=et</code><ul>
+<li><code>processing-progress    parts-processed=ea</code><ul>
 <li>The number of parts of the video that YouTube has already processed. You can estimate the percentage of the video that YouTube has already processed by calculating: 100 * parts_processed / parts_total Note that since the estimated number of parts could increase without a corresponding increase in the number of parts that have already been processed, it is possible that the calculated progress could periodically decrease while YouTube processes a video.</li>
 </ul>
 </li>
-<li><code>parts-total=dolor</code><ul>
+<li><code>parts-total=no</code><ul>
 <li>An estimate of the total number of parts that need to be processed for the video. The number may be updated with more precise estimates while YouTube processes the video.</li>
 </ul>
 </li>
 <li>
-<p><code>time-left-ms=clita</code></p>
+<p><code>time-left-ms=aliquyam</code></p>
 <ul>
 <li>An estimate of the amount of time, in millseconds, that YouTube needs to finish processing the video.</li>
 </ul>
 </li>
 <li>
-<p><code>..    processing-status=tempor</code></p>
+<p><code>..    processing-status=sed</code></p>
 <ul>
 <li>The video&#39;s processing status. This value indicates whether YouTube was able to process the video or if the video is still being processed.</li>
 </ul>
 </li>
-<li><code>tag-suggestions-availability=amet</code><ul>
+<li><code>tag-suggestions-availability=dolores</code><ul>
 <li>This value indicates whether keyword (tag) suggestions are available for the video. Tags can be added to a video&#39;s metadata to make it easier for other users to find the video. You can retrieve these suggestions by requesting the suggestions part in your videos.list() request.</li>
 </ul>
 </li>
 <li>
-<p><code>thumbnails-availability=dolor</code></p>
+<p><code>thumbnails-availability=invidunt</code></p>
 <ul>
 <li>This value indicates whether thumbnail images have been generated for the video.</li>
 </ul>
 </li>
 <li>
-<p><code>..recording-details.location    altitude=0.13881637662508084</code></p>
+<p><code>..recording-details.location    altitude=0.44314409260228127</code></p>
 <ul>
 <li>Altitude above the reference ellipsoid, in meters.</li>
 </ul>
 </li>
-<li><code>latitude=0.22662962651953522</code><ul>
+<li><code>latitude=0.11445649675939595</code><ul>
 <li>Latitude in degrees.</li>
 </ul>
 </li>
 <li>
-<p><code>longitude=0.728848368011315</code></p>
+<p><code>longitude=0.040412627400529755</code></p>
 <ul>
 <li>Longitude in degrees.</li>
 </ul>
 </li>
 <li>
-<p><code>..    location-description=lorem</code></p>
+<p><code>..    location-description=vero</code></p>
 <ul>
 <li>The text description of the location where the video was recorded.</li>
 </ul>
 </li>
 <li>
-<p><code>recording-date=sed</code></p>
+<p><code>recording-date=ipsum</code></p>
 <ul>
 <li>The date and time when the video was recorded.</li>
 </ul>
 </li>
 <li>
-<p><code>..snippet    category-id=tempor</code></p>
+<p><code>..snippet    category-id=no</code></p>
 <ul>
 <li>The YouTube video category associated with the video.</li>
 </ul>
 </li>
-<li><code>channel-id=et</code><ul>
+<li><code>channel-id=rebum.</code><ul>
 <li>The ID that YouTube uses to uniquely identify the channel that the video was uploaded to.</li>
 </ul>
 </li>
-<li><code>channel-title=et</code><ul>
+<li><code>channel-title=est</code><ul>
 <li>Channel title for the channel that the video belongs to.</li>
 </ul>
 </li>
-<li><code>default-audio-language=sadipscing</code><ul>
+<li><code>default-audio-language=rebum.</code><ul>
 <li>The default_audio_language property specifies the language spoken in the video&#39;s default audio track.</li>
 </ul>
 </li>
-<li><code>default-language=vero</code><ul>
+<li><code>default-language=nonumy</code><ul>
 <li>The language of the videos&#39;s default snippet.</li>
 </ul>
 </li>
-<li><code>description=sed</code><ul>
+<li><code>description=rebum.</code><ul>
 <li>The video&#39;s description. @mutable youtube.videos.insert youtube.videos.update</li>
 </ul>
 </li>
@@ -1436,32 +1107,80 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Indicates if the video is an upcoming/active live broadcast. Or it&#39;s &#34;none&#34; if the video is not an upcoming/active live broadcast.</li>
 </ul>
 </li>
-<li><code>localized    description=sea</code><ul>
+<li><code>localized    description=et</code><ul>
 <li>Localized version of the video&#39;s description.</li>
 </ul>
 </li>
 <li>
-<p><code>title=ut</code></p>
+<p><code>title=aliquyam</code></p>
 <ul>
 <li>Localized version of the video&#39;s title.</li>
 </ul>
 </li>
 <li>
-<p><code>..    published-at=et</code></p>
+<p><code>..    published-at=sanctus</code></p>
 <ul>
 <li>The date and time when the video was uploaded.</li>
 </ul>
 </li>
-<li><code>tags=sanctus</code><ul>
+<li><code>tags=sed</code><ul>
 <li>A list of keyword tags associated with the video. Tags may contain spaces.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>thumbnails.default    height=68</code><ul>
+<li><code>thumbnails.default    height=12</code><ul>
 <li>(Optional) Height of the thumbnail image.</li>
 </ul>
 </li>
-<li><code>url=magna</code><ul>
+<li><code>url=dolore</code><ul>
+<li>The thumbnail image&#39;s URL.</li>
+</ul>
+</li>
+<li>
+<p><code>width=17</code></p>
+<ul>
+<li>(Optional) Width of the thumbnail image.</li>
+</ul>
+</li>
+<li>
+<p><code>..high    height=46</code></p>
+<ul>
+<li>(Optional) Height of the thumbnail image.</li>
+</ul>
+</li>
+<li><code>url=takimata</code><ul>
+<li>The thumbnail image&#39;s URL.</li>
+</ul>
+</li>
+<li>
+<p><code>width=80</code></p>
+<ul>
+<li>(Optional) Width of the thumbnail image.</li>
+</ul>
+</li>
+<li>
+<p><code>..maxres    height=34</code></p>
+<ul>
+<li>(Optional) Height of the thumbnail image.</li>
+</ul>
+</li>
+<li><code>url=ipsum</code><ul>
+<li>The thumbnail image&#39;s URL.</li>
+</ul>
+</li>
+<li>
+<p><code>width=9</code></p>
+<ul>
+<li>(Optional) Width of the thumbnail image.</li>
+</ul>
+</li>
+<li>
+<p><code>..medium    height=21</code></p>
+<ul>
+<li>(Optional) Height of the thumbnail image.</li>
+</ul>
+</li>
+<li><code>url=justo</code><ul>
 <li>The thumbnail image&#39;s URL.</li>
 </ul>
 </li>
@@ -1472,130 +1191,82 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..high    height=40</code></p>
+<p><code>..standard    height=66</code></p>
 <ul>
 <li>(Optional) Height of the thumbnail image.</li>
 </ul>
 </li>
-<li><code>url=aliquyam</code><ul>
+<li><code>url=dolor</code><ul>
 <li>The thumbnail image&#39;s URL.</li>
 </ul>
 </li>
 <li>
-<p><code>width=58</code></p>
+<p><code>width=32</code></p>
 <ul>
 <li>(Optional) Width of the thumbnail image.</li>
 </ul>
 </li>
 <li>
-<p><code>..maxres    height=32</code></p>
-<ul>
-<li>(Optional) Height of the thumbnail image.</li>
-</ul>
-</li>
-<li><code>url=invidunt</code><ul>
-<li>The thumbnail image&#39;s URL.</li>
-</ul>
-</li>
-<li>
-<p><code>width=56</code></p>
-<ul>
-<li>(Optional) Width of the thumbnail image.</li>
-</ul>
-</li>
-<li>
-<p><code>..medium    height=36</code></p>
-<ul>
-<li>(Optional) Height of the thumbnail image.</li>
-</ul>
-</li>
-<li><code>url=ut</code><ul>
-<li>The thumbnail image&#39;s URL.</li>
-</ul>
-</li>
-<li>
-<p><code>width=5</code></p>
-<ul>
-<li>(Optional) Width of the thumbnail image.</li>
-</ul>
-</li>
-<li>
-<p><code>..standard    height=4</code></p>
-<ul>
-<li>(Optional) Height of the thumbnail image.</li>
-</ul>
-</li>
-<li><code>url=vero</code><ul>
-<li>The thumbnail image&#39;s URL.</li>
-</ul>
-</li>
-<li>
-<p><code>width=96</code></p>
-<ul>
-<li>(Optional) Width of the thumbnail image.</li>
-</ul>
-</li>
-<li>
-<p><code>...    title=no</code></p>
+<p><code>...    title=amet</code></p>
 <ul>
 <li>The video&#39;s title. @mutable youtube.videos.insert youtube.videos.update</li>
 </ul>
 </li>
 <li>
-<p><code>..statistics    comment-count=-66</code></p>
+<p><code>..statistics    comment-count=-98</code></p>
 <ul>
 <li>The number of comments for the video.</li>
 </ul>
 </li>
-<li><code>dislike-count=-7</code><ul>
+<li><code>dislike-count=-46</code><ul>
 <li>The number of users who have indicated that they disliked the video by giving it a negative rating.</li>
 </ul>
 </li>
-<li><code>favorite-count=-66</code><ul>
+<li><code>favorite-count=-13</code><ul>
 <li>The number of users who currently have the video marked as a favorite video.</li>
 </ul>
 </li>
-<li><code>like-count=-91</code><ul>
+<li><code>like-count=-77</code><ul>
 <li>The number of users who have indicated that they liked the video by giving it a positive rating.</li>
 </ul>
 </li>
 <li>
-<p><code>view-count=-16</code></p>
+<p><code>view-count=-66</code></p>
 <ul>
 <li>The number of times the video has been viewed.</li>
 </ul>
 </li>
 <li>
-<p><code>..status    embeddable=false</code></p>
+<p><code>..status    embeddable=true</code></p>
 <ul>
 <li>This value indicates if the video can be embedded on another website. @mutable youtube.videos.insert youtube.videos.update</li>
 </ul>
 </li>
-<li><code>failure-reason=et</code><ul>
+<li><code>failure-reason=gubergren</code><ul>
 <li>This value explains why a video failed to upload. This property is only present if the uploadStatus property indicates that the upload failed.</li>
 </ul>
 </li>
-<li><code>license=aliquyam</code><ul>
+<li><code>license=kasd</code><ul>
 <li>The video&#39;s license. @mutable youtube.videos.insert youtube.videos.update</li>
 </ul>
 </li>
-<li><code>made-for-kids=false</code><ul>
+<li><code>made-for-kids=true</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>privacy-status=tempor</code><ul>
+<li><code>privacy-status=kasd</code><ul>
 <li>The video&#39;s privacy status.</li>
 </ul>
 </li>
-<li><code>public-stats-viewable=false</code><ul>
+<li><code>public-stats-viewable=true</code><ul>
 <li>This value indicates if the extended video statistics on the watch page can be viewed by everyone. Note that the view count, likes, etc will still be visible if this is disabled. @mutable youtube.videos.insert youtube.videos.update</li>
 </ul>
 </li>
-<li><code>publish-at=ipsum</code><ul>
+<li><code>publish-at=labore</code><ul>
 <li>The date and time when the video is scheduled to publish. It can be set only if the privacy status of the video is private..</li>
 </ul>
 </li>
-<li><code>rejection-reason=takimata</code><ul>
+<li><code>rejection-reason=et</code><ul>
 <li>This value explains why YouTube rejected an uploaded video. This property is only present if the uploadStatus property indicates that the upload was rejected.</li>
 </ul>
 </li>
@@ -1604,48 +1275,48 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>upload-status=ipsum</code></p>
+<p><code>upload-status=voluptua.</code></p>
 <ul>
 <li>The status of the uploaded video.</li>
 </ul>
 </li>
 <li>
-<p><code>..suggestions    editor-suggestions=diam</code></p>
+<p><code>..suggestions    editor-suggestions=no</code></p>
 <ul>
 <li>A list of video editing operations that might improve the video quality or playback experience of the uploaded video.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>processing-errors=sed</code><ul>
+<li><code>processing-errors=ut</code><ul>
 <li>A list of errors that will prevent YouTube from successfully processing the uploaded video video. These errors indicate that, regardless of the video&#39;s current processing status, eventually, that status will almost certainly be failed.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>processing-hints=justo</code><ul>
+<li><code>processing-hints=dolore</code><ul>
 <li>A list of suggestions that may improve YouTube&#39;s ability to process the video.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>processing-warnings=ea</code></p>
+<p><code>processing-warnings=takimata</code></p>
 <ul>
 <li>A list of reasons why YouTube may have difficulty transcoding the uploaded video or that might result in an erroneous transcoding. These warnings are generated before YouTube actually processes the uploaded video file. In addition, they identify issues that are unlikely to cause the video processing to fail but that might cause problems such as sync issues, video artifacts, or a missing audio track.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..topic-details    relevant-topic-ids=et</code></p>
+<p><code>..topic-details    relevant-topic-ids=invidunt</code></p>
 <ul>
 <li>Similar to topic_id, except that these topics are merely relevant to the video. These are topics that may be mentioned in, or appear in the video. You can retrieve information about each topic using Freebase Topic API.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>topic-categories=dolor</code><ul>
+<li><code>topic-categories=sed</code><ul>
 <li>A list of Wikipedia URLs that provide a high-level description of the video&#39;s content.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>topic-ids=dolores</code><ul>
+<li><code>topic-ids=et</code><ul>
 <li>A list of Freebase topic IDs that are centrally associated with the video. These are topics that are centrally featured in the video, and it can be said that the video is mainly about each of these. You can retrieve information about each topic using the &lt; a href=&#34;http://wiki.freebase.com/wiki/Topic_API&#34;&gt;Freebase Topic API.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
@@ -1795,32 +1466,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../videos_list" class="btn btn-neutral float-right" title="List"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../videos_get-rating" class="btn btn-neutral" title="Get Rating"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../videos_get-rating/" class="btn btn-neutral float-left" title="Get Rating"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../videos_list/" class="btn btn-neutral float-right" title="List">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -1828,14 +1491,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../videos_get-rating" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../videos_list" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/youtube3-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../videos_get-rating/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../videos_list/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

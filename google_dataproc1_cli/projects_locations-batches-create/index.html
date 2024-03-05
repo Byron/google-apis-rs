@@ -1,460 +1,257 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Locations Batches Create - Dataproc v3.0.0+20220224</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-dataproc1-cli/projects_locations-batches-create/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Locations Batches Create - Dataproc v5.0.4+20240222</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Locations Batches Create";
+        var mkdocs_page_input_path = "projects_locations-batches-create.md";
+        var mkdocs_page_url = "/google-apis-rs/google-dataproc1-cli/projects_locations-batches-create/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dataproc v3.0.0+20220224</a>
-        
+          <a href=".." class="icon icon-home"> Dataproc v5.0.4+20240222
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-autoscaling-policies-create">Locations Autoscaling Policies Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-autoscaling-policies-delete">Locations Autoscaling Policies Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-autoscaling-policies-get">Locations Autoscaling Policies Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-autoscaling-policies-get-iam-policy">Locations Autoscaling Policies Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-autoscaling-policies-list">Locations Autoscaling Policies List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-autoscaling-policies-set-iam-policy">Locations Autoscaling Policies Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-autoscaling-policies-test-iam-permissions">Locations Autoscaling Policies Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-autoscaling-policies-update">Locations Autoscaling Policies Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Locations Batches Create</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-batches-delete">Locations Batches Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-batches-get">Locations Batches Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-batches-list">Locations Batches List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workflow-templates-create">Locations Workflow Templates Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workflow-templates-delete">Locations Workflow Templates Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workflow-templates-get">Locations Workflow Templates Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workflow-templates-get-iam-policy">Locations Workflow Templates Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workflow-templates-instantiate">Locations Workflow Templates Instantiate</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workflow-templates-instantiate-inline">Locations Workflow Templates Instantiate Inline</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workflow-templates-list">Locations Workflow Templates List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workflow-templates-set-iam-policy">Locations Workflow Templates Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workflow-templates-test-iam-permissions">Locations Workflow Templates Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workflow-templates-update">Locations Workflow Templates Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-autoscaling-policies-create">Regions Autoscaling Policies Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-autoscaling-policies-delete">Regions Autoscaling Policies Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-autoscaling-policies-get">Regions Autoscaling Policies Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-autoscaling-policies-get-iam-policy">Regions Autoscaling Policies Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-autoscaling-policies-list">Regions Autoscaling Policies List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-autoscaling-policies-set-iam-policy">Regions Autoscaling Policies Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-autoscaling-policies-test-iam-permissions">Regions Autoscaling Policies Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-autoscaling-policies-update">Regions Autoscaling Policies Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-clusters-create">Regions Clusters Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-clusters-delete">Regions Clusters Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-clusters-diagnose">Regions Clusters Diagnose</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-clusters-get">Regions Clusters Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-clusters-get-iam-policy">Regions Clusters Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-clusters-inject-credentials">Regions Clusters Inject Credentials</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-clusters-list">Regions Clusters List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-clusters-patch">Regions Clusters Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-clusters-repair">Regions Clusters Repair</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-clusters-set-iam-policy">Regions Clusters Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-clusters-start">Regions Clusters Start</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-clusters-stop">Regions Clusters Stop</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-clusters-test-iam-permissions">Regions Clusters Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-jobs-cancel">Regions Jobs Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-jobs-delete">Regions Jobs Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-jobs-get">Regions Jobs Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-jobs-get-iam-policy">Regions Jobs Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-jobs-list">Regions Jobs List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-jobs-patch">Regions Jobs Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-jobs-set-iam-policy">Regions Jobs Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-jobs-submit">Regions Jobs Submit</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-jobs-submit-as-operation">Regions Jobs Submit As Operation</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-jobs-test-iam-permissions">Regions Jobs Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-operations-cancel">Regions Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-operations-delete">Regions Operations Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-operations-get">Regions Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-operations-get-iam-policy">Regions Operations Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-operations-list">Regions Operations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-operations-set-iam-policy">Regions Operations Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-operations-test-iam-permissions">Regions Operations Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-workflow-templates-create">Regions Workflow Templates Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-workflow-templates-delete">Regions Workflow Templates Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-workflow-templates-get">Regions Workflow Templates Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-workflow-templates-get-iam-policy">Regions Workflow Templates Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-workflow-templates-instantiate">Regions Workflow Templates Instantiate</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-workflow-templates-instantiate-inline">Regions Workflow Templates Instantiate Inline</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-workflow-templates-list">Regions Workflow Templates List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-workflow-templates-set-iam-policy">Regions Workflow Templates Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-workflow-templates-test-iam-permissions">Regions Workflow Templates Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_regions-workflow-templates-update">Regions Workflow Templates Update</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-autoscaling-policies-create/">Locations Autoscaling Policies Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-autoscaling-policies-delete/">Locations Autoscaling Policies Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-autoscaling-policies-get/">Locations Autoscaling Policies Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-autoscaling-policies-get-iam-policy/">Locations Autoscaling Policies Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-autoscaling-policies-list/">Locations Autoscaling Policies List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-autoscaling-policies-set-iam-policy/">Locations Autoscaling Policies Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-autoscaling-policies-test-iam-permissions/">Locations Autoscaling Policies Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-autoscaling-policies-update/">Locations Autoscaling Policies Update</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Locations Batches Create</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-batches-delete/">Locations Batches Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-batches-get/">Locations Batches Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-batches-list/">Locations Batches List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-delete/">Locations Operations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-session-templates-create/">Locations Session Templates Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-session-templates-delete/">Locations Session Templates Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-session-templates-get/">Locations Session Templates Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-session-templates-list/">Locations Session Templates List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-session-templates-patch/">Locations Session Templates Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-sessions-create/">Locations Sessions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-sessions-delete/">Locations Sessions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-sessions-get/">Locations Sessions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-sessions-list/">Locations Sessions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-sessions-terminate/">Locations Sessions Terminate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workflow-templates-create/">Locations Workflow Templates Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workflow-templates-delete/">Locations Workflow Templates Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workflow-templates-get/">Locations Workflow Templates Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workflow-templates-get-iam-policy/">Locations Workflow Templates Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workflow-templates-instantiate/">Locations Workflow Templates Instantiate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workflow-templates-instantiate-inline/">Locations Workflow Templates Instantiate Inline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workflow-templates-list/">Locations Workflow Templates List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workflow-templates-set-iam-policy/">Locations Workflow Templates Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workflow-templates-test-iam-permissions/">Locations Workflow Templates Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workflow-templates-update/">Locations Workflow Templates Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-autoscaling-policies-create/">Regions Autoscaling Policies Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-autoscaling-policies-delete/">Regions Autoscaling Policies Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-autoscaling-policies-get/">Regions Autoscaling Policies Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-autoscaling-policies-get-iam-policy/">Regions Autoscaling Policies Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-autoscaling-policies-list/">Regions Autoscaling Policies List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-autoscaling-policies-set-iam-policy/">Regions Autoscaling Policies Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-autoscaling-policies-test-iam-permissions/">Regions Autoscaling Policies Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-autoscaling-policies-update/">Regions Autoscaling Policies Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-create/">Regions Clusters Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-delete/">Regions Clusters Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-diagnose/">Regions Clusters Diagnose</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-get/">Regions Clusters Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-get-iam-policy/">Regions Clusters Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-inject-credentials/">Regions Clusters Inject Credentials</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-list/">Regions Clusters List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-node-groups-create/">Regions Clusters Node Groups Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-node-groups-get/">Regions Clusters Node Groups Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-node-groups-repair/">Regions Clusters Node Groups Repair</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-node-groups-resize/">Regions Clusters Node Groups Resize</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-patch/">Regions Clusters Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-repair/">Regions Clusters Repair</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-set-iam-policy/">Regions Clusters Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-start/">Regions Clusters Start</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-stop/">Regions Clusters Stop</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-clusters-test-iam-permissions/">Regions Clusters Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-jobs-cancel/">Regions Jobs Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-jobs-delete/">Regions Jobs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-jobs-get/">Regions Jobs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-jobs-get-iam-policy/">Regions Jobs Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-jobs-list/">Regions Jobs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-jobs-patch/">Regions Jobs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-jobs-set-iam-policy/">Regions Jobs Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-jobs-submit/">Regions Jobs Submit</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-jobs-submit-as-operation/">Regions Jobs Submit As Operation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-jobs-test-iam-permissions/">Regions Jobs Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-operations-cancel/">Regions Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-operations-delete/">Regions Operations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-operations-get/">Regions Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-operations-get-iam-policy/">Regions Operations Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-operations-list/">Regions Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-operations-set-iam-policy/">Regions Operations Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-operations-test-iam-permissions/">Regions Operations Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-workflow-templates-create/">Regions Workflow Templates Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-workflow-templates-delete/">Regions Workflow Templates Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-workflow-templates-get/">Regions Workflow Templates Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-workflow-templates-get-iam-policy/">Regions Workflow Templates Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-workflow-templates-instantiate/">Regions Workflow Templates Instantiate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-workflow-templates-instantiate-inline/">Regions Workflow Templates Instantiate Inline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-workflow-templates-list/">Regions Workflow Templates List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-workflow-templates-set-iam-policy/">Regions Workflow Templates Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-workflow-templates-test-iam-permissions/">Regions Workflow Templates Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_regions-workflow-templates-update/">Regions Workflow Templates Update</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Dataproc v5.0.4+20240222</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Locations Batches Create</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dataproc1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Locations Batches Create</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dataproc1-cli/edit/master/docs/projects_locations-batches-create.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Creates a batch workload that executes asynchronously.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Creates a batch workload that executes asynchronously.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -475,11 +272,14 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   creator: string
   environment-config:
     execution-config:
+      idle-ttl: string
       kms-key: string
       network-tags: [string]
       network-uri: string
       service-account: string
+      staging-bucket: string
       subnetwork-uri: string
+      ttl: string
     peripherals-config:
       metastore-service: string
       spark-history-server-config:
@@ -497,8 +297,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   runtime-config:
     container-image: string
     properties: { string: string }
+    repository-config:
+      pypi-repository-config:
+        pypi-repository: string
     version: string
   runtime-info:
+    approximate-usage:
+      accelerator-type: string
+      milli-accelerator-seconds: string
+      milli-dcu-seconds: string
+      shuffle-storage-gb-seconds: string
+    current-usage:
+      accelerator-type: string
+      milli-accelerator: string
+      milli-dcu: string
+      milli-dcu-premium: string
+      shuffle-storage-gb: string
+      shuffle-storage-gb-premium: string
+      snapshot-time: string
     diagnostic-output-uri: string
     endpoints: { string: string }
     output-uri: string
@@ -524,177 +340,246 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   uuid: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    create-time=sed</code><ul>
+<li><code>-r .    create-time=voluptua.</code><ul>
 <li>Output only. The time when the batch was created.</li>
 </ul>
 </li>
-<li><code>creator=duo</code><ul>
+<li><code>creator=amet.</code><ul>
 <li>Output only. The email address of the user who created the batch.</li>
 </ul>
 </li>
-<li><code>environment-config.execution-config    kms-key=dolore</code><ul>
+<li><code>environment-config.execution-config    idle-ttl=consetetur</code><ul>
+<li>Optional. Applies to sessions only. The duration to keep the session alive while it&#39;s idling. Exceeding this threshold causes the session to terminate. This field cannot be set on a batch workload. Minimum value is 10 minutes; maximum value is 14 days (see JSON representation of Duration (https://developers.google.com/protocol-buffers/docs/proto3#json)). Defaults to 1 hour if not set. If both ttl and idle_ttl are specified for an interactive session, the conditions are treated as OR conditions: the workload will be terminated when it has been idle for idle_ttl or when ttl has been exceeded, whichever occurs first.</li>
+</ul>
+</li>
+<li><code>kms-key=diam</code><ul>
 <li>Optional. The Cloud KMS key to use for encryption.</li>
 </ul>
 </li>
-<li><code>network-tags=et</code><ul>
+<li><code>network-tags=dolor</code><ul>
 <li>Optional. Tags used for network traffic control.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>network-uri=voluptua.</code><ul>
+<li><code>network-uri=et</code><ul>
 <li>Optional. Network URI to connect workload to.</li>
 </ul>
 </li>
-<li><code>service-account=amet.</code><ul>
+<li><code>service-account=et</code><ul>
 <li>Optional. Service account that used to execute workload.</li>
 </ul>
 </li>
-<li>
-<p><code>subnetwork-uri=consetetur</code></p>
-<ul>
+<li><code>staging-bucket=sadipscing</code><ul>
+<li>Optional. A Cloud Storage bucket used to stage workload dependencies, config files, and store workload output and other ephemeral data, such as Spark history files. If you do not specify a staging bucket, Cloud Dataproc will determine a Cloud Storage location according to the region where your workload is running, and then create and manage project-level, per-location staging and temporary buckets. This field requires a Cloud Storage bucket name, not a gs://... URI to a Cloud Storage bucket.</li>
+</ul>
+</li>
+<li><code>subnetwork-uri=stet</code><ul>
 <li>Optional. Subnetwork URI to connect workload to.</li>
 </ul>
 </li>
 <li>
-<p><code>..peripherals-config    metastore-service=diam</code></p>
+<p><code>ttl=dolor</code></p>
+<ul>
+<li>Optional. The duration after which the workload will be terminated, specified as the JSON representation for Duration (https://protobuf.dev/programming-guides/proto3/#json). When the workload exceeds this duration, it will be unconditionally terminated without waiting for ongoing work to finish. If ttl is not specified for a batch workload, the workload will be allowed to run until it exits naturally (or run forever without exiting). If ttl is not specified for an interactive session, it defaults to 24 hours. If ttl is not specified for a batch that uses 2.1+ runtime version, it defaults to 4 hours. Minimum value is 10 minutes; maximum value is 14 days. If both ttl and idle_ttl are specified (for an interactive session), the conditions are treated as OR conditions: the workload will be terminated when it has been idle for idle_ttl or when ttl has been exceeded, whichever occurs first.</li>
+</ul>
+</li>
+<li>
+<p><code>..peripherals-config    metastore-service=duo</code></p>
 <ul>
 <li>Optional. Resource name of an existing Dataproc Metastore service.Example: projects/[project_id]/locations/[region]/services/[service_id]</li>
 </ul>
 </li>
 <li>
-<p><code>spark-history-server-config    dataproc-cluster=dolor</code></p>
+<p><code>spark-history-server-config    dataproc-cluster=vero</code></p>
 <ul>
 <li>Optional. Resource name of an existing Dataproc Cluster to act as a Spark History Server for the workload.Example: projects/[project_id]/regions/[region]/clusters/[cluster_name]</li>
 </ul>
 </li>
 <li>
-<p><code>....    labels=key=et</code></p>
+<p><code>....    labels=key=vero</code></p>
 <ul>
 <li>Optional. The labels to associate with this batch. Label keys must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). Label values may be empty, but, if present, must contain 1 to 63 characters, and must conform to RFC 1035 (https://www.ietf.org/rfc/rfc1035.txt). No more than 32 labels can be associated with a batch.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=et</code><ul>
+<li><code>name=invidunt</code><ul>
 <li>Output only. The resource name of the batch.</li>
 </ul>
 </li>
-<li><code>operation=sadipscing</code><ul>
+<li><code>operation=stet</code><ul>
 <li>Output only. The resource name of the operation associated with this batch.</li>
 </ul>
 </li>
-<li><code>pyspark-batch    archive-uris=stet</code><ul>
+<li><code>pyspark-batch    archive-uris=vero</code><ul>
 <li>Optional. HCFS URIs of archives to be extracted into the working directory of each executor. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>args=dolor</code><ul>
+<li><code>args=elitr</code><ul>
 <li>Optional. The arguments to pass to the driver. Do not include arguments that can be set as batch properties, such as --conf, since a collision can occur that causes an incorrect batch submission.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>file-uris=duo</code><ul>
+<li><code>file-uris=lorem</code><ul>
 <li>Optional. HCFS URIs of files to be placed in the working directory of each executor.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>jar-file-uris=vero</code><ul>
+<li><code>jar-file-uris=diam</code><ul>
 <li>Optional. HCFS URIs of jar files to add to the classpath of the Spark driver and tasks.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>main-python-file-uri=vero</code><ul>
+<li><code>main-python-file-uri=no</code><ul>
 <li>Required. The HCFS URI of the main Python file to use as the Spark driver. Must be a .py file.</li>
 </ul>
 </li>
 <li>
-<p><code>python-file-uris=invidunt</code></p>
+<p><code>python-file-uris=ipsum</code></p>
 <ul>
 <li>Optional. HCFS file URIs of Python files to pass to the PySpark framework. Supported file types: .py, .egg, and .zip.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..runtime-config    container-image=stet</code></p>
+<p><code>..runtime-config    container-image=accusam</code></p>
 <ul>
 <li>Optional. Optional custom container image for the job runtime environment. If not specified, a default container image will be used.</li>
 </ul>
 </li>
-<li><code>properties=key=vero</code><ul>
+<li><code>properties=key=takimata</code><ul>
 <li>Optional. A mapping of property names to values, which are used to configure workload execution.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
 <li>
-<p><code>version=elitr</code></p>
+<p><code>repository-config.pypi-repository-config    pypi-repository=consetetur</code></p>
+<ul>
+<li>Optional. PyPi repository address</li>
+</ul>
+</li>
+<li>
+<p><code>...    version=voluptua.</code></p>
 <ul>
 <li>Optional. Version of the batch runtime.</li>
 </ul>
 </li>
 <li>
-<p><code>..runtime-info    diagnostic-output-uri=lorem</code></p>
+<p><code>..runtime-info.approximate-usage    accelerator-type=et</code></p>
+<ul>
+<li>Optional. Accelerator type being used, if any</li>
+</ul>
+</li>
+<li><code>milli-accelerator-seconds=erat</code><ul>
+<li>Optional. Accelerator usage in (milliAccelerator x seconds) (see Dataproc Serverless pricing (https://cloud.google.com/dataproc-serverless/pricing)).</li>
+</ul>
+</li>
+<li><code>milli-dcu-seconds=consetetur</code><ul>
+<li>Optional. DCU (Dataproc Compute Units) usage in (milliDCU x seconds) (see Dataproc Serverless pricing (https://cloud.google.com/dataproc-serverless/pricing)).</li>
+</ul>
+</li>
+<li>
+<p><code>shuffle-storage-gb-seconds=amet.</code></p>
+<ul>
+<li>Optional. Shuffle storage usage in (GB x seconds) (see Dataproc Serverless pricing (https://cloud.google.com/dataproc-serverless/pricing)).</li>
+</ul>
+</li>
+<li>
+<p><code>..current-usage    accelerator-type=sed</code></p>
+<ul>
+<li>Optional. Accelerator type being used, if any</li>
+</ul>
+</li>
+<li><code>milli-accelerator=takimata</code><ul>
+<li>Optional. Milli (one-thousandth) accelerator. (see Dataproc Serverless pricing (https://cloud.google.com/dataproc-serverless/pricing))</li>
+</ul>
+</li>
+<li><code>milli-dcu=dolores</code><ul>
+<li>Optional. Milli (one-thousandth) Dataproc Compute Units (DCUs) (see Dataproc Serverless pricing (https://cloud.google.com/dataproc-serverless/pricing)).</li>
+</ul>
+</li>
+<li><code>milli-dcu-premium=gubergren</code><ul>
+<li>Optional. Milli (one-thousandth) Dataproc Compute Units (DCUs) charged at premium tier (see Dataproc Serverless pricing (https://cloud.google.com/dataproc-serverless/pricing)).</li>
+</ul>
+</li>
+<li><code>shuffle-storage-gb=et</code><ul>
+<li>Optional. Shuffle Storage in gigabytes (GB). (see Dataproc Serverless pricing (https://cloud.google.com/dataproc-serverless/pricing))</li>
+</ul>
+</li>
+<li><code>shuffle-storage-gb-premium=accusam</code><ul>
+<li>Optional. Shuffle Storage in gigabytes (GB) charged at premium tier. (see Dataproc Serverless pricing (https://cloud.google.com/dataproc-serverless/pricing))</li>
+</ul>
+</li>
+<li>
+<p><code>snapshot-time=voluptua.</code></p>
+<ul>
+<li>Optional. The timestamp of the usage snapshot.</li>
+</ul>
+</li>
+<li>
+<p><code>..    diagnostic-output-uri=dolore</code></p>
 <ul>
 <li>Output only. A URI pointing to the location of the diagnostics tarball.</li>
 </ul>
 </li>
-<li><code>endpoints=key=diam</code><ul>
+<li><code>endpoints=key=dolore</code><ul>
 <li>Output only. Map of remote access endpoints (such as web interfaces and APIs) to their URIs.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
 <li>
-<p><code>output-uri=no</code></p>
+<p><code>output-uri=dolore</code></p>
 <ul>
 <li>Output only. A URI pointing to the location of the stdout and stderr of the workload.</li>
 </ul>
 </li>
 <li>
-<p><code>..spark-batch    archive-uris=ipsum</code></p>
+<p><code>..spark-batch    archive-uris=voluptua.</code></p>
 <ul>
 <li>Optional. HCFS URIs of archives to be extracted into the working directory of each executor. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>args=accusam</code><ul>
+<li><code>args=amet.</code><ul>
 <li>Optional. The arguments to pass to the driver. Do not include arguments that can be set as batch properties, such as --conf, since a collision can occur that causes an incorrect batch submission.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>file-uris=takimata</code><ul>
+<li><code>file-uris=ea</code><ul>
 <li>Optional. HCFS URIs of files to be placed in the working directory of each executor.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>jar-file-uris=consetetur</code><ul>
+<li><code>jar-file-uris=sadipscing</code><ul>
 <li>Optional. HCFS URIs of jar files to add to the classpath of the Spark driver and tasks.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>main-class=voluptua.</code><ul>
+<li><code>main-class=lorem</code><ul>
 <li>Optional. The name of the driver main class. The jar file that contains the class must be in the classpath or specified in jar_file_uris.</li>
 </ul>
 </li>
 <li>
-<p><code>main-jar-file-uri=et</code></p>
+<p><code>main-jar-file-uri=invidunt</code></p>
 <ul>
 <li>Optional. The HCFS URI of the jar file that contains the main class.</li>
 </ul>
 </li>
 <li>
-<p><code>..spark-r-batch    archive-uris=erat</code></p>
+<p><code>..spark-r-batch    archive-uris=no</code></p>
 <ul>
 <li>Optional. HCFS URIs of archives to be extracted into the working directory of each executor. Supported file types: .jar, .tar, .tar.gz, .tgz, and .zip.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>args=consetetur</code><ul>
+<li><code>args=est</code><ul>
 <li>Optional. The arguments to pass to the Spark driver. Do not include arguments that can be set as batch properties, such as --conf, since a collision can occur that causes an incorrect batch submission.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>file-uris=amet.</code><ul>
+<li><code>file-uris=at</code><ul>
 <li>Optional. HCFS URIs of files to be placed in the working directory of each executor.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
@@ -706,38 +591,38 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..spark-sql-batch    jar-file-uris=takimata</code></p>
+<p><code>..spark-sql-batch    jar-file-uris=sit</code></p>
 <ul>
 <li>Optional. HCFS URIs of jar files to be added to the Spark CLASSPATH.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>query-file-uri=dolores</code><ul>
+<li><code>query-file-uri=et</code><ul>
 <li>Required. The HCFS URI of the script that contains Spark SQL queries to execute.</li>
 </ul>
 </li>
 <li>
-<p><code>query-variables=key=gubergren</code></p>
+<p><code>query-variables=key=tempor</code></p>
 <ul>
 <li>Optional. Mapping of query variable names to values (equivalent to the Spark SQL command: SET name=&#34;value&#34;;).</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
 <li>
-<p><code>..    state=et</code></p>
+<p><code>..    state=aliquyam</code></p>
 <ul>
 <li>Output only. The state of the batch.</li>
 </ul>
 </li>
-<li><code>state-message=accusam</code><ul>
+<li><code>state-message=ipsum</code><ul>
 <li>Output only. Batch state details, such as a failure description if the state is FAILED.</li>
 </ul>
 </li>
-<li><code>state-time=voluptua.</code><ul>
+<li><code>state-time=et</code><ul>
 <li>Output only. The time when the batch entered a current state.</li>
 </ul>
 </li>
-<li><code>uuid=dolore</code><ul>
+<li><code>uuid=sanctus</code><ul>
 <li>Output only. A batch UUID (Unique Universal Identifier). The service generates this value when it creates the batch.</li>
 </ul>
 </li>
@@ -849,32 +734,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_locations-batches-delete" class="btn btn-neutral float-right" title="Locations Batches Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_locations-autoscaling-policies-update" class="btn btn-neutral" title="Locations Autoscaling Policies Update"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_locations-autoscaling-policies-update/" class="btn btn-neutral float-left" title="Locations Autoscaling Policies Update"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-batches-delete/" class="btn btn-neutral float-right" title="Locations Batches Delete">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -882,14 +759,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_locations-autoscaling-policies-update" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-batches-delete" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dataproc1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_locations-autoscaling-policies-update/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_locations-batches-delete/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

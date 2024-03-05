@@ -1,422 +1,219 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Locations Entry Groups Entries Patch - Data Catalog v3.0.0+20220224</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-datacatalog1-cli/projects_locations-entry-groups-entries-patch/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Locations Entry Groups Entries Patch - Data Catalog v5.0.4+20240222</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Locations Entry Groups Entries Patch";
+        var mkdocs_page_input_path = "projects_locations-entry-groups-entries-patch.md";
+        var mkdocs_page_url = "/google-apis-rs/google-datacatalog1-cli/projects_locations-entry-groups-entries-patch/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Data Catalog v3.0.0+20220224</a>
-        
+          <a href=".." class="icon icon-home"> Data Catalog v5.0.4+20240222
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Catalog</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../catalog_search">Search</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-        
-
-    
-        
-        <span>Entries</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../entries_lookup">Lookup</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-create">Locations Entry Groups Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-delete">Locations Entry Groups Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-entries-create">Locations Entry Groups Entries Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-entries-delete">Locations Entry Groups Entries Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-entries-get">Locations Entry Groups Entries Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-entries-get-iam-policy">Locations Entry Groups Entries Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-entries-list">Locations Entry Groups Entries List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-entries-modify-entry-contacts">Locations Entry Groups Entries Modify Entry Contacts</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-entries-modify-entry-overview">Locations Entry Groups Entries Modify Entry Overview</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Locations Entry Groups Entries Patch</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-entries-star">Locations Entry Groups Entries Star</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-entries-tags-create">Locations Entry Groups Entries Tags Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-entries-tags-delete">Locations Entry Groups Entries Tags Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-entries-tags-list">Locations Entry Groups Entries Tags List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-entries-tags-patch">Locations Entry Groups Entries Tags Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-entries-test-iam-permissions">Locations Entry Groups Entries Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-entries-unstar">Locations Entry Groups Entries Unstar</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-get">Locations Entry Groups Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-get-iam-policy">Locations Entry Groups Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-list">Locations Entry Groups List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-patch">Locations Entry Groups Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-set-iam-policy">Locations Entry Groups Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-tags-create">Locations Entry Groups Tags Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-tags-delete">Locations Entry Groups Tags Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-tags-list">Locations Entry Groups Tags List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-tags-patch">Locations Entry Groups Tags Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-entry-groups-test-iam-permissions">Locations Entry Groups Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-tag-templates-create">Locations Tag Templates Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-tag-templates-delete">Locations Tag Templates Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-tag-templates-fields-create">Locations Tag Templates Fields Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-tag-templates-fields-delete">Locations Tag Templates Fields Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-tag-templates-fields-enum-values-rename">Locations Tag Templates Fields Enum Values Rename</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-tag-templates-fields-patch">Locations Tag Templates Fields Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-tag-templates-fields-rename">Locations Tag Templates Fields Rename</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-tag-templates-get">Locations Tag Templates Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-tag-templates-get-iam-policy">Locations Tag Templates Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-tag-templates-patch">Locations Tag Templates Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-tag-templates-set-iam-policy">Locations Tag Templates Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-tag-templates-test-iam-permissions">Locations Tag Templates Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-create">Locations Taxonomies Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-delete">Locations Taxonomies Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-export">Locations Taxonomies Export</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-get">Locations Taxonomies Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-get-iam-policy">Locations Taxonomies Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-import">Locations Taxonomies Import</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-list">Locations Taxonomies List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-patch">Locations Taxonomies Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-policy-tags-create">Locations Taxonomies Policy Tags Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-policy-tags-delete">Locations Taxonomies Policy Tags Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-policy-tags-get">Locations Taxonomies Policy Tags Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-policy-tags-get-iam-policy">Locations Taxonomies Policy Tags Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-policy-tags-list">Locations Taxonomies Policy Tags List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-policy-tags-patch">Locations Taxonomies Policy Tags Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-policy-tags-set-iam-policy">Locations Taxonomies Policy Tags Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-policy-tags-test-iam-permissions">Locations Taxonomies Policy Tags Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-replace">Locations Taxonomies Replace</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-set-iam-policy">Locations Taxonomies Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-taxonomies-test-iam-permissions">Locations Taxonomies Test Iam Permissions</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Catalog</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../catalog_search/">Search</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Entries</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../entries_lookup/">Lookup</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-create/">Locations Entry Groups Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-delete/">Locations Entry Groups Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-create/">Locations Entry Groups Entries Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-delete/">Locations Entry Groups Entries Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-get/">Locations Entry Groups Entries Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-get-iam-policy/">Locations Entry Groups Entries Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-import/">Locations Entry Groups Entries Import</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-list/">Locations Entry Groups Entries List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-modify-entry-contacts/">Locations Entry Groups Entries Modify Entry Contacts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-modify-entry-overview/">Locations Entry Groups Entries Modify Entry Overview</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Locations Entry Groups Entries Patch</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-star/">Locations Entry Groups Entries Star</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-tags-create/">Locations Entry Groups Entries Tags Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-tags-delete/">Locations Entry Groups Entries Tags Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-tags-list/">Locations Entry Groups Entries Tags List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-tags-patch/">Locations Entry Groups Entries Tags Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-tags-reconcile/">Locations Entry Groups Entries Tags Reconcile</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-test-iam-permissions/">Locations Entry Groups Entries Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-entries-unstar/">Locations Entry Groups Entries Unstar</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-get/">Locations Entry Groups Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-get-iam-policy/">Locations Entry Groups Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-list/">Locations Entry Groups List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-patch/">Locations Entry Groups Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-set-iam-policy/">Locations Entry Groups Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-tags-create/">Locations Entry Groups Tags Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-tags-delete/">Locations Entry Groups Tags Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-tags-list/">Locations Entry Groups Tags List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-tags-patch/">Locations Entry Groups Tags Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-entry-groups-test-iam-permissions/">Locations Entry Groups Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-delete/">Locations Operations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-tag-templates-create/">Locations Tag Templates Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-tag-templates-delete/">Locations Tag Templates Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-tag-templates-fields-create/">Locations Tag Templates Fields Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-tag-templates-fields-delete/">Locations Tag Templates Fields Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-tag-templates-fields-enum-values-rename/">Locations Tag Templates Fields Enum Values Rename</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-tag-templates-fields-patch/">Locations Tag Templates Fields Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-tag-templates-fields-rename/">Locations Tag Templates Fields Rename</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-tag-templates-get/">Locations Tag Templates Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-tag-templates-get-iam-policy/">Locations Tag Templates Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-tag-templates-patch/">Locations Tag Templates Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-tag-templates-set-iam-policy/">Locations Tag Templates Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-tag-templates-test-iam-permissions/">Locations Tag Templates Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-create/">Locations Taxonomies Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-delete/">Locations Taxonomies Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-export/">Locations Taxonomies Export</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-get/">Locations Taxonomies Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-get-iam-policy/">Locations Taxonomies Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-import/">Locations Taxonomies Import</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-list/">Locations Taxonomies List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-patch/">Locations Taxonomies Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-policy-tags-create/">Locations Taxonomies Policy Tags Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-policy-tags-delete/">Locations Taxonomies Policy Tags Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-policy-tags-get/">Locations Taxonomies Policy Tags Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-policy-tags-get-iam-policy/">Locations Taxonomies Policy Tags Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-policy-tags-list/">Locations Taxonomies Policy Tags List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-policy-tags-patch/">Locations Taxonomies Policy Tags Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-policy-tags-set-iam-policy/">Locations Taxonomies Policy Tags Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-policy-tags-test-iam-permissions/">Locations Taxonomies Policy Tags Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-replace/">Locations Taxonomies Replace</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-set-iam-policy/">Locations Taxonomies Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-taxonomies-test-iam-permissions/">Locations Taxonomies Test Iam Permissions</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Data Catalog v5.0.4+20240222</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Locations Entry Groups Entries Patch</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/datacatalog1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Locations Entry Groups Entries Patch</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/datacatalog1-cli/edit/master/docs/projects_locations-entry-groups-entries-patch.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates an existing entry. You must enable the Data Catalog API in the project identified by the <code>entry.name</code> parameter. For more information, see <a href="https://cloud.google.com/data-catalog/docs/concepts/resource-project">Data Catalog resource project</a>.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates an existing entry. You must enable the Data Catalog API in the project identified by the <code>entry.name</code> parameter. For more information, see <a href="https://cloud.google.com/data-catalog/docs/concepts/resource-project">Data Catalog resource project</a>.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -447,6 +244,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   business-context:
     entry-overview:
       overview: string
+  cloud-bigtable-system-spec:
+    instance-display-name: string
   data-source:
     resource: string
     service: string
@@ -463,6 +262,10 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       connection-type: string
       has-credential: boolean
   database-table-spec:
+    database-view-spec:
+      base-table: string
+      sql-query: string
+      view-type: string
     dataplex-table:
       dataplex-spec:
         asset: string
@@ -477,8 +280,14 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         project-id: string
       user-managed: boolean
     type: string
+  dataset-spec:
+    vertex-dataset-spec:
+      data-item-count: int64
+      data-type: string
   description: string
   display-name: string
+  feature-online-store-spec:
+    storage-type: string
   fileset-spec:
     dataplex-fileset:
       dataplex-spec:
@@ -498,6 +307,22 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   integrated-system: string
   labels: { string: string }
   linked-resource: string
+  looker-system-spec:
+    parent-instance-display-name: string
+    parent-instance-id: string
+    parent-model-display-name: string
+    parent-model-id: string
+    parent-view-display-name: string
+    parent-view-id: string
+  model-spec:
+    vertex-model-spec:
+      container-image-uri: string
+      version-aliases: [string]
+      version-description: string
+      version-id: string
+      vertex-model-source-info:
+        copy: boolean
+        source-type: string
   name: string
   personal-details:
     star-time: string
@@ -513,17 +338,21 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     create-time: string
     expire-time: string
     update-time: string
+  sql-database-system-spec:
+    database-version: string
+    instance-host: string
+    sql-engine: string
   type: string
   usage-signal:
+    favorite-count: int64
     update-time: string
   user-specified-system: string
   user-specified-type: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .bigquery-date-sharded-spec    dataset=voluptua.</code><ul>
+<li><code>-r .bigquery-date-sharded-spec    dataset=ipsum</code><ul>
 <li>Output only. The Data Catalog resource name of the dataset entry the current table belongs to. For example: <code>projects/{PROJECT_ID}/locations/{LOCATION}/entrygroups/{ENTRY_GROUP_ID}/entries/{ENTRY_ID}</code>.</li>
 </ul>
 </li>
@@ -531,18 +360,18 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Output only. BigQuery resource name of the latest shard.</li>
 </ul>
 </li>
-<li><code>shard-count=-31</code><ul>
+<li><code>shard-count=-8</code><ul>
 <li>Output only. Total number of shards.</li>
 </ul>
 </li>
 <li>
-<p><code>table-prefix=consetetur</code></p>
+<p><code>table-prefix=lorem</code></p>
 <ul>
 <li>Output only. The table name prefix of the shards. The name of any given shard is <code>[table_prefix]YYYYMMDD</code>. For example, for the <code>MyTable20180101</code> shard, the <code>table_prefix</code> is <code>MyTable</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..bigquery-table-spec    table-source-type=amet.</code></p>
+<p><code>..bigquery-table-spec    table-source-type=est</code></p>
 <ul>
 <li>Output only. The table source type.</li>
 </ul>
@@ -554,7 +383,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..view-spec    view-query=takimata</code></p>
+<p><code>..view-spec    view-query=diam</code></p>
 <ul>
 <li>Output only. The query that defines the table view.</li>
 </ul>
@@ -566,70 +395,92 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>...data-source    resource=gubergren</code></p>
+<p><code>...cloud-bigtable-system-spec    instance-display-name=dolores</code></p>
+<ul>
+<li>Display name of the Instance. This is user specified and different from the resource name.</li>
+</ul>
+</li>
+<li>
+<p><code>..data-source    resource=et</code></p>
 <ul>
 <li>Full name of a resource as defined by the service. For example: <code>//bigquery.googleapis.com/projects/{PROJECT_ID}/locations/{LOCATION}/datasets/{DATASET_ID}/tables/{TABLE_ID}</code></li>
 </ul>
 </li>
-<li><code>service=et</code><ul>
+<li><code>service=sed</code><ul>
 <li>Service that physically stores the data.</li>
 </ul>
 </li>
-<li><code>source-entry=accusam</code><ul>
+<li><code>source-entry=no</code><ul>
 <li>Output only. Data Catalog entry name, if applicable.</li>
 </ul>
 </li>
-<li><code>storage-properties    file-pattern=voluptua.</code><ul>
+<li><code>storage-properties    file-pattern=et</code><ul>
 <li>Patterns to identify a set of files for this fileset. Examples of a valid <code>file_pattern</code>: * <code>gs://bucket_name/dir/*</code>: matches all files in the <code>bucket_name/dir</code> directory * <code>gs://bucket_name/dir/**</code>: matches all files in the <code>bucket_name/dir</code> and all subdirectories recursively * <code>gs://bucket_name/file*</code>: matches files prefixed by <code>file</code> in <code>bucket_name</code> * <code>gs://bucket_name/??.txt</code>: matches files with two characters followed by <code>.txt</code> in <code>bucket_name</code> * <code>gs://bucket_name/[aeiou].txt</code>: matches files that contain a single vowel character followed by <code>.txt</code> in <code>bucket_name</code> * <code>gs://bucket_name/[a-m].txt</code>: matches files that contain <code>a</code>, <code>b</code>, ... or <code>m</code> followed by <code>.txt</code> in <code>bucket_name</code> * <code>gs://bucket_name/a/*/b</code>: matches all files in <code>bucket_name</code> that match the <code>a/*/b</code> pattern, such as <code>a/c/b</code>, <code>a/d/b</code> * <code>gs://another_bucket/a.txt</code>: matches <code>gs://another_bucket/a.txt</code></li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>file-type=dolore</code></p>
+<p><code>file-type=elitr</code></p>
 <ul>
 <li>File type in MIME format, for example, <code>text/plain</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>...data-source-connection-spec.bigquery-connection-spec.cloud-sql    database=dolore</code></p>
+<p><code>...data-source-connection-spec.bigquery-connection-spec.cloud-sql    database=sed</code></p>
 <ul>
 <li>Database name.</li>
 </ul>
 </li>
-<li><code>instance-id=dolore</code><ul>
+<li><code>instance-id=no</code><ul>
 <li>Cloud SQL instance ID in the format of <code>project:location:instance</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>type=voluptua.</code></p>
+<p><code>type=nonumy</code></p>
 <ul>
 <li>Type of the Cloud SQL database.</li>
 </ul>
 </li>
 <li>
-<p><code>..    connection-type=amet.</code></p>
+<p><code>..    connection-type=at</code></p>
 <ul>
 <li>The type of the BigQuery connection.</li>
 </ul>
 </li>
 <li>
-<p><code>has-credential=false</code></p>
+<p><code>has-credential=true</code></p>
 <ul>
 <li>True if there are credentials attached to the BigQuery connection; false otherwise.</li>
 </ul>
 </li>
 <li>
-<p><code>...database-table-spec.dataplex-table.dataplex-spec    asset=lorem</code></p>
+<p><code>...database-table-spec.database-view-spec    base-table=aliquyam</code></p>
+<ul>
+<li>Name of a singular table this view reflects one to one.</li>
+</ul>
+</li>
+<li><code>sql-query=dolores</code><ul>
+<li>SQL query used to generate this view.</li>
+</ul>
+</li>
+<li>
+<p><code>view-type=sadipscing</code></p>
+<ul>
+<li>Type of this view.</li>
+</ul>
+</li>
+<li>
+<p><code>..dataplex-table.dataplex-spec    asset=erat</code></p>
 <ul>
 <li>Fully qualified resource name of an asset in Dataplex, to which the underlying data source (Cloud Storage bucket or BigQuery dataset) of the entity is attached.</li>
 </ul>
 </li>
-<li><code>compression-format=invidunt</code><ul>
+<li><code>compression-format=aliquyam</code><ul>
 <li>Compression format of the data, e.g., zip, gzip etc.</li>
 </ul>
 </li>
 <li>
-<p><code>data-format.avro    text=no</code></p>
+<p><code>data-format.avro    text=amet</code></p>
 <ul>
 <li>JSON source of the Avro schema.</li>
 </ul>
@@ -641,13 +492,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..thrift    text=at</code></p>
+<p><code>..thrift    text=et</code></p>
 <ul>
 <li>Thrift IDL source of the schema.</li>
 </ul>
 </li>
 <li>
-<p><code>...    project-id=sed</code></p>
+<p><code>...    project-id=sea</code></p>
 <ul>
 <li>Project ID of the underlying Cloud Storage or BigQuery data. Note that this may not be the same project as the correspondingly Dataplex lake / zone / asset.</li>
 </ul>
@@ -659,61 +510,81 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    type=et</code></p>
+<p><code>..    type=consetetur</code></p>
 <ul>
 <li>Type of this table.</li>
 </ul>
 </li>
 <li>
-<p><code>..    description=tempor</code></p>
+<p><code>..dataset-spec.vertex-dataset-spec    data-item-count=-65</code></p>
+<ul>
+<li>The number of DataItems in this Dataset. Only apply for non-structured Dataset.</li>
+</ul>
+</li>
+<li>
+<p><code>data-type=est</code></p>
+<ul>
+<li>Type of the dataset.</li>
+</ul>
+</li>
+<li>
+<p><code>...    description=aliquyam</code></p>
 <ul>
 <li>Entry description that can consist of several sentences or paragraphs that describe entry contents. The description must not contain Unicode non-characters as well as C0 and C1 control codes except tabs (HT), new lines (LF), carriage returns (CR), and page breaks (FF). The maximum size is 2000 bytes when encoded in UTF-8. Default value is an empty string.</li>
 </ul>
 </li>
-<li><code>display-name=aliquyam</code><ul>
-<li>Display name of an entry. The name must contain only Unicode letters, numbers (0-9), underscores (_), dashes (-), spaces ( ), and can&#39;t start or end with spaces. The maximum size is 200 bytes when encoded in UTF-8. Default value is an empty string.</li>
+<li><code>display-name=elitr</code><ul>
+<li>Display name of an entry. The maximum size is 500 bytes when encoded in UTF-8. Default value is an empty string.</li>
 </ul>
 </li>
-<li><code>fileset-spec.dataplex-fileset.dataplex-spec    asset=ipsum</code><ul>
+<li>
+<p><code>feature-online-store-spec    storage-type=duo</code></p>
+<ul>
+<li>Output only. Type of underelaying storage for the FeatureOnlineStore.</li>
+</ul>
+</li>
+<li>
+<p><code>..fileset-spec.dataplex-fileset.dataplex-spec    asset=diam</code></p>
+<ul>
 <li>Fully qualified resource name of an asset in Dataplex, to which the underlying data source (Cloud Storage bucket or BigQuery dataset) of the entity is attached.</li>
 </ul>
 </li>
-<li><code>compression-format=et</code><ul>
+<li><code>compression-format=est</code><ul>
 <li>Compression format of the data, e.g., zip, gzip etc.</li>
 </ul>
 </li>
 <li>
-<p><code>data-format.avro    text=sanctus</code></p>
+<p><code>data-format.avro    text=sit</code></p>
 <ul>
 <li>JSON source of the Avro schema.</li>
 </ul>
 </li>
 <li>
-<p><code>..protobuf    text=lorem</code></p>
+<p><code>..protobuf    text=sed</code></p>
 <ul>
 <li>Protocol buffer source of the schema.</li>
 </ul>
 </li>
 <li>
-<p><code>..thrift    text=est</code></p>
+<p><code>..thrift    text=eos</code></p>
 <ul>
 <li>Thrift IDL source of the schema.</li>
 </ul>
 </li>
 <li>
-<p><code>...    project-id=sed</code></p>
+<p><code>...    project-id=lorem</code></p>
 <ul>
 <li>Project ID of the underlying Cloud Storage or BigQuery data. Note that this may not be the same project as the correspondingly Dataplex lake / zone / asset.</li>
 </ul>
 </li>
 <li>
-<p><code>....    fully-qualified-name=diam</code></p>
+<p><code>....    fully-qualified-name=ea</code></p>
 <ul>
-<li>Fully qualified name (FQN) of the resource. Set automatically for entries representing resources from synced systems. Settable only during creation and read-only afterwards. Can be used for search and lookup of the entries. FQNs take two forms: * For non-regionalized resources: <code>{SYSTEM}:{PROJECT}.{PATH_TO_RESOURCE_SEPARATED_WITH_DOTS}</code> * For regionalized resources: <code>{SYSTEM}:{PROJECT}.{LOCATION_ID}.{PATH_TO_RESOURCE_SEPARATED_WITH_DOTS}</code> Example for a DPMS table: <code>dataproc_metastore:{PROJECT_ID}.{LOCATION_ID}.{INSTANCE_ID}.{DATABASE_ID}.{TABLE_ID}</code></li>
+<li><a href="https://cloud.google.com//data-catalog/docs/fully-qualified-names">Fully Qualified Name (FQN)</a> of the resource. Set automatically for entries representing resources from synced systems. Settable only during creation, and read-only later. Can be used for search and lookup of the entries. </li>
 </ul>
 </li>
 <li>
-<p><code>gcs-fileset-spec    file-patterns=dolores</code></p>
+<p><code>gcs-fileset-spec    file-patterns=stet</code></p>
 <ul>
 <li>Required. Patterns to identify a set of files in Google Cloud Storage. For more information, see [Wildcard Names] (https://cloud.google.com/storage/docs/gsutil/addlhelp/WildcardNames). Note: Currently, bucket wildcards are not supported. Examples of valid <code>file_patterns</code>: * <code>gs://bucket_name/dir/*</code>: matches all files in <code>bucket_name/dir</code> directory * <code>gs://bucket_name/dir/**</code>: matches all files in <code>bucket_name/dir</code> and all subdirectories * <code>gs://bucket_name/file*</code>: matches files prefixed by <code>file</code> in <code>bucket_name</code> * <code>gs://bucket_name/??.txt</code>: matches files with two characters followed by <code>.txt</code> in <code>bucket_name</code> * <code>gs://bucket_name/[aeiou].txt</code>: matches files that contain a single vowel character followed by <code>.txt</code> in <code>bucket_name</code> * <code>gs://bucket_name/[a-m].txt</code>: matches files that contain <code>a</code>, <code>b</code>, ... or <code>m</code> followed by <code>.txt</code> in <code>bucket_name</code> * <code>gs://bucket_name/a/*/b</code>: matches all files in <code>bucket_name</code> that match the <code>a/*/b</code> pattern, such as <code>a/c/b</code>, <code>a/d/b</code> * <code>gs://another_bucket/a.txt</code>: matches <code>gs://another_bucket/a.txt</code> You can combine wildcards to match complex sets of files, for example: <code>gs://bucket_name/[a-m]??.j*g</code></li>
 <li>Each invocation of this argument appends the given value to the array.</li>
@@ -725,91 +596,168 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Output only. Indicates the entry&#39;s source system that Data Catalog integrates with, such as BigQuery, Pub/Sub, or Dataproc Metastore.</li>
 </ul>
 </li>
-<li><code>labels=key=et</code><ul>
+<li><code>labels=key=eos</code><ul>
 <li>Cloud labels attached to the entry. In Data Catalog, you can create and modify labels attached only to custom entries. Synced entries have unmodifiable labels that come from the source system.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>linked-resource=sed</code><ul>
+<li><code>linked-resource=et</code><ul>
 <li>The resource this metadata entry refers to. For Google Cloud Platform resources, <code>linked_resource</code> is the [Full Resource Name] (https://cloud.google.com/apis/design/resource_names#full_resource_name). For example, the <code>linked_resource</code> for a table resource from BigQuery is: <code>//bigquery.googleapis.com/projects/{PROJECT_ID}/datasets/{DATASET_ID}/tables/{TABLE_ID}</code> Output only when the entry is one of the types in the <code>EntryType</code> enum. For entries with a <code>user_specified_type</code>, this field is optional and defaults to an empty string. The resource string must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), periods (.), colons (:), slashes (/), dashes (-), and hashes (#). The maximum size is 200 bytes when encoded in UTF-8.</li>
 </ul>
 </li>
-<li><code>name=no</code><ul>
+<li><code>looker-system-spec    parent-instance-display-name=sea</code><ul>
+<li>Name of the parent Looker Instance. Empty if it does not exist.</li>
+</ul>
+</li>
+<li><code>parent-instance-id=et</code><ul>
+<li>ID of the parent Looker Instance. Empty if it does not exist. Example value: <code>someinstance.looker.com</code></li>
+</ul>
+</li>
+<li><code>parent-model-display-name=at</code><ul>
+<li>Name of the parent Model. Empty if it does not exist.</li>
+</ul>
+</li>
+<li><code>parent-model-id=dolore</code><ul>
+<li>ID of the parent Model. Empty if it does not exist.</li>
+</ul>
+</li>
+<li><code>parent-view-display-name=eirmod</code><ul>
+<li>Name of the parent View. Empty if it does not exist.</li>
+</ul>
+</li>
+<li>
+<p><code>parent-view-id=lorem</code></p>
+<ul>
+<li>ID of the parent View. Empty if it does not exist.</li>
+</ul>
+</li>
+<li>
+<p><code>..model-spec.vertex-model-spec    container-image-uri=accusam</code></p>
+<ul>
+<li>URI of the Docker image to be used as the custom container for serving predictions.</li>
+</ul>
+</li>
+<li><code>version-aliases=amet</code><ul>
+<li>User provided version aliases so that a model version can be referenced via alias</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>version-description=erat</code><ul>
+<li>The description of this version.</li>
+</ul>
+</li>
+<li><code>version-id=dolores</code><ul>
+<li>The version ID of the model.</li>
+</ul>
+</li>
+<li><code>vertex-model-source-info    copy=false</code><ul>
+<li>If this Model is copy of another Model. If true then source_type pertains to the original.</li>
+</ul>
+</li>
+<li>
+<p><code>source-type=accusam</code></p>
+<ul>
+<li>Type of the model source.</li>
+</ul>
+</li>
+<li>
+<p><code>....    name=sea</code></p>
+<ul>
 <li>Output only. The resource name of an entry in URL format. Note: The entry itself and its child resources might not be stored in the location specified in its name.</li>
 </ul>
 </li>
-<li><code>personal-details    star-time=et</code><ul>
+<li><code>personal-details    star-time=takimata</code><ul>
 <li>Set if the entry is starred; unset otherwise.</li>
 </ul>
 </li>
 <li>
-<p><code>starred=false</code></p>
+<p><code>starred=true</code></p>
 <ul>
 <li>True if the entry is starred by the user; false otherwise.</li>
 </ul>
 </li>
 <li>
-<p><code>..routine-spec.bigquery-routine-spec    imported-libraries=sed</code></p>
+<p><code>..routine-spec.bigquery-routine-spec    imported-libraries=et</code></p>
 <ul>
 <li>Paths of the imported libraries.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    definition-body=no</code></p>
+<p><code>..    definition-body=at</code></p>
 <ul>
 <li>The body of the routine.</li>
 </ul>
 </li>
-<li><code>language=nonumy</code><ul>
+<li><code>language=dolor</code><ul>
 <li>The language the routine is written in. The exact value depends on the source system. For BigQuery routines, possible values are: * <code>SQL</code> * <code>JAVASCRIPT</code></li>
 </ul>
 </li>
-<li><code>return-type=at</code><ul>
+<li><code>return-type=et</code><ul>
 <li>Return type of the argument. The exact value depends on the source system and the language.</li>
 </ul>
 </li>
 <li>
-<p><code>routine-type=sadipscing</code></p>
+<p><code>routine-type=sit</code></p>
 <ul>
 <li>The type of the routine.</li>
 </ul>
 </li>
 <li>
-<p><code>..source-system-timestamps    create-time=aliquyam</code></p>
+<p><code>..source-system-timestamps    create-time=erat</code></p>
 <ul>
 <li>Creation timestamp of the resource within the given system.</li>
 </ul>
 </li>
-<li><code>expire-time=dolores</code><ul>
+<li><code>expire-time=sea</code><ul>
 <li>Output only. Expiration timestamp of the resource within the given system. Currently only applicable to BigQuery resources.</li>
 </ul>
 </li>
 <li>
-<p><code>update-time=sadipscing</code></p>
+<p><code>update-time=nonumy</code></p>
 <ul>
 <li>Timestamp of the last modification of the resource or its metadata within a given system. Note: Depending on the source system, not every modification updates this timestamp. For example, BigQuery timestamps every metadata modification but not data or permission changes.</li>
 </ul>
 </li>
 <li>
-<p><code>..    type=erat</code></p>
+<p><code>..sql-database-system-spec    database-version=et</code></p>
 <ul>
-<li>The type of the entry. Only used for entries with types listed in the <code>EntryType</code> enum. Currently, only <code>FILESET</code> enum value is allowed. All other entries created in Data Catalog must use the <code>user_specified_type</code>.</li>
+<li>Version of the database engine.</li>
+</ul>
+</li>
+<li><code>instance-host=gubergren</code><ul>
+<li>Host of the SQL database enum InstanceHost { UNDEFINED = 0; SELF_HOSTED = 1; CLOUD_SQL = 2; AMAZON_RDS = 3; AZURE_SQL = 4; } Host of the enclousing database instance.</li>
 </ul>
 </li>
 <li>
-<p><code>usage-signal    update-time=aliquyam</code></p>
+<p><code>sql-engine=justo</code></p>
+<ul>
+<li>SQL Database Engine. enum SqlEngine { UNDEFINED = 0; MY_SQL = 1; POSTGRE_SQL = 2; SQL_SERVER = 3; } Engine of the enclosing database instance.</li>
+</ul>
+</li>
+<li>
+<p><code>..    type=sea</code></p>
+<ul>
+<li>The type of the entry. For details, see <a href="#entrytype"><code>EntryType</code></a>.</li>
+</ul>
+</li>
+<li><code>usage-signal    favorite-count=-96</code><ul>
+<li>Favorite count in the source system.</li>
+</ul>
+</li>
+<li>
+<p><code>update-time=sit</code></p>
 <ul>
 <li>The end timestamp of the duration of usage statistics.</li>
 </ul>
 </li>
 <li>
-<p><code>..    user-specified-system=amet</code></p>
+<p><code>..    user-specified-system=aliquyam</code></p>
 <ul>
 <li>Indicates the entry&#39;s source system that Data Catalog doesn&#39;t automatically integrate with. The <code>user_specified_system</code> string has the following limitations: * Is case insensitive. * Must begin with a letter or underscore. * Can only contain letters, numbers, and underscores. * Must be at least 1 character and at most 64 characters long.</li>
 </ul>
 </li>
-<li><code>user-specified-type=est</code><ul>
+<li><code>user-specified-type=eos</code><ul>
 <li>Custom entry type that doesn&#39;t match any of the values allowed for input and listed in the <code>EntryType</code> enum. When creating an entry, first check the type values in the enum. If there are no appropriate types for the new entry, provide a custom value, for example, <code>my_special_type</code>. The <code>user_specified_type</code> string has the following limitations: * Is case insensitive. * Must begin with a letter or underscore. * Can only contain letters, numbers, and underscores. * Must be at least 1 character and at most 64 characters long.</li>
 </ul>
 </li>
@@ -913,32 +861,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_locations-entry-groups-entries-star" class="btn btn-neutral float-right" title="Locations Entry Groups Entries Star"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_locations-entry-groups-entries-modify-entry-overview" class="btn btn-neutral" title="Locations Entry Groups Entries Modify Entry Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_locations-entry-groups-entries-modify-entry-overview/" class="btn btn-neutral float-left" title="Locations Entry Groups Entries Modify Entry Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-entry-groups-entries-star/" class="btn btn-neutral float-right" title="Locations Entry Groups Entries Star">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -946,14 +886,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_locations-entry-groups-entries-modify-entry-overview" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-entry-groups-entries-star" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/datacatalog1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_locations-entry-groups-entries-modify-entry-overview/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_locations-entry-groups-entries-star/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

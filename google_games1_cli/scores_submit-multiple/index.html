@@ -1,312 +1,184 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Submit Multiple - Games v3.0.0+20220217</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-games1-cli/scores_submit-multiple/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Submit Multiple - Games v5.0.4+20240228</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Submit Multiple";
+        var mkdocs_page_input_path = "scores_submit-multiple.md";
+        var mkdocs_page_url = "/google-apis-rs/google-games1-cli/scores_submit-multiple/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Games v3.0.0+20220217</a>
-        
+          <a href=".." class="icon icon-home"> Games v5.0.4+20240228
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Achievement Definitions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../achievement-definitions_list">List</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-        
-
-    
-        
-        <span>Achievements</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../achievements_increment">Increment</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../achievements_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../achievements_reveal">Reveal</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../achievements_set-steps-at-least">Set Steps At Least</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../achievements_unlock">Unlock</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../achievements_update-multiple">Update Multiple</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Applications</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../applications_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../applications_get-end-point">Get End Point</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../applications_played">Played</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../applications_verify">Verify</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Events</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../events_list-by-player">List By Player</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../events_list-definitions">List Definitions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../events_record">Record</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Leaderboards</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../leaderboards_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../leaderboards_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Metagame</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../metagame_get-metagame-config">Get Metagame Config</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../metagame_list-categories-by-player">List Categories By Player</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Players</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../players_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../players_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Revisions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_check">Check</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Scores</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../scores_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../scores_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../scores_list-window">List Window</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../scores_submit">Submit</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Submit Multiple</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Snapshots</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../snapshots_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../snapshots_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Stats</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../stats_get">Get</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Achievement Definitions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../achievement-definitions_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Achievements</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../achievements_increment/">Increment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../achievements_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../achievements_reveal/">Reveal</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../achievements_set-steps-at-least/">Set Steps At Least</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../achievements_unlock/">Unlock</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../achievements_update-multiple/">Update Multiple</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Applications</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../applications_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../applications_get-end-point/">Get End Point</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../applications_played/">Played</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../applications_verify/">Verify</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Events</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../events_list-by-player/">List By Player</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../events_list-definitions/">List Definitions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../events_record/">Record</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Leaderboards</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../leaderboards_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../leaderboards_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Metagame</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../metagame_get-metagame-config/">Get Metagame Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../metagame_list-categories-by-player/">List Categories By Player</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Players</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../players_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../players_get-multiple-application-player-ids/">Get Multiple Application Player Ids</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../players_get-scoped-player-ids/">Get Scoped Player Ids</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../players_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Recall</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../recall_link-persona/">Link Persona</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../recall_reset-persona/">Reset Persona</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../recall_retrieve-tokens/">Retrieve Tokens</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../recall_unlink-persona/">Unlink Persona</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Revisions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_check/">Check</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Scores</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../scores_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../scores_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../scores_list-window/">List Window</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../scores_submit/">Submit</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Submit Multiple</a>
+    <ul class="current">
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Snapshots</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../snapshots_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../snapshots_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Stats</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../stats_get/">Get</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Games v5.0.4+20240228</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Submit Multiple</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/games1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Scores &raquo;</li>
+      <li>Submit Multiple</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/games1-cli/edit/master/docs/scores_submit-multiple.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Submits multiple scores to leaderboards.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Submits multiple scores to leaderboards.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/games</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/games</em>.
@@ -319,10 +191,9 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   kind: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    kind=voluptua.</code><ul>
+<li><code>-r .    kind=gubergren</code><ul>
 <li>Uniquely identifies the type of this resource. Value is always the fixed string <code>games#playerScoreSubmissionList</code>.</li>
 </ul>
 </li>
@@ -426,32 +297,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../snapshots_get" class="btn btn-neutral float-right" title="Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../scores_submit" class="btn btn-neutral" title="Submit"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../scores_submit/" class="btn btn-neutral float-left" title="Submit"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../snapshots_get/" class="btn btn-neutral float-right" title="Get">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -459,14 +322,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../scores_submit" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../snapshots_get" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/games1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../scores_submit/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../snapshots_get/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

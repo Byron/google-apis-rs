@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"macro":["declare_TCFType","impl_CFComparison","impl_CFTypeDescription","impl_TCFType"],"mod":["array","attributed_string","base","boolean","bundle","characterset","data","date","dictionary","error","filedescriptor","mach_port","number","propertylist","runloop","set","string","timezone","url","uuid"],"trait":["ConcreteCFType"]};

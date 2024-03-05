@@ -1,193 +1,116 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Patch - My Business Account Management v3.0.0+20220305</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-mybusinessaccountmanagement1-cli/accounts_patch/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Patch - My Business Account Management v5.0.4+20240304</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Patch";
+        var mkdocs_page_input_path = "accounts_patch.md";
+        var mkdocs_page_url = "/google-apis-rs/google-mybusinessaccountmanagement1-cli/accounts_patch/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> My Business Account Management v3.0.0+20220305</a>
-        
+          <a href=".." class="icon icon-home"> My Business Account Management v5.0.4+20240304
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Accounts</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_admins-create">Admins Create</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_admins-delete">Admins Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_admins-list">Admins List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_admins-patch">Admins Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_create">Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_invitations-accept">Invitations Accept</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_invitations-decline">Invitations Decline</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_invitations-list">Invitations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Patch</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Locations</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_admins-create">Admins Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_admins-delete">Admins Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_admins-list">Admins List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_admins-patch">Admins Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_transfer">Transfer</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Accounts</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_admins-create/">Admins Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_admins-delete/">Admins Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_admins-list/">Admins List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_admins-patch/">Admins Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_invitations-accept/">Invitations Accept</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_invitations-decline/">Invitations Decline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_invitations-list/">Invitations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_list/">List</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Patch</a>
+    <ul class="current">
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Locations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_admins-create/">Admins Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_admins-delete/">Admins Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_admins-list/">Admins List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_admins-patch/">Admins Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_transfer/">Transfer</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">My Business Account Management v5.0.4+20240304</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Patch</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinessaccountmanagement1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Accounts &raquo;</li>
+      <li>Patch</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinessaccountmanagement1-cli/edit/master/docs/accounts_patch.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates the specified business account. Personal accounts cannot be updated using this method.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates the specified business account. Personal accounts cannot be updated using this method.</p>
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
@@ -226,35 +149,34 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   vetted-state: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    account-name=est</code><ul>
+<li><code>-r .    account-name=ea</code><ul>
 <li>Required. The name of the account. For an account of type <code>PERSONAL</code>, this is the first and last name of the user account.</li>
 </ul>
 </li>
-<li><code>account-number=gubergren</code><ul>
+<li><code>account-number=dolor</code><ul>
 <li>Output only. Account reference number if provisioned.</li>
 </ul>
 </li>
-<li><code>name=ea</code><ul>
+<li><code>name=lorem</code><ul>
 <li>Immutable. The resource name, in the format <code>accounts/{account_id}</code>.</li>
 </ul>
 </li>
-<li><code>organization-info.address    address-lines=dolor</code><ul>
+<li><code>organization-info.address    address-lines=eos</code><ul>
 <li>Unstructured address lines describing the lower levels of an address. Because values in address_lines do not have type information and may sometimes contain multiple values in a single field (e.g. &#34;Austin, TX&#34;), it is important that the line order is clear. The order of address lines should be &#34;envelope order&#34; for the country/region of the address. In places where this can vary (e.g. Japan), address_language is used to make it explicit (e.g. &#34;ja&#34; for large-to-small ordering and &#34;ja-Latn&#34; or &#34;en&#34; for small-to-large). This way, the most specific line of an address can be selected based on the language. The minimum permitted structural representation of an address consists of a region_code with all remaining information placed in the address_lines. It would be possible to format such an address very approximately without geocoding, but no semantic reasoning could be made about any of the address components until it was at least partially resolved. Creating an address only containing a region_code and address_lines, and then geocoding is the recommended way to handle completely unstructured addresses (as opposed to guessing which parts of the address should be localities or administrative areas).</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>administrative-area=lorem</code><ul>
+<li><code>administrative-area=labore</code><ul>
 <li>Optional. Highest administrative subdivision which is used for postal addresses of a country or region. For example, this can be a state, a province, an oblast, or a prefecture. Specifically, for Spain this is the province and not the autonomous community (e.g. &#34;Barcelona&#34; and not &#34;Catalonia&#34;). Many countries don&#39;t use an administrative area in postal addresses. E.g. in Switzerland this should be left unpopulated.</li>
 </ul>
 </li>
-<li><code>language-code=eos</code><ul>
+<li><code>language-code=sed</code><ul>
 <li>Optional. BCP-47 language code of the contents of this address (if known). This is often the UI language of the input form or is expected to match one of the languages used in the address&#39; country/region, or their transliterated equivalents. This can affect formatting in certain countries, but is not critical to the correctness of the data and will never affect any validation or other non-formatting related operations. If this value is not known, it should be omitted (rather than specifying a possibly incorrect default). Examples: &#34;zh-Hant&#34;, &#34;ja&#34;, &#34;ja-Latn&#34;, &#34;en&#34;.</li>
 </ul>
 </li>
-<li><code>locality=labore</code><ul>
+<li><code>locality=duo</code><ul>
 <li>Optional. Generally refers to the city/town portion of the address. Examples: US city, IT comune, UK post town. In regions of the world where localities are not well defined or do not fit into this structure well, leave locality empty and use address_lines.</li>
 </ul>
 </li>
@@ -262,24 +184,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Optional. The name of the organization at the address.</li>
 </ul>
 </li>
-<li><code>postal-code=duo</code><ul>
+<li><code>postal-code=no</code><ul>
 <li>Optional. Postal code of the address. Not all countries use or require postal codes to be present, but where they are used, they may trigger additional validation with other parts of the address (e.g. state/zip validation in the U.S.A.).</li>
 </ul>
 </li>
-<li><code>recipients=sed</code><ul>
+<li><code>recipients=stet</code><ul>
 <li>Optional. The recipient at the address. This field may, under certain circumstances, contain multiline information. For example, it might contain &#34;care of&#34; information.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>region-code=no</code><ul>
+<li><code>region-code=kasd</code><ul>
 <li>Required. CLDR region code of the country/region of the address. This is never inferred and it is up to the user to ensure the value is correct. See https://cldr.unicode.org/ and https://www.unicode.org/cldr/charts/30/supplemental/territory_information.html for details. Example: &#34;CH&#34; for Switzerland.</li>
 </ul>
 </li>
-<li><code>revision=86</code><ul>
+<li><code>revision=77</code><ul>
 <li>The schema revision of the <code>PostalAddress</code>. This must be set to 0, which is the latest revision. All new revisions <strong>must</strong> be backward compatible with old revisions.</li>
 </ul>
 </li>
-<li><code>sorting-code=kasd</code><ul>
+<li><code>sorting-code=sed</code><ul>
 <li>Optional. Additional, country-specific, sorting code. This is not used in most regions. Where it is used, the value is either a string like &#34;CEDEX&#34;, optionally followed by a number (e.g. &#34;CEDEX 7&#34;), or just a number alone, representing the &#34;sector code&#34; (Jamaica), &#34;delivery area indicator&#34; (Malawi) or &#34;post office indicator&#34; (e.g. Côte d&#39;Ivoire).</li>
 </ul>
 </li>
@@ -290,40 +212,40 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    phone-number=sed</code></p>
+<p><code>..    phone-number=et</code></p>
 <ul>
 <li>Output only. The contact number for the organization.</li>
 </ul>
 </li>
 <li>
-<p><code>registered-domain=et</code></p>
+<p><code>registered-domain=vero</code></p>
 <ul>
 <li>Output only. The registered domain for the account.</li>
 </ul>
 </li>
 <li>
-<p><code>..    permission-level=et</code></p>
+<p><code>..    permission-level=erat</code></p>
 <ul>
 <li>Output only. Specifies the permission level the user has for this account.</li>
 </ul>
 </li>
-<li><code>primary-owner=vero</code><ul>
-<li>Required. Input only. The resource name of the account which will be the primary owner of the account being created. It should be of the form <code>accounts/{account_id}/</code>.</li>
+<li><code>primary-owner=sed</code><ul>
+<li>Required. Input only. The resource name of the account which will be the primary owner of the account being created. It should be of the form <code>accounts/{account_id}</code>.</li>
 </ul>
 </li>
-<li><code>role=erat</code><ul>
+<li><code>role=duo</code><ul>
 <li>Output only. Specifies the AccountRole of this account.</li>
 </ul>
 </li>
-<li><code>type=sed</code><ul>
+<li><code>type=dolore</code><ul>
 <li>Required. Contains the type of account. Accounts of type PERSONAL and ORGANIZATION cannot be created using this API.</li>
 </ul>
 </li>
-<li><code>verification-state=duo</code><ul>
+<li><code>verification-state=et</code><ul>
 <li>Output only. If verified, future locations that are created are automatically connected to Google Maps, and have Google+ pages created, without requiring moderation.</li>
 </ul>
 </li>
-<li><code>vetted-state=dolore</code><ul>
+<li><code>vetted-state=voluptua.</code><ul>
 <li>Output only. Indicates whether the account is vetted by Google. A vetted account is able to verify locations via the VETTED_PARTNER method.</li>
 </ul>
 </li>
@@ -435,32 +357,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../locations_admins-create" class="btn btn-neutral float-right" title="Admins Create"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../accounts_list" class="btn btn-neutral" title="List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../accounts_list/" class="btn btn-neutral float-left" title="List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../locations_admins-create/" class="btn btn-neutral float-right" title="Admins Create">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -468,14 +382,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../accounts_list" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../locations_admins-create" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinessaccountmanagement1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../accounts_list/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../locations_admins-create/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

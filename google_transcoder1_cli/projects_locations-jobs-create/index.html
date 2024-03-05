@@ -1,147 +1,97 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Locations Jobs Create - Transcoder v3.0.0+20220201</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-transcoder1-cli/projects_locations-jobs-create/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Locations Jobs Create - Transcoder v5.0.4+20240221</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Locations Jobs Create";
+        var mkdocs_page_input_path = "projects_locations-jobs-create.md";
+        var mkdocs_page_url = "/google-apis-rs/google-transcoder1-cli/projects_locations-jobs-create/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Transcoder v3.0.0+20220201</a>
-        
+          <a href=".." class="icon icon-home"> Transcoder v5.0.4+20240221
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-job-templates-create">Locations Job Templates Create</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-job-templates-delete">Locations Job Templates Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-job-templates-get">Locations Job Templates Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-job-templates-list">Locations Job Templates List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Locations Jobs Create</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-jobs-delete">Locations Jobs Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-jobs-get">Locations Jobs Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-jobs-list">Locations Jobs List</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-job-templates-create/">Locations Job Templates Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-job-templates-delete/">Locations Job Templates Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-job-templates-get/">Locations Job Templates Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-job-templates-list/">Locations Job Templates List</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Locations Jobs Create</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-delete/">Locations Jobs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-get/">Locations Jobs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-list/">Locations Jobs List</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Transcoder v5.0.4+20240221</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Locations Jobs Create</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/transcoder1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Locations Jobs Create</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/transcoder1-cli/edit/master/docs/projects_locations-jobs-create.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Creates a job in the specified region.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Creates a job in the specified region.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -158,6 +108,7 @@ You can set the scope for this method like this: <code>transcoder1 --scope &lt;s
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>Job:
+  batch-mode-priority: integer
   config:
     output:
       uri: string
@@ -169,7 +120,10 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     code: integer
     message: string
   input-uri: string
+  labels: { string: string }
+  mode: string
   name: string
+  optimization: string
   output-uri: string
   start-time: string
   state: string
@@ -177,32 +131,35 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   ttl-after-completion-days: integer
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li>
-<p><code>-r .config.output    uri=ipsum</code></p>
-<ul>
-<li>URI for the output file(s). For example, <code>gs://my-bucket/outputs/</code>. If empty the value is populated from <code>Job.output_uri</code>.</li>
+<li><code>-r .    batch-mode-priority=73</code><ul>
+<li>The processing priority of a batch job. This field can only be set for batch mode jobs. The default value is 0. This value cannot be negative. Higher values correspond to higher priorities for the job.</li>
 </ul>
 </li>
 <li>
-<p><code>..pubsub-destination    topic=voluptua.</code></p>
+<p><code>config.output    uri=at</code></p>
+<ul>
+<li>URI for the output file(s). For example, <code>gs://my-bucket/outputs/</code>. If empty, the value is populated from Job.output_uri. See <a href="https://cloud.google.com/transcoder/docs/concepts/supported-input-and-output-formats">Supported input and output formats</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>..pubsub-destination    topic=sanctus</code></p>
 <ul>
 <li>The name of the Pub/Sub topic to publish job completion notification to. For example: <code>projects/{project}/topics/{topic}</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>...    create-time=at</code></p>
+<p><code>...    create-time=sed</code></p>
 <ul>
 <li>Output only. The time the job was created.</li>
 </ul>
 </li>
-<li><code>end-time=sanctus</code><ul>
+<li><code>end-time=amet.</code><ul>
 <li>Output only. The time the transcoding finished.</li>
 </ul>
 </li>
-<li><code>error    code=21</code><ul>
+<li><code>error    code=42</code><ul>
 <li>The status code, which should be an enum value of google.rpc.Code.</li>
 </ul>
 </li>
@@ -213,32 +170,45 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    input-uri=takimata</code></p>
+<p><code>..    input-uri=duo</code></p>
 <ul>
-<li>Input only. Specify the <code>input_uri</code> to populate empty <code>uri</code> fields in each element of <code>Job.config.inputs</code> or <code>JobTemplate.config.inputs</code> when using template. URI of the media. Input files must be at least 5 seconds in duration and stored in Cloud Storage (for example, <code>gs://bucket/inputs/file.mp4</code>).</li>
+<li>Input only. Specify the <code>input_uri</code> to populate empty <code>uri</code> fields in each element of <code>Job.config.inputs</code> or <code>JobTemplate.config.inputs</code> when using template. URI of the media. Input files must be at least 5 seconds in duration and stored in Cloud Storage (for example, <code>gs://bucket/inputs/file.mp4</code>). See <a href="https://cloud.google.com/transcoder/docs/concepts/supported-input-and-output-formats">Supported input and output formats</a>.</li>
 </ul>
 </li>
-<li><code>name=amet.</code><ul>
+<li><code>labels=key=ipsum</code><ul>
+<li>The labels associated with this job. You can use these to organize and group your jobs.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>mode=gubergren</code><ul>
+<li>The processing mode of the job. The default is <code>PROCESSING_MODE_INTERACTIVE</code>.</li>
+</ul>
+</li>
+<li><code>name=lorem</code><ul>
 <li>The resource name of the job. Format: <code>projects/{project_number}/locations/{location}/jobs/{job}</code></li>
 </ul>
 </li>
-<li><code>output-uri=duo</code><ul>
-<li>Input only. Specify the <code>output_uri</code> to populate an empty <code>Job.config.output.uri</code> or <code>JobTemplate.config.output.uri</code> when using template. URI for the output file(s). For example, <code>gs://my-bucket/outputs/</code>.</li>
+<li><code>optimization=gubergren</code><ul>
+<li>Optional. The optimization strategy of the job. The default is <code>AUTODETECT</code>.</li>
 </ul>
 </li>
-<li><code>start-time=ipsum</code><ul>
+<li><code>output-uri=eos</code><ul>
+<li>Input only. Specify the <code>output_uri</code> to populate an empty <code>Job.config.output.uri</code> or <code>JobTemplate.config.output.uri</code> when using template. URI for the output file(s). For example, <code>gs://my-bucket/outputs/</code>. See <a href="https://cloud.google.com/transcoder/docs/concepts/supported-input-and-output-formats">Supported input and output formats</a>.</li>
+</ul>
+</li>
+<li><code>start-time=dolor</code><ul>
 <li>Output only. The time the transcoding started.</li>
 </ul>
 </li>
-<li><code>state=gubergren</code><ul>
+<li><code>state=ea</code><ul>
 <li>Output only. The current state of the job.</li>
 </ul>
 </li>
-<li><code>template-id=lorem</code><ul>
-<li>Input only. Specify the <code>template_id</code> to use for populating <code>Job.config</code>. The default is <code>preset/web-hd</code>. Preset Transcoder templates: - <code>preset/{preset_id}</code> - User defined JobTemplate: <code>{job_template_id}</code></li>
+<li><code>template-id=ipsum</code><ul>
+<li>Input only. Specify the <code>template_id</code> to use for populating <code>Job.config</code>. The default is <code>preset/web-hd</code>, which is the only supported preset. User defined JobTemplate: <code>{job_template_id}</code></li>
 </ul>
 </li>
-<li><code>ttl-after-completion-days=89</code><ul>
+<li><code>ttl-after-completion-days=13</code><ul>
 <li>Job time to live value in days, which will be effective after job completion. Job should be deleted automatically after the given TTL. Enter a value between 1 and 90. The default is 30.</li>
 </ul>
 </li>
@@ -332,32 +302,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_locations-jobs-delete" class="btn btn-neutral float-right" title="Locations Jobs Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_locations-job-templates-list" class="btn btn-neutral" title="Locations Job Templates List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_locations-job-templates-list/" class="btn btn-neutral float-left" title="Locations Job Templates List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-jobs-delete/" class="btn btn-neutral float-right" title="Locations Jobs Delete">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -365,14 +327,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_locations-job-templates-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-jobs-delete" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/transcoder1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_locations-job-templates-list/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_locations-jobs-delete/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

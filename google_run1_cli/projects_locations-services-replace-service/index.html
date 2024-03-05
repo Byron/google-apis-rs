@@ -1,381 +1,200 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Locations Services Replace Service - Cloud Run v3.0.0+20220225</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-run1-cli/projects_locations-services-replace-service/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Locations Services Replace Service - Cloud Run v5.0.4+20240225</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Locations Services Replace Service";
+        var mkdocs_page_input_path = "projects_locations-services-replace-service.md";
+        var mkdocs_page_url = "/google-apis-rs/google-run1-cli/projects_locations-services-replace-service/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Run v3.0.0+20220225</a>
-        
+          <a href=".." class="icon icon-home"> Cloud Run v5.0.4+20240225
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Namespaces</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_authorizeddomains-list">Authorizeddomains List</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_configurations-get">Configurations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_configurations-list">Configurations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_domainmappings-create">Domainmappings Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_domainmappings-delete">Domainmappings Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_domainmappings-get">Domainmappings Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_domainmappings-list">Domainmappings List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_executions-delete">Executions Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_executions-get">Executions Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_executions-list">Executions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_jobs-create">Jobs Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_jobs-delete">Jobs Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_jobs-get">Jobs Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_jobs-list">Jobs List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_jobs-replace-job">Jobs Replace Job</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_jobs-run">Jobs Run</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_revisions-delete">Revisions Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_revisions-get">Revisions Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_revisions-list">Revisions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_routes-get">Routes Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_routes-list">Routes List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_services-create">Services Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_services-delete">Services Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_services-get">Services Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_services-list">Services List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_services-replace-service">Services Replace Service</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_tasks-get">Tasks Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../namespaces_tasks-list">Tasks List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_authorizeddomains-list">Authorizeddomains List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-authorizeddomains-list">Locations Authorizeddomains List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-configurations-get">Locations Configurations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-configurations-list">Locations Configurations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-domainmappings-create">Locations Domainmappings Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-domainmappings-delete">Locations Domainmappings Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-domainmappings-get">Locations Domainmappings Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-domainmappings-list">Locations Domainmappings List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-jobs-get-iam-policy">Locations Jobs Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-jobs-set-iam-policy">Locations Jobs Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-jobs-test-iam-permissions">Locations Jobs Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-list">Locations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-revisions-delete">Locations Revisions Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-revisions-get">Locations Revisions Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-revisions-list">Locations Revisions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-routes-get">Locations Routes Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-routes-list">Locations Routes List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-create">Locations Services Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-delete">Locations Services Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-get">Locations Services Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-get-iam-policy">Locations Services Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-list">Locations Services List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Locations Services Replace Service</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-set-iam-policy">Locations Services Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-test-iam-permissions">Locations Services Test Iam Permissions</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Namespaces</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_authorizeddomains-list/">Authorizeddomains List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_configurations-get/">Configurations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_configurations-list/">Configurations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_domainmappings-create/">Domainmappings Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_domainmappings-delete/">Domainmappings Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_domainmappings-get/">Domainmappings Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_domainmappings-list/">Domainmappings List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_executions-cancel/">Executions Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_executions-delete/">Executions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_executions-get/">Executions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_executions-list/">Executions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_jobs-create/">Jobs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_jobs-delete/">Jobs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_jobs-get/">Jobs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_jobs-list/">Jobs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_jobs-replace-job/">Jobs Replace Job</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_jobs-run/">Jobs Run</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_revisions-delete/">Revisions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_revisions-get/">Revisions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_revisions-list/">Revisions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_routes-get/">Routes Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_routes-list/">Routes List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_services-create/">Services Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_services-delete/">Services Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_services-get/">Services Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_services-list/">Services List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_services-replace-service/">Services Replace Service</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_tasks-get/">Tasks Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../namespaces_tasks-list/">Tasks List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_authorizeddomains-list/">Authorizeddomains List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-authorizeddomains-list/">Locations Authorizeddomains List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-configurations-get/">Locations Configurations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-configurations-list/">Locations Configurations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-domainmappings-create/">Locations Domainmappings Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-domainmappings-delete/">Locations Domainmappings Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-domainmappings-get/">Locations Domainmappings Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-domainmappings-list/">Locations Domainmappings List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-get-iam-policy/">Locations Jobs Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-set-iam-policy/">Locations Jobs Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-test-iam-permissions/">Locations Jobs Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-list/">Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-delete/">Locations Operations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-wait/">Locations Operations Wait</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-revisions-delete/">Locations Revisions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-revisions-get/">Locations Revisions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-revisions-list/">Locations Revisions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-routes-get/">Locations Routes Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-routes-list/">Locations Routes List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-create/">Locations Services Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-delete/">Locations Services Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-get/">Locations Services Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-get-iam-policy/">Locations Services Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-list/">Locations Services List</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Locations Services Replace Service</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-set-iam-policy/">Locations Services Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-test-iam-permissions/">Locations Services Test Iam Permissions</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Cloud Run v5.0.4+20240225</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Locations Services Replace Service</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/run1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Locations Services Replace Service</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/run1-cli/edit/master/docs/projects_locations-services-replace-service.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Replace a service. Only the spec and metadata labels and annotations are modifiable. After the Update request, Cloud Run will work to make the &#39;status&#39; match the requested &#39;spec&#39;. May provide metadata.resourceVersion to enforce update from last read for optimistic concurrency control.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Replaces a service. Only the spec and metadata labels and annotations are modifiable. After the Update request, Cloud Run will work to make the &#39;status&#39; match the requested &#39;spec&#39;. May provide metadata.resourceVersion to enforce update from last read for optimistic concurrency control.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -383,7 +202,7 @@ You can set the scope for this method like this: <code>run1 --scope &lt;scope&gt
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>The name of the service being replaced. For Cloud Run (fully managed), replace {namespace_id} with the project ID or number.</li>
+<li>Required. The fully qualified name of the service to replace. It can be any of the following forms: * <code>namespaces/{project_id_or_number}/services/{service_name}</code> (only when the <code>endpoint</code> is regional) * <code>projects/{project_id_or_number}/locations/{region}/services/{service_name}</code> * <code>projects/{project_id_or_number}/regions/{region}/services/{service_name}</code></li>
 </ul>
 </li>
 </ul>
@@ -440,183 +259,182 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     url: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    api-version=dolores</code><ul>
-<li>The API version for this call such as &#34;serving.knative.dev/v1&#34;.</li>
+<li><code>-r .    api-version=diam</code><ul>
+<li>The API version for this call. It must be &#34;serving.knative.dev/v1&#34;.</li>
 </ul>
 </li>
-<li><code>kind=consetetur</code><ul>
-<li>The kind of resource, in this case &#34;Service&#34;.</li>
+<li><code>kind=nonumy</code><ul>
+<li>The kind of resource. It must be &#34;Service&#34;.</li>
 </ul>
 </li>
-<li><code>metadata    annotations=key=dolores</code><ul>
-<li>(Optional) Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/user-guide/annotations</li>
+<li><code>metadata    annotations=key=et</code><ul>
+<li>Unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. In Cloud Run, annotations with &#39;run.googleapis.com/&#39; and &#39;autoscaling.knative.dev&#39; are restricted, and the accepted annotations will be different depending on the resource type. * <code>autoscaling.knative.dev/maxScale</code>: Revision. * <code>autoscaling.knative.dev/minScale</code>: Revision. * <code>run.googleapis.com/binary-authorization-breakglass</code>: Service, Job, * <code>run.googleapis.com/binary-authorization</code>: Service, Job, Execution. * <code>run.googleapis.com/client-name</code>: All resources. * <code>run.googleapis.com/cloudsql-instances</code>: Revision, Execution. * <code>run.googleapis.com/container-dependencies</code>: Revision . * <code>run.googleapis.com/cpu-throttling</code>: Revision. * <code>run.googleapis.com/custom-audiences</code>: Service. * <code>run.googleapis.com/default-url-disabled</code>: Service. * <code>run.googleapis.com/description</code>: Service. * <code>run.googleapis.com/encryption-key-shutdown-hours</code>: Revision * <code>run.googleapis.com/encryption-key</code>: Revision, Execution. * <code>run.googleapis.com/execution-environment</code>: Revision, Execution. * <code>run.googleapis.com/gc-traffic-tags</code>: Service. * <code>run.googleapis.com/ingress</code>: Service. * <code>run.googleapis.com/launch-stage</code>: Service, Job. * <code>run.googleapis.com/minScale</code>: Service (ALPHA) * <code>run.googleapis.com/network-interfaces</code>: Revision, Execution. * <code>run.googleapis.com/post-key-revocation-action-type</code>: Revision. * <code>run.googleapis.com/secrets</code>: Revision, Execution. * <code>run.googleapis.com/secure-session-agent</code>: Revision. * <code>run.googleapis.com/sessionAffinity</code>: Revision. * <code>run.googleapis.com/startup-cpu-boost</code>: Revision. * <code>run.googleapis.com/vpc-access-connector</code>: Revision, Execution. * <code>run.googleapis.com/vpc-access-egress</code>: Revision, Execution.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>cluster-name=sed</code><ul>
-<li>(Optional) Not supported by Cloud Run The name of the cluster which the object belongs to. This is used to distinguish resources with same name and namespace in different clusters. This field is not set anywhere right now and apiserver is going to ignore it if set in create or update request.</li>
+<li><code>cluster-name=sanctus</code><ul>
+<li>Not supported by Cloud Run</li>
 </ul>
 </li>
-<li><code>creation-timestamp=invidunt</code><ul>
-<li>(Optional) CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC. Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata</li>
+<li><code>creation-timestamp=accusam</code><ul>
+<li>UTC timestamp representing the server time when this object was created.</li>
 </ul>
 </li>
-<li><code>deletion-grace-period-seconds=37</code><ul>
-<li>(Optional) Not supported by Cloud Run Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.</li>
+<li><code>deletion-grace-period-seconds=62</code><ul>
+<li>Not supported by Cloud Run</li>
 </ul>
 </li>
-<li><code>deletion-timestamp=dolor</code><ul>
-<li>(Optional) Not supported by Cloud Run DeletionTimestamp is RFC 3339 date and time at which this resource will be deleted. This field is set by the server when a graceful deletion is requested by the user, and is not directly settable by a client. The resource is expected to be deleted (no longer visible from resource lists, and not reachable by name) after the time in this field, once the finalizers list is empty. As long as the finalizers list contains items, deletion is blocked. Once the deletionTimestamp is set, this value may not be unset or be set further into the future, although it may be shortened or the resource may be deleted prior to this time. For example, a user may request that a pod is deleted in 30 seconds. The Kubelet will react by sending a graceful termination signal to the containers in the pod. After that 30 seconds, the Kubelet will send a hard termination signal (SIGKILL) to the container and after cleanup, remove the pod from the API. In the presence of network partitions, this object may still exist after this timestamp, until an administrator or automated process can determine the resource is fully terminated. If not set, graceful deletion of the object has not been requested. Populated by the system when a graceful deletion is requested. Read-only. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata</li>
+<li><code>deletion-timestamp=sed</code><ul>
+<li>The read-only soft deletion timestamp for this resource. In Cloud Run, users are not able to set this field. Instead, they must call the corresponding Delete API.</li>
 </ul>
 </li>
-<li><code>finalizers=aliquyam</code><ul>
-<li>(Optional) Not supported by Cloud Run Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. +patchStrategy=merge</li>
+<li><code>finalizers=est</code><ul>
+<li>Not supported by Cloud Run</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>generate-name=magna</code><ul>
-<li>(Optional) Not supported by Cloud Run GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server. If this field is specified and the generated name exists, the server will NOT return a 409 - instead, it will either return 201 Created or 500 with Reason ServerTimeout indicating a unique name could not be found in the time allotted, and the client should retry (optionally after the time indicated in the Retry-After header). Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#idempotency string generateName = 2;</li>
+<li><code>generate-name=takimata</code><ul>
+<li>Not supported by Cloud Run</li>
 </ul>
 </li>
-<li><code>generation=59</code><ul>
-<li>(Optional) A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.</li>
+<li><code>generation=2</code><ul>
+<li>A system-provided sequence number representing a specific generation of the desired state.</li>
 </ul>
 </li>
-<li><code>labels=key=nonumy</code><ul>
-<li>(Optional) Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and routes. More info: https://kubernetes.io/docs/user-guide/labels</li>
+<li><code>labels=key=diam</code><ul>
+<li>Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and routes.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=et</code><ul>
-<li>Name must be unique within a namespace, within a Cloud Run region. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/user-guide/identifiers#names +optional</li>
+<li><code>name=at</code><ul>
+<li>Required. The name of the resource. Name is required when creating top-level resources (Service, Job), must be unique within a Cloud Run project/region, and cannot be changed once created.</li>
 </ul>
 </li>
-<li><code>namespace=sanctus</code><ul>
-<li>Namespace defines the space within each name must be unique, within a Cloud Run region. In Cloud Run the namespace must be equal to either the project ID or project number.</li>
+<li><code>namespace=erat</code><ul>
+<li>Required. Defines the space within each name must be unique within a Cloud Run region. In Cloud Run, it must be project ID or number.</li>
 </ul>
 </li>
-<li><code>resource-version=accusam</code><ul>
-<li>Optional. An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server or omit the value to disable conflict-detection. They may only be valid for a particular resource or set of resources. Populated by the system. Read-only. Value must be treated as opaque by clients or omitted. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency</li>
+<li><code>resource-version=justo</code><ul>
+<li>Opaque, system-generated value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server or omit the value to disable conflict-detection.</li>
 </ul>
 </li>
-<li><code>self-link=tempor</code><ul>
-<li>(Optional) SelfLink is a URL representing this object. Populated by the system. Read-only. string selfLink = 4;</li>
-</ul>
-</li>
-<li>
-<p><code>uid=sed</code></p>
-<ul>
-<li>(Optional) UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations. Populated by the system. Read-only. More info: https://kubernetes.io/docs/user-guide/identifiers#uids</li>
+<li><code>self-link=ipsum</code><ul>
+<li>URL representing this object.</li>
 </ul>
 </li>
 <li>
-<p><code>..spec.template.metadata    annotations=key=est</code></p>
+<p><code>uid=accusam</code></p>
 <ul>
-<li>(Optional) Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: https://kubernetes.io/docs/user-guide/annotations</li>
+<li>Unique, system-generated identifier for this resource.</li>
+</ul>
+</li>
+<li>
+<p><code>..spec.template.metadata    annotations=key=dolores</code></p>
+<ul>
+<li>Unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. In Cloud Run, annotations with &#39;run.googleapis.com/&#39; and &#39;autoscaling.knative.dev&#39; are restricted, and the accepted annotations will be different depending on the resource type. * <code>autoscaling.knative.dev/maxScale</code>: Revision. * <code>autoscaling.knative.dev/minScale</code>: Revision. * <code>run.googleapis.com/binary-authorization-breakglass</code>: Service, Job, * <code>run.googleapis.com/binary-authorization</code>: Service, Job, Execution. * <code>run.googleapis.com/client-name</code>: All resources. * <code>run.googleapis.com/cloudsql-instances</code>: Revision, Execution. * <code>run.googleapis.com/container-dependencies</code>: Revision . * <code>run.googleapis.com/cpu-throttling</code>: Revision. * <code>run.googleapis.com/custom-audiences</code>: Service. * <code>run.googleapis.com/default-url-disabled</code>: Service. * <code>run.googleapis.com/description</code>: Service. * <code>run.googleapis.com/encryption-key-shutdown-hours</code>: Revision * <code>run.googleapis.com/encryption-key</code>: Revision, Execution. * <code>run.googleapis.com/execution-environment</code>: Revision, Execution. * <code>run.googleapis.com/gc-traffic-tags</code>: Service. * <code>run.googleapis.com/ingress</code>: Service. * <code>run.googleapis.com/launch-stage</code>: Service, Job. * <code>run.googleapis.com/minScale</code>: Service (ALPHA) * <code>run.googleapis.com/network-interfaces</code>: Revision, Execution. * <code>run.googleapis.com/post-key-revocation-action-type</code>: Revision. * <code>run.googleapis.com/secrets</code>: Revision, Execution. * <code>run.googleapis.com/secure-session-agent</code>: Revision. * <code>run.googleapis.com/sessionAffinity</code>: Revision. * <code>run.googleapis.com/startup-cpu-boost</code>: Revision. * <code>run.googleapis.com/vpc-access-connector</code>: Revision, Execution. * <code>run.googleapis.com/vpc-access-egress</code>: Revision, Execution.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>cluster-name=takimata</code><ul>
-<li>(Optional) Not supported by Cloud Run The name of the cluster which the object belongs to. This is used to distinguish resources with same name and namespace in different clusters. This field is not set anywhere right now and apiserver is going to ignore it if set in create or update request.</li>
+<li><code>cluster-name=consetetur</code><ul>
+<li>Not supported by Cloud Run</li>
 </ul>
 </li>
-<li><code>creation-timestamp=dolor</code><ul>
-<li>(Optional) CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC. Populated by the system. Read-only. Null for lists. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata</li>
+<li><code>creation-timestamp=no</code><ul>
+<li>UTC timestamp representing the server time when this object was created.</li>
 </ul>
 </li>
-<li><code>deletion-grace-period-seconds=22</code><ul>
-<li>(Optional) Not supported by Cloud Run Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only.</li>
+<li><code>deletion-grace-period-seconds=80</code><ul>
+<li>Not supported by Cloud Run</li>
 </ul>
 </li>
-<li><code>deletion-timestamp=at</code><ul>
-<li>(Optional) Not supported by Cloud Run DeletionTimestamp is RFC 3339 date and time at which this resource will be deleted. This field is set by the server when a graceful deletion is requested by the user, and is not directly settable by a client. The resource is expected to be deleted (no longer visible from resource lists, and not reachable by name) after the time in this field, once the finalizers list is empty. As long as the finalizers list contains items, deletion is blocked. Once the deletionTimestamp is set, this value may not be unset or be set further into the future, although it may be shortened or the resource may be deleted prior to this time. For example, a user may request that a pod is deleted in 30 seconds. The Kubelet will react by sending a graceful termination signal to the containers in the pod. After that 30 seconds, the Kubelet will send a hard termination signal (SIGKILL) to the container and after cleanup, remove the pod from the API. In the presence of network partitions, this object may still exist after this timestamp, until an administrator or automated process can determine the resource is fully terminated. If not set, graceful deletion of the object has not been requested. Populated by the system when a graceful deletion is requested. Read-only. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata</li>
+<li><code>deletion-timestamp=sadipscing</code><ul>
+<li>The read-only soft deletion timestamp for this resource. In Cloud Run, users are not able to set this field. Instead, they must call the corresponding Delete API.</li>
 </ul>
 </li>
-<li><code>finalizers=erat</code><ul>
-<li>(Optional) Not supported by Cloud Run Must be empty before the object is deleted from the registry. Each entry is an identifier for the responsible component that will remove the entry from the list. If the deletionTimestamp of the object is non-nil, entries in this list can only be removed. +patchStrategy=merge</li>
+<li><code>finalizers=diam</code><ul>
+<li>Not supported by Cloud Run</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>generate-name=justo</code><ul>
-<li>(Optional) Not supported by Cloud Run GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server. If this field is specified and the generated name exists, the server will NOT return a 409 - instead, it will either return 201 Created or 500 with Reason ServerTimeout indicating a unique name could not be found in the time allotted, and the client should retry (optionally after the time indicated in the Retry-After header). Applied only if Name is not specified. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#idempotency string generateName = 2;</li>
+<li><code>generate-name=sea</code><ul>
+<li>Not supported by Cloud Run</li>
 </ul>
 </li>
-<li><code>generation=96</code><ul>
-<li>(Optional) A sequence number representing a specific generation of the desired state. Populated by the system. Read-only.</li>
+<li><code>generation=51</code><ul>
+<li>A system-provided sequence number representing a specific generation of the desired state.</li>
 </ul>
 </li>
-<li><code>labels=key=accusam</code><ul>
-<li>(Optional) Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and routes. More info: https://kubernetes.io/docs/user-guide/labels</li>
+<li><code>labels=key=stet</code><ul>
+<li>Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and routes.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=dolores</code><ul>
-<li>Name must be unique within a namespace, within a Cloud Run region. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: https://kubernetes.io/docs/user-guide/identifiers#names +optional</li>
+<li><code>name=gubergren</code><ul>
+<li>Required. The name of the resource. Name is required when creating top-level resources (Service, Job), must be unique within a Cloud Run project/region, and cannot be changed once created.</li>
 </ul>
 </li>
-<li><code>namespace=consetetur</code><ul>
-<li>Namespace defines the space within each name must be unique, within a Cloud Run region. In Cloud Run the namespace must be equal to either the project ID or project number.</li>
+<li><code>namespace=ipsum</code><ul>
+<li>Required. Defines the space within each name must be unique within a Cloud Run region. In Cloud Run, it must be project ID or number.</li>
 </ul>
 </li>
 <li><code>resource-version=no</code><ul>
-<li>Optional. An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server or omit the value to disable conflict-detection. They may only be valid for a particular resource or set of resources. Populated by the system. Read-only. Value must be treated as opaque by clients or omitted. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency</li>
+<li>Opaque, system-generated value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server or omit the value to disable conflict-detection.</li>
 </ul>
 </li>
-<li><code>self-link=justo</code><ul>
-<li>(Optional) SelfLink is a URL representing this object. Populated by the system. Read-only. string selfLink = 4;</li>
-</ul>
-</li>
-<li>
-<p><code>uid=sadipscing</code></p>
-<ul>
-<li>(Optional) UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations. Populated by the system. Read-only. More info: https://kubernetes.io/docs/user-guide/identifiers#uids</li>
+<li><code>self-link=sit</code><ul>
+<li>URL representing this object.</li>
 </ul>
 </li>
 <li>
-<p><code>..spec    container-concurrency=59</code></p>
+<p><code>uid=kasd</code></p>
 <ul>
-<li>ContainerConcurrency specifies the maximum allowed in-flight (concurrent) requests per container instance of the Revision. Cloud Run fully managed: supported, defaults to 80 Cloud Run for Anthos: supported, defaults to 0, which means concurrency to the application is not limited, and the system decides the target concurrency for the autoscaler.</li>
+<li>Unique, system-generated identifier for this resource.</li>
+</ul>
+</li>
+<li>
+<p><code>..spec    container-concurrency=54</code></p>
+<ul>
+<li>ContainerConcurrency specifies the maximum allowed in-flight (concurrent) requests per container instance of the Revision. If not specified, defaults to 80.</li>
 </ul>
 </li>
 <li><code>enable-service-links=true</code><ul>
-<li>Indicates whether information about services should be injected into pod&#39;s environment variables, matching the syntax of Docker links. Cloud Run fully managed: Not supported. Cloud Run for Anthos: supported, defaults to true.</li>
+<li>Not supported by Cloud Run.</li>
 </ul>
 </li>
-<li><code>service-account-name=stet</code><ul>
+<li><code>service-account-name=justo</code><ul>
 <li>Email address of the IAM service account associated with the revision of the service. The service account represents the identity of the running revision, and determines what permissions the revision has. If not provided, the revision will use the project&#39;s default service account.</li>
 </ul>
 </li>
 <li>
-<p><code>timeout-seconds=39</code></p>
+<p><code>timeout-seconds=13</code></p>
 <ul>
-<li>TimeoutSeconds holds the max duration the instance is allowed for responding to a request. Cloud Run fully managed: defaults to 300 seconds (5 minutes). Maximum allowed value is 3600 seconds (1 hour). Cloud Run for Anthos: defaults to 300 seconds (5 minutes). Maximum allowed value is configurable by the cluster operator.</li>
+<li>TimeoutSeconds holds the max duration the instance is allowed for responding to a request. Cloud Run: defaults to 300 seconds (5 minutes). Maximum allowed value is 3600 seconds (1 hour).</li>
 </ul>
 </li>
 <li>
-<p><code>....status.address    url=ipsum</code></p>
+<p><code>....status.address    url=sed</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>..    latest-created-revision-name=no</code></p>
+<p><code>..    latest-created-revision-name=nonumy</code></p>
 <ul>
-<li>From ConfigurationStatus. LatestCreatedRevisionName is the last revision that was created from this Service&#39;s Configuration. It might not be ready yet, for that use LatestReadyRevisionName.</li>
+<li>Name of the last revision that was created from this Service&#39;s Configuration. It might not be ready yet, for that use LatestReadyRevisionName.</li>
 </ul>
 </li>
-<li><code>latest-ready-revision-name=sit</code><ul>
-<li>From ConfigurationStatus. LatestReadyRevisionName holds the name of the latest Revision stamped out from this Service&#39;s Configuration that has had its &#34;Ready&#34; condition become &#34;True&#34;.</li>
+<li><code>latest-ready-revision-name=sea</code><ul>
+<li>Name of the latest Revision from this Service&#39;s Configuration that has had its <code>Ready</code> condition become <code>True</code>.</li>
 </ul>
 </li>
-<li><code>observed-generation=88</code><ul>
-<li>ObservedGeneration is the &#39;Generation&#39; of the Route that was last processed by the controller. Clients polling for completed reconciliation should poll until observedGeneration = metadata.generation and the Ready condition&#39;s status is True or False.</li>
+<li><code>observed-generation=1</code><ul>
+<li>Returns the generation last seen by the system. Clients polling for completed reconciliation should poll until observedGeneration = metadata.generation and the Ready condition&#39;s status is True or False.</li>
 </ul>
 </li>
-<li><code>url=amet</code><ul>
-<li>From RouteStatus. URL holds the url that will distribute traffic over the provided traffic targets. It generally has the form https://{route-hash}-{project-hash}-{cluster-level-suffix}.a.run.app</li>
+<li><code>url=kasd</code><ul>
+<li>URL that will distribute traffic over the provided traffic targets. It generally has the form <code>https://{route-hash}-{project-hash}-{cluster-level-suffix}.a.run.app</code></li>
 </ul>
 </li>
 </ul>
@@ -719,32 +537,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_locations-services-set-iam-policy" class="btn btn-neutral float-right" title="Locations Services Set Iam Policy"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_locations-services-list" class="btn btn-neutral" title="Locations Services List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_locations-services-list/" class="btn btn-neutral float-left" title="Locations Services List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-services-set-iam-policy/" class="btn btn-neutral float-right" title="Locations Services Set Iam Policy">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -752,14 +562,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_locations-services-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-services-set-iam-policy" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/run1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_locations-services-list/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_locations-services-set-iam-policy/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

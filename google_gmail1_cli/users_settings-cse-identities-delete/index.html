@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-gmail1-cli/users_settings-cse-identities-delete/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Settings Cse Identities Delete - Gmail v5.0.4+20240226</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Settings Cse Identities Delete";
+        var mkdocs_page_input_path = "users_settings-cse-identities-delete.md";
+        var mkdocs_page_url = "/google-apis-rs/google-gmail1-cli/users_settings-cse-identities-delete/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Gmail v5.0.4+20240226
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Users</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../users_drafts-create/">Drafts Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_drafts-delete/">Drafts Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_drafts-get/">Drafts Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_drafts-list/">Drafts List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_drafts-send/">Drafts Send</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_drafts-update/">Drafts Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_get-profile/">Get Profile</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_history-list/">History List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_labels-create/">Labels Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_labels-delete/">Labels Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_labels-get/">Labels Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_labels-list/">Labels List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_labels-patch/">Labels Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_labels-update/">Labels Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_messages-attachments-get/">Messages Attachments Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_messages-batch-delete/">Messages Batch Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_messages-batch-modify/">Messages Batch Modify</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_messages-delete/">Messages Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_messages-get/">Messages Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_messages-import/">Messages Import</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_messages-insert/">Messages Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_messages-list/">Messages List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_messages-modify/">Messages Modify</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_messages-send/">Messages Send</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_messages-trash/">Messages Trash</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_messages-untrash/">Messages Untrash</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-cse-identities-create/">Settings Cse Identities Create</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Settings Cse Identities Delete</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-cse-identities-get/">Settings Cse Identities Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-cse-identities-list/">Settings Cse Identities List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-cse-identities-patch/">Settings Cse Identities Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-cse-keypairs-create/">Settings Cse Keypairs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-cse-keypairs-disable/">Settings Cse Keypairs Disable</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-cse-keypairs-enable/">Settings Cse Keypairs Enable</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-cse-keypairs-get/">Settings Cse Keypairs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-cse-keypairs-list/">Settings Cse Keypairs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-cse-keypairs-obliterate/">Settings Cse Keypairs Obliterate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-delegates-create/">Settings Delegates Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-delegates-delete/">Settings Delegates Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-delegates-get/">Settings Delegates Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-delegates-list/">Settings Delegates List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-filters-create/">Settings Filters Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-filters-delete/">Settings Filters Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-filters-get/">Settings Filters Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-filters-list/">Settings Filters List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-forwarding-addresses-create/">Settings Forwarding Addresses Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-forwarding-addresses-delete/">Settings Forwarding Addresses Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-forwarding-addresses-get/">Settings Forwarding Addresses Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-forwarding-addresses-list/">Settings Forwarding Addresses List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-get-auto-forwarding/">Settings Get Auto Forwarding</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-get-imap/">Settings Get Imap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-get-language/">Settings Get Language</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-get-pop/">Settings Get Pop</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-get-vacation/">Settings Get Vacation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-send-as-create/">Settings Send As Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-send-as-delete/">Settings Send As Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-send-as-get/">Settings Send As Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-send-as-list/">Settings Send As List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-send-as-patch/">Settings Send As Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-send-as-smime-info-delete/">Settings Send As Smime Info Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-send-as-smime-info-get/">Settings Send As Smime Info Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-send-as-smime-info-insert/">Settings Send As Smime Info Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-send-as-smime-info-list/">Settings Send As Smime Info List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-send-as-smime-info-set-default/">Settings Send As Smime Info Set Default</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-send-as-update/">Settings Send As Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-send-as-verify/">Settings Send As Verify</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-update-auto-forwarding/">Settings Update Auto Forwarding</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-update-imap/">Settings Update Imap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-update-language/">Settings Update Language</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-update-pop/">Settings Update Pop</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_settings-update-vacation/">Settings Update Vacation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_stop/">Stop</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_threads-delete/">Threads Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_threads-get/">Threads Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_threads-list/">Threads List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_threads-modify/">Threads Modify</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_threads-trash/">Threads Trash</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_threads-untrash/">Threads Untrash</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_watch/">Watch</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Gmail v5.0.4+20240226</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Users &raquo;</li>
+      <li>Settings Cse Identities Delete</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/gmail1-cli/edit/master/docs/users_settings-cse-identities-delete.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Deletes a client-side encryption identity. The authenticated user can no longer use the identity to send encrypted messages. You cannot restore the identity after you delete it. Instead, use the CreateCseIdentity method to create another identity with the same configuration.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/gmail.settings.basic</em></li>
+<li><em>https://www.googleapis.com/auth/gmail.settings.sharing</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/gmail.settings.basic</em>.
+You can set the scope for this method like this: <code>gmail1 --scope &lt;scope&gt; users settings-cse-identities-delete ...</code></p>
+<h1 id="required-scalar-arguments">Required Scalar Arguments</h1>
+<ul>
+<li><strong>&lt;user-id&gt;</strong> <em>(string)</em><ul>
+<li>The requester&#39;s primary email address. To indicate the authenticated user, you can use the special value <code>me</code>.</li>
+</ul>
+</li>
+<li><strong>&lt;cse-email-address&gt;</strong> <em>(string)</em><ul>
+<li>The primary email address associated with the client-side encryption identity configuration that&#39;s removed.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../users_settings-cse-identities-create/" class="btn btn-neutral float-left" title="Settings Cse Identities Create"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../users_settings-cse-identities-get/" class="btn btn-neutral float-right" title="Settings Cse Identities Get">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/gmail1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../users_settings-cse-identities-create/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../users_settings-cse-identities-get/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

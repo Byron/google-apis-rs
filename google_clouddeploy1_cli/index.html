@@ -1,241 +1,192 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Cloud Deploy v3.0.0+20220223</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="./css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="./css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="./js/highlight.pack.js"></script>
-  <script src="./js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="A complete library to interact with Cloud Deploy (protocol v1)" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-clouddeploy1-cli/" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>Cloud Deploy v5.0.4+20240221</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Home";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = "/google-apis-rs/google-clouddeploy1-cli/";
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Cloud Deploy v3.0.0+20220223</a>
-        
+          <a href="." class="icon icon-home"> Cloud Deploy v5.0.4+20240221
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-delivery-pipelines-create/">Locations Delivery Pipelines Create</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+    <ul class="current">
+    </ul>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-delivery-pipelines-delete/">Locations Delivery Pipelines Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-delivery-pipelines-get/">Locations Delivery Pipelines Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-delivery-pipelines-get-iam-policy/">Locations Delivery Pipelines Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-delivery-pipelines-list/">Locations Delivery Pipelines List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-delivery-pipelines-patch/">Locations Delivery Pipelines Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-delivery-pipelines-releases-create/">Locations Delivery Pipelines Releases Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-delivery-pipelines-releases-get/">Locations Delivery Pipelines Releases Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-delivery-pipelines-releases-list/">Locations Delivery Pipelines Releases List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-delivery-pipelines-releases-rollouts-approve/">Locations Delivery Pipelines Releases Rollouts Approve</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-delivery-pipelines-releases-rollouts-create/">Locations Delivery Pipelines Releases Rollouts Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-delivery-pipelines-releases-rollouts-get/">Locations Delivery Pipelines Releases Rollouts Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-delivery-pipelines-releases-rollouts-list/">Locations Delivery Pipelines Releases Rollouts List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-delivery-pipelines-set-iam-policy/">Locations Delivery Pipelines Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-delivery-pipelines-test-iam-permissions/">Locations Delivery Pipelines Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-get/">Locations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-get-config/">Locations Get Config</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-list/">Locations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-operations-cancel/">Locations Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-operations-delete/">Locations Operations Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-operations-get/">Locations Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-operations-list/">Locations Operations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-targets-create/">Locations Targets Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-targets-delete/">Locations Targets Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-targets-get/">Locations Targets Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-targets-get-iam-policy/">Locations Targets Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-targets-list/">Locations Targets List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-targets-patch/">Locations Targets Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-targets-set-iam-policy/">Locations Targets Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-targets-test-iam-permissions/">Locations Targets Test Iam Permissions</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-custom-target-types-create/">Locations Custom Target Types Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-custom-target-types-delete/">Locations Custom Target Types Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-custom-target-types-get/">Locations Custom Target Types Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-custom-target-types-get-iam-policy/">Locations Custom Target Types Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-custom-target-types-list/">Locations Custom Target Types List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-custom-target-types-patch/">Locations Custom Target Types Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-custom-target-types-set-iam-policy/">Locations Custom Target Types Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-automation-runs-cancel/">Locations Delivery Pipelines Automation Runs Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-automation-runs-get/">Locations Delivery Pipelines Automation Runs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-automation-runs-list/">Locations Delivery Pipelines Automation Runs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-automations-create/">Locations Delivery Pipelines Automations Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-automations-delete/">Locations Delivery Pipelines Automations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-automations-get/">Locations Delivery Pipelines Automations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-automations-list/">Locations Delivery Pipelines Automations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-automations-patch/">Locations Delivery Pipelines Automations Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-create/">Locations Delivery Pipelines Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-delete/">Locations Delivery Pipelines Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-get/">Locations Delivery Pipelines Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-get-iam-policy/">Locations Delivery Pipelines Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-list/">Locations Delivery Pipelines List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-patch/">Locations Delivery Pipelines Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-releases-abandon/">Locations Delivery Pipelines Releases Abandon</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-releases-create/">Locations Delivery Pipelines Releases Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-releases-get/">Locations Delivery Pipelines Releases Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-releases-list/">Locations Delivery Pipelines Releases List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-releases-rollouts-advance/">Locations Delivery Pipelines Releases Rollouts Advance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-releases-rollouts-approve/">Locations Delivery Pipelines Releases Rollouts Approve</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-releases-rollouts-cancel/">Locations Delivery Pipelines Releases Rollouts Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-releases-rollouts-create/">Locations Delivery Pipelines Releases Rollouts Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-releases-rollouts-get/">Locations Delivery Pipelines Releases Rollouts Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-releases-rollouts-ignore-job/">Locations Delivery Pipelines Releases Rollouts Ignore Job</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-releases-rollouts-job-runs-get/">Locations Delivery Pipelines Releases Rollouts Job Runs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-releases-rollouts-job-runs-list/">Locations Delivery Pipelines Releases Rollouts Job Runs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-releases-rollouts-job-runs-terminate/">Locations Delivery Pipelines Releases Rollouts Job Runs Terminate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-releases-rollouts-list/">Locations Delivery Pipelines Releases Rollouts List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-releases-rollouts-retry-job/">Locations Delivery Pipelines Releases Rollouts Retry Job</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-rollback-target/">Locations Delivery Pipelines Rollback Target</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-set-iam-policy/">Locations Delivery Pipelines Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-delivery-pipelines-test-iam-permissions/">Locations Delivery Pipelines Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-get-config/">Locations Get Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-list/">Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-operations-delete/">Locations Operations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-targets-create/">Locations Targets Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-targets-delete/">Locations Targets Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-targets-get/">Locations Targets Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-targets-get-iam-policy/">Locations Targets Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-targets-list/">Locations Targets List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-targets-patch/">Locations Targets Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-targets-set-iam-policy/">Locations Targets Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-targets-test-iam-permissions/">Locations Targets Test Iam Permissions</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href="."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">Cloud Deploy v5.0.4+20240221</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".">Docs</a> &raquo;</li>
-    <li>Home</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/clouddeploy1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+      <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/clouddeploy1-cli/edit/master/docs/index.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <!---
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <!---
 DO NOT EDIT !
-This file was generated automatically from 'src/mako/cli/README.md.mako'
+This file was generated automatically from 'src/generator/templates/cli/README.md.mako'
 DO NOT EDIT !
 -->
-
 <p>The <code>clouddeploy1</code> command-line interface <em>(CLI)</em> allows to use most features of the <em>Google Cloud Deploy</em> service from the comfort of your terminal.</p>
 <p>By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.</p>
@@ -244,27 +195,50 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 <a href="https://cloud.google.com/deploy/">official documentation site</a>.</p>
 <h1 id="installation-and-source-code">Installation and Source Code</h1>
 <p>Install the command-line interface with cargo using:</p>
-<pre><code class="bash">cargo install google-clouddeploy1-cli
+<pre><code class="language-bash">cargo install google-clouddeploy1-cli
 </code></pre>
-
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/clouddeploy1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Cloud Deploy</em> API at revision <em>20220223</em>. The CLI is at version <em>3.0.0</em>.</p>
-<pre><code class="bash">clouddeploy1 [options]
+<p>This documentation was generated from the <em>Cloud Deploy</em> API at revision <em>20240221</em>. The CLI is at version <em>5.0.4</em>.</p>
+<pre><code class="language-bash">clouddeploy1 [options]
         projects
+                locations-custom-target-types-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-custom-target-types-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-custom-target-types-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-custom-target-types-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-custom-target-types-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-custom-target-types-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-custom-target-types-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-automation-runs-cancel &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-automation-runs-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-automation-runs-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-automations-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-automations-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-automations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-automations-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-automations-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-delivery-pipelines-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-delivery-pipelines-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-delivery-pipelines-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-delivery-pipelines-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-delivery-pipelines-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-delivery-pipelines-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-releases-abandon &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-delivery-pipelines-releases-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-delivery-pipelines-releases-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-delivery-pipelines-releases-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-releases-rollouts-advance &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-delivery-pipelines-releases-rollouts-approve &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-releases-rollouts-cancel &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-delivery-pipelines-releases-rollouts-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-delivery-pipelines-releases-rollouts-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-releases-rollouts-ignore-job &lt;rollout&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-releases-rollouts-job-runs-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-releases-rollouts-job-runs-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-releases-rollouts-job-runs-terminate &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-delivery-pipelines-releases-rollouts-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-releases-rollouts-retry-job &lt;rollout&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-delivery-pipelines-rollback-target &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-delivery-pipelines-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-delivery-pipelines-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -295,7 +269,6 @@ Configuration:
             [default: ~/.google-service-cli]
 
 </code></pre>
-
 <h1 id="configuration">Configuration</h1>
 <p>The program will store all persistent data in the <code>~/.google-service-cli</code> directory in <em>JSON</em> files prefixed with <code>clouddeploy1-</code>.  You can change the directory used to store configuration with the <code>--config-dir</code> flag on a per-invocation basis.</p>
 <p>More information about the various kinds of persistent data are given in the following paragraphs.</p>
@@ -330,30 +303,23 @@ what exactly led to a particular issue. This is done by allowing all client-serv
 output to standard error <em>as-is</em>.</p>
 <p>The <code>--debug</code> flag will print errors using the <code>Debug</code> representation to standard error.</p>
 <p>You may consider redirecting standard error into a file for ease of use, e.g. <code>clouddeploy1 --debug &lt;resource&gt; &lt;method&gt; [options] 2&gt;debug.txt</code>.</p>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="projects_locations-delivery-pipelines-create/" class="btn btn-neutral float-right" title="Locations Delivery Pipelines Create"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="projects_locations-custom-target-types-create/" class="btn btn-neutral float-right" title="Locations Custom Target Types Create">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -361,14 +327,33 @@ output to standard error <em>as-is</em>.</p>
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="projects_locations-delivery-pipelines-create/" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/clouddeploy1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+      <span><a href="projects_locations-custom-target-types-create/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>
+
+<!--
+MkDocs version : 1.3.1
+Build Date UTC : 2024-03-05 20:03:47.581328+00:00
+-->

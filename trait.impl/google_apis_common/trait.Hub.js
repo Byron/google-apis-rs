@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"google_youtube3":[["impl&lt;'a, S&gt; <a class=\"trait\" href=\"google_apis_common/trait.Hub.html\" title=\"trait google_apis_common::Hub\">Hub</a> for <a class=\"struct\" href=\"google_youtube3/api/struct.YouTube.html\" title=\"struct google_youtube3::api::YouTube\">YouTube</a>&lt;S&gt;"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

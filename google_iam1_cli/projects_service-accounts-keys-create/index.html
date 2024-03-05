@@ -1,422 +1,272 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Service Accounts Keys Create - Iam v3.0.0+20220224</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-iam1-cli/projects_service-accounts-keys-create/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Service Accounts Keys Create - Iam v5.0.4+20240220</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Service Accounts Keys Create";
+        var mkdocs_page_input_path = "projects_service-accounts-keys-create.md";
+        var mkdocs_page_url = "/google-apis-rs/google-iam1-cli/projects_service-accounts-keys-create/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Iam v3.0.0+20220224</a>
-        
+          <a href=".." class="icon icon-home"> Iam v5.0.4+20240220
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Iam Policies</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../iam-policies_lint-policy">Lint Policy</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../iam-policies_query-auditable-services">Query Auditable Services</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Locations</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_workforce-pools-operations-get">Workforce Pools Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_workforce-pools-providers-operations-get">Workforce Pools Providers Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_workforce-pools-subjects-operations-get">Workforce Pools Subjects Operations Get</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Organizations</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_roles-create">Roles Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_roles-delete">Roles Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_roles-get">Roles Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_roles-list">Roles List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_roles-patch">Roles Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_roles-undelete">Roles Undelete</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Permissions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_query-testable-permissions">Query Testable Permissions</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workload-identity-pools-create">Locations Workload Identity Pools Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workload-identity-pools-delete">Locations Workload Identity Pools Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workload-identity-pools-get">Locations Workload Identity Pools Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workload-identity-pools-list">Locations Workload Identity Pools List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workload-identity-pools-operations-get">Locations Workload Identity Pools Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workload-identity-pools-patch">Locations Workload Identity Pools Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workload-identity-pools-providers-create">Locations Workload Identity Pools Providers Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workload-identity-pools-providers-delete">Locations Workload Identity Pools Providers Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workload-identity-pools-providers-get">Locations Workload Identity Pools Providers Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workload-identity-pools-providers-keys-operations-get">Locations Workload Identity Pools Providers Keys Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workload-identity-pools-providers-list">Locations Workload Identity Pools Providers List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workload-identity-pools-providers-operations-get">Locations Workload Identity Pools Providers Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workload-identity-pools-providers-patch">Locations Workload Identity Pools Providers Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workload-identity-pools-providers-undelete">Locations Workload Identity Pools Providers Undelete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-workload-identity-pools-undelete">Locations Workload Identity Pools Undelete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_roles-create">Roles Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_roles-delete">Roles Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_roles-get">Roles Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_roles-list">Roles List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_roles-patch">Roles Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_roles-undelete">Roles Undelete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-create">Service Accounts Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-delete">Service Accounts Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-disable">Service Accounts Disable</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-enable">Service Accounts Enable</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-get">Service Accounts Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-get-iam-policy">Service Accounts Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Service Accounts Keys Create</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-keys-delete">Service Accounts Keys Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-keys-disable">Service Accounts Keys Disable</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-keys-enable">Service Accounts Keys Enable</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-keys-get">Service Accounts Keys Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-keys-list">Service Accounts Keys List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-keys-upload">Service Accounts Keys Upload</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-list">Service Accounts List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-patch">Service Accounts Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-set-iam-policy">Service Accounts Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-sign-blob">Service Accounts Sign Blob</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-sign-jwt">Service Accounts Sign Jwt</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-test-iam-permissions">Service Accounts Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-undelete">Service Accounts Undelete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-accounts-update">Service Accounts Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Roles</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../roles_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../roles_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../roles_query-grantable-roles">Query Grantable Roles</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Iam Policies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../iam-policies_lint-policy/">Lint Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../iam-policies_query-auditable-services/">Query Auditable Services</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Locations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-create/">Workforce Pools Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-delete/">Workforce Pools Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-get/">Workforce Pools Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-get-iam-policy/">Workforce Pools Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-list/">Workforce Pools List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-operations-get/">Workforce Pools Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-patch/">Workforce Pools Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-providers-create/">Workforce Pools Providers Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-providers-delete/">Workforce Pools Providers Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-providers-get/">Workforce Pools Providers Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-providers-keys-create/">Workforce Pools Providers Keys Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-providers-keys-delete/">Workforce Pools Providers Keys Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-providers-keys-get/">Workforce Pools Providers Keys Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-providers-keys-list/">Workforce Pools Providers Keys List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-providers-keys-operations-get/">Workforce Pools Providers Keys Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-providers-keys-undelete/">Workforce Pools Providers Keys Undelete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-providers-list/">Workforce Pools Providers List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-providers-operations-get/">Workforce Pools Providers Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-providers-patch/">Workforce Pools Providers Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-providers-undelete/">Workforce Pools Providers Undelete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-set-iam-policy/">Workforce Pools Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-subjects-delete/">Workforce Pools Subjects Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-subjects-operations-get/">Workforce Pools Subjects Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-subjects-undelete/">Workforce Pools Subjects Undelete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-test-iam-permissions/">Workforce Pools Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_workforce-pools-undelete/">Workforce Pools Undelete</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Organizations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_roles-create/">Roles Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_roles-delete/">Roles Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_roles-get/">Roles Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_roles-list/">Roles List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_roles-patch/">Roles Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_roles-undelete/">Roles Undelete</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Permissions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_query-testable-permissions/">Query Testable Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-create/">Locations Workload Identity Pools Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-delete/">Locations Workload Identity Pools Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-get/">Locations Workload Identity Pools Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-list/">Locations Workload Identity Pools List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-namespaces-managed-identities-operations-get/">Locations Workload Identity Pools Namespaces Managed Identities Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-namespaces-managed-identities-workload-sources-operations-get/">Locations Workload Identity Pools Namespaces Managed Identities Workload Sources Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-namespaces-operations-get/">Locations Workload Identity Pools Namespaces Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-operations-get/">Locations Workload Identity Pools Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-patch/">Locations Workload Identity Pools Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-providers-create/">Locations Workload Identity Pools Providers Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-providers-delete/">Locations Workload Identity Pools Providers Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-providers-get/">Locations Workload Identity Pools Providers Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-providers-keys-create/">Locations Workload Identity Pools Providers Keys Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-providers-keys-delete/">Locations Workload Identity Pools Providers Keys Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-providers-keys-get/">Locations Workload Identity Pools Providers Keys Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-providers-keys-list/">Locations Workload Identity Pools Providers Keys List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-providers-keys-operations-get/">Locations Workload Identity Pools Providers Keys Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-providers-keys-undelete/">Locations Workload Identity Pools Providers Keys Undelete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-providers-list/">Locations Workload Identity Pools Providers List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-providers-operations-get/">Locations Workload Identity Pools Providers Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-providers-patch/">Locations Workload Identity Pools Providers Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-providers-undelete/">Locations Workload Identity Pools Providers Undelete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-workload-identity-pools-undelete/">Locations Workload Identity Pools Undelete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_roles-create/">Roles Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_roles-delete/">Roles Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_roles-get/">Roles Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_roles-list/">Roles List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_roles-patch/">Roles Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_roles-undelete/">Roles Undelete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-create/">Service Accounts Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-delete/">Service Accounts Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-disable/">Service Accounts Disable</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-enable/">Service Accounts Enable</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-get/">Service Accounts Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-get-iam-policy/">Service Accounts Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Service Accounts Keys Create</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-keys-delete/">Service Accounts Keys Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-keys-disable/">Service Accounts Keys Disable</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-keys-enable/">Service Accounts Keys Enable</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-keys-get/">Service Accounts Keys Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-keys-list/">Service Accounts Keys List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-keys-upload/">Service Accounts Keys Upload</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-list/">Service Accounts List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-patch/">Service Accounts Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-set-iam-policy/">Service Accounts Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-sign-blob/">Service Accounts Sign Blob</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-sign-jwt/">Service Accounts Sign Jwt</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-test-iam-permissions/">Service Accounts Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-undelete/">Service Accounts Undelete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-accounts-update/">Service Accounts Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Roles</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../roles_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roles_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../roles_query-grantable-roles/">Query Grantable Roles</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Iam v5.0.4+20240220</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Service Accounts Keys Create</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/iam1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Service Accounts Keys Create</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/iam1-cli/edit/master/docs/projects_service-accounts-keys-create.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Creates a ServiceAccountKey.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Creates a ServiceAccountKey.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -424,7 +274,7 @@ You can set the scope for this method like this: <code>iam1 --scope &lt;scope&gt
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>Required. The resource name of the service account in the following format: <code>projects/{PROJECT_ID}/serviceAccounts/{ACCOUNT}</code>. Using <code>-</code> as a wildcard for the <code>PROJECT_ID</code> will infer the project from the account. The <code>ACCOUNT</code> value can be the <code>email</code> address or the <code>unique_id</code> of the service account.</li>
+<li>Required. The resource name of the service account. Use one of the following formats: * <code>projects/{PROJECT_ID}/serviceAccounts/{EMAIL_ADDRESS}</code> * <code>projects/{PROJECT_ID}/serviceAccounts/{UNIQUE_ID}</code> As an alternative, you can use the <code>-</code> wildcard character instead of the project ID: * <code>projects/-/serviceAccounts/{EMAIL_ADDRESS}</code> * <code>projects/-/serviceAccounts/{UNIQUE_ID}</code> When possible, avoid using the <code>-</code> wildcard character, because it can cause response messages to contain misleading error codes. For example, if you try to access the service account <code>projects/-/serviceAccounts/fake@example.com</code>, which does not exist, the response contains an HTTP <code>403 Forbidden</code> error instead of a <code>404 Not Found</code> error.</li>
 </ul>
 </li>
 </ul>
@@ -437,14 +287,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   private-key-type: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    key-algorithm=amet.</code><ul>
+<li><code>-r .    key-algorithm=sit</code><ul>
 <li>Which type of key and algorithm to use for the key. The default is currently a 2K RSA key. However this may change in the future.</li>
 </ul>
 </li>
-<li><code>private-key-type=ea</code><ul>
+<li><code>private-key-type=erat</code><ul>
 <li>The output format of the private key. The default value is <code>TYPE_GOOGLE_CREDENTIALS_FILE</code>, which is the Google Credentials File format.</li>
 </ul>
 </li>
@@ -538,32 +387,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_service-accounts-keys-delete" class="btn btn-neutral float-right" title="Service Accounts Keys Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_service-accounts-get-iam-policy" class="btn btn-neutral" title="Service Accounts Get Iam Policy"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_service-accounts-get-iam-policy/" class="btn btn-neutral float-left" title="Service Accounts Get Iam Policy"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_service-accounts-keys-delete/" class="btn btn-neutral float-right" title="Service Accounts Keys Delete">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -571,14 +412,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_service-accounts-get-iam-policy" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_service-accounts-keys-delete" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/iam1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_service-accounts-get-iam-policy/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_service-accounts-keys-delete/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

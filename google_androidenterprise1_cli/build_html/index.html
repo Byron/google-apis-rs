@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="A complete library to interact with Android Enterprise (protocol v1)" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-androidenterprise1-cli/" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>Android Enterprise v5.0.4+20240304</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Home";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = "/google-apis-rs/google-androidenterprise1-cli/";
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> Android Enterprise v5.0.4+20240304
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Devices</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="devices_force-report-upload/">Force Report Upload</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="devices_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="devices_get-state/">Get State</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="devices_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="devices_set-state/">Set State</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="devices_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Enterprises</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="enterprises_acknowledge-notification-set/">Acknowledge Notification Set</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="enterprises_complete-signup/">Complete Signup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="enterprises_create-enrollment-token/">Create Enrollment Token</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="enterprises_create-web-token/">Create Web Token</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="enterprises_enroll/">Enroll</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="enterprises_generate-signup-url/">Generate Signup Url</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="enterprises_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="enterprises_get-service-account/">Get Service Account</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="enterprises_get-store-layout/">Get Store Layout</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="enterprises_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="enterprises_pull-notification-set/">Pull Notification Set</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="enterprises_send-test-push-notification/">Send Test Push Notification</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="enterprises_set-account/">Set Account</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="enterprises_set-store-layout/">Set Store Layout</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="enterprises_unenroll/">Unenroll</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Entitlements</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="entitlements_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="entitlements_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="entitlements_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="entitlements_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Grouplicenses</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="grouplicenses_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="grouplicenses_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Grouplicenseusers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="grouplicenseusers_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Installs</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="installs_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="installs_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="installs_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="installs_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Managedconfigurationsfordevice</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="managedconfigurationsfordevice_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="managedconfigurationsfordevice_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="managedconfigurationsfordevice_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="managedconfigurationsfordevice_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Managedconfigurationsforuser</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="managedconfigurationsforuser_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="managedconfigurationsforuser_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="managedconfigurationsforuser_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="managedconfigurationsforuser_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Managedconfigurationssettings</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="managedconfigurationssettings_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Permissions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="permissions_get/">Get</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Products</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="products_approve/">Approve</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="products_generate-approval-url/">Generate Approval Url</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="products_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="products_get-app-restrictions-schema/">Get App Restrictions Schema</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="products_get-permissions/">Get Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="products_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="products_unapprove/">Unapprove</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Serviceaccountkeys</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="serviceaccountkeys_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="serviceaccountkeys_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="serviceaccountkeys_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Storelayoutclusters</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="storelayoutclusters_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="storelayoutclusters_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="storelayoutclusters_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="storelayoutclusters_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="storelayoutclusters_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Storelayoutpages</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="storelayoutpages_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="storelayoutpages_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="storelayoutpages_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="storelayoutpages_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="storelayoutpages_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Users</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="users_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="users_generate-authentication-token/">Generate Authentication Token</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="users_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="users_get-available-product-set/">Get Available Product Set</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="users_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="users_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="users_revoke-device-access/">Revoke Device Access</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="users_set-available-product-set/">Set Available Product Set</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="users_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Webapps</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="webapps_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="webapps_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="webapps_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="webapps_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="webapps_update/">Update</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">Android Enterprise v5.0.4+20240304</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+      <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/androidenterprise1-cli/edit/master/docs/index.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <!---
+DO NOT EDIT !
+This file was generated automatically from 'src/generator/templates/cli/README.md.mako'
+DO NOT EDIT !
+-->
+<p>The <code>androidenterprise1</code> command-line interface <em>(CLI)</em> allows to use most features of the <em>Google Android Enterprise</em> service from the comfort of your terminal.</p>
+<p>By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
+capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.</p>
+<p>If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.</p>
+<p>Everything else about the <em>Android Enterprise</em> API can be found at the
+<a href="https://developers.google.com/android/work/play/emm-api">official documentation site</a>.</p>
+<h1 id="installation-and-source-code">Installation and Source Code</h1>
+<p>Install the command-line interface with cargo using:</p>
+<pre><code class="language-bash">cargo install google-androidenterprise1-cli
+</code></pre>
+<p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/androidenterprise1-cli">on github</a>.</p>
+<h1 id="usage">Usage</h1>
+<p>This documentation was generated from the <em>Android Enterprise</em> API at revision <em>20240304</em>. The CLI is at version <em>5.0.4</em>.</p>
+<pre><code class="language-bash">androidenterprise1 [options]
+        devices
+                force-report-upload &lt;enterprise-id&gt; &lt;user-id&gt; &lt;device-id&gt; [-p &lt;v&gt;]...
+                get &lt;enterprise-id&gt; &lt;user-id&gt; &lt;device-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-state &lt;enterprise-id&gt; &lt;user-id&gt; &lt;device-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;enterprise-id&gt; &lt;user-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-state &lt;enterprise-id&gt; &lt;user-id&gt; &lt;device-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;enterprise-id&gt; &lt;user-id&gt; &lt;device-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        enterprises
+                acknowledge-notification-set [-p &lt;v&gt;]...
+                complete-signup [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                create-enrollment-token &lt;enterprise-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                create-web-token &lt;enterprise-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                enroll &lt;token&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                generate-signup-url [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;enterprise-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-service-account &lt;enterprise-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-store-layout &lt;enterprise-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;domain&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                pull-notification-set [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                send-test-push-notification &lt;enterprise-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-account &lt;enterprise-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                set-store-layout &lt;enterprise-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                unenroll &lt;enterprise-id&gt; [-p &lt;v&gt;]...
+        entitlements
+                delete &lt;enterprise-id&gt; &lt;user-id&gt; &lt;entitlement-id&gt; [-p &lt;v&gt;]...
+                get &lt;enterprise-id&gt; &lt;user-id&gt; &lt;entitlement-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;enterprise-id&gt; &lt;user-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;enterprise-id&gt; &lt;user-id&gt; &lt;entitlement-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        grouplicenses
+                get &lt;enterprise-id&gt; &lt;group-license-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;enterprise-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        grouplicenseusers
+                list &lt;enterprise-id&gt; &lt;group-license-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        installs
+                delete &lt;enterprise-id&gt; &lt;user-id&gt; &lt;device-id&gt; &lt;install-id&gt; [-p &lt;v&gt;]...
+                get &lt;enterprise-id&gt; &lt;user-id&gt; &lt;device-id&gt; &lt;install-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;enterprise-id&gt; &lt;user-id&gt; &lt;device-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;enterprise-id&gt; &lt;user-id&gt; &lt;device-id&gt; &lt;install-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        managedconfigurationsfordevice
+                delete &lt;enterprise-id&gt; &lt;user-id&gt; &lt;device-id&gt; &lt;managed-configuration-for-device-id&gt; [-p &lt;v&gt;]...
+                get &lt;enterprise-id&gt; &lt;user-id&gt; &lt;device-id&gt; &lt;managed-configuration-for-device-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;enterprise-id&gt; &lt;user-id&gt; &lt;device-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;enterprise-id&gt; &lt;user-id&gt; &lt;device-id&gt; &lt;managed-configuration-for-device-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        managedconfigurationsforuser
+                delete &lt;enterprise-id&gt; &lt;user-id&gt; &lt;managed-configuration-for-user-id&gt; [-p &lt;v&gt;]...
+                get &lt;enterprise-id&gt; &lt;user-id&gt; &lt;managed-configuration-for-user-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;enterprise-id&gt; &lt;user-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;enterprise-id&gt; &lt;user-id&gt; &lt;managed-configuration-for-user-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        managedconfigurationssettings
+                list &lt;enterprise-id&gt; &lt;product-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        permissions
+                get &lt;permission-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        products
+                approve &lt;enterprise-id&gt; &lt;product-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]...
+                generate-approval-url &lt;enterprise-id&gt; &lt;product-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;enterprise-id&gt; &lt;product-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-app-restrictions-schema &lt;enterprise-id&gt; &lt;product-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-permissions &lt;enterprise-id&gt; &lt;product-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;enterprise-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                unapprove &lt;enterprise-id&gt; &lt;product-id&gt; [-p &lt;v&gt;]...
+        serviceaccountkeys
+                delete &lt;enterprise-id&gt; &lt;key-id&gt; [-p &lt;v&gt;]...
+                insert &lt;enterprise-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;enterprise-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        storelayoutclusters
+                delete &lt;enterprise-id&gt; &lt;page-id&gt; &lt;cluster-id&gt; [-p &lt;v&gt;]...
+                get &lt;enterprise-id&gt; &lt;page-id&gt; &lt;cluster-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;enterprise-id&gt; &lt;page-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;enterprise-id&gt; &lt;page-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;enterprise-id&gt; &lt;page-id&gt; &lt;cluster-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        storelayoutpages
+                delete &lt;enterprise-id&gt; &lt;page-id&gt; [-p &lt;v&gt;]...
+                get &lt;enterprise-id&gt; &lt;page-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;enterprise-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;enterprise-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;enterprise-id&gt; &lt;page-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        users
+                delete &lt;enterprise-id&gt; &lt;user-id&gt; [-p &lt;v&gt;]...
+                generate-authentication-token &lt;enterprise-id&gt; &lt;user-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;enterprise-id&gt; &lt;user-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get-available-product-set &lt;enterprise-id&gt; &lt;user-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;enterprise-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;enterprise-id&gt; &lt;email&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                revoke-device-access &lt;enterprise-id&gt; &lt;user-id&gt; [-p &lt;v&gt;]...
+                set-available-product-set &lt;enterprise-id&gt; &lt;user-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;enterprise-id&gt; &lt;user-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        webapps
+                delete &lt;enterprise-id&gt; &lt;web-app-id&gt; [-p &lt;v&gt;]...
+                get &lt;enterprise-id&gt; &lt;web-app-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;enterprise-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;enterprise-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;enterprise-id&gt; &lt;web-app-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+  androidenterprise1 --help
+
+Configuration:
+  [--scope &lt;url&gt;]...
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
+            If unset, it defaults to the shortest scope url for a particular method.
+  --config-dir &lt;folder&gt;
+            A directory into which we will store our persistent data. Defaults to
+            a user-writable directory that we will create during the first invocation.
+            [default: ~/.google-service-cli]
+
+</code></pre>
+<h1 id="configuration">Configuration</h1>
+<p>The program will store all persistent data in the <code>~/.google-service-cli</code> directory in <em>JSON</em> files prefixed with <code>androidenterprise1-</code>.  You can change the directory used to store configuration with the <code>--config-dir</code> flag on a per-invocation basis.</p>
+<p>More information about the various kinds of persistent data are given in the following paragraphs.</p>
+<h1 id="authentication">Authentication</h1>
+<p>Most APIs require a user to authenticate any request. If this is the case, the <a href="https://developers.google.com/+/api/oauth#scopes">scope</a> determines the 
+set of permissions granted. The granularity of these is usually no more than <em>read-only</em> or <em>full-access</em>.</p>
+<p>If not set, the system will automatically select the smallest feasible scope, e.g. when invoking a
+method that is read-only, it will ask only for a read-only scope. 
+You may use the <code>--scope</code> flag to specify a scope directly. 
+All applicable scopes are documented in the respective method's CLI documentation.</p>
+<p>The first time a scope is used, the user is asked for permission. Follow the instructions given 
+by the CLI to grant permissions, or to decline.</p>
+<p>If a scope was authenticated by the user, the respective information will be stored as <em>JSON</em> in the configuration
+directory, e.g. <code>~/.google-service-cli/androidenterprise1-token-&lt;scope-hash&gt;.json</code>. No manual management of these tokens
+is necessary.</p>
+<p>To revoke granted authentication, please refer to the <a href="http://webapps.stackexchange.com/a/30849">official documentation</a>.</p>
+<h1 id="application-secrets">Application Secrets</h1>
+<p>In order to allow any application to use Google services, it will need to be registered using the 
+<a href="https://console.developers.google.com/">Google Developer Console</a>. APIs the application may use are then enabled for it
+one by one. Most APIs can be used for free and have a daily quota.</p>
+<p>To allow more comfortable usage of the CLI without forcing anyone to register an own application, the CLI
+comes with a default application secret that is configured accordingly. This also means that heavy usage
+all around the world may deplete the daily quota.</p>
+<p>You can workaround this limitation by putting your own secrets file at this location: 
+<code>~/.google-service-cli/androidenterprise1-secret.json</code>, assuming that the required <em>androidenterprise</em> API 
+was enabled for it. Such a secret file can be downloaded in the <em>Google Developer Console</em> at 
+<em>APIs &amp; auth -&gt; Credentials -&gt; Download JSON</em> and used as is.</p>
+<p>Learn more about how to setup Google projects and enable APIs using the <a href="https://developers.google.com/console/help/new/">official documentation</a>.</p>
+<h1 id="debugging">Debugging</h1>
+<p>Even though the CLI does its best to provide usable error messages, sometimes it might be desirable to know
+what exactly led to a particular issue. This is done by allowing all client-server communication to be 
+output to standard error <em>as-is</em>.</p>
+<p>The <code>--debug</code> flag will print errors using the <code>Debug</code> representation to standard error.</p>
+<p>You may consider redirecting standard error into a file for ease of use, e.g. <code>androidenterprise1 --debug &lt;resource&gt; &lt;method&gt; [options] 2&gt;debug.txt</code>.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="devices_force-report-upload/" class="btn btn-neutral float-right" title="Force Report Upload">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/androidenterprise1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+      <span><a href="devices_force-report-upload/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.3.1
+Build Date UTC : 2024-03-05 20:04:05.619397+00:00
+-->

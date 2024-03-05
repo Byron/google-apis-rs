@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="A complete library to interact with AdExchangeBuyerII (protocol v2beta1)" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-adexchangebuyer2_v2_beta1-cli/" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>AdExchangeBuyerII v5.0.4+20240305</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Home";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = "/google-apis-rs/google-adexchangebuyer2_v2_beta1-cli/";
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> AdExchangeBuyerII v5.0.4+20240305
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Accounts</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_clients-create/">Clients Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_clients-get/">Clients Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_clients-invitations-create/">Clients Invitations Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_clients-invitations-get/">Clients Invitations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_clients-invitations-list/">Clients Invitations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_clients-list/">Clients List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_clients-update/">Clients Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_clients-users-get/">Clients Users Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_clients-users-list/">Clients Users List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_clients-users-update/">Clients Users Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_creatives-create/">Creatives Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_creatives-deal-associations-add/">Creatives Deal Associations Add</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_creatives-deal-associations-list/">Creatives Deal Associations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_creatives-deal-associations-remove/">Creatives Deal Associations Remove</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_creatives-get/">Creatives Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_creatives-list/">Creatives List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_creatives-stop-watching/">Creatives Stop Watching</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_creatives-update/">Creatives Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_creatives-watch/">Creatives Watch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_finalized-proposals-list/">Finalized Proposals List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_finalized-proposals-pause/">Finalized Proposals Pause</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_finalized-proposals-resume/">Finalized Proposals Resume</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_products-get/">Products Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_products-list/">Products List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_proposals-accept/">Proposals Accept</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_proposals-add-note/">Proposals Add Note</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_proposals-cancel-negotiation/">Proposals Cancel Negotiation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_proposals-complete-setup/">Proposals Complete Setup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_proposals-create/">Proposals Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_proposals-get/">Proposals Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_proposals-list/">Proposals List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_proposals-pause/">Proposals Pause</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_proposals-resume/">Proposals Resume</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_proposals-update/">Proposals Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_publisher-profiles-get/">Publisher Profiles Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="accounts_publisher-profiles-list/">Publisher Profiles List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bidders</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_accounts-filter-sets-bid-metrics-list/">Accounts Filter Sets Bid Metrics List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_accounts-filter-sets-bid-response-errors-list/">Accounts Filter Sets Bid Response Errors List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_accounts-filter-sets-bid-responses-without-bids-list/">Accounts Filter Sets Bid Responses Without Bids List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_accounts-filter-sets-create/">Accounts Filter Sets Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_accounts-filter-sets-delete/">Accounts Filter Sets Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_accounts-filter-sets-filtered-bid-requests-list/">Accounts Filter Sets Filtered Bid Requests List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_accounts-filter-sets-filtered-bids-creatives-list/">Accounts Filter Sets Filtered Bids Creatives List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_accounts-filter-sets-filtered-bids-details-list/">Accounts Filter Sets Filtered Bids Details List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_accounts-filter-sets-filtered-bids-list/">Accounts Filter Sets Filtered Bids List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_accounts-filter-sets-get/">Accounts Filter Sets Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_accounts-filter-sets-impression-metrics-list/">Accounts Filter Sets Impression Metrics List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_accounts-filter-sets-list/">Accounts Filter Sets List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_accounts-filter-sets-losing-bids-list/">Accounts Filter Sets Losing Bids List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_accounts-filter-sets-non-billable-winning-bids-list/">Accounts Filter Sets Non Billable Winning Bids List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_filter-sets-bid-metrics-list/">Filter Sets Bid Metrics List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_filter-sets-bid-response-errors-list/">Filter Sets Bid Response Errors List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_filter-sets-bid-responses-without-bids-list/">Filter Sets Bid Responses Without Bids List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_filter-sets-create/">Filter Sets Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_filter-sets-delete/">Filter Sets Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_filter-sets-filtered-bid-requests-list/">Filter Sets Filtered Bid Requests List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_filter-sets-filtered-bids-creatives-list/">Filter Sets Filtered Bids Creatives List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_filter-sets-filtered-bids-details-list/">Filter Sets Filtered Bids Details List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_filter-sets-filtered-bids-list/">Filter Sets Filtered Bids List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_filter-sets-get/">Filter Sets Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_filter-sets-impression-metrics-list/">Filter Sets Impression Metrics List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_filter-sets-list/">Filter Sets List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_filter-sets-losing-bids-list/">Filter Sets Losing Bids List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bidders_filter-sets-non-billable-winning-bids-list/">Filter Sets Non Billable Winning Bids List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Buyers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="buyers_filter-sets-bid-metrics-list/">Filter Sets Bid Metrics List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="buyers_filter-sets-bid-response-errors-list/">Filter Sets Bid Response Errors List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="buyers_filter-sets-bid-responses-without-bids-list/">Filter Sets Bid Responses Without Bids List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="buyers_filter-sets-create/">Filter Sets Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="buyers_filter-sets-delete/">Filter Sets Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="buyers_filter-sets-filtered-bid-requests-list/">Filter Sets Filtered Bid Requests List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="buyers_filter-sets-filtered-bids-creatives-list/">Filter Sets Filtered Bids Creatives List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="buyers_filter-sets-filtered-bids-details-list/">Filter Sets Filtered Bids Details List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="buyers_filter-sets-filtered-bids-list/">Filter Sets Filtered Bids List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="buyers_filter-sets-get/">Filter Sets Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="buyers_filter-sets-impression-metrics-list/">Filter Sets Impression Metrics List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="buyers_filter-sets-list/">Filter Sets List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="buyers_filter-sets-losing-bids-list/">Filter Sets Losing Bids List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="buyers_filter-sets-non-billable-winning-bids-list/">Filter Sets Non Billable Winning Bids List</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">AdExchangeBuyerII v5.0.4+20240305</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+      <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/adexchangebuyer2_v2_beta1-cli/edit/master/docs/index.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <!---
+DO NOT EDIT !
+This file was generated automatically from 'src/generator/templates/cli/README.md.mako'
+DO NOT EDIT !
+-->
+<p>The <code>adexchangebuyer2-v2-beta1</code> command-line interface <em>(CLI)</em> allows to use most features of the <em>Google AdExchangeBuyerII</em> service from the comfort of your terminal.</p>
+<p>By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
+capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.</p>
+<p>If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.</p>
+<p>Everything else about the <em>AdExchangeBuyerII</em> API can be found at the
+<a href="https://developers.google.com/authorized-buyers/apis/reference/rest/">official documentation site</a>.</p>
+<h1 id="installation-and-source-code">Installation and Source Code</h1>
+<p>Install the command-line interface with cargo using:</p>
+<pre><code class="language-bash">cargo install google-adexchangebuyer2_v2_beta1-cli
+</code></pre>
+<p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/adexchangebuyer2_v2_beta1-cli">on github</a>.</p>
+<h1 id="usage">Usage</h1>
+<p>This documentation was generated from the <em>AdExchangeBuyerII</em> API at revision <em>20240305</em>. The CLI is at version <em>5.0.4</em>.</p>
+<pre><code class="language-bash">adexchangebuyer2-v2-beta1 [options]
+        accounts
+                clients-create &lt;account-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                clients-get &lt;account-id&gt; &lt;client-account-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                clients-invitations-create &lt;account-id&gt; &lt;client-account-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                clients-invitations-get &lt;account-id&gt; &lt;client-account-id&gt; &lt;invitation-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                clients-invitations-list &lt;account-id&gt; &lt;client-account-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                clients-list &lt;account-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                clients-update &lt;account-id&gt; &lt;client-account-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                clients-users-get &lt;account-id&gt; &lt;client-account-id&gt; &lt;user-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                clients-users-list &lt;account-id&gt; &lt;client-account-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                clients-users-update &lt;account-id&gt; &lt;client-account-id&gt; &lt;user-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                creatives-create &lt;account-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                creatives-deal-associations-add &lt;account-id&gt; &lt;creative-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                creatives-deal-associations-list &lt;account-id&gt; &lt;creative-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                creatives-deal-associations-remove &lt;account-id&gt; &lt;creative-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                creatives-get &lt;account-id&gt; &lt;creative-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                creatives-list &lt;account-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                creatives-stop-watching &lt;account-id&gt; &lt;creative-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                creatives-update &lt;account-id&gt; &lt;creative-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                creatives-watch &lt;account-id&gt; &lt;creative-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                finalized-proposals-list &lt;account-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                finalized-proposals-pause &lt;account-id&gt; &lt;proposal-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                finalized-proposals-resume &lt;account-id&gt; &lt;proposal-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                products-get &lt;account-id&gt; &lt;product-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                products-list &lt;account-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                proposals-accept &lt;account-id&gt; &lt;proposal-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                proposals-add-note &lt;account-id&gt; &lt;proposal-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                proposals-cancel-negotiation &lt;account-id&gt; &lt;proposal-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                proposals-complete-setup &lt;account-id&gt; &lt;proposal-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                proposals-create &lt;account-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                proposals-get &lt;account-id&gt; &lt;proposal-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                proposals-list &lt;account-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                proposals-pause &lt;account-id&gt; &lt;proposal-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                proposals-resume &lt;account-id&gt; &lt;proposal-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                proposals-update &lt;account-id&gt; &lt;proposal-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                publisher-profiles-get &lt;account-id&gt; &lt;publisher-profile-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                publisher-profiles-list &lt;account-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        bidders
+                accounts-filter-sets-bid-metrics-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                accounts-filter-sets-bid-response-errors-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                accounts-filter-sets-bid-responses-without-bids-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                accounts-filter-sets-create &lt;owner-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                accounts-filter-sets-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                accounts-filter-sets-filtered-bid-requests-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                accounts-filter-sets-filtered-bids-creatives-list &lt;filter-set-name&gt; &lt;creative-status-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                accounts-filter-sets-filtered-bids-details-list &lt;filter-set-name&gt; &lt;creative-status-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                accounts-filter-sets-filtered-bids-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                accounts-filter-sets-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                accounts-filter-sets-impression-metrics-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                accounts-filter-sets-list &lt;owner-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                accounts-filter-sets-losing-bids-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                accounts-filter-sets-non-billable-winning-bids-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-bid-metrics-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-bid-response-errors-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-bid-responses-without-bids-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-create &lt;owner-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-filtered-bid-requests-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-filtered-bids-creatives-list &lt;filter-set-name&gt; &lt;creative-status-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-filtered-bids-details-list &lt;filter-set-name&gt; &lt;creative-status-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-filtered-bids-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-impression-metrics-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-list &lt;owner-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-losing-bids-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-non-billable-winning-bids-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        buyers
+                filter-sets-bid-metrics-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-bid-response-errors-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-bid-responses-without-bids-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-create &lt;owner-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-filtered-bid-requests-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-filtered-bids-creatives-list &lt;filter-set-name&gt; &lt;creative-status-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-filtered-bids-details-list &lt;filter-set-name&gt; &lt;creative-status-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-filtered-bids-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-impression-metrics-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-list &lt;owner-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-losing-bids-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                filter-sets-non-billable-winning-bids-list &lt;filter-set-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+  adexchangebuyer2-v2-beta1 --help
+
+Configuration:
+  [--scope &lt;url&gt;]...
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
+            If unset, it defaults to the shortest scope url for a particular method.
+  --config-dir &lt;folder&gt;
+            A directory into which we will store our persistent data. Defaults to
+            a user-writable directory that we will create during the first invocation.
+            [default: ~/.google-service-cli]
+
+</code></pre>
+<h1 id="configuration">Configuration</h1>
+<p>The program will store all persistent data in the <code>~/.google-service-cli</code> directory in <em>JSON</em> files prefixed with <code>adexchangebuyer2-v2-beta1-</code>.  You can change the directory used to store configuration with the <code>--config-dir</code> flag on a per-invocation basis.</p>
+<p>More information about the various kinds of persistent data are given in the following paragraphs.</p>
+<h1 id="authentication">Authentication</h1>
+<p>Most APIs require a user to authenticate any request. If this is the case, the <a href="https://developers.google.com/+/api/oauth#scopes">scope</a> determines the 
+set of permissions granted. The granularity of these is usually no more than <em>read-only</em> or <em>full-access</em>.</p>
+<p>If not set, the system will automatically select the smallest feasible scope, e.g. when invoking a
+method that is read-only, it will ask only for a read-only scope. 
+You may use the <code>--scope</code> flag to specify a scope directly. 
+All applicable scopes are documented in the respective method's CLI documentation.</p>
+<p>The first time a scope is used, the user is asked for permission. Follow the instructions given 
+by the CLI to grant permissions, or to decline.</p>
+<p>If a scope was authenticated by the user, the respective information will be stored as <em>JSON</em> in the configuration
+directory, e.g. <code>~/.google-service-cli/adexchangebuyer2-v2-beta1-token-&lt;scope-hash&gt;.json</code>. No manual management of these tokens
+is necessary.</p>
+<p>To revoke granted authentication, please refer to the <a href="http://webapps.stackexchange.com/a/30849">official documentation</a>.</p>
+<h1 id="application-secrets">Application Secrets</h1>
+<p>In order to allow any application to use Google services, it will need to be registered using the 
+<a href="https://console.developers.google.com/">Google Developer Console</a>. APIs the application may use are then enabled for it
+one by one. Most APIs can be used for free and have a daily quota.</p>
+<p>To allow more comfortable usage of the CLI without forcing anyone to register an own application, the CLI
+comes with a default application secret that is configured accordingly. This also means that heavy usage
+all around the world may deplete the daily quota.</p>
+<p>You can workaround this limitation by putting your own secrets file at this location: 
+<code>~/.google-service-cli/adexchangebuyer2-v2-beta1-secret.json</code>, assuming that the required <em>adexchangebuyer2</em> API 
+was enabled for it. Such a secret file can be downloaded in the <em>Google Developer Console</em> at 
+<em>APIs &amp; auth -&gt; Credentials -&gt; Download JSON</em> and used as is.</p>
+<p>Learn more about how to setup Google projects and enable APIs using the <a href="https://developers.google.com/console/help/new/">official documentation</a>.</p>
+<h1 id="debugging">Debugging</h1>
+<p>Even though the CLI does its best to provide usable error messages, sometimes it might be desirable to know
+what exactly led to a particular issue. This is done by allowing all client-server communication to be 
+output to standard error <em>as-is</em>.</p>
+<p>The <code>--debug</code> flag will print errors using the <code>Debug</code> representation to standard error.</p>
+<p>You may consider redirecting standard error into a file for ease of use, e.g. <code>adexchangebuyer2-v2-beta1 --debug &lt;resource&gt; &lt;method&gt; [options] 2&gt;debug.txt</code>.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="accounts_clients-create/" class="btn btn-neutral float-right" title="Clients Create">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/adexchangebuyer2_v2_beta1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+      <span><a href="accounts_clients-create/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.3.1
+Build Date UTC : 2024-03-05 20:04:01.950238+00:00
+-->

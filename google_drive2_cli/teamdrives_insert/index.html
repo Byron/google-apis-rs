@@ -1,553 +1,275 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Insert - drive v3.0.0+20220225</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-drive2-cli/teamdrives_insert/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Insert - drive v5.0.4+20240227</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Insert";
+        var mkdocs_page_input_path = "teamdrives_insert.md";
+        var mkdocs_page_url = "/google-apis-rs/google-drive2-cli/teamdrives_insert/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> drive v3.0.0+20220225</a>
-        
+          <a href=".." class="icon icon-home"> drive v5.0.4+20240227
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>About</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../about_get">Get</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Apps</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../apps_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../apps_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Changes</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../changes_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../changes_get-start-page-token">Get Start Page Token</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../changes_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../changes_watch">Watch</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Channels</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channels_stop">Stop</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Children</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../children_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../children_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../children_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../children_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Comments</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Drives</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_hide">Hide</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_unhide">Unhide</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Files</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_copy">Copy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_empty-trash">Empty Trash</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_export">Export</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_generate-ids">Generate Ids</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_touch">Touch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_trash">Trash</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_untrash">Untrash</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_update">Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_watch">Watch</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Parents</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../parents_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../parents_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../parents_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../parents_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Permissions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_get-id-for-email">Get Id For Email</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Properties</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Replies</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Revisions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Teamdrives</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../teamdrives_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../teamdrives_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Insert</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../teamdrives_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../teamdrives_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">About</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../about_get/">Get</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Apps</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../apps_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../apps_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Changes</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../changes_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../changes_get-start-page-token/">Get Start Page Token</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../changes_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../changes_watch/">Watch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Channels</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../channels_stop/">Stop</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Children</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../children_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../children_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../children_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../children_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Comments</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Drives</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_hide/">Hide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_unhide/">Unhide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Files</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_copy/">Copy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_empty-trash/">Empty Trash</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_export/">Export</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_generate-ids/">Generate Ids</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_list-labels/">List Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_modify-labels/">Modify Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_touch/">Touch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_trash/">Trash</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_untrash/">Untrash</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_update/">Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_watch/">Watch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Parents</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../parents_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../parents_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../parents_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../parents_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Permissions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_get-id-for-email/">Get Id For Email</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Properties</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Replies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Revisions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Teamdrives</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../teamdrives_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../teamdrives_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Insert</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../teamdrives_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../teamdrives_update/">Update</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">drive v5.0.4+20240227</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Insert</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/drive2-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Teamdrives &raquo;</li>
+      <li>Insert</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/drive2-cli/edit/master/docs/teamdrives_insert.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Deprecated use drives.insert instead.</p>
-<h1 id="scopes">Scopes</h1>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/drive</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/drive</em>.
 You can set the scope for this method like this: <code>drive2 --scope &lt;scope&gt; teamdrives insert ...</code></p>
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;request-id&gt;</strong> <em>(string)</em><ul>
-<li>An ID, such as a random UUID, which uniquely identifies this user&#39;s request for idempotent creation of a Team Drive. A repeated request by the same user and with the same request ID will avoid creating duplicates by attempting to create the same Team Drive. If the Team Drive already exists a 409 error will be returned.</li>
+<li>Required. An ID, such as a random UUID, which uniquely identifies this user&#39;s request for idempotent creation of a Team Drive. A repeated request by the same user and with the same request ID will avoid creating duplicates by attempting to create the same Team Drive. If the Team Drive already exists a 409 error will be returned.</li>
 </ul>
 </li>
 </ul>
@@ -566,6 +288,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     can-add-children: boolean
     can-change-copy-requires-writer-permission-restriction: boolean
     can-change-domain-users-only-restriction: boolean
+    can-change-sharing-folders-requires-organizer-permission-restriction: boolean
     can-change-team-drive-background: boolean
     can-change-team-members-only-restriction: boolean
     can-comment: boolean
@@ -580,6 +303,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     can-remove-children: boolean
     can-rename: boolean
     can-rename-team-drive: boolean
+    can-reset-team-drive-restrictions: boolean
     can-share: boolean
     can-trash-children: boolean
   color-rgb: string
@@ -592,33 +316,33 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     admin-managed-restrictions: boolean
     copy-requires-writer-permission: boolean
     domain-users-only: boolean
+    sharing-folders-requires-organizer-permission: boolean
     team-members-only: boolean
   theme-id: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .background-image-file    id=et</code><ul>
+<li><code>-r .background-image-file    id=diam</code><ul>
 <li>The ID of an image file in Drive to use for the background image.</li>
 </ul>
 </li>
-<li><code>width=0.8174370791692032</code><ul>
+<li><code>width=0.8658226705474971</code><ul>
 <li>The width of the cropped image in the closed range of 0 to 1. This value represents the width of the cropped image divided by the width of the entire image. The height is computed by applying a width to height aspect ratio of 80 to 9. The resulting image must be at least 1280 pixels wide and 144 pixels high.</li>
 </ul>
 </li>
-<li><code>x-coordinate=0.8998545867951372</code><ul>
+<li><code>x-coordinate=0.7826272004392801</code><ul>
 <li>The X coordinate of the upper left corner of the cropping area in the background image. This is a value in the closed range of 0 to 1. This value represents the horizontal distance from the left side of the entire image to the left side of the cropping area divided by the width of the entire image.</li>
 </ul>
 </li>
 <li>
-<p><code>y-coordinate=0.6842852527819243</code></p>
+<p><code>y-coordinate=0.7825571733406923</code></p>
 <ul>
 <li>The Y coordinate of the upper left corner of the cropping area in the background image. This is a value in the closed range of 0 to 1. This value represents the vertical distance from the top side of the entire image to the top side of the cropping area divided by the height of the entire image.</li>
 </ul>
 </li>
 <li>
-<p><code>..    background-image-link=duo</code></p>
+<p><code>..    background-image-link=vero</code></p>
 <ul>
 <li>A short-lived link to this Team Drive&#39;s background image.</li>
 </ul>
@@ -628,22 +352,26 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>can-change-copy-requires-writer-permission-restriction=true</code><ul>
-<li>Whether the current user can change the copyRequiresWriterPermission restriction of this Team Drive.</li>
+<li>Whether the current user can change the <code>copyRequiresWriterPermission</code> restriction of this Team Drive.</li>
 </ul>
 </li>
 <li><code>can-change-domain-users-only-restriction=false</code><ul>
-<li>Whether the current user can change the domainUsersOnly restriction of this Team Drive.</li>
+<li>Whether the current user can change the <code>domainUsersOnly</code> restriction of this Team Drive.</li>
+</ul>
+</li>
+<li><code>can-change-sharing-folders-requires-organizer-permission-restriction=false</code><ul>
+<li>Whether the current user can change the <code>sharingFoldersRequiresOrganizerPermission</code> restriction of this Team Drive.</li>
 </ul>
 </li>
 <li><code>can-change-team-drive-background=false</code><ul>
 <li>Whether the current user can change the background of this Team Drive.</li>
 </ul>
 </li>
-<li><code>can-change-team-members-only-restriction=true</code><ul>
-<li>Whether the current user can change the teamMembersOnly restriction of this Team Drive.</li>
+<li><code>can-change-team-members-only-restriction=false</code><ul>
+<li>Whether the current user can change the <code>teamMembersOnly</code> restriction of this Team Drive.</li>
 </ul>
 </li>
-<li><code>can-comment=true</code><ul>
+<li><code>can-comment=false</code><ul>
 <li>Whether the current user can comment on files in this Team Drive.</li>
 </ul>
 </li>
@@ -663,7 +391,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the current user can download files in this Team Drive.</li>
 </ul>
 </li>
-<li><code>can-edit=true</code><ul>
+<li><code>can-edit=false</code><ul>
 <li>Whether the current user can edit files in this Team Drive</li>
 </ul>
 </li>
@@ -679,11 +407,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the current user can read the revisions resource of files in this Team Drive.</li>
 </ul>
 </li>
-<li><code>can-remove-children=true</code><ul>
-<li>Deprecated - use canDeleteChildren or canTrashChildren instead.</li>
+<li><code>can-remove-children=false</code><ul>
+<li>Deprecated: Use <code>canDeleteChildren</code> or <code>canTrashChildren</code> instead.</li>
 </ul>
 </li>
-<li><code>can-rename=false</code><ul>
+<li><code>can-rename=true</code><ul>
 <li>Whether the current user can rename files or folders in this Team Drive.</li>
 </ul>
 </li>
@@ -691,7 +419,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the current user can rename this Team Drive.</li>
 </ul>
 </li>
-<li><code>can-share=true</code><ul>
+<li><code>can-reset-team-drive-restrictions=true</code><ul>
+<li>Whether the current user can reset the Team Drive restrictions to defaults.</li>
+</ul>
+</li>
+<li><code>can-share=false</code><ul>
 <li>Whether the current user can share files or folders in this Team Drive.</li>
 </ul>
 </li>
@@ -702,41 +434,45 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    color-rgb=ea</code></p>
+<p><code>..    color-rgb=sea</code></p>
 <ul>
-<li>The color of this Team Drive as an RGB hex string. It can only be set on a drive.teamdrives.update request that does not set themeId.</li>
+<li>The color of this Team Drive as an RGB hex string. It can only be set on a <code>drive.teamdrives.update</code> request that does not set <code>themeId</code>.</li>
 </ul>
 </li>
-<li><code>created-date=justo</code><ul>
+<li><code>created-date=et</code><ul>
 <li>The time at which the Team Drive was created (RFC 3339 date-time).</li>
 </ul>
 </li>
-<li><code>id=rebum.</code><ul>
+<li><code>id=et</code><ul>
 <li>The ID of this Team Drive which is also the ID of the top level folder of this Team Drive.</li>
 </ul>
 </li>
-<li><code>kind=justo</code><ul>
-<li>This is always drive#teamDrive</li>
+<li><code>kind=et</code><ul>
+<li>This is always <code>drive#teamDrive</code></li>
 </ul>
 </li>
-<li><code>name=consetetur</code><ul>
+<li><code>name=magna</code><ul>
 <li>The name of this Team Drive.</li>
 </ul>
 </li>
-<li><code>org-unit-id=amet.</code><ul>
-<li>The organizational unit of this shared drive. This field is only populated on drives.list responses when the useDomainAdminAccess parameter is set to true.</li>
+<li><code>org-unit-id=dolores</code><ul>
+<li>The organizational unit of this shared drive. This field is only populated on <code>drives.list</code> responses when the <code>useDomainAdminAccess</code> parameter is set to <code>true</code>.</li>
 </ul>
 </li>
-<li><code>restrictions    admin-managed-restrictions=false</code><ul>
+<li><code>restrictions    admin-managed-restrictions=true</code><ul>
 <li>Whether administrative privileges on this Team Drive are required to modify restrictions.</li>
 </ul>
 </li>
 <li><code>copy-requires-writer-permission=false</code><ul>
-<li>Whether the options to copy, print, or download files inside this Team Drive, should be disabled for readers and commenters. When this restriction is set to true, it will override the similarly named field to true for any file inside this Team Drive.</li>
+<li>Whether the options to copy, print, or download files inside this Team Drive, should be disabled for readers and commenters. When this restriction is set to <code>true</code>, it will override the similarly named field to <code>true</code> for any file inside this Team Drive.</li>
 </ul>
 </li>
-<li><code>domain-users-only=false</code><ul>
+<li><code>domain-users-only=true</code><ul>
 <li>Whether access to this Team Drive and items inside this Team Drive is restricted to users of the domain to which this Team Drive belongs. This restriction may be overridden by other sharing policies controlled outside of this Team Drive.</li>
+</ul>
+</li>
+<li><code>sharing-folders-requires-organizer-permission=false</code><ul>
+<li>If true, only users with the organizer role can share folders. If false, users with either the organizer role or the file organizer role can share folders.</li>
 </ul>
 </li>
 <li>
@@ -746,9 +482,9 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    theme-id=kasd</code></p>
+<p><code>..    theme-id=takimata</code></p>
 <ul>
-<li>The ID of the theme from which the background image and color will be set. The set of possible teamDriveThemes can be retrieved from a drive.about.get response. When not specified on a drive.teamdrives.insert request, a random theme is chosen from which the background image and color are set. This is a write-only field; it can only be set on requests that don&#39;t set colorRgb or backgroundImageFile.</li>
+<li>The ID of the theme from which the background image and color will be set. The set of possible <code>teamDriveThemes</code> can be retrieved from a <code>drive.about.get</code> response. When not specified on a <code>drive.teamdrives.insert</code> request, a random theme is chosen from which the background image and color are set. This is a write-only field; it can only be set on requests that don&#39;t set <code>colorRgb</code> or <code>backgroundImageFile</code>.</li>
 </ul>
 </li>
 </ul>
@@ -775,9 +511,27 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>The following properties can configure any call, and are not specific to this method.</p>
 <ul>
 <li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
 <p><strong>-p alt=string</strong></p>
 <ul>
-<li>Data format for the response.</li>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
 </ul>
 </li>
 <li>
@@ -807,42 +561,40 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><strong>-p quota-user=string</strong></p>
 <ul>
-<li>An opaque string that represents a user for quota purposes. Must not exceed 40 characters.</li>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
 </ul>
 </li>
 <li>
-<p><strong>-p user-ip=string</strong></p>
+<p><strong>-p upload-type=string</strong></p>
 <ul>
-<li>Deprecated. Please use quotaUser instead.</li>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../teamdrives_list" class="btn btn-neutral float-right" title="List"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../teamdrives_get" class="btn btn-neutral" title="Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../teamdrives_get/" class="btn btn-neutral float-left" title="Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../teamdrives_list/" class="btn btn-neutral float-right" title="List">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -850,14 +602,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../teamdrives_get" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../teamdrives_list" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/drive2-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../teamdrives_get/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../teamdrives_list/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

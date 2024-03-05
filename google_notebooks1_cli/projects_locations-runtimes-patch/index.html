@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-notebooks1-cli/projects_locations-runtimes-patch/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Locations Runtimes Patch - AI Platform Notebooks v5.0.4+20231227</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Locations Runtimes Patch";
+        var mkdocs_page_input_path = "projects_locations-runtimes-patch.md";
+        var mkdocs_page_url = "/google-apis-rs/google-notebooks1-cli/projects_locations-runtimes-patch/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> AI Platform Notebooks v5.0.4+20231227
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-environments-create/">Locations Environments Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-environments-delete/">Locations Environments Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-environments-get/">Locations Environments Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-environments-list/">Locations Environments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-executions-create/">Locations Executions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-executions-delete/">Locations Executions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-executions-get/">Locations Executions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-executions-list/">Locations Executions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-create/">Locations Instances Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-delete/">Locations Instances Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-diagnose/">Locations Instances Diagnose</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-get/">Locations Instances Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-get-iam-policy/">Locations Instances Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-get-instance-health/">Locations Instances Get Instance Health</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-is-upgradeable/">Locations Instances Is Upgradeable</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-list/">Locations Instances List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-migrate/">Locations Instances Migrate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-register/">Locations Instances Register</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-report/">Locations Instances Report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-report-event/">Locations Instances Report Event</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-reset/">Locations Instances Reset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-rollback/">Locations Instances Rollback</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-set-accelerator/">Locations Instances Set Accelerator</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-set-iam-policy/">Locations Instances Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-set-labels/">Locations Instances Set Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-set-machine-type/">Locations Instances Set Machine Type</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-start/">Locations Instances Start</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-stop/">Locations Instances Stop</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-test-iam-permissions/">Locations Instances Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-update-config/">Locations Instances Update Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-update-metadata-items/">Locations Instances Update Metadata Items</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-update-shielded-instance-config/">Locations Instances Update Shielded Instance Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-upgrade/">Locations Instances Upgrade</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-upgrade-internal/">Locations Instances Upgrade Internal</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-list/">Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-delete/">Locations Operations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-create/">Locations Runtimes Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-delete/">Locations Runtimes Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-diagnose/">Locations Runtimes Diagnose</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-get/">Locations Runtimes Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-get-iam-policy/">Locations Runtimes Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-list/">Locations Runtimes List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-migrate/">Locations Runtimes Migrate</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Locations Runtimes Patch</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-refresh-runtime-token-internal/">Locations Runtimes Refresh Runtime Token Internal</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-report-event/">Locations Runtimes Report Event</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-reset/">Locations Runtimes Reset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-set-iam-policy/">Locations Runtimes Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-start/">Locations Runtimes Start</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-stop/">Locations Runtimes Stop</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-switch/">Locations Runtimes Switch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-test-iam-permissions/">Locations Runtimes Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-runtimes-upgrade/">Locations Runtimes Upgrade</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-schedules-create/">Locations Schedules Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-schedules-delete/">Locations Schedules Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-schedules-get/">Locations Schedules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-schedules-list/">Locations Schedules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-schedules-trigger/">Locations Schedules Trigger</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">AI Platform Notebooks v5.0.4+20231227</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Locations Runtimes Patch</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/notebooks1-cli/edit/master/docs/projects_locations-runtimes-patch.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Update Notebook Runtime configuration.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>notebooks1 --scope &lt;scope&gt; projects locations-runtimes-patch ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
+<li>Output only. The resource name of the runtime. Format: <code>projects/{project}/locations/{location}/runtimes/{runtimeId}</code></li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Runtime:
+  access-config:
+    access-type: string
+    proxy-uri: string
+    runtime-owner: string
+  create-time: string
+  health-state: string
+  labels: { string: string }
+  metrics:
+    system-metrics: { string: string }
+  migrated: boolean
+  name: string
+  runtime-migration-eligibility:
+    errors: [string]
+    warnings: [string]
+  software-config:
+    custom-gpu-driver-path: string
+    disable-terminal: boolean
+    enable-health-monitoring: boolean
+    idle-shutdown: boolean
+    idle-shutdown-timeout: integer
+    install-gpu-driver: boolean
+    mixer-disabled: boolean
+    notebook-upgrade-schedule: string
+    post-startup-script: string
+    post-startup-script-behavior: string
+    upgradeable: boolean
+    version: string
+  state: string
+  update-time: string
+  virtual-machine:
+    instance-id: string
+    instance-name: string
+    virtual-machine-config:
+      accelerator-config:
+        core-count: int64
+        type: string
+      data-disk:
+        auto-delete: boolean
+        boot: boolean
+        device-name: string
+        index: integer
+        initialize-params:
+          description: string
+          disk-name: string
+          disk-size-gb: string
+          disk-type: string
+          labels: { string: string }
+        interface: string
+        kind: string
+        licenses: [string]
+        mode: string
+        source: string
+        type: string
+      encryption-config:
+        kms-key: string
+      guest-attributes: { string: string }
+      internal-ip-only: boolean
+      labels: { string: string }
+      machine-type: string
+      metadata: { string: string }
+      network: string
+      nic-type: string
+      reserved-ip-range: string
+      shielded-instance-config:
+        enable-integrity-monitoring: boolean
+        enable-secure-boot: boolean
+        enable-vtpm: boolean
+      subnet: string
+      tags: [string]
+      zone: string
+
+</code></pre>
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .access-config    access-type=duo</code><ul>
+<li>The type of access mode this instance.</li>
+</ul>
+</li>
+<li><code>proxy-uri=sit</code><ul>
+<li>Output only. The proxy endpoint that is used to access the runtime.</li>
+</ul>
+</li>
+<li>
+<p><code>runtime-owner=magna</code></p>
+<ul>
+<li>The owner of this runtime after creation. Format: <code>alias@example.com</code> Currently supports one owner only.</li>
+</ul>
+</li>
+<li>
+<p><code>..    create-time=et</code></p>
+<ul>
+<li>Output only. Runtime creation time.</li>
+</ul>
+</li>
+<li><code>health-state=rebum.</code><ul>
+<li>Output only. Runtime health_state.</li>
+</ul>
+</li>
+<li><code>labels=key=dolor</code><ul>
+<li>Optional. The labels to associate with this Managed Notebook or Runtime. Label <strong>keys</strong> must contain 1 to 63 characters, and must conform to <a href="https://www.ietf.org/rfc/rfc1035.txt">RFC 1035</a>. Label <strong>values</strong> may be empty, but, if present, must contain 1 to 63 characters, and must conform to <a href="https://www.ietf.org/rfc/rfc1035.txt">RFC 1035</a>. No more than 32 labels can be associated with a cluster.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>metrics    system-metrics=key=lorem</code></p>
+<ul>
+<li>Output only. The system metrics.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>..    migrated=false</code></p>
+<ul>
+<li>Output only. Bool indicating whether this notebook has been migrated to a Workbench Instance</li>
+</ul>
+</li>
+<li><code>name=amet.</code><ul>
+<li>Output only. The resource name of the runtime. Format: <code>projects/{project}/locations/{location}/runtimes/{runtimeId}</code></li>
+</ul>
+</li>
+<li><code>runtime-migration-eligibility    errors=no</code><ul>
+<li>Output only. Certain configurations make the GmN ineligible for an automatic migration. A manual migration is required.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>warnings=nonumy</code></p>
+<ul>
+<li>Output only. Certain configurations will be defaulted during the migration.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..software-config    custom-gpu-driver-path=sed</code></p>
+<ul>
+<li>Specify a custom Cloud Storage path where the GPU driver is stored. If not specified, we&#39;ll automatically choose from official GPU drivers.</li>
+</ul>
+</li>
+<li><code>disable-terminal=false</code><ul>
+<li>Bool indicating whether JupyterLab terminal will be available or not. Default: False</li>
+</ul>
+</li>
+<li><code>enable-health-monitoring=true</code><ul>
+<li>Verifies core internal services are running. Default: True</li>
+</ul>
+</li>
+<li><code>idle-shutdown=false</code><ul>
+<li>Runtime will automatically shutdown after idle_shutdown_time. Default: True</li>
+</ul>
+</li>
+<li><code>idle-shutdown-timeout=35</code><ul>
+<li>Time in minutes to wait before shutting down runtime. Default: 180 minutes</li>
+</ul>
+</li>
+<li><code>install-gpu-driver=true</code><ul>
+<li>Install Nvidia Driver automatically. Default: True</li>
+</ul>
+</li>
+<li><code>mixer-disabled=true</code><ul>
+<li>Bool indicating whether mixer client should be disabled. Default: False</li>
+</ul>
+</li>
+<li><code>notebook-upgrade-schedule=dolore</code><ul>
+<li>Cron expression in UTC timezone, used to schedule instance auto upgrade. Please follow the <a href="https://en.wikipedia.org/wiki/Cron">cron format</a>.</li>
+</ul>
+</li>
+<li><code>post-startup-script=amet</code><ul>
+<li>Path to a Bash script that automatically runs after a notebook instance fully boots up. The path must be a URL or Cloud Storage path (<code>gs://path-to-file/file-name</code>).</li>
+</ul>
+</li>
+<li><code>post-startup-script-behavior=ut</code><ul>
+<li>Behavior for the post startup script.</li>
+</ul>
+</li>
+<li><code>upgradeable=true</code><ul>
+<li>Output only. Bool indicating whether an newer image is available in an image family.</li>
+</ul>
+</li>
+<li>
+<p><code>version=vero</code></p>
+<ul>
+<li>Output only. version of boot image such as M100, from release label of the image.</li>
+</ul>
+</li>
+<li>
+<p><code>..    state=duo</code></p>
+<ul>
+<li>Output only. Runtime state.</li>
+</ul>
+</li>
+<li><code>update-time=sadipscing</code><ul>
+<li>Output only. Runtime update time.</li>
+</ul>
+</li>
+<li><code>virtual-machine    instance-id=ut</code><ul>
+<li>Output only. The unique identifier of the Managed Compute Engine instance.</li>
+</ul>
+</li>
+<li><code>instance-name=rebum.</code><ul>
+<li>Output only. The user-friendly name of the Managed Compute Engine instance.</li>
+</ul>
+</li>
+<li><code>virtual-machine-config.accelerator-config    core-count=-70</code><ul>
+<li>Count of cores of this accelerator.</li>
+</ul>
+</li>
+<li>
+<p><code>type=kasd</code></p>
+<ul>
+<li>Accelerator model.</li>
+</ul>
+</li>
+<li>
+<p><code>..data-disk    auto-delete=false</code></p>
+<ul>
+<li>Optional. Output only. Specifies whether the disk will be auto-deleted when the instance is deleted (but not when the disk is detached from the instance).</li>
+</ul>
+</li>
+<li><code>boot=true</code><ul>
+<li>Optional. Output only. Indicates that this is a boot disk. The virtual machine will use the first partition of the disk for its root filesystem.</li>
+</ul>
+</li>
+<li><code>device-name=sea</code><ul>
+<li>Optional. Output only. Specifies a unique device name of your choice that is reflected into the <code>/dev/disk/by-id/google-*</code> tree of a Linux operating system running within the instance. This name can be used to reference the device for mounting, resizing, and so on, from within the instance. If not specified, the server chooses a default device name to apply to this disk, in the form persistent-disk-x, where x is a number assigned by Google Compute Engine. This field is only applicable for persistent disks.</li>
+</ul>
+</li>
+<li><code>index=27</code><ul>
+<li>Output only. A zero-based index to this disk, where 0 is reserved for the boot disk. If you have many disks attached to an instance, each disk would have a unique index number.</li>
+</ul>
+</li>
+<li><code>initialize-params    description=lorem</code><ul>
+<li>Optional. Provide this property when creating the disk.</li>
+</ul>
+</li>
+<li><code>disk-name=magna</code><ul>
+<li>Optional. Specifies the disk name. If not specified, the default is to use the name of the instance. If the disk with the instance name exists already in the given zone/region, a new name will be automatically generated.</li>
+</ul>
+</li>
+<li><code>disk-size-gb=takimata</code><ul>
+<li>Optional. Specifies the size of the disk in base-2 GB. If not specified, the disk will be the same size as the image (usually 10GB). If specified, the size must be equal to or larger than 10GB. Default 100 GB.</li>
+</ul>
+</li>
+<li><code>disk-type=rebum.</code><ul>
+<li>Input only. The type of the boot disk attached to this instance, defaults to standard persistent disk (<code>PD_STANDARD</code>).</li>
+</ul>
+</li>
+<li>
+<p><code>labels=key=at</code></p>
+<ul>
+<li>Optional. Labels to apply to this disk. These can be later modified by the disks.setLabels method. This field is only applicable for persistent disks.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>..    interface=invidunt</code></p>
+<ul>
+<li>Specifies the disk interface to use for attaching this disk, which is either SCSI or NVME. The default is SCSI. Persistent disks must always use SCSI and the request will fail if you attempt to attach a persistent disk in any other format than SCSI. Local SSDs can use either NVME or SCSI. For performance characteristics of SCSI over NVMe, see Local SSD performance. Valid values: * <code>NVME</code> * <code>SCSI</code></li>
+</ul>
+</li>
+<li><code>kind=clita</code><ul>
+<li>Output only. Type of the resource. Always compute#attachedDisk for attached disks.</li>
+</ul>
+</li>
+<li><code>licenses=stet</code><ul>
+<li>Output only. Any valid publicly visible licenses.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>mode=aliquyam</code><ul>
+<li>The mode in which to attach this disk, either <code>READ_WRITE</code> or <code>READ_ONLY</code>. If not specified, the default is to attach the disk in <code>READ_WRITE</code> mode. Valid values: * <code>READ_ONLY</code> * <code>READ_WRITE</code></li>
+</ul>
+</li>
+<li><code>source=ut</code><ul>
+<li>Specifies a valid partial or full URL to an existing Persistent Disk resource.</li>
+</ul>
+</li>
+<li>
+<p><code>type=sit</code></p>
+<ul>
+<li>Specifies the type of the disk, either <code>SCRATCH</code> or <code>PERSISTENT</code>. If not specified, the default is <code>PERSISTENT</code>. Valid values: * <code>PERSISTENT</code> * <code>SCRATCH</code></li>
+</ul>
+</li>
+<li>
+<p><code>..encryption-config    kms-key=vero</code></p>
+<ul>
+<li>The Cloud KMS resource identifier of the customer-managed encryption key used to protect a resource, such as a disks. It has the following format: <code>projects/{PROJECT_ID}/locations/{REGION}/keyRings/{KEY_RING_NAME}/cryptoKeys/{KEY_NAME}</code></li>
+</ul>
+</li>
+<li>
+<p><code>..    guest-attributes=key=rebum.</code></p>
+<ul>
+<li>Output only. The Compute Engine guest attributes. (see <a href="https://cloud.google.com/compute/docs/storing-retrieving-metadata#guest_attributes">Project and instance guest attributes</a>).</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>internal-ip-only=false</code><ul>
+<li>Optional. If true, runtime will only have internal IP addresses. By default, runtimes are not restricted to internal IP addresses, and will have ephemeral external IP addresses assigned to each vm. This <code>internal_ip_only</code> restriction can only be enabled for subnetwork enabled networks, and all dependencies must be configured to be accessible without external IP addresses.</li>
+</ul>
+</li>
+<li><code>labels=key=dolores</code><ul>
+<li>Optional. The labels to associate with this runtime. Label <strong>keys</strong> must contain 1 to 63 characters, and must conform to <a href="https://www.ietf.org/rfc/rfc1035.txt">RFC 1035</a>. Label <strong>values</strong> may be empty, but, if present, must contain 1 to 63 characters, and must conform to <a href="https://www.ietf.org/rfc/rfc1035.txt">RFC 1035</a>. No more than 32 labels can be associated with a cluster.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>machine-type=sed</code><ul>
+<li>Required. The Compute Engine machine type used for runtimes. Short name is valid. Examples: * <code>n1-standard-2</code> * <code>e2-standard-8</code></li>
+</ul>
+</li>
+<li><code>metadata=key=invidunt</code><ul>
+<li>Optional. The Compute Engine metadata entries to add to virtual machine. (see <a href="https://cloud.google.com/compute/docs/storing-retrieving-metadata#project_and_instance_metadata">Project and instance metadata</a>).</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>network=clita</code><ul>
+<li>Optional. The Compute Engine network to be used for machine communications. Cannot be specified with subnetwork. If neither <code>network</code> nor <code>subnet</code> is specified, the &#34;default&#34; network of the project is used, if it exists. A full URL or partial URI. Examples: * <code>https://www.googleapis.com/compute/v1/projects/[project_id]/global/networks/default</code> * <code>projects/[project_id]/global/networks/default</code> Runtimes are managed resources inside Google Infrastructure. Runtimes support the following network configurations: * Google Managed Network (Network &amp; subnet are empty) * Consumer Project VPC (network &amp; subnet are required). Requires configuring Private Service Access. * Shared VPC (network &amp; subnet are required). Requires configuring Private Service Access.</li>
+</ul>
+</li>
+<li><code>nic-type=dolor</code><ul>
+<li>Optional. The type of vNIC to be used on this interface. This may be gVNIC or VirtioNet.</li>
+</ul>
+</li>
+<li><code>reserved-ip-range=aliquyam</code><ul>
+<li>Optional. Reserved IP Range name is used for VPC Peering. The subnetwork allocation will use the range <em>name</em> if it&#39;s assigned. Example: managed-notebooks-range-c PEERING_RANGE_NAME_3=managed-notebooks-range-c gcloud compute addresses create $PEERING_RANGE_NAME_3 \ --global \ --prefix-length=24 \ --description=&#34;Google Cloud Managed Notebooks Range 24 c&#34; \ --network=$NETWORK \ --addresses=192.168.0.0 \ --purpose=VPC_PEERING Field value will be: <code>managed-notebooks-range-c</code></li>
+</ul>
+</li>
+<li><code>shielded-instance-config    enable-integrity-monitoring=false</code><ul>
+<li>Defines whether the instance has integrity monitoring enabled. Enables monitoring and attestation of the boot integrity of the instance. The attestation is performed against the integrity policy baseline. This baseline is initially derived from the implicitly trusted boot image when the instance is created. Enabled by default.</li>
+</ul>
+</li>
+<li><code>enable-secure-boot=true</code><ul>
+<li>Defines whether the instance has Secure Boot enabled. Secure Boot helps ensure that the system only runs authentic software by verifying the digital signature of all boot components, and halting the boot process if signature verification fails. Disabled by default.</li>
+</ul>
+</li>
+<li>
+<p><code>enable-vtpm=false</code></p>
+<ul>
+<li>Defines whether the instance has the vTPM enabled. Enabled by default.</li>
+</ul>
+</li>
+<li>
+<p><code>..    subnet=et</code></p>
+<ul>
+<li>Optional. The Compute Engine subnetwork to be used for machine communications. Cannot be specified with network. A full URL or partial URI are valid. Examples: * <code>https://www.googleapis.com/compute/v1/projects/[project_id]/regions/us-east1/subnetworks/sub0</code> * <code>projects/[project_id]/regions/us-east1/subnetworks/sub0</code></li>
+</ul>
+</li>
+<li><code>tags=sanctus</code><ul>
+<li>Optional. The Compute Engine tags to add to runtime (see <a href="https://cloud.google.com/compute/docs/label-or-tag-resources#tags">Tagging instances</a>).</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>zone=accusam</code><ul>
+<li>Output only. The zone where the virtual machine is located. If using regional request, the notebooks service will pick a location in the corresponding runtime region. On a get request, zone will always be present. Example: * <code>us-central1-b</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li>
+<p><strong>-p request-id=string</strong></p>
+<ul>
+<li>Idempotent request UUID.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p update-mask=string</strong></p>
+<ul>
+<li>Required. Specifies the path, relative to <code>Runtime</code>, of the field to update. For example, to change the software configuration kernels, the <code>update_mask</code> parameter would be specified as <code>software_config.kernels</code>, and the <code>PATCH</code> request body would specify the new value, as follows: { &#34;software_config&#34;:{ &#34;kernels&#34;: [{ &#39;repository&#39;: &#39;gcr.io/deeplearning-platform-release/pytorch-gpu&#39;, &#39;tag&#39;: &#39;latest&#39; }], } } Currently, only the following fields can be updated: - <code>software_config.kernels</code> - <code>software_config.post_startup_script</code> - <code>software_config.custom_gpu_driver_path</code> - <code>software_config.idle_shutdown</code> - <code>software_config.idle_shutdown_timeout</code> - <code>software_config.disable_terminal</code> - <code>labels</code></li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_locations-runtimes-migrate/" class="btn btn-neutral float-left" title="Locations Runtimes Migrate"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-runtimes-refresh-runtime-token-internal/" class="btn btn-neutral float-right" title="Locations Runtimes Refresh Runtime Token Internal">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/notebooks1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_locations-runtimes-migrate/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_locations-runtimes-refresh-runtime-token-internal/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

@@ -1,384 +1,201 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Uptime Check Configs Patch - Monitoring v3.0.0+20220218</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-monitoring3-cli/projects_uptime-check-configs-patch/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Uptime Check Configs Patch - Monitoring v5.0.4+20240225</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Uptime Check Configs Patch";
+        var mkdocs_page_input_path = "projects_uptime-check-configs-patch.md";
+        var mkdocs_page_url = "/google-apis-rs/google-monitoring3-cli/projects_uptime-check-configs-patch/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Monitoring v3.0.0+20220218</a>
-        
+          <a href=".." class="icon icon-home"> Monitoring v5.0.4+20240225
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Folders</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_time-series-list">Time Series List</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-        
-
-    
-        
-        <span>Organizations</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_time-series-list">Time Series List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_alert-policies-create">Alert Policies Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_alert-policies-delete">Alert Policies Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_alert-policies-get">Alert Policies Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_alert-policies-list">Alert Policies List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_alert-policies-patch">Alert Policies Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_collectd-time-series-create">Collectd Time Series Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_groups-create">Groups Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_groups-delete">Groups Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_groups-get">Groups Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_groups-list">Groups List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_groups-members-list">Groups Members List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_groups-update">Groups Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_metric-descriptors-create">Metric Descriptors Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_metric-descriptors-delete">Metric Descriptors Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_metric-descriptors-get">Metric Descriptors Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_metric-descriptors-list">Metric Descriptors List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_monitored-resource-descriptors-get">Monitored Resource Descriptors Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_monitored-resource-descriptors-list">Monitored Resource Descriptors List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notification-channel-descriptors-get">Notification Channel Descriptors Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notification-channel-descriptors-list">Notification Channel Descriptors List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notification-channels-create">Notification Channels Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notification-channels-delete">Notification Channels Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notification-channels-get">Notification Channels Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notification-channels-get-verification-code">Notification Channels Get Verification Code</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notification-channels-list">Notification Channels List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notification-channels-patch">Notification Channels Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notification-channels-send-verification-code">Notification Channels Send Verification Code</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notification-channels-verify">Notification Channels Verify</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_time-series-create">Time Series Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_time-series-create-service">Time Series Create Service</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_time-series-list">Time Series List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_time-series-query">Time Series Query</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_uptime-check-configs-create">Uptime Check Configs Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_uptime-check-configs-delete">Uptime Check Configs Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_uptime-check-configs-get">Uptime Check Configs Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_uptime-check-configs-list">Uptime Check Configs List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Uptime Check Configs Patch</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Services</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../services_create">Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../services_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../services_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../services_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../services_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../services_service-level-objectives-create">Service Level Objectives Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../services_service-level-objectives-delete">Service Level Objectives Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../services_service-level-objectives-get">Service Level Objectives Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../services_service-level-objectives-list">Service Level Objectives List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../services_service-level-objectives-patch">Service Level Objectives Patch</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Uptime Check Ips</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../uptime-check-ips_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Folders</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_time-series-list/">Time Series List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Organizations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_time-series-list/">Time Series List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_alert-policies-create/">Alert Policies Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_alert-policies-delete/">Alert Policies Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_alert-policies-get/">Alert Policies Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_alert-policies-list/">Alert Policies List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_alert-policies-patch/">Alert Policies Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_collectd-time-series-create/">Collectd Time Series Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_groups-create/">Groups Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_groups-delete/">Groups Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_groups-get/">Groups Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_groups-list/">Groups List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_groups-members-list/">Groups Members List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_groups-update/">Groups Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_metric-descriptors-create/">Metric Descriptors Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_metric-descriptors-delete/">Metric Descriptors Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_metric-descriptors-get/">Metric Descriptors Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_metric-descriptors-list/">Metric Descriptors List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_monitored-resource-descriptors-get/">Monitored Resource Descriptors Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_monitored-resource-descriptors-list/">Monitored Resource Descriptors List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channel-descriptors-get/">Notification Channel Descriptors Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channel-descriptors-list/">Notification Channel Descriptors List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-create/">Notification Channels Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-delete/">Notification Channels Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-get/">Notification Channels Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-get-verification-code/">Notification Channels Get Verification Code</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-list/">Notification Channels List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-patch/">Notification Channels Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-send-verification-code/">Notification Channels Send Verification Code</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-verify/">Notification Channels Verify</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snoozes-create/">Snoozes Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snoozes-get/">Snoozes Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snoozes-list/">Snoozes List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snoozes-patch/">Snoozes Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_time-series-create/">Time Series Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_time-series-create-service/">Time Series Create Service</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_time-series-list/">Time Series List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_time-series-query/">Time Series Query</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_uptime-check-configs-create/">Uptime Check Configs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_uptime-check-configs-delete/">Uptime Check Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_uptime-check-configs-get/">Uptime Check Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_uptime-check-configs-list/">Uptime Check Configs List</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Uptime Check Configs Patch</a>
+    <ul class="current">
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Services</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_service-level-objectives-create/">Service Level Objectives Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_service-level-objectives-delete/">Service Level Objectives Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_service-level-objectives-get/">Service Level Objectives Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_service-level-objectives-list/">Service Level Objectives List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_service-level-objectives-patch/">Service Level Objectives Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Uptime Check Ips</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../uptime-check-ips_list/">List</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Monitoring v5.0.4+20240225</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Uptime Check Configs Patch</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/monitoring3-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Uptime Check Configs Patch</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/monitoring3-cli/edit/master/docs/projects_uptime-check-configs-patch.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates an Uptime check configuration. You can either replace the entire configuration with a new one or replace only certain fields in the current configuration by specifying the fields to be updated via updateMask. Returns the updated configuration.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates an Uptime check configuration. You can either replace the entire configuration with a new one or replace only certain fields in the current configuration by specifying the fields to be updated via updateMask. Returns the updated configuration.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -390,7 +207,7 @@ You can set the scope for this method like this: <code>monitoring3 --scope &lt;s
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
-<li>A unique resource name for this Uptime check configuration. The format is: projects/[PROJECT_ID_OR_NUMBER]/uptimeCheckConfigs/[UPTIME_CHECK_ID] [PROJECT_ID_OR_NUMBER] is the Workspace host project associated with the Uptime check.This field should be omitted when creating the Uptime check configuration; on create, the resource name is assigned by the server and included in the response.</li>
+<li>Identifier. A unique resource name for this Uptime check configuration. The format is: projects/[PROJECT_ID_OR_NUMBER]/uptimeCheckConfigs/[UPTIME_CHECK_ID] [PROJECT_ID_OR_NUMBER] is the Workspace host project associated with the Uptime check.This field should be omitted when creating the Uptime check configuration; on create, the resource name is assigned by the server and included in the response.</li>
 </ul>
 </li>
 </ul>
@@ -407,9 +224,12 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       username: string
     body: string
     content-type: string
+    custom-content-type: string
     headers: { string: string }
     mask-headers: boolean
     path: string
+    ping-config:
+      pings-count: integer
     port: integer
     request-method: string
     use-ssl: boolean
@@ -424,64 +244,84 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     group-id: string
     resource-type: string
   selected-regions: [string]
+  synthetic-monitor:
+    cloud-function-v2:
+      cloud-run-revision:
+        labels: { string: string }
+        type: string
+      name: string
   tcp-check:
+    ping-config:
+      pings-count: integer
     port: integer
   timeout: string
+  user-labels: { string: string }
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    checker-type=dolores</code><ul>
+<li><code>-r .    checker-type=est</code><ul>
 <li>The type of checkers to use to execute the Uptime check.</li>
 </ul>
 </li>
 <li><code>display-name=et</code><ul>
-<li>A human-friendly name for the Uptime check configuration. The display name should be unique within a Stackdriver Workspace in order to make it easier to identify; however, uniqueness is not enforced. Required.</li>
+<li>A human-friendly name for the Uptime check configuration. The display name should be unique within a Cloud Monitoring Workspace in order to make it easier to identify; however, uniqueness is not enforced. Required.</li>
 </ul>
 </li>
-<li><code>http-check.auth-info    password=sed</code><ul>
+<li><code>http-check.auth-info    password=sea</code><ul>
 <li>The password to use when authenticating with the HTTP server.</li>
 </ul>
 </li>
 <li>
-<p><code>username=no</code></p>
+<p><code>username=consetetur</code></p>
 <ul>
 <li>The username to use when authenticating with the HTTP server.</li>
 </ul>
 </li>
 <li>
-<p><code>..    body=et</code></p>
+<p><code>..    body=consetetur</code></p>
 <ul>
 <li>The request body associated with the HTTP POST request. If content_type is URL_ENCODED, the body passed in must be URL-encoded. Users can provide a Content-Length header via the headers field or the API will do so. If the request_method is GET and body is not empty, the API will return an error. The maximum byte size is 1 megabyte.Note: If client libraries aren&#39;t used (which performs the conversion automatically) base64 encode your body data since the field is of bytes type.</li>
 </ul>
 </li>
-<li><code>content-type=elitr</code><ul>
+<li><code>content-type=stet</code><ul>
 <li>The content type header to use for the check. The following configurations result in errors: 1. Content type is specified in both the headers field and the content_type field. 2. Request method is GET and content_type is not TYPE_UNSPECIFIED 3. Request method is POST and content_type is TYPE_UNSPECIFIED. 4. Request method is POST and a &#34;Content-Type&#34; header is provided via headers field. The content_type field should be used instead.</li>
 </ul>
 </li>
-<li><code>headers=key=sed</code><ul>
+<li><code>custom-content-type=est</code><ul>
+<li>A user provided content type header to use for the check. The invalid configurations outlined in the content_type field apply to custom_content_type, as well as the following: 1. content_type is URL_ENCODED and custom_content_type is set. 2. content_type is USER_PROVIDED and custom_content_type is not set.</li>
+</ul>
+</li>
+<li><code>headers=key=aliquyam</code><ul>
 <li>The list of headers to send as part of the Uptime check request. If two headers have the same key and different values, they should be entered as a single header, with the value being a comma-separated list of all the desired values as described at https://www.w3.org/Protocols/rfc2616/rfc2616.txt (page 31). Entering two separate headers with the same key in a Create call will cause the first to be overwritten by the second. The maximum number of headers allowed is 100.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>mask-headers=true</code><ul>
+<li><code>mask-headers=false</code><ul>
 <li>Boolean specifying whether to encrypt the header information. Encryption should be specified for any headers related to authentication that you do not wish to be seen when retrieving the configuration. The server will be responsible for encrypting the headers. On Get/List calls, if mask_headers is set to true then the headers will be obscured with <strong>*</strong>*.</li>
 </ul>
 </li>
-<li><code>path=nonumy</code><ul>
+<li><code>path=duo</code><ul>
 <li>Optional (defaults to &#34;/&#34;). The path to the page against which to run the check. Will be combined with the host (specified within the monitored_resource) and port to construct the full URL. If the provided path does not begin with &#34;/&#34;, a &#34;/&#34; will be prepended automatically.</li>
 </ul>
 </li>
-<li><code>port=24</code><ul>
+<li>
+<p><code>ping-config    pings-count=59</code></p>
+<ul>
+<li>Number of ICMP pings. A maximum of 3 ICMP pings is currently supported.</li>
+</ul>
+</li>
+<li>
+<p><code>..    port=44</code></p>
+<ul>
 <li>Optional (defaults to 80 when use_ssl is false, and 443 when use_ssl is true). The TCP port on the HTTP server against which to run the check. Will be combined with host (specified within the monitored_resource) and path to construct the full URL.</li>
 </ul>
 </li>
-<li><code>request-method=sadipscing</code><ul>
+<li><code>request-method=sit</code><ul>
 <li>The HTTP request method to use for the check. If set to METHOD_UNSPECIFIED then request_method defaults to GET.</li>
 </ul>
 </li>
-<li><code>use-ssl=true</code><ul>
+<li><code>use-ssl=false</code><ul>
 <li>If true, use HTTPS instead of HTTP to run the check.</li>
 </ul>
 </li>
@@ -492,59 +332,87 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    is-internal=false</code></p>
+<p><code>..    is-internal=true</code></p>
 <ul>
 <li>If this is true, then checks are made only from the &#39;internal_checkers&#39;. If it is false, then checks are made only from the &#39;selected_regions&#39;. It is an error to provide &#39;selected_regions&#39; when is_internal is true, or to provide &#39;internal_checkers&#39; when is_internal is false.</li>
 </ul>
 </li>
-<li><code>monitored-resource    labels=key=amet</code><ul>
+<li><code>monitored-resource    labels=key=ea</code><ul>
 <li>Required. Values for all of the labels listed in the associated monitored resource descriptor. For example, Compute Engine VM instances use the labels &#34;project_id&#34;, &#34;instance_id&#34;, and &#34;zone&#34;.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
 <li>
-<p><code>type=est</code></p>
+<p><code>type=stet</code></p>
 <ul>
 <li>Required. The monitored resource type. This field must match the type field of a MonitoredResourceDescriptor object. For example, the type of a Compute Engine VM instance is gce_instance. For a list of types, see Monitoring resource types (https://cloud.google.com/monitoring/api/resources) and Logging resource types (https://cloud.google.com/logging/docs/api/v2/resource-list).</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=et</code></p>
+<p><code>..    name=dolores</code></p>
 <ul>
-<li>A unique resource name for this Uptime check configuration. The format is: projects/[PROJECT_ID_OR_NUMBER]/uptimeCheckConfigs/[UPTIME_CHECK_ID] [PROJECT_ID_OR_NUMBER] is the Workspace host project associated with the Uptime check.This field should be omitted when creating the Uptime check configuration; on create, the resource name is assigned by the server and included in the response.</li>
+<li>Identifier. A unique resource name for this Uptime check configuration. The format is: projects/[PROJECT_ID_OR_NUMBER]/uptimeCheckConfigs/[UPTIME_CHECK_ID] [PROJECT_ID_OR_NUMBER] is the Workspace host project associated with the Uptime check.This field should be omitted when creating the Uptime check configuration; on create, the resource name is assigned by the server and included in the response.</li>
 </ul>
 </li>
-<li><code>period=sea</code><ul>
+<li><code>period=eos</code><ul>
 <li>How often, in seconds, the Uptime check is performed. Currently, the only supported values are 60s (1 minute), 300s (5 minutes), 600s (10 minutes), and 900s (15 minutes). Optional, defaults to 60s.</li>
 </ul>
 </li>
-<li><code>resource-group    group-id=consetetur</code><ul>
+<li><code>resource-group    group-id=et</code><ul>
 <li>The group of resources being monitored. Should be only the [GROUP_ID], and not the full-path projects/[PROJECT_ID_OR_NUMBER]/groups/[GROUP_ID].</li>
 </ul>
 </li>
 <li>
-<p><code>resource-type=consetetur</code></p>
+<p><code>resource-type=sea</code></p>
 <ul>
 <li>The resource type of the group members.</li>
 </ul>
 </li>
 <li>
-<p><code>..    selected-regions=stet</code></p>
+<p><code>..    selected-regions=et</code></p>
 <ul>
 <li>The list of regions from which the check will be run. Some regions contain one location, and others contain more than one. If this field is specified, enough regions must be provided to include a minimum of 3 locations. Not specifying this field will result in Uptime checks running from all available regions.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
+<li><code>synthetic-monitor.cloud-function-v2.cloud-run-revision    labels=key=at</code><ul>
+<li>Required. Values for all of the labels listed in the associated monitored resource descriptor. For example, Compute Engine VM instances use the labels &#34;project_id&#34;, &#34;instance_id&#34;, and &#34;zone&#34;.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
 <li>
-<p><code>tcp-check    port=94</code></p>
+<p><code>type=dolore</code></p>
+<ul>
+<li>Required. The monitored resource type. This field must match the type field of a MonitoredResourceDescriptor object. For example, the type of a Compute Engine VM instance is gce_instance. For a list of types, see Monitoring resource types (https://cloud.google.com/monitoring/api/resources) and Logging resource types (https://cloud.google.com/logging/docs/api/v2/resource-list).</li>
+</ul>
+</li>
+<li>
+<p><code>..    name=eirmod</code></p>
+<ul>
+<li>Required. Fully qualified GCFv2 resource name i.e. projects/{project}/locations/{location}/functions/{function} Required.</li>
+</ul>
+</li>
+<li>
+<p><code>...tcp-check.ping-config    pings-count=50</code></p>
+<ul>
+<li>Number of ICMP pings. A maximum of 3 ICMP pings is currently supported.</li>
+</ul>
+</li>
+<li>
+<p><code>..    port=78</code></p>
 <ul>
 <li>The TCP port on the server against which to run the check. Will be combined with host (specified within the monitored_resource) to construct the full URL. Required.</li>
 </ul>
 </li>
 <li>
-<p><code>..    timeout=aliquyam</code></p>
+<p><code>..    timeout=amet</code></p>
 <ul>
 <li>The maximum amount of time to wait for the request to complete (must be between 1 and 60 seconds). Required.</li>
+</ul>
+</li>
+<li><code>user-labels=key=erat</code><ul>
+<li>User-supplied key/value data to be used for organizing and identifying the UptimeCheckConfig objects.The field can contain up to 64 entries. Each key and value is limited to 63 Unicode characters or 128 bytes, whichever is smaller. Labels and values can contain only lowercase letters, numerals, underscores, and dashes. Keys must begin with a letter.</li>
+<li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
 </ul>
@@ -647,32 +515,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../services_create" class="btn btn-neutral float-right" title="Create"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_uptime-check-configs-list" class="btn btn-neutral" title="Uptime Check Configs List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_uptime-check-configs-list/" class="btn btn-neutral float-left" title="Uptime Check Configs List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../services_create/" class="btn btn-neutral float-right" title="Create">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -680,14 +540,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_uptime-check-configs-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../services_create" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/monitoring3-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_uptime-check-configs-list/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../services_create/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

@@ -1,272 +1,173 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Databases Documents Run Query - Firestore v3.0.0+20220221</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-firestore1-cli/projects_databases-documents-run-query/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Databases Documents Run Query - Firestore v5.0.4+20240226</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Databases Documents Run Query";
+        var mkdocs_page_input_path = "projects_databases-documents-run-query.md";
+        var mkdocs_page_url = "/google-apis-rs/google-firestore1-cli/projects_databases-documents-run-query/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Firestore v3.0.0+20220221</a>
-        
+          <a href=".." class="icon icon-home"> Firestore v5.0.4+20240226
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-collection-groups-fields-get">Databases Collection Groups Fields Get</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-collection-groups-fields-list">Databases Collection Groups Fields List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-collection-groups-fields-patch">Databases Collection Groups Fields Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-collection-groups-indexes-create">Databases Collection Groups Indexes Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-collection-groups-indexes-delete">Databases Collection Groups Indexes Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-collection-groups-indexes-get">Databases Collection Groups Indexes Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-collection-groups-indexes-list">Databases Collection Groups Indexes List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-batch-get">Databases Documents Batch Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-batch-write">Databases Documents Batch Write</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-begin-transaction">Databases Documents Begin Transaction</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-commit">Databases Documents Commit</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-create-document">Databases Documents Create Document</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-delete">Databases Documents Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-get">Databases Documents Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-list">Databases Documents List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-list-collection-ids">Databases Documents List Collection Ids</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-listen">Databases Documents Listen</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-partition-query">Databases Documents Partition Query</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-patch">Databases Documents Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-rollback">Databases Documents Rollback</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Databases Documents Run Query</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-write">Databases Documents Write</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-export-documents">Databases Export Documents</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-get">Databases Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-import-documents">Databases Import Documents</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-list">Databases List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-operations-cancel">Databases Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-operations-delete">Databases Operations Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-operations-get">Databases Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-operations-list">Databases Operations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-patch">Databases Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-get">Locations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-list">Locations List</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-backup-schedules-create/">Databases Backup Schedules Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-backup-schedules-delete/">Databases Backup Schedules Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-backup-schedules-get/">Databases Backup Schedules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-backup-schedules-list/">Databases Backup Schedules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-backup-schedules-patch/">Databases Backup Schedules Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-collection-groups-fields-get/">Databases Collection Groups Fields Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-collection-groups-fields-list/">Databases Collection Groups Fields List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-collection-groups-fields-patch/">Databases Collection Groups Fields Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-collection-groups-indexes-create/">Databases Collection Groups Indexes Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-collection-groups-indexes-delete/">Databases Collection Groups Indexes Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-collection-groups-indexes-get/">Databases Collection Groups Indexes Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-collection-groups-indexes-list/">Databases Collection Groups Indexes List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-create/">Databases Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-delete/">Databases Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-batch-get/">Databases Documents Batch Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-batch-write/">Databases Documents Batch Write</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-begin-transaction/">Databases Documents Begin Transaction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-commit/">Databases Documents Commit</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-create-document/">Databases Documents Create Document</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-delete/">Databases Documents Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-get/">Databases Documents Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-list/">Databases Documents List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-list-collection-ids/">Databases Documents List Collection Ids</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-list-documents/">Databases Documents List Documents</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-listen/">Databases Documents Listen</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-partition-query/">Databases Documents Partition Query</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-patch/">Databases Documents Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-rollback/">Databases Documents Rollback</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-run-aggregation-query/">Databases Documents Run Aggregation Query</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Databases Documents Run Query</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-write/">Databases Documents Write</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-export-documents/">Databases Export Documents</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-get/">Databases Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-import-documents/">Databases Import Documents</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-list/">Databases List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-operations-cancel/">Databases Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-operations-delete/">Databases Operations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-operations-get/">Databases Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-operations-list/">Databases Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-patch/">Databases Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-restore/">Databases Restore</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-backups-delete/">Locations Backups Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-backups-get/">Locations Backups Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-backups-list/">Locations Backups List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-list/">Locations List</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Firestore v5.0.4+20240226</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Databases Documents Run Query</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/firestore1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Databases Documents Run Query</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/firestore1-cli/edit/master/docs/projects_databases-documents-run-query.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Runs a query.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Runs a query.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -326,63 +227,62 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   transaction: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li>
-<p><code>-r .new-transaction.read-only    read-time=sed</code></p>
+<p><code>-r .new-transaction.read-only    read-time=est</code></p>
 <ul>
-<li>Reads documents at the given time. This may not be older than 60 seconds.</li>
+<li>Reads documents at the given time. This must be a microsecond precision timestamp within the past one hour, or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.</li>
 </ul>
 </li>
 <li>
-<p><code>..read-write    retry-transaction=takimata</code></p>
+<p><code>..read-write    retry-transaction=sit</code></p>
 <ul>
 <li>An optional transaction to retry.</li>
 </ul>
 </li>
 <li>
-<p><code>...    read-time=dolores</code></p>
+<p><code>...    read-time=sed</code></p>
 <ul>
-<li>Reads documents as they were at the given time. This may not be older than 270 seconds.</li>
+<li>Reads documents as they were at the given time. This must be a microsecond precision timestamp within the past one hour, or if Point-in-Time Recovery is enabled, can additionally be a whole minute timestamp within the past 7 days.</li>
 </ul>
 </li>
 <li>
-<p><code>structured-query.end-at    before=true</code></p>
-<ul>
-<li>If the position is just before or just after the given values, relative to the sort order defined by the query.</li>
-</ul>
-</li>
-<li>
-<p><code>..    limit=27</code></p>
-<ul>
-<li>The maximum number of results to return. Applies after all other constraints. Must be &gt;= 0 if specified.</li>
-</ul>
-</li>
-<li><code>offset=78</code><ul>
-<li>The number of results to skip. Applies before limit, but after all other constraints. Must be &gt;= 0 if specified.</li>
-</ul>
-</li>
-<li>
-<p><code>start-at    before=false</code></p>
+<p><code>structured-query.end-at    before=false</code></p>
 <ul>
 <li>If the position is just before or just after the given values, relative to the sort order defined by the query.</li>
 </ul>
 </li>
 <li>
-<p><code>..where.composite-filter    op=dolore</code></p>
+<p><code>..    limit=45</code></p>
+<ul>
+<li>The maximum number of results to return. Applies after all other constraints. Requires: * The value must be greater than or equal to zero if specified.</li>
+</ul>
+</li>
+<li><code>offset=84</code><ul>
+<li>The number of documents to skip before returning the first result. This applies after the constraints specified by the <code>WHERE</code>, <code>START AT</code>, &amp; <code>END AT</code> but before the <code>LIMIT</code> clause. Requires: * The value must be greater than or equal to zero if specified.</li>
+</ul>
+</li>
+<li>
+<p><code>start-at    before=true</code></p>
+<ul>
+<li>If the position is just before or just after the given values, relative to the sort order defined by the query.</li>
+</ul>
+</li>
+<li>
+<p><code>..where.composite-filter    op=sea</code></p>
 <ul>
 <li>The operator for combining multiple filters.</li>
 </ul>
 </li>
 <li>
-<p><code>..field-filter.field    field-path=dolore</code></p>
+<p><code>..field-filter.field    field-path=et</code></p>
 <ul>
-<li>No description provided.</li>
+<li>A reference to a field in a document. Requires: * MUST be a dot-delimited (<code>.</code>) string of segments, where each segment conforms to document field name limitations.</li>
 </ul>
 </li>
 <li>
-<p><code>..    op=dolore</code></p>
+<p><code>..    op=at</code></p>
 <ul>
 <li>The operator to filter by.</li>
 </ul>
@@ -391,56 +291,56 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>A boolean value.</li>
 </ul>
 </li>
-<li><code>bytes-value=amet.</code><ul>
+<li><code>bytes-value=eirmod</code><ul>
 <li>A bytes value. Must not exceed 1 MiB - 89 bytes. Only the first 1,500 bytes are considered by queries.</li>
 </ul>
 </li>
-<li><code>double-value=0.6626374874296354</code><ul>
+<li><code>double-value=0.3918759123472283</code><ul>
 <li>A double value.</li>
 </ul>
 </li>
-<li><code>geo-point-value    latitude=0.7463638372321394</code><ul>
+<li><code>geo-point-value    latitude=0.42959542239324255</code><ul>
 <li>The latitude in degrees. It must be in the range [-90.0, +90.0].</li>
 </ul>
 </li>
 <li>
-<p><code>longitude=0.7036393712200139</code></p>
+<p><code>longitude=0.2528691601732844</code></p>
 <ul>
 <li>The longitude in degrees. It must be in the range [-180.0, +180.0].</li>
 </ul>
 </li>
 <li>
-<p><code>..    integer-value=at</code></p>
+<p><code>..    integer-value=accusam</code></p>
 <ul>
 <li>An integer value.</li>
 </ul>
 </li>
-<li><code>null-value=sed</code><ul>
+<li><code>null-value=sea</code><ul>
 <li>A null value.</li>
 </ul>
 </li>
-<li><code>reference-value=sit</code><ul>
+<li><code>reference-value=takimata</code><ul>
 <li>A reference to a document. For example: <code>projects/{project_id}/databases/{database_id}/documents/{document_path}</code>.</li>
 </ul>
 </li>
-<li><code>string-value=et</code><ul>
+<li><code>string-value=lorem</code><ul>
 <li>A string value. The string, represented as UTF-8, must not exceed 1 MiB - 89 bytes. Only the first 1,500 bytes of the UTF-8 representation are considered by queries.</li>
 </ul>
 </li>
 <li>
-<p><code>timestamp-value=tempor</code></p>
+<p><code>timestamp-value=et</code></p>
 <ul>
 <li>A timestamp value. Precise only to microseconds. When stored, any additional precision is rounded down.</li>
 </ul>
 </li>
 <li>
-<p><code>...unary-filter.field    field-path=aliquyam</code></p>
+<p><code>...unary-filter.field    field-path=at</code></p>
 <ul>
-<li>No description provided.</li>
+<li>A reference to a field in a document. Requires: * MUST be a dot-delimited (<code>.</code>) string of segments, where each segment conforms to document field name limitations.</li>
 </ul>
 </li>
 <li>
-<p><code>..    op=ipsum</code></p>
+<p><code>..    op=dolor</code></p>
 <ul>
 <li>The unary operator to apply.</li>
 </ul>
@@ -541,32 +441,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_databases-documents-write" class="btn btn-neutral float-right" title="Databases Documents Write"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_databases-documents-rollback" class="btn btn-neutral" title="Databases Documents Rollback"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_databases-documents-run-aggregation-query/" class="btn btn-neutral float-left" title="Databases Documents Run Aggregation Query"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_databases-documents-write/" class="btn btn-neutral float-right" title="Databases Documents Write">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -574,14 +466,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_databases-documents-rollback" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_databases-documents-write" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/firestore1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_databases-documents-run-aggregation-query/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_databases-documents-write/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

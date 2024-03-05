@@ -1,222 +1,139 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Policies List - OrgPolicy API v3.0.0+20220305</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-orgpolicy2-cli/organizations_policies-list/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Policies List - OrgPolicy API v5.0.4+20240226</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Policies List";
+        var mkdocs_page_input_path = "organizations_policies-list.md";
+        var mkdocs_page_url = "/google-apis-rs/google-orgpolicy2-cli/organizations_policies-list/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> OrgPolicy API v3.0.0+20220305</a>
-        
+          <a href=".." class="icon icon-home"> OrgPolicy API v5.0.4+20240226
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Folders</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_constraints-list">Constraints List</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_policies-create">Policies Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_policies-delete">Policies Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_policies-get">Policies Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_policies-get-effective-policy">Policies Get Effective Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_policies-list">Policies List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_policies-patch">Policies Patch</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Organizations</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_constraints-list">Constraints List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_policies-create">Policies Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_policies-delete">Policies Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_policies-get">Policies Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_policies-get-effective-policy">Policies Get Effective Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Policies List</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_policies-patch">Policies Patch</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_constraints-list">Constraints List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_policies-create">Policies Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_policies-delete">Policies Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_policies-get">Policies Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_policies-get-effective-policy">Policies Get Effective Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_policies-list">Policies List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_policies-patch">Policies Patch</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Folders</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_constraints-list/">Constraints List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_policies-create/">Policies Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_policies-delete/">Policies Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_policies-get/">Policies Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_policies-get-effective-policy/">Policies Get Effective Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_policies-list/">Policies List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_policies-patch/">Policies Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Organizations</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_constraints-list/">Constraints List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_custom-constraints-create/">Custom Constraints Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_custom-constraints-delete/">Custom Constraints Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_custom-constraints-get/">Custom Constraints Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_custom-constraints-list/">Custom Constraints List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_custom-constraints-patch/">Custom Constraints Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_policies-create/">Policies Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_policies-delete/">Policies Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_policies-get/">Policies Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_policies-get-effective-policy/">Policies Get Effective Policy</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Policies List</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_policies-patch/">Policies Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_constraints-list/">Constraints List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_policies-create/">Policies Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_policies-delete/">Policies Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_policies-get/">Policies Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_policies-get-effective-policy/">Policies Get Effective Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_policies-list/">Policies List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_policies-patch/">Policies Patch</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">OrgPolicy API v5.0.4+20240226</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Policies List</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/orgpolicy2-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Organizations &raquo;</li>
+      <li>Policies List</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/orgpolicy2-cli/edit/master/docs/organizations_policies-list.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Retrieves all of the <code>Policies</code> that exist on a particular resource.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Retrieves all of the policies that exist on a particular resource.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -224,7 +141,7 @@ You can set the scope for this method like this: <code>orgpolicy2 --scope &lt;sc
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
-<li>Required. The target Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * <code>projects/{project_number}</code> * <code>projects/{project_id}</code> * <code>folders/{folder_id}</code> * <code>organizations/{organization_id}</code></li>
+<li>Required. The target Google Cloud resource that parents the set of constraints and policies that will be returned from this call. Must be in one of the following forms: * <code>projects/{project_number}</code> * <code>projects/{project_id}</code> * <code>folders/{folder_id}</code> * <code>organizations/{organization_id}</code></li>
 </ul>
 </li>
 </ul>
@@ -327,32 +244,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../organizations_policies-patch" class="btn btn-neutral float-right" title="Policies Patch"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../organizations_policies-get-effective-policy" class="btn btn-neutral" title="Policies Get Effective Policy"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../organizations_policies-get-effective-policy/" class="btn btn-neutral float-left" title="Policies Get Effective Policy"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../organizations_policies-patch/" class="btn btn-neutral float-right" title="Policies Patch">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -360,14 +269,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../organizations_policies-get-effective-policy" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../organizations_policies-patch" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/orgpolicy2-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../organizations_policies-get-effective-policy/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../organizations_policies-patch/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-storage1-cli/buckets_operations-cancel/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Operations Cancel - storage v5.0.4+20240229</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Operations Cancel";
+        var mkdocs_page_input_path = "buckets_operations-cancel.md";
+        var mkdocs_page_url = "/google-apis-rs/google-storage1-cli/buckets_operations-cancel/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> storage v5.0.4+20240229
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Anywhere Caches</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../anywhere-caches_disable/">Disable</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../anywhere-caches_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../anywhere-caches_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../anywhere-caches_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../anywhere-caches_pause/">Pause</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../anywhere-caches_resume/">Resume</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../anywhere-caches_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bucket Access Controls</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../bucket-access-controls_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bucket-access-controls_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bucket-access-controls_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bucket-access-controls_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bucket-access-controls_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bucket-access-controls_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Buckets</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_lock-retention-policy/">Lock Retention Policy</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Operations Cancel</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_operations-get/">Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_operations-list/">Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Channels</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../channels_stop/">Stop</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Default Object Access Controls</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../default-object-access-controls_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../default-object-access-controls_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../default-object-access-controls_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../default-object-access-controls_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../default-object-access-controls_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../default-object-access-controls_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Folders</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_rename/">Rename</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Managed Folders</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../managed-folders_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../managed-folders_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../managed-folders_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../managed-folders_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../managed-folders_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../managed-folders_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../managed-folders_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Notifications</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../notifications_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../notifications_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../notifications_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../notifications_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Object Access Controls</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../object-access-controls_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object-access-controls_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object-access-controls_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object-access-controls_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object-access-controls_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object-access-controls_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Objects</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_bulk-restore/">Bulk Restore</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_compose/">Compose</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_copy/">Copy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_restore/">Restore</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_rewrite/">Rewrite</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_update/">Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_watch-all/">Watch All</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_hmac-keys-create/">Hmac Keys Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_hmac-keys-delete/">Hmac Keys Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_hmac-keys-get/">Hmac Keys Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_hmac-keys-list/">Hmac Keys List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_hmac-keys-update/">Hmac Keys Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-account-get/">Service Account Get</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">storage v5.0.4+20240229</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Buckets &raquo;</li>
+      <li>Operations Cancel</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/storage1-cli/edit/master/docs/buckets_operations-cancel.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/cloud-platform</em></li>
+<li><em>https://www.googleapis.com/auth/devstorage.full_control</em></li>
+<li><em>https://www.googleapis.com/auth/devstorage.read_write</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>storage1 --scope &lt;scope&gt; buckets operations-cancel ...</code></p>
+<h1 id="required-scalar-arguments">Required Scalar Arguments</h1>
+<ul>
+<li><strong>&lt;bucket&gt;</strong> <em>(string)</em><ul>
+<li>The parent bucket of the operation resource.</li>
+</ul>
+</li>
+<li><strong>&lt;operation-id&gt;</strong> <em>(string)</em><ul>
+<li>The ID of the operation resource.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for the response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>An opaque string that represents a user for quota purposes. Must not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;, &#34;resumable&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p user-ip=string</strong></p>
+<ul>
+<li>Deprecated. Please use quotaUser instead.</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../buckets_lock-retention-policy/" class="btn btn-neutral float-left" title="Lock Retention Policy"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../buckets_operations-get/" class="btn btn-neutral float-right" title="Operations Get">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/storage1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../buckets_lock-retention-policy/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../buckets_operations-get/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

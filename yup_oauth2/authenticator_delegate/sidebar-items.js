@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["DefaultDeviceFlowDelegate","DefaultInstalledFlowDelegate","DefaultInstalledFlowDelegateWithRedirectURI","DeviceAuthResponse"],"trait":["DeviceFlowDelegate","InstalledFlowDelegate"]};

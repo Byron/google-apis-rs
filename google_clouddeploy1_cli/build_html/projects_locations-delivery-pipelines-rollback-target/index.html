@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-clouddeploy1-cli/projects_locations-delivery-pipelines-rollback-target/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Locations Delivery Pipelines Rollback Target - Cloud Deploy v5.0.4+20240221</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Locations Delivery Pipelines Rollback Target";
+        var mkdocs_page_input_path = "projects_locations-delivery-pipelines-rollback-target.md";
+        var mkdocs_page_url = "/google-apis-rs/google-clouddeploy1-cli/projects_locations-delivery-pipelines-rollback-target/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Cloud Deploy v5.0.4+20240221
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-custom-target-types-create/">Locations Custom Target Types Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-custom-target-types-delete/">Locations Custom Target Types Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-custom-target-types-get/">Locations Custom Target Types Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-custom-target-types-get-iam-policy/">Locations Custom Target Types Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-custom-target-types-list/">Locations Custom Target Types List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-custom-target-types-patch/">Locations Custom Target Types Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-custom-target-types-set-iam-policy/">Locations Custom Target Types Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-automation-runs-cancel/">Locations Delivery Pipelines Automation Runs Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-automation-runs-get/">Locations Delivery Pipelines Automation Runs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-automation-runs-list/">Locations Delivery Pipelines Automation Runs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-automations-create/">Locations Delivery Pipelines Automations Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-automations-delete/">Locations Delivery Pipelines Automations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-automations-get/">Locations Delivery Pipelines Automations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-automations-list/">Locations Delivery Pipelines Automations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-automations-patch/">Locations Delivery Pipelines Automations Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-create/">Locations Delivery Pipelines Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-delete/">Locations Delivery Pipelines Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-get/">Locations Delivery Pipelines Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-get-iam-policy/">Locations Delivery Pipelines Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-list/">Locations Delivery Pipelines List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-patch/">Locations Delivery Pipelines Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-releases-abandon/">Locations Delivery Pipelines Releases Abandon</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-releases-create/">Locations Delivery Pipelines Releases Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-releases-get/">Locations Delivery Pipelines Releases Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-releases-list/">Locations Delivery Pipelines Releases List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-releases-rollouts-advance/">Locations Delivery Pipelines Releases Rollouts Advance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-releases-rollouts-approve/">Locations Delivery Pipelines Releases Rollouts Approve</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-releases-rollouts-cancel/">Locations Delivery Pipelines Releases Rollouts Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-releases-rollouts-create/">Locations Delivery Pipelines Releases Rollouts Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-releases-rollouts-get/">Locations Delivery Pipelines Releases Rollouts Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-releases-rollouts-ignore-job/">Locations Delivery Pipelines Releases Rollouts Ignore Job</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-releases-rollouts-job-runs-get/">Locations Delivery Pipelines Releases Rollouts Job Runs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-releases-rollouts-job-runs-list/">Locations Delivery Pipelines Releases Rollouts Job Runs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-releases-rollouts-job-runs-terminate/">Locations Delivery Pipelines Releases Rollouts Job Runs Terminate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-releases-rollouts-list/">Locations Delivery Pipelines Releases Rollouts List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-releases-rollouts-retry-job/">Locations Delivery Pipelines Releases Rollouts Retry Job</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Locations Delivery Pipelines Rollback Target</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-set-iam-policy/">Locations Delivery Pipelines Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-delivery-pipelines-test-iam-permissions/">Locations Delivery Pipelines Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-get-config/">Locations Get Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-list/">Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-delete/">Locations Operations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-targets-create/">Locations Targets Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-targets-delete/">Locations Targets Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-targets-get/">Locations Targets Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-targets-get-iam-policy/">Locations Targets Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-targets-list/">Locations Targets List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-targets-patch/">Locations Targets Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-targets-set-iam-policy/">Locations Targets Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-targets-test-iam-permissions/">Locations Targets Test Iam Permissions</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Cloud Deploy v5.0.4+20240221</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Locations Delivery Pipelines Rollback Target</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/clouddeploy1-cli/edit/master/docs/projects_locations-delivery-pipelines-rollback-target.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Creates a <code>Rollout</code> to roll back the specified target.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>clouddeploy1 --scope &lt;scope&gt; projects locations-delivery-pipelines-rollback-target ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
+<li>Required. The <code>DeliveryPipeline</code> for which the rollback <code>Rollout</code> should be created. Format should be <code>projects/{project_id}/locations/{location_name}/deliveryPipelines/{pipeline_name}</code>.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>RollbackTargetRequest:
+  release-id: string
+  rollback-config:
+    rollout:
+      annotations: { string: string }
+      approval-state: string
+      approve-time: string
+      controller-rollout: string
+      create-time: string
+      deploy-end-time: string
+      deploy-failure-cause: string
+      deploy-start-time: string
+      deploying-build: string
+      description: string
+      enqueue-time: string
+      etag: string
+      failure-reason: string
+      labels: { string: string }
+      metadata:
+        automation:
+          advance-automation-runs: [string]
+          current-repair-automation-run: string
+          promote-automation-run: string
+          repair-automation-runs: [string]
+        cloud-run:
+          job: string
+          revision: string
+          service: string
+          service-urls: [string]
+        custom:
+          values: { string: string }
+      name: string
+      rollback-of-rollout: string
+      rolled-back-by-rollouts: [string]
+      state: string
+      target-id: string
+      uid: string
+    starting-phase-id: string
+  rollout-id: string
+  rollout-to-roll-back: string
+  target-id: string
+  validate-only: boolean
+
+</code></pre>
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    release-id=takimata</code><ul>
+<li>Optional. ID of the <code>Release</code> to roll back to. If this isn&#39;t specified, the previous successful <code>Rollout</code> to the specified target will be used to determine the <code>Release</code>.</li>
+</ul>
+</li>
+<li><code>rollback-config.rollout    annotations=key=lorem</code><ul>
+<li>User annotations. These attributes can only be set and used by the user, and not by Cloud Deploy. See https://google.aip.dev/128#annotations for more details such as format and size limitations.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>approval-state=et</code><ul>
+<li>Output only. Approval state of the <code>Rollout</code>.</li>
+</ul>
+</li>
+<li><code>approve-time=at</code><ul>
+<li>Output only. Time at which the <code>Rollout</code> was approved.</li>
+</ul>
+</li>
+<li><code>controller-rollout=dolor</code><ul>
+<li>Output only. Name of the <code>ControllerRollout</code>. Format is <code>projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}/releases/{release}/rollouts/a-z{0,62}</code>.</li>
+</ul>
+</li>
+<li><code>create-time=et</code><ul>
+<li>Output only. Time at which the <code>Rollout</code> was created.</li>
+</ul>
+</li>
+<li><code>deploy-end-time=sit</code><ul>
+<li>Output only. Time at which the <code>Rollout</code> finished deploying.</li>
+</ul>
+</li>
+<li><code>deploy-failure-cause=erat</code><ul>
+<li>Output only. The reason this rollout failed. This will always be unspecified while the rollout is in progress.</li>
+</ul>
+</li>
+<li><code>deploy-start-time=sea</code><ul>
+<li>Output only. Time at which the <code>Rollout</code> started deploying.</li>
+</ul>
+</li>
+<li><code>deploying-build=nonumy</code><ul>
+<li>Output only. The resource name of the Cloud Build <code>Build</code> object that is used to deploy the Rollout. Format is <code>projects/{project}/locations/{location}/builds/{build}</code>.</li>
+</ul>
+</li>
+<li><code>description=et</code><ul>
+<li>Description of the <code>Rollout</code> for user purposes. Max length is 255 characters.</li>
+</ul>
+</li>
+<li><code>enqueue-time=gubergren</code><ul>
+<li>Output only. Time at which the <code>Rollout</code> was enqueued.</li>
+</ul>
+</li>
+<li><code>etag=justo</code><ul>
+<li>This checksum is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding.</li>
+</ul>
+</li>
+<li><code>failure-reason=sea</code><ul>
+<li>Output only. Additional information about the rollout failure, if available.</li>
+</ul>
+</li>
+<li><code>labels=key=consetetur</code><ul>
+<li>Labels are attributes that can be set and used by both the user and by Cloud Deploy. Labels must meet the following constraints: * Keys and values can contain only lowercase letters, numeric characters, underscores, and dashes. * All characters must use UTF-8 encoding, and international characters are allowed. * Keys must start with a lowercase letter or international character. * Each resource is limited to a maximum of 64 labels. Both keys and values are additionally constrained to be &lt;= 128 bytes.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>metadata.automation    advance-automation-runs=sit</code><ul>
+<li>Output only. The IDs of the AutomationRuns initiated by an advance rollout rule.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>current-repair-automation-run=aliquyam</code><ul>
+<li>Output only. The current AutomationRun repairing the rollout.</li>
+</ul>
+</li>
+<li><code>promote-automation-run=eos</code><ul>
+<li>Output only. The ID of the AutomationRun initiated by a promote release rule.</li>
+</ul>
+</li>
+<li>
+<p><code>repair-automation-runs=at</code></p>
+<ul>
+<li>Output only. The IDs of the AutomationRuns initiated by a repair rollout rule.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..cloud-run    job=dolores</code></p>
+<ul>
+<li>Output only. The name of the Cloud Run job that is associated with a <code>Rollout</code>. Format is <code>projects/{project}/locations/{location}/jobs/{job_name}</code>.</li>
+</ul>
+</li>
+<li><code>revision=consetetur</code><ul>
+<li>Output only. The Cloud Run Revision id associated with a <code>Rollout</code>.</li>
+</ul>
+</li>
+<li><code>service=gubergren</code><ul>
+<li>Output only. The name of the Cloud Run Service that is associated with a <code>Rollout</code>. Format is <code>projects/{project}/locations/{location}/services/{service}</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>service-urls=dolor</code></p>
+<ul>
+<li>Output only. The Cloud Run Service urls that are associated with a <code>Rollout</code>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom    values=key=aliquyam</code></p>
+<ul>
+<li>Output only. Key-value pairs provided by the user-defined operation.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>...    name=no</code></p>
+<ul>
+<li>Optional. Name of the <code>Rollout</code>. Format is <code>projects/{project}/locations/{location}/deliveryPipelines/{deliveryPipeline}/releases/{release}/rollouts/a-z{0,62}</code>.</li>
+</ul>
+</li>
+<li><code>rollback-of-rollout=amet.</code><ul>
+<li>Output only. Name of the <code>Rollout</code> that is rolled back by this <code>Rollout</code>. Empty if this <code>Rollout</code> wasn&#39;t created as a rollback.</li>
+</ul>
+</li>
+<li><code>rolled-back-by-rollouts=ipsum</code><ul>
+<li>Output only. Names of <code>Rollouts</code> that rolled back this <code>Rollout</code>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>state=lorem</code><ul>
+<li>Output only. Current state of the <code>Rollout</code>.</li>
+</ul>
+</li>
+<li><code>target-id=accusam</code><ul>
+<li>Required. The ID of Target to which this <code>Rollout</code> is deploying.</li>
+</ul>
+</li>
+<li>
+<p><code>uid=gubergren</code></p>
+<ul>
+<li>Output only. Unique identifier of the <code>Rollout</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    starting-phase-id=sadipscing</code></p>
+<ul>
+<li>Optional. The starting phase ID for the <code>Rollout</code>. If unspecified, the <code>Rollout</code> will start in the stable phase.</li>
+</ul>
+</li>
+<li>
+<p><code>..    rollout-id=at</code></p>
+<ul>
+<li>Required. ID of the rollback <code>Rollout</code> to create.</li>
+</ul>
+</li>
+<li><code>rollout-to-roll-back=sit</code><ul>
+<li>Optional. If provided, this must be the latest <code>Rollout</code> that is on the <code>Target</code>.</li>
+</ul>
+</li>
+<li><code>target-id=duo</code><ul>
+<li>Required. ID of the <code>Target</code> that is being rolled back.</li>
+</ul>
+</li>
+<li><code>validate-only=true</code><ul>
+<li>Optional. If set to true, the request is validated and the user is provided with a <code>RollbackTargetResponse</code>.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_locations-delivery-pipelines-releases-rollouts-retry-job/" class="btn btn-neutral float-left" title="Locations Delivery Pipelines Releases Rollouts Retry Job"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-delivery-pipelines-set-iam-policy/" class="btn btn-neutral float-right" title="Locations Delivery Pipelines Set Iam Policy">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/clouddeploy1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_locations-delivery-pipelines-releases-rollouts-retry-job/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_locations-delivery-pipelines-set-iam-policy/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

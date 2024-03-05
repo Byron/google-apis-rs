@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-androidmanagement1-cli/enterprises_migration-tokens-create/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Migration Tokens Create - Android Management v5.0.4+20240221</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Migration Tokens Create";
+        var mkdocs_page_input_path = "enterprises_migration-tokens-create.md";
+        var mkdocs_page_url = "/google-apis-rs/google-androidmanagement1-cli/enterprises_migration-tokens-create/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Android Management v5.0.4+20240221
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Enterprises</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_applications-get/">Applications Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_devices-delete/">Devices Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_devices-get/">Devices Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_devices-issue-command/">Devices Issue Command</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_devices-list/">Devices List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_devices-operations-cancel/">Devices Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_devices-operations-get/">Devices Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_devices-operations-list/">Devices Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_devices-patch/">Devices Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_enrollment-tokens-create/">Enrollment Tokens Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_enrollment-tokens-delete/">Enrollment Tokens Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_enrollment-tokens-get/">Enrollment Tokens Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_enrollment-tokens-list/">Enrollment Tokens List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_list/">List</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Migration Tokens Create</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_migration-tokens-get/">Migration Tokens Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_migration-tokens-list/">Migration Tokens List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_policies-delete/">Policies Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_policies-get/">Policies Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_policies-list/">Policies List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_policies-patch/">Policies Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_web-apps-create/">Web Apps Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_web-apps-delete/">Web Apps Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_web-apps-get/">Web Apps Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_web-apps-list/">Web Apps List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_web-apps-patch/">Web Apps Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../enterprises_web-tokens-create/">Web Tokens Create</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Provisioning Info</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../provisioning-info_get/">Get</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Signup Urls</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../signup-urls_create/">Create</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Android Management v5.0.4+20240221</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Enterprises &raquo;</li>
+      <li>Migration Tokens Create</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/androidmanagement1-cli/edit/master/docs/enterprises_migration-tokens-create.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Creates a migration token, to migrate an existing device from being managed by the EMM&#39;s Device Policy Controller (DPC) to being managed by the Android Management API.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/androidmanagement</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/androidmanagement</em>.
+You can set the scope for this method like this: <code>androidmanagement1 --scope &lt;scope&gt; enterprises migration-tokens-create ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
+<li>Required. The enterprise in which this migration token will be created. Format: enterprises/{enterprise}</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>MigrationToken:
+  additional-data: string
+  create-time: string
+  device: string
+  device-id: string
+  expire-time: string
+  management-mode: string
+  name: string
+  policy: string
+  ttl: string
+  user-id: string
+  value: string
+
+</code></pre>
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    additional-data=aliquyam</code><ul>
+<li>Immutable. Optional EMM-specified additional data. Once the device is migrated this will be populated in the migrationAdditionalData field of the Device resource. This must be at most 1024 characters.</li>
+</ul>
+</li>
+<li><code>create-time=dolores</code><ul>
+<li>Output only. Time when this migration token was created.</li>
+</ul>
+</li>
+<li><code>device=sadipscing</code><ul>
+<li>Output only. Once this migration token is used to migrate a device, the name of the resulting Device resource will be populated here, in the form enterprises/{enterprise}/devices/{device}.</li>
+</ul>
+</li>
+<li><code>device-id=erat</code><ul>
+<li>Required. Immutable. The id of the device, as in the Play EMM API. This corresponds to the deviceId parameter in Play EMM API&#39;s Devices.get (https://developers.google.com/android/work/play/emm-api/v1/devices/get#parameters) call.</li>
+</ul>
+</li>
+<li><code>expire-time=aliquyam</code><ul>
+<li>Immutable. The time when this migration token expires. This can be at most seven days from the time of creation. The migration token is deleted seven days after it expires.</li>
+</ul>
+</li>
+<li><code>management-mode=amet</code><ul>
+<li>Required. Immutable. The management mode of the device or profile being migrated.</li>
+</ul>
+</li>
+<li><code>name=est</code><ul>
+<li>Output only. The name of the migration token, which is generated by the server during creation, in the form enterprises/{enterprise}/migrationTokens/{migration_token}.</li>
+</ul>
+</li>
+<li><code>policy=et</code><ul>
+<li>Required. Immutable. The name of the policy initially applied to the enrolled device, in the form enterprises/{enterprise}/policies/{policy}.</li>
+</ul>
+</li>
+<li><code>ttl=sea</code><ul>
+<li>Input only. The time that this migration token is valid for. This is input-only, and for returning a migration token the server will populate the expireTime field. This can be at most seven days. The default is seven days.</li>
+</ul>
+</li>
+<li><code>user-id=consetetur</code><ul>
+<li>Required. Immutable. The user id of the Managed Google Play account on the device, as in the Play EMM API. This corresponds to the userId parameter in Play EMM API&#39;s Devices.get (https://developers.google.com/android/work/play/emm-api/v1/devices/get#parameters) call.</li>
+</ul>
+</li>
+<li><code>value=consetetur</code><ul>
+<li>Output only. The value of the migration token.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../enterprises_list/" class="btn btn-neutral float-left" title="List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../enterprises_migration-tokens-get/" class="btn btn-neutral float-right" title="Migration Tokens Get">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/androidmanagement1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../enterprises_list/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../enterprises_migration-tokens-get/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

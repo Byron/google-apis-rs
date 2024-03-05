@@ -1,224 +1,129 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Update - Deployment Manager v3.0.0+20220225</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-deploymentmanager2-cli/deployments_update/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Update - Deployment Manager v5.0.4+20240229</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Update";
+        var mkdocs_page_input_path = "deployments_update.md";
+        var mkdocs_page_url = "/google-apis-rs/google-deploymentmanager2-cli/deployments_update/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Deployment Manager v3.0.0+20220225</a>
-        
+          <a href=".." class="icon icon-home"> Deployment Manager v5.0.4+20240229
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Deployments</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../deployments_cancel-preview">Cancel Preview</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../deployments_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../deployments_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../deployments_get-iam-policy">Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../deployments_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../deployments_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../deployments_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../deployments_set-iam-policy">Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../deployments_stop">Stop</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../deployments_test-iam-permissions">Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Update</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-arguments">Required Scalar Arguments</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Manifests</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../manifests_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../manifests_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Operations</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../operations_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../operations_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Resources</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../resources_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../resources_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Types</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../types_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Deployments</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../deployments_cancel-preview/">Cancel Preview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../deployments_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../deployments_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../deployments_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../deployments_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../deployments_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../deployments_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../deployments_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../deployments_stop/">Stop</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../deployments_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Update</a>
+    <ul class="current">
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Manifests</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../manifests_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../manifests_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Operations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Resources</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../resources_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../resources_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Types</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../types_list/">List</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Deployment Manager v5.0.4+20240229</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Update</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/deploymentmanager2-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Deployments &raquo;</li>
+      <li>Update</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/deploymentmanager2-cli/edit/master/docs/deployments_update.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates a deployment and all of the resources described by the deployment manifest.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates a deployment and all of the resources described by the deployment manifest.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -265,6 +170,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     progress: integer
     region: string
     self-link: string
+    set-common-instance-metadata-operation-metadata:
+      client-operation-id: string
     start-time: string
     status: string
     status-message: string
@@ -282,78 +189,77 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   update-time: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    description=diam</code><ul>
+<li><code>-r .    description=ipsum</code><ul>
 <li>An optional user-provided description of the deployment.</li>
 </ul>
 </li>
-<li><code>fingerprint=no</code><ul>
+<li><code>fingerprint=accusam</code><ul>
 <li>Provides a fingerprint to use in requests to modify a deployment, such as <code>update()</code>, <code>stop()</code>, and <code>cancelPreview()</code> requests. A fingerprint is a randomly generated value that must be provided with <code>update()</code>, <code>stop()</code>, and <code>cancelPreview()</code> requests to perform optimistic locking. This ensures optimistic concurrency so that only one request happens at a time. The fingerprint is initially generated by Deployment Manager and changes after every request to modify data. To get the latest fingerprint value, perform a <code>get()</code> request to a deployment.</li>
 </ul>
 </li>
-<li><code>id=ipsum</code><ul>
+<li><code>id=takimata</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>insert-time=accusam</code><ul>
+<li><code>insert-time=consetetur</code><ul>
 <li>Output only. Creation timestamp in RFC3339 text format.</li>
 </ul>
 </li>
-<li><code>manifest=takimata</code><ul>
+<li><code>manifest=voluptua.</code><ul>
 <li>Output only. URL of the manifest representing the last manifest that was successfully deployed. If no manifest has been successfully deployed, this field will be absent.</li>
 </ul>
 </li>
-<li><code>name=consetetur</code><ul>
+<li><code>name=et</code><ul>
 <li>Name of the resource; provided by the client when the resource is created. The name must be 1-63 characters long, and comply with RFC1035. Specifically, the name must be 1-63 characters long and match the regular expression <code>[a-z]([-a-z0-9]*[a-z0-9])?</code> which means the first character must be a lowercase letter, and all following characters must be a dash, lowercase letter, or digit, except the last character, which cannot be a dash.</li>
 </ul>
 </li>
-<li><code>operation    client-operation-id=voluptua.</code><ul>
+<li><code>operation    client-operation-id=erat</code><ul>
 <li>[Output Only] The value of <code>requestId</code> if you provided it in the request. Not present otherwise.</li>
 </ul>
 </li>
-<li><code>creation-timestamp=et</code><ul>
+<li><code>creation-timestamp=consetetur</code><ul>
 <li>[Deprecated] This field is deprecated.</li>
 </ul>
 </li>
-<li><code>description=erat</code><ul>
+<li><code>description=amet.</code><ul>
 <li>[Output Only] A textual description of the operation, which is set when the operation is created.</li>
 </ul>
 </li>
-<li><code>end-time=consetetur</code><ul>
+<li><code>end-time=sed</code><ul>
 <li>[Output Only] The time that this operation was completed. This value is in RFC3339 text format.</li>
 </ul>
 </li>
-<li><code>http-error-message=amet.</code><ul>
+<li><code>http-error-message=takimata</code><ul>
 <li>[Output Only] If the operation fails, this field contains the HTTP error message that was returned, such as <code>NOT FOUND</code>.</li>
 </ul>
 </li>
-<li><code>http-error-status-code=71</code><ul>
+<li><code>http-error-status-code=82</code><ul>
 <li>[Output Only] If the operation fails, this field contains the HTTP error status code that was returned. For example, a <code>404</code> means the resource was not found.</li>
 </ul>
 </li>
-<li><code>id=takimata</code><ul>
+<li><code>id=gubergren</code><ul>
 <li>[Output Only] The unique identifier for the operation. This identifier is defined by the server.</li>
 </ul>
 </li>
-<li><code>insert-time=dolores</code><ul>
+<li><code>insert-time=et</code><ul>
 <li>[Output Only] The time that this operation was requested. This value is in RFC3339 text format.</li>
 </ul>
 </li>
-<li><code>kind=gubergren</code><ul>
+<li><code>kind=accusam</code><ul>
 <li>[Output Only] Type of the resource. Always <code>compute#operation</code> for Operation resources.</li>
 </ul>
 </li>
-<li><code>name=et</code><ul>
+<li><code>name=voluptua.</code><ul>
 <li>[Output Only] Name of the operation.</li>
 </ul>
 </li>
-<li><code>operation-group-id=accusam</code><ul>
+<li><code>operation-group-id=dolore</code><ul>
 <li>[Output Only] An ID that represents a group of operations, such as when a group of operations results from a <code>bulkInsert</code> API request.</li>
 </ul>
 </li>
-<li><code>operation-type=voluptua.</code><ul>
+<li><code>operation-type=dolore</code><ul>
 <li>[Output Only] The type of operation, such as <code>insert</code>, <code>update</code>, or <code>delete</code>, and so on.</li>
 </ul>
 </li>
@@ -361,70 +267,78 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>[Output Only] An optional progress indicator that ranges from 0 to 100. There is no requirement that this be linear or support any granularity of operations. This should not be used to guess when the operation will be complete. This number should monotonically increase as the operation progresses.</li>
 </ul>
 </li>
-<li><code>region=dolore</code><ul>
+<li><code>region=voluptua.</code><ul>
 <li>[Output Only] The URL of the region where the operation resides. Only applicable when performing regional operations.</li>
 </ul>
 </li>
-<li><code>self-link=dolore</code><ul>
+<li><code>self-link=amet.</code><ul>
 <li>[Output Only] Server-defined URL for the resource.</li>
 </ul>
 </li>
-<li><code>start-time=voluptua.</code><ul>
-<li>[Output Only] The time that this operation was started by the server. This value is in RFC3339 text format.</li>
-</ul>
-</li>
-<li><code>status=amet.</code><ul>
-<li>[Output Only] The status of the operation, which can be one of the following: <code>PENDING</code>, <code>RUNNING</code>, or <code>DONE</code>.</li>
-</ul>
-</li>
-<li><code>status-message=ea</code><ul>
-<li>[Output Only] An optional textual description of the current status of the operation.</li>
-</ul>
-</li>
-<li><code>target-id=sadipscing</code><ul>
-<li>[Output Only] The unique target ID, which identifies a specific incarnation of the target resource.</li>
-</ul>
-</li>
-<li><code>target-link=lorem</code><ul>
-<li>[Output Only] The URL of the resource that the operation modifies. For operations related to creating a snapshot, this points to the persistent disk that the snapshot was created from.</li>
-</ul>
-</li>
-<li><code>user=invidunt</code><ul>
-<li>[Output Only] User who requested the operation, for example: <code>user@example.com</code>.</li>
+<li>
+<p><code>set-common-instance-metadata-operation-metadata    client-operation-id=ea</code></p>
+<ul>
+<li>[Output Only] The client operation id.</li>
 </ul>
 </li>
 <li>
-<p><code>zone=no</code></p>
+<p><code>..    start-time=sadipscing</code></p>
+<ul>
+<li>[Output Only] The time that this operation was started by the server. This value is in RFC3339 text format.</li>
+</ul>
+</li>
+<li><code>status=lorem</code><ul>
+<li>[Output Only] The status of the operation, which can be one of the following: <code>PENDING</code>, <code>RUNNING</code>, or <code>DONE</code>.</li>
+</ul>
+</li>
+<li><code>status-message=invidunt</code><ul>
+<li>[Output Only] An optional textual description of the current status of the operation.</li>
+</ul>
+</li>
+<li><code>target-id=no</code><ul>
+<li>[Output Only] The unique target ID, which identifies a specific incarnation of the target resource.</li>
+</ul>
+</li>
+<li><code>target-link=est</code><ul>
+<li>[Output Only] The URL of the resource that the operation modifies. For operations related to creating a snapshot, this points to the persistent disk that the snapshot was created from.</li>
+</ul>
+</li>
+<li><code>user=at</code><ul>
+<li>[Output Only] User who requested the operation, for example: <code>user@example.com</code> or <code>alice_smith_identifier (global/workforcePools/example-com-us-employees)</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>zone=sed</code></p>
 <ul>
 <li>[Output Only] The URL of the zone where the operation resides. Only applicable when performing per-zone operations.</li>
 </ul>
 </li>
 <li>
-<p><code>..    self-link=est</code></p>
+<p><code>..    self-link=sit</code></p>
 <ul>
 <li>Output only. Server defined URL for the resource.</li>
 </ul>
 </li>
 <li>
-<p><code>target.config    content=at</code></p>
+<p><code>target.config    content=et</code></p>
 <ul>
 <li>The contents of the file.</li>
 </ul>
 </li>
 <li>
-<p><code>...update    description=sed</code></p>
+<p><code>...update    description=tempor</code></p>
 <ul>
 <li>Output only. An optional user-provided description of the deployment after the current update has been applied.</li>
 </ul>
 </li>
 <li>
-<p><code>manifest=sit</code></p>
+<p><code>manifest=aliquyam</code></p>
 <ul>
 <li>Output only. URL of the manifest representing the update configuration of this deployment.</li>
 </ul>
 </li>
 <li>
-<p><code>..    update-time=et</code></p>
+<p><code>..    update-time=ipsum</code></p>
 <ul>
 <li>Output only. Update timestamp in RFC3339 text format.</li>
 </ul>
@@ -543,32 +457,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../manifests_get" class="btn btn-neutral float-right" title="Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../deployments_test-iam-permissions" class="btn btn-neutral" title="Test Iam Permissions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../deployments_test-iam-permissions/" class="btn btn-neutral float-left" title="Test Iam Permissions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../manifests_get/" class="btn btn-neutral float-right" title="Get">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -576,14 +482,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../deployments_test-iam-permissions" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../manifests_get" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/deploymentmanager2-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../deployments_test-iam-permissions/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../manifests_get/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

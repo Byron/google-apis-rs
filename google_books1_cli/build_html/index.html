@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="A complete library to interact with books (protocol v1)" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-books1-cli/" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>books v5.0.4+20240222</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Home";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = "/google-apis-rs/google-books1-cli/";
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> books v5.0.4+20240222
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bookshelves</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="bookshelves_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bookshelves_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="bookshelves_volumes-list/">Volumes List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Cloudloading</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="cloudloading_add-book/">Add Book</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="cloudloading_delete-book/">Delete Book</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="cloudloading_update-book/">Update Book</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Dictionary</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="dictionary_list-offline-metadata/">List Offline Metadata</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Familysharing</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="familysharing_get-family-info/">Get Family Info</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="familysharing_share/">Share</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="familysharing_unshare/">Unshare</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Layers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="layers_annotation-data-get/">Annotation Data Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="layers_annotation-data-list/">Annotation Data List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="layers_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="layers_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="layers_volume-annotations-get/">Volume Annotations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="layers_volume-annotations-list/">Volume Annotations List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Myconfig</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="myconfig_get-user-settings/">Get User Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="myconfig_release-download-access/">Release Download Access</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="myconfig_request-access/">Request Access</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="myconfig_sync-volume-licenses/">Sync Volume Licenses</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="myconfig_update-user-settings/">Update User Settings</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Mylibrary</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="mylibrary_annotations-delete/">Annotations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="mylibrary_annotations-insert/">Annotations Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="mylibrary_annotations-list/">Annotations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="mylibrary_annotations-summary/">Annotations Summary</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="mylibrary_annotations-update/">Annotations Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="mylibrary_bookshelves-add-volume/">Bookshelves Add Volume</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="mylibrary_bookshelves-clear-volumes/">Bookshelves Clear Volumes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="mylibrary_bookshelves-get/">Bookshelves Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="mylibrary_bookshelves-list/">Bookshelves List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="mylibrary_bookshelves-move-volume/">Bookshelves Move Volume</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="mylibrary_bookshelves-remove-volume/">Bookshelves Remove Volume</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="mylibrary_bookshelves-volumes-list/">Bookshelves Volumes List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="mylibrary_readingpositions-get/">Readingpositions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="mylibrary_readingpositions-set-position/">Readingpositions Set Position</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Notification</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="notification_get/">Get</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Onboarding</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="onboarding_list-categories/">List Categories</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="onboarding_list-category-volumes/">List Category Volumes</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Personalizedstream</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="personalizedstream_get/">Get</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Promooffer</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="promooffer_accept/">Accept</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="promooffer_dismiss/">Dismiss</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="promooffer_get/">Get</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Series</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="series_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="series_membership-get/">Membership Get</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Volumes</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="volumes_associated-list/">Associated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="volumes_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="volumes_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="volumes_mybooks-list/">Mybooks List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="volumes_recommended-list/">Recommended List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="volumes_recommended-rate/">Recommended Rate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="volumes_useruploaded-list/">Useruploaded List</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">books v5.0.4+20240222</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+      <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/books1-cli/edit/master/docs/index.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <!---
+DO NOT EDIT !
+This file was generated automatically from 'src/generator/templates/cli/README.md.mako'
+DO NOT EDIT !
+-->
+<p>The <code>books1</code> command-line interface <em>(CLI)</em> allows to use most features of the <em>Google books</em> service from the comfort of your terminal.</p>
+<p>By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
+capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.</p>
+<p>If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.</p>
+<p>Everything else about the <em>books</em> API can be found at the
+<a href="https://code.google.com/apis/books/docs/v1/getting_started.html">official documentation site</a>.</p>
+<h1 id="installation-and-source-code">Installation and Source Code</h1>
+<p>Install the command-line interface with cargo using:</p>
+<pre><code class="language-bash">cargo install google-books1-cli
+</code></pre>
+<p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/books1-cli">on github</a>.</p>
+<h1 id="usage">Usage</h1>
+<p>This documentation was generated from the <em>books</em> API at revision <em>20240222</em>. The CLI is at version <em>5.0.4</em>.</p>
+<pre><code class="language-bash">books1 [options]
+        bookshelves
+                get &lt;user-id&gt; &lt;shelf&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;user-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                volumes-list &lt;user-id&gt; &lt;shelf&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        cloudloading
+                add-book [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete-book &lt;volume-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update-book (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        dictionary
+                list-offline-metadata &lt;cpksver&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        familysharing
+                get-family-info [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                share [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                unshare [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        layers
+                annotation-data-get &lt;volume-id&gt; &lt;layer-id&gt; &lt;annotation-data-id&gt; &lt;content-version&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                annotation-data-list &lt;volume-id&gt; &lt;layer-id&gt; &lt;content-version&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;volume-id&gt; &lt;summary-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;volume-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                volume-annotations-get &lt;volume-id&gt; &lt;layer-id&gt; &lt;annotation-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                volume-annotations-list &lt;volume-id&gt; &lt;layer-id&gt; &lt;content-version&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        myconfig
+                get-user-settings [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                release-download-access &lt;cpksver&gt; &lt;volume-ids&gt;... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                request-access &lt;cpksver&gt; &lt;nonce&gt; &lt;source&gt; &lt;volume-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                sync-volume-licenses &lt;cpksver&gt; &lt;nonce&gt; &lt;source&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update-user-settings (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        mylibrary
+                annotations-delete &lt;annotation-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                annotations-insert (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                annotations-list [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                annotations-summary &lt;layer-ids&gt;... &lt;volume-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                annotations-update &lt;annotation-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                bookshelves-add-volume &lt;shelf&gt; &lt;volume-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                bookshelves-clear-volumes &lt;shelf&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                bookshelves-get &lt;shelf&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                bookshelves-list [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                bookshelves-move-volume &lt;shelf&gt; &lt;volume-id&gt; &lt;volume-position&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                bookshelves-remove-volume &lt;shelf&gt; &lt;volume-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                bookshelves-volumes-list &lt;shelf&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                readingpositions-get &lt;volume-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                readingpositions-set-position &lt;volume-id&gt; &lt;position&gt; &lt;timestamp&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        notification
+                get &lt;notification-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        onboarding
+                list-categories [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list-category-volumes [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        personalizedstream
+                get [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        promooffer
+                accept [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                dismiss [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        series
+                get &lt;series-id&gt;... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                membership-get &lt;series-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        volumes
+                associated-list &lt;volume-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;volume-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;q&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                mybooks-list [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                recommended-list [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                recommended-rate &lt;rating&gt; &lt;volume-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                useruploaded-list [-p &lt;v&gt;]... [-o &lt;out&gt;]
+  books1 --help
+
+Configuration:
+  [--scope &lt;url&gt;]...
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
+            If unset, it defaults to the shortest scope url for a particular method.
+  --config-dir &lt;folder&gt;
+            A directory into which we will store our persistent data. Defaults to
+            a user-writable directory that we will create during the first invocation.
+            [default: ~/.google-service-cli]
+
+</code></pre>
+<h1 id="configuration">Configuration</h1>
+<p>The program will store all persistent data in the <code>~/.google-service-cli</code> directory in <em>JSON</em> files prefixed with <code>books1-</code>.  You can change the directory used to store configuration with the <code>--config-dir</code> flag on a per-invocation basis.</p>
+<p>More information about the various kinds of persistent data are given in the following paragraphs.</p>
+<h1 id="authentication">Authentication</h1>
+<p>Most APIs require a user to authenticate any request. If this is the case, the <a href="https://developers.google.com/+/api/oauth#scopes">scope</a> determines the 
+set of permissions granted. The granularity of these is usually no more than <em>read-only</em> or <em>full-access</em>.</p>
+<p>If not set, the system will automatically select the smallest feasible scope, e.g. when invoking a
+method that is read-only, it will ask only for a read-only scope. 
+You may use the <code>--scope</code> flag to specify a scope directly. 
+All applicable scopes are documented in the respective method's CLI documentation.</p>
+<p>The first time a scope is used, the user is asked for permission. Follow the instructions given 
+by the CLI to grant permissions, or to decline.</p>
+<p>If a scope was authenticated by the user, the respective information will be stored as <em>JSON</em> in the configuration
+directory, e.g. <code>~/.google-service-cli/books1-token-&lt;scope-hash&gt;.json</code>. No manual management of these tokens
+is necessary.</p>
+<p>To revoke granted authentication, please refer to the <a href="http://webapps.stackexchange.com/a/30849">official documentation</a>.</p>
+<h1 id="application-secrets">Application Secrets</h1>
+<p>In order to allow any application to use Google services, it will need to be registered using the 
+<a href="https://console.developers.google.com/">Google Developer Console</a>. APIs the application may use are then enabled for it
+one by one. Most APIs can be used for free and have a daily quota.</p>
+<p>To allow more comfortable usage of the CLI without forcing anyone to register an own application, the CLI
+comes with a default application secret that is configured accordingly. This also means that heavy usage
+all around the world may deplete the daily quota.</p>
+<p>You can workaround this limitation by putting your own secrets file at this location: 
+<code>~/.google-service-cli/books1-secret.json</code>, assuming that the required <em>books</em> API 
+was enabled for it. Such a secret file can be downloaded in the <em>Google Developer Console</em> at 
+<em>APIs &amp; auth -&gt; Credentials -&gt; Download JSON</em> and used as is.</p>
+<p>Learn more about how to setup Google projects and enable APIs using the <a href="https://developers.google.com/console/help/new/">official documentation</a>.</p>
+<h1 id="debugging">Debugging</h1>
+<p>Even though the CLI does its best to provide usable error messages, sometimes it might be desirable to know
+what exactly led to a particular issue. This is done by allowing all client-server communication to be 
+output to standard error <em>as-is</em>.</p>
+<p>The <code>--debug</code> flag will print errors using the <code>Debug</code> representation to standard error.</p>
+<p>You may consider redirecting standard error into a file for ease of use, e.g. <code>books1 --debug &lt;resource&gt; &lt;method&gt; [options] 2&gt;debug.txt</code>.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="bookshelves_get/" class="btn btn-neutral float-right" title="Get">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/books1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+      <span><a href="bookshelves_get/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.3.1
+Build Date UTC : 2024-03-05 20:04:16.095106+00:00
+-->

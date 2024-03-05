@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="./img/favicon.ico" />
+    <title>DLP v5.0.4+20240225</title>
+    <link rel="stylesheet" href="./css/theme.css" />
+    <link rel="stylesheet" href="./css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+    <script src="./js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="./js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="./." class="icon icon-home"> DLP v5.0.4+20240225
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="./.">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Info Types</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="./info-types_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Locations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="./locations_info-types-list/">Info Types List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Organizations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_deidentify-templates-create/">Deidentify Templates Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_deidentify-templates-delete/">Deidentify Templates Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_deidentify-templates-get/">Deidentify Templates Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_deidentify-templates-list/">Deidentify Templates List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_deidentify-templates-patch/">Deidentify Templates Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_inspect-templates-create/">Inspect Templates Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_inspect-templates-delete/">Inspect Templates Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_inspect-templates-get/">Inspect Templates Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_inspect-templates-list/">Inspect Templates List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_inspect-templates-patch/">Inspect Templates Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-column-data-profiles-get/">Locations Column Data Profiles Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-column-data-profiles-list/">Locations Column Data Profiles List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-deidentify-templates-create/">Locations Deidentify Templates Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-deidentify-templates-delete/">Locations Deidentify Templates Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-deidentify-templates-get/">Locations Deidentify Templates Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-deidentify-templates-list/">Locations Deidentify Templates List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-deidentify-templates-patch/">Locations Deidentify Templates Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-discovery-configs-create/">Locations Discovery Configs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-discovery-configs-delete/">Locations Discovery Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-discovery-configs-get/">Locations Discovery Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-discovery-configs-list/">Locations Discovery Configs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-discovery-configs-patch/">Locations Discovery Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-dlp-jobs-list/">Locations Dlp Jobs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-inspect-templates-create/">Locations Inspect Templates Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-inspect-templates-delete/">Locations Inspect Templates Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-inspect-templates-get/">Locations Inspect Templates Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-inspect-templates-list/">Locations Inspect Templates List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-inspect-templates-patch/">Locations Inspect Templates Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-job-triggers-create/">Locations Job Triggers Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-job-triggers-delete/">Locations Job Triggers Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-job-triggers-get/">Locations Job Triggers Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-job-triggers-list/">Locations Job Triggers List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-job-triggers-patch/">Locations Job Triggers Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-project-data-profiles-get/">Locations Project Data Profiles Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-project-data-profiles-list/">Locations Project Data Profiles List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-stored-info-types-create/">Locations Stored Info Types Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-stored-info-types-delete/">Locations Stored Info Types Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-stored-info-types-get/">Locations Stored Info Types Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-stored-info-types-list/">Locations Stored Info Types List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-stored-info-types-patch/">Locations Stored Info Types Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-table-data-profiles-get/">Locations Table Data Profiles Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_locations-table-data-profiles-list/">Locations Table Data Profiles List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_stored-info-types-create/">Stored Info Types Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_stored-info-types-delete/">Stored Info Types Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_stored-info-types-get/">Stored Info Types Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_stored-info-types-list/">Stored Info Types List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./organizations_stored-info-types-patch/">Stored Info Types Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_content-deidentify/">Content Deidentify</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_content-inspect/">Content Inspect</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_content-reidentify/">Content Reidentify</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_deidentify-templates-create/">Deidentify Templates Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_deidentify-templates-delete/">Deidentify Templates Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_deidentify-templates-get/">Deidentify Templates Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_deidentify-templates-list/">Deidentify Templates List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_deidentify-templates-patch/">Deidentify Templates Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_dlp-jobs-cancel/">Dlp Jobs Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_dlp-jobs-create/">Dlp Jobs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_dlp-jobs-delete/">Dlp Jobs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_dlp-jobs-get/">Dlp Jobs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_dlp-jobs-list/">Dlp Jobs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_image-redact/">Image Redact</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_inspect-templates-create/">Inspect Templates Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_inspect-templates-delete/">Inspect Templates Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_inspect-templates-get/">Inspect Templates Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_inspect-templates-list/">Inspect Templates List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_inspect-templates-patch/">Inspect Templates Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_job-triggers-activate/">Job Triggers Activate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_job-triggers-create/">Job Triggers Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_job-triggers-delete/">Job Triggers Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_job-triggers-get/">Job Triggers Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_job-triggers-list/">Job Triggers List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_job-triggers-patch/">Job Triggers Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-column-data-profiles-get/">Locations Column Data Profiles Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-column-data-profiles-list/">Locations Column Data Profiles List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-content-deidentify/">Locations Content Deidentify</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-content-inspect/">Locations Content Inspect</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-content-reidentify/">Locations Content Reidentify</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-deidentify-templates-create/">Locations Deidentify Templates Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-deidentify-templates-delete/">Locations Deidentify Templates Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-deidentify-templates-get/">Locations Deidentify Templates Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-deidentify-templates-list/">Locations Deidentify Templates List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-deidentify-templates-patch/">Locations Deidentify Templates Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-discovery-configs-create/">Locations Discovery Configs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-discovery-configs-delete/">Locations Discovery Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-discovery-configs-get/">Locations Discovery Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-discovery-configs-list/">Locations Discovery Configs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-discovery-configs-patch/">Locations Discovery Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-dlp-jobs-cancel/">Locations Dlp Jobs Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-dlp-jobs-create/">Locations Dlp Jobs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-dlp-jobs-delete/">Locations Dlp Jobs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-dlp-jobs-finish/">Locations Dlp Jobs Finish</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-dlp-jobs-get/">Locations Dlp Jobs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-dlp-jobs-hybrid-inspect/">Locations Dlp Jobs Hybrid Inspect</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-dlp-jobs-list/">Locations Dlp Jobs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-image-redact/">Locations Image Redact</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-inspect-templates-create/">Locations Inspect Templates Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-inspect-templates-delete/">Locations Inspect Templates Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-inspect-templates-get/">Locations Inspect Templates Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-inspect-templates-list/">Locations Inspect Templates List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-inspect-templates-patch/">Locations Inspect Templates Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-job-triggers-activate/">Locations Job Triggers Activate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-job-triggers-create/">Locations Job Triggers Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-job-triggers-delete/">Locations Job Triggers Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-job-triggers-get/">Locations Job Triggers Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-job-triggers-hybrid-inspect/">Locations Job Triggers Hybrid Inspect</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-job-triggers-list/">Locations Job Triggers List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-job-triggers-patch/">Locations Job Triggers Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-project-data-profiles-get/">Locations Project Data Profiles Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-project-data-profiles-list/">Locations Project Data Profiles List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-stored-info-types-create/">Locations Stored Info Types Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-stored-info-types-delete/">Locations Stored Info Types Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-stored-info-types-get/">Locations Stored Info Types Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-stored-info-types-list/">Locations Stored Info Types List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-stored-info-types-patch/">Locations Stored Info Types Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-table-data-profiles-get/">Locations Table Data Profiles Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_locations-table-data-profiles-list/">Locations Table Data Profiles List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_stored-info-types-create/">Stored Info Types Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_stored-info-types-delete/">Stored Info Types Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_stored-info-types-get/">Stored Info Types Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_stored-info-types-list/">Stored Info Types List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="./projects_stored-info-types-patch/">Stored Info Types Patch</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="./.">DLP v5.0.4+20240225</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="./." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+  <h1 id="search">Search Results</h1>
+
+  <form id="content_search" action="search.html">
+    <span role="status" aria-live="polite" class="ui-helper-hidden-accessible"></span>
+    <input name="q" id="mkdocs-search-query" type="text" class="search_input search-query ui-autocomplete-input" placeholder="Search the Docs" autocomplete="off" autofocus title="Type search term here">
+  </form>
+
+  <div id="mkdocs-search-results" class="search-results" data-no-results-text="No results found">
+    Searching...
+  </div>
+
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dlp2-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="./js/theme_extra.js" defer></script>
+    <script src="./js/theme.js" defer></script>
+      <script src="./search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["RightDefinition"],"struct":["Authorization","AuthorizationItem","AuthorizationItemSet","AuthorizationItemSetBuilder","AuthorizationItemSetStorage","Flags"]};

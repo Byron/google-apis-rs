@@ -1,215 +1,125 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Notes Patch - Container Analysis v3.0.0+20220225</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-containeranalysis1-cli/projects_notes-patch/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Notes Patch - Container Analysis v5.0.4+20240223</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Notes Patch";
+        var mkdocs_page_input_path = "projects_notes-patch.md";
+        var mkdocs_page_url = "/google-apis-rs/google-containeranalysis1-cli/projects_notes-patch/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Container Analysis v3.0.0+20220225</a>
-        
+          <a href=".." class="icon icon-home"> Container Analysis v5.0.4+20240223
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notes-batch-create">Notes Batch Create</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notes-create">Notes Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notes-delete">Notes Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notes-get">Notes Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notes-get-iam-policy">Notes Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notes-list">Notes List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notes-occurrences-list">Notes Occurrences List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Notes Patch</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notes-set-iam-policy">Notes Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_notes-test-iam-permissions">Notes Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_occurrences-batch-create">Occurrences Batch Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_occurrences-create">Occurrences Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_occurrences-delete">Occurrences Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_occurrences-get">Occurrences Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_occurrences-get-iam-policy">Occurrences Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_occurrences-get-notes">Occurrences Get Notes</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_occurrences-get-vulnerability-summary">Occurrences Get Vulnerability Summary</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_occurrences-list">Occurrences List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_occurrences-patch">Occurrences Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_occurrences-set-iam-policy">Occurrences Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_occurrences-test-iam-permissions">Occurrences Test Iam Permissions</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notes-batch-create/">Notes Batch Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notes-create/">Notes Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notes-delete/">Notes Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notes-get/">Notes Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notes-get-iam-policy/">Notes Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notes-list/">Notes List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notes-occurrences-list/">Notes Occurrences List</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Notes Patch</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notes-set-iam-policy/">Notes Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notes-test-iam-permissions/">Notes Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_occurrences-batch-create/">Occurrences Batch Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_occurrences-create/">Occurrences Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_occurrences-delete/">Occurrences Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_occurrences-get/">Occurrences Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_occurrences-get-iam-policy/">Occurrences Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_occurrences-get-notes/">Occurrences Get Notes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_occurrences-get-vulnerability-summary/">Occurrences Get Vulnerability Summary</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_occurrences-list/">Occurrences List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_occurrences-patch/">Occurrences Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_occurrences-set-iam-policy/">Occurrences Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_occurrences-test-iam-permissions/">Occurrences Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_resources-export-sbom/">Resources Export Sbom</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Container Analysis v5.0.4+20240223</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Notes Patch</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/containeranalysis1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Notes Patch</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/containeranalysis1-cli/edit/master/docs/projects_notes-patch.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates the specified note.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates the specified note.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -259,8 +169,27 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   long-description: string
   name: string
   package:
+    architecture: string
+    cpe-uri: string
+    description: string
+    license:
+      comments: string
+      expression: string
+    maintainer: string
     name: string
+    package-type: string
+    url: string
+    version:
+      epoch: integer
+      full-name: string
+      inclusive: boolean
+      kind: string
+      name: string
+      revision: string
   related-note-names: [string]
+  sbom-reference:
+    format: string
+    version: string
   short-description: string
   update-time: string
   upgrade:
@@ -283,6 +212,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       title: string
   vulnerability:
     cvss-score: number
+    cvss-v2:
+      attack-complexity: string
+      attack-vector: string
+      authentication: string
+      availability-impact: string
+      base-score: number
+      confidentiality-impact: string
+      exploitability-score: number
+      impact-score: number
+      integrity-impact: string
+      privileges-required: string
+      scope: string
+      user-interaction: string
     cvss-v3:
       attack-complexity: string
       attack-vector: string
@@ -295,157 +237,252 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       privileges-required: string
       scope: string
       user-interaction: string
+    cvss-version: string
     severity: string
     source-update-time: string
+  vulnerability-assessment:
+    assessment:
+      cve: string
+      impacts: [string]
+      justification:
+        details: string
+        justification-type: string
+      long-description: string
+      short-description: string
+      state: string
+      vulnerability-id: string
+    language-code: string
+    long-description: string
+    product:
+      generic-uri: string
+      id: string
+      name: string
+    publisher:
+      issuing-authority: string
+      name: string
+      publisher-namespace: string
+    short-description: string
+    title: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li>
-<p><code>-r .attestation.hint    human-readable-name=amet.</code></p>
+<p><code>-r .attestation.hint    human-readable-name=et</code></p>
 <ul>
 <li>Required. The human readable name of this attestation authority, for example &#34;qa&#34;.</li>
 </ul>
 </li>
 <li>
-<p><code>...build    builder-version=consetetur</code></p>
+<p><code>...build    builder-version=sanctus</code></p>
 <ul>
 <li>Required. Immutable. Version of the builder which produced this build.</li>
 </ul>
 </li>
 <li>
-<p><code>..compliance.cis-benchmark    profile-level=9</code></p>
+<p><code>..compliance.cis-benchmark    profile-level=45</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>severity=dolor</code></p>
+<p><code>severity=est</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>..    description=et</code></p>
+<p><code>..    description=sed</code></p>
 <ul>
 <li>A description about this compliance check.</li>
 </ul>
 </li>
-<li><code>rationale=et</code><ul>
+<li><code>rationale=diam</code><ul>
 <li>A rationale for the existence of this compliance check.</li>
 </ul>
 </li>
-<li><code>remediation=sadipscing</code><ul>
+<li><code>remediation=dolores</code><ul>
 <li>A description of remediation steps if the compliance check fails.</li>
 </ul>
 </li>
-<li><code>scan-instructions=stet</code><ul>
+<li><code>scan-instructions=dolores</code><ul>
 <li>Serialized scan instructions with a predefined format.</li>
 </ul>
 </li>
 <li>
-<p><code>title=dolor</code></p>
+<p><code>title=et</code></p>
 <ul>
 <li>The title that identifies this compliance check.</li>
 </ul>
 </li>
 <li>
-<p><code>..    create-time=duo</code></p>
+<p><code>..    create-time=sed</code></p>
 <ul>
 <li>Output only. The time this note was created. This field can be used as a filter in list requests.</li>
 </ul>
 </li>
 <li>
-<p><code>deployment    resource-uri=vero</code></p>
+<p><code>deployment    resource-uri=no</code></p>
 <ul>
 <li>Required. Resource URI for the artifact being deployed.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..discovery    analysis-kind=vero</code></p>
+<p><code>..discovery    analysis-kind=et</code></p>
 <ul>
 <li>Required. Immutable. The kind of analysis that is handled by this discovery.</li>
 </ul>
 </li>
 <li>
-<p><code>..dsse-attestation.hint    human-readable-name=invidunt</code></p>
+<p><code>..dsse-attestation.hint    human-readable-name=elitr</code></p>
 <ul>
 <li>Required. The human readable name of this attestation authority, for example &#34;cloudbuild-prod&#34;.</li>
 </ul>
 </li>
 <li>
-<p><code>...    expiration-time=stet</code></p>
+<p><code>...    expiration-time=sed</code></p>
 <ul>
 <li>Time of expiration for this note. Empty if note does not expire.</li>
 </ul>
 </li>
-<li><code>image.fingerprint    v1-name=vero</code><ul>
+<li><code>image.fingerprint    v1-name=no</code><ul>
 <li>Required. The layer ID of the final layer in the Docker image&#39;s v1 representation.</li>
 </ul>
 </li>
-<li><code>v2-blob=elitr</code><ul>
+<li><code>v2-blob=nonumy</code><ul>
 <li>Required. The ordered list of v2 blobs that represent a given image.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>v2-name=lorem</code></p>
+<p><code>v2-name=at</code></p>
 <ul>
 <li>Output only. The name of the image&#39;s v2 blobs computed via: [bottom] := v2_blobbottom := sha256(v2_blob[N] + &#34; &#34; + v2_name[N+1]) Only the name of the final blob is kept.</li>
 </ul>
 </li>
 <li>
-<p><code>..    resource-url=diam</code></p>
+<p><code>..    resource-url=sadipscing</code></p>
 <ul>
 <li>Required. Immutable. The resource_url for the resource representing the basis of associated occurrence images.</li>
 </ul>
 </li>
 <li>
-<p><code>..    kind=no</code></p>
+<p><code>..    kind=aliquyam</code></p>
 <ul>
 <li>Output only. The type of analysis. This field can be used as a filter in list requests.</li>
 </ul>
 </li>
-<li><code>long-description=ipsum</code><ul>
+<li><code>long-description=dolores</code><ul>
 <li>A detailed description of this note.</li>
 </ul>
 </li>
-<li><code>name=accusam</code><ul>
+<li><code>name=sadipscing</code><ul>
 <li>Output only. The name of the note in the form of <code>projects/[PROVIDER_ID]/notes/[NOTE_ID]</code>.</li>
 </ul>
 </li>
-<li>
-<p><code>package    name=takimata</code></p>
-<ul>
-<li>Required. Immutable. The name of the package.</li>
+<li><code>package    architecture=erat</code><ul>
+<li>The CPU architecture for which packages in this distribution channel were built. Architecture will be blank for language packages.</li>
+</ul>
+</li>
+<li><code>cpe-uri=aliquyam</code><ul>
+<li>The cpe_uri in <a href="https://cpe.mitre.org/specification/">CPE format</a> denoting the package manager version distributing a package. The cpe_uri will be blank for language packages.</li>
+</ul>
+</li>
+<li><code>description=amet</code><ul>
+<li>The description of this package.</li>
+</ul>
+</li>
+<li><code>license    comments=est</code><ul>
+<li>Comments</li>
 </ul>
 </li>
 <li>
-<p><code>..    related-note-names=consetetur</code></p>
+<p><code>expression=et</code></p>
+<ul>
+<li>Often a single license can be used to represent the licensing terms. Sometimes it is necessary to include a choice of one or more licenses or some combination of license identifiers. Examples: &#34;LGPL-2.1-only OR MIT&#34;, &#34;LGPL-2.1-only AND MIT&#34;, &#34;GPL-2.0-or-later WITH Bison-exception-2.2&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>..    maintainer=sea</code></p>
+<ul>
+<li>A freeform text denoting the maintainer of this package.</li>
+</ul>
+</li>
+<li><code>name=consetetur</code><ul>
+<li>Required. Immutable. The name of the package.</li>
+</ul>
+</li>
+<li><code>package-type=consetetur</code><ul>
+<li>The type of package; whether native or non native (e.g., ruby gems, node.js packages, etc.).</li>
+</ul>
+</li>
+<li><code>url=stet</code><ul>
+<li>The homepage for this package.</li>
+</ul>
+</li>
+<li><code>version    epoch=94</code><ul>
+<li>Used to correct mistakes in the version numbering scheme.</li>
+</ul>
+</li>
+<li><code>full-name=aliquyam</code><ul>
+<li>Human readable version string. This string is of the form :- and is only set when kind is NORMAL.</li>
+</ul>
+</li>
+<li><code>inclusive=false</code><ul>
+<li>Whether this version is specifying part of an inclusive range. Grafeas does not have the capability to specify version ranges; instead we have fields that specify start version and end versions. At times this is insufficient - we also need to specify whether the version is included in the range or is excluded from the range. This boolean is expected to be set to true when the version is included in a range.</li>
+</ul>
+</li>
+<li><code>kind=duo</code><ul>
+<li>Required. Distinguishes between sentinel MIN/MAX versions and normal versions.</li>
+</ul>
+</li>
+<li><code>name=diam</code><ul>
+<li>Required only when version kind is NORMAL. The main part of the version name.</li>
+</ul>
+</li>
+<li>
+<p><code>revision=est</code></p>
+<ul>
+<li>The iteration of the package build from the above version.</li>
+</ul>
+</li>
+<li>
+<p><code>...    related-note-names=sit</code></p>
 <ul>
 <li>Other notes related to this note.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>short-description=voluptua.</code><ul>
+<li><code>sbom-reference    format=sed</code><ul>
+<li>The format that SBOM takes. E.g. may be spdx, cyclonedx, etc...</li>
+</ul>
+</li>
+<li>
+<p><code>version=eos</code></p>
+<ul>
+<li>The version of the format that the SBOM takes. E.g. if the format is spdx, the version may be 2.3.</li>
+</ul>
+</li>
+<li>
+<p><code>..    short-description=lorem</code></p>
+<ul>
 <li>A one sentence description of this note.</li>
 </ul>
 </li>
-<li><code>update-time=et</code><ul>
+<li><code>update-time=ea</code><ul>
 <li>Output only. The time this note was last updated. This field can be used as a filter in list requests.</li>
 </ul>
 </li>
-<li><code>upgrade    package=erat</code><ul>
+<li><code>upgrade    package=stet</code><ul>
 <li>Required for non-Windows OS. The package this Upgrade is for.</li>
 </ul>
 </li>
-<li><code>version    epoch=5</code><ul>
+<li><code>version    epoch=82</code><ul>
 <li>Used to correct mistakes in the version numbering scheme.</li>
 </ul>
 </li>
-<li><code>full-name=amet.</code><ul>
+<li><code>full-name=eos</code><ul>
 <li>Human readable version string. This string is of the form :- and is only set when kind is NORMAL.</li>
 </ul>
 </li>
@@ -453,16 +490,16 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether this version is specifying part of an inclusive range. Grafeas does not have the capability to specify version ranges; instead we have fields that specify start version and end versions. At times this is insufficient - we also need to specify whether the version is included in the range or is excluded from the range. This boolean is expected to be set to true when the version is included in a range.</li>
 </ul>
 </li>
-<li><code>kind=et</code><ul>
+<li><code>kind=sea</code><ul>
 <li>Required. Distinguishes between sentinel MIN/MAX versions and normal versions.</li>
 </ul>
 </li>
-<li><code>name=accusam</code><ul>
+<li><code>name=et</code><ul>
 <li>Required only when version kind is NORMAL. The main part of the version name.</li>
 </ul>
 </li>
 <li>
-<p><code>revision=voluptua.</code></p>
+<p><code>revision=at</code></p>
 <ul>
 <li>The iteration of the package build from the above version.</li>
 </ul>
@@ -473,97 +510,246 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>The localized description of the update.</li>
 </ul>
 </li>
-<li><code>identity    revision=67</code><ul>
+<li><code>identity    revision=61</code><ul>
 <li>The revision number of the update.</li>
 </ul>
 </li>
 <li>
-<p><code>update-id=dolore</code></p>
+<p><code>update-id=lorem</code></p>
 <ul>
 <li>The revision independent identifier of the update.</li>
 </ul>
 </li>
 <li>
-<p><code>..    kb-article-ids=voluptua.</code></p>
+<p><code>..    kb-article-ids=accusam</code></p>
 <ul>
 <li>The Microsoft Knowledge Base article IDs that are associated with the update.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>last-published-timestamp=amet.</code><ul>
+<li><code>last-published-timestamp=amet</code><ul>
 <li>The last published timestamp of the update.</li>
 </ul>
 </li>
-<li><code>support-url=ea</code><ul>
+<li><code>support-url=erat</code><ul>
 <li>The hyperlink to the support information for the update.</li>
 </ul>
 </li>
 <li>
-<p><code>title=sadipscing</code></p>
+<p><code>title=dolores</code></p>
 <ul>
 <li>The localized title of the update.</li>
 </ul>
 </li>
 <li>
-<p><code>...vulnerability    cvss-score=0.7463638372321394</code></p>
+<p><code>...vulnerability    cvss-score=0.15972633079770038</code></p>
 <ul>
 <li>The CVSS score of this vulnerability. CVSS score is on a scale of 0 - 10 where 0 indicates low severity and 10 indicates high severity.</li>
 </ul>
 </li>
-<li><code>cvss-v3    attack-complexity=no</code><ul>
+<li><code>cvss-v2    attack-complexity=sea</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>attack-vector=est</code><ul>
+<li><code>attack-vector=takimata</code><ul>
 <li>Base Metrics Represents the intrinsic characteristics of a vulnerability that are constant over time and across user environments.</li>
 </ul>
 </li>
-<li><code>availability-impact=at</code><ul>
+<li><code>authentication=lorem</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>base-score=0.4551855025693473</code><ul>
+<li><code>availability-impact=et</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>base-score=0.1945321992186927</code><ul>
 <li>The base score is a function of the base metric scores.</li>
 </ul>
 </li>
-<li><code>confidentiality-impact=sit</code><ul>
+<li><code>confidentiality-impact=dolor</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>exploitability-score=0.8049890363387713</code><ul>
+<li><code>exploitability-score=0.9576851027078831</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>impact-score=0.4875873367661776</code><ul>
+<li><code>impact-score=0.9295719371551834</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>integrity-impact=ipsum</code><ul>
+<li><code>integrity-impact=erat</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>privileges-required=et</code><ul>
+<li><code>privileges-required=sea</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>scope=sanctus</code><ul>
+<li><code>scope=nonumy</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>user-interaction=lorem</code></p>
+<p><code>user-interaction=et</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>..    severity=est</code></p>
+<p><code>..cvss-v3    attack-complexity=gubergren</code></p>
 <ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>attack-vector=justo</code><ul>
+<li>Base Metrics Represents the intrinsic characteristics of a vulnerability that are constant over time and across user environments.</li>
+</ul>
+</li>
+<li><code>availability-impact=sea</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>base-score=0.03937387488958621</code><ul>
+<li>The base score is a function of the base metric scores.</li>
+</ul>
+</li>
+<li><code>confidentiality-impact=aliquyam</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>exploitability-score=0.5999462320813541</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>impact-score=0.6413061576894121</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>integrity-impact=gubergren</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>privileges-required=dolor</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li><code>scope=aliquyam</code><ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>user-interaction=no</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>..    cvss-version=amet.</code></p>
+<ul>
+<li>CVSS version used to populate cvss_score and severity.</li>
+</ul>
+</li>
+<li><code>severity=ipsum</code><ul>
 <li>The note provider assigned severity of this vulnerability.</li>
 </ul>
 </li>
-<li><code>source-update-time=sed</code><ul>
+<li>
+<p><code>source-update-time=lorem</code></p>
+<ul>
 <li>The time this information was last changed at the source. This is an upstream timestamp from the underlying information source - e.g. Ubuntu security tracker.</li>
+</ul>
+</li>
+<li>
+<p><code>..vulnerability-assessment.assessment    cve=accusam</code></p>
+<ul>
+<li>Holds the MITRE standard Common Vulnerabilities and Exposures (CVE) tracking number for the vulnerability. Deprecated: Use vulnerability_id instead to denote CVEs.</li>
+</ul>
+</li>
+<li><code>impacts=gubergren</code><ul>
+<li>Contains information about the impact of this vulnerability, this will change with time.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>justification    details=sadipscing</code><ul>
+<li>Additional details on why this justification was chosen.</li>
+</ul>
+</li>
+<li>
+<p><code>justification-type=at</code></p>
+<ul>
+<li>The justification type for this vulnerability.</li>
+</ul>
+</li>
+<li>
+<p><code>..    long-description=sit</code></p>
+<ul>
+<li>A detailed description of this Vex.</li>
+</ul>
+</li>
+<li><code>short-description=duo</code><ul>
+<li>A one sentence description of this Vex.</li>
+</ul>
+</li>
+<li><code>state=sit</code><ul>
+<li>Provides the state of this Vulnerability assessment.</li>
+</ul>
+</li>
+<li>
+<p><code>vulnerability-id=magna</code></p>
+<ul>
+<li>The vulnerability identifier for this Assessment. Will hold one of common identifiers e.g. CVE, GHSA etc.</li>
+</ul>
+</li>
+<li>
+<p><code>..    language-code=et</code></p>
+<ul>
+<li>Identifies the language used by this document, corresponding to IETF BCP 47 / RFC 5646.</li>
+</ul>
+</li>
+<li><code>long-description=rebum.</code><ul>
+<li>A detailed description of this Vex.</li>
+</ul>
+</li>
+<li><code>product    generic-uri=dolor</code><ul>
+<li>Contains a URI which is vendor-specific. Example: The artifact repository URL of an image.</li>
+</ul>
+</li>
+<li><code>id=lorem</code><ul>
+<li>Token that identifies a product so that it can be referred to from other parts in the document. There is no predefined format as long as it uniquely identifies a group in the context of the current document.</li>
+</ul>
+</li>
+<li>
+<p><code>name=justo</code></p>
+<ul>
+<li>Name of the product.</li>
+</ul>
+</li>
+<li>
+<p><code>..publisher    issuing-authority=amet.</code></p>
+<ul>
+<li>Provides information about the authority of the issuing party to release the document, in particular, the party&#39;s constituency and responsibilities or other obligations.</li>
+</ul>
+</li>
+<li><code>name=no</code><ul>
+<li>Name of the publisher. Examples: &#39;Google&#39;, &#39;Google Cloud Platform&#39;.</li>
+</ul>
+</li>
+<li>
+<p><code>publisher-namespace=nonumy</code></p>
+<ul>
+<li>The context or namespace. Contains a URL which is under control of the issuing party and can be used as a globally unique identifier for that issuing party. Example: https://csaf.io</li>
+</ul>
+</li>
+<li>
+<p><code>..    short-description=sed</code></p>
+<ul>
+<li>A one sentence description of this Vex.</li>
+</ul>
+</li>
+<li><code>title=kasd</code><ul>
+<li>The title of the note. E.g. <code>Vex-Debian-11.4</code></li>
 </ul>
 </li>
 </ul>
@@ -666,32 +852,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_notes-set-iam-policy" class="btn btn-neutral float-right" title="Notes Set Iam Policy"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_notes-occurrences-list" class="btn btn-neutral" title="Notes Occurrences List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_notes-occurrences-list/" class="btn btn-neutral float-left" title="Notes Occurrences List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_notes-set-iam-policy/" class="btn btn-neutral float-right" title="Notes Set Iam Policy">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -699,14 +877,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_notes-occurrences-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_notes-set-iam-policy" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/containeranalysis1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_notes-occurrences-list/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_notes-set-iam-policy/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

@@ -1,181 +1,122 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Update Iap Settings - Cloud IAP v3.0.0+20220225</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-iap1-cli/methods_update-iap-settings/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Update Iap Settings - Cloud IAP v5.0.4+20240224</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Update Iap Settings";
+        var mkdocs_page_input_path = "methods_update-iap-settings.md";
+        var mkdocs_page_url = "/google-apis-rs/google-iap1-cli/methods_update-iap-settings/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud IAP v3.0.0+20220225</a>
-        
+          <a href=".." class="icon icon-home"> Cloud IAP v5.0.4+20240224
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Methods</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../methods_get-iam-policy">Get Iam Policy</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../methods_get-iap-settings">Get Iap Settings</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../methods_set-iam-policy">Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../methods_test-iam-permissions">Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Update Iap Settings</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_brands-create">Brands Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_brands-get">Brands Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_brands-identity-aware-proxy-clients-create">Brands Identity Aware Proxy Clients Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_brands-identity-aware-proxy-clients-delete">Brands Identity Aware Proxy Clients Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_brands-identity-aware-proxy-clients-get">Brands Identity Aware Proxy Clients Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_brands-identity-aware-proxy-clients-list">Brands Identity Aware Proxy Clients List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_brands-identity-aware-proxy-clients-reset-secret">Brands Identity Aware Proxy Clients Reset Secret</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_brands-list">Brands List</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Methods</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_get-iap-settings/">Get Iap Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Update Iap Settings</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_validate-attribute-expression/">Validate Attribute Expression</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_brands-create/">Brands Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_brands-get/">Brands Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_brands-identity-aware-proxy-clients-create/">Brands Identity Aware Proxy Clients Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_brands-identity-aware-proxy-clients-delete/">Brands Identity Aware Proxy Clients Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_brands-identity-aware-proxy-clients-get/">Brands Identity Aware Proxy Clients Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_brands-identity-aware-proxy-clients-list/">Brands Identity Aware Proxy Clients List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_brands-identity-aware-proxy-clients-reset-secret/">Brands Identity Aware Proxy Clients Reset Secret</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_brands-list/">Brands List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_iap-tunnel-locations-dest-groups-create/">Iap Tunnel Locations Dest Groups Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_iap-tunnel-locations-dest-groups-delete/">Iap Tunnel Locations Dest Groups Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_iap-tunnel-locations-dest-groups-get/">Iap Tunnel Locations Dest Groups Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_iap-tunnel-locations-dest-groups-list/">Iap Tunnel Locations Dest Groups List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_iap-tunnel-locations-dest-groups-patch/">Iap Tunnel Locations Dest Groups Patch</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Cloud IAP v5.0.4+20240224</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Update Iap Settings</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/iap1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Methods &raquo;</li>
+      <li>Update Iap Settings</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/iap1-cli/edit/master/docs/methods_update-iap-settings.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates the IAP settings on a particular IAP protected resource. It replaces all fields unless the <code>update_mask</code> is set.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates the IAP settings on a particular IAP protected resource. It replaces all fields unless the <code>update_mask</code> is set.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -193,6 +134,9 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>For example, a structure like this:</p>
 <pre><code>IapSettings:
   access-settings:
+    allowed-domains-settings:
+      domains: [string]
+      enable: boolean
     cors-settings:
       allow-http-options: boolean
     gcip-settings:
@@ -200,6 +144,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       tenant-ids: [string]
     oauth-settings:
       login-hint: string
+      programmatic-clients: [string]
     policy-delegation-settings:
       iam-permission: string
       iam-service-name: string
@@ -220,17 +165,32 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     access-denied-page-settings:
       access-denied-page-uri: string
       generate-troubleshooting-uri: boolean
+      remediation-token-generation-enabled: boolean
+    attribute-propagation-settings:
+      enable: boolean
+      expression: string
+      output-credentials: [string]
     cookie-domain: string
     csm-settings:
       rctoken-aud: string
   name: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
+<li><code>-r .access-settings.allowed-domains-settings    domains=voluptua.</code><ul>
+<li>List of trusted domains.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
 <li>
-<p><code>-r .access-settings.cors-settings    allow-http-options=false</code></p>
+<p><code>enable=false</code></p>
+<ul>
+<li>Configuration for customers to opt in for the feature.</li>
+</ul>
+</li>
+<li>
+<p><code>..cors-settings    allow-http-options=true</code></p>
 <ul>
 <li>Configuration to allow HTTP OPTIONS calls to skip authorization. If undefined, IAP will not apply any special logic to OPTIONS requests.</li>
 </ul>
@@ -242,105 +202,133 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>tenant-ids=takimata</code></p>
+<p><code>tenant-ids=duo</code></p>
 <ul>
 <li>GCIP tenant ids that are linked to the IAP resource. tenant_ids could be a string beginning with a number character to indicate authenticating with GCIP tenant flow, or in the format of _ to indicate authenticating with GCIP agent flow. If agent flow is used, tenant_ids should only contain one single element, while for tenant flow, tenant_ids can contain multiple elements.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..oauth-settings    login-hint=amet.</code></p>
+<p><code>..oauth-settings    login-hint=ipsum</code></p>
 <ul>
 <li>Domain hint to send as hd=? parameter in OAuth request flow. Enables redirect to primary IDP by skipping Google&#39;s login screen. https://developers.google.com/identity/protocols/OpenIDConnect#hd-param Note: IAP does not verify that the id token&#39;s hd claim matches this value since access behavior is managed by IAM policies.</li>
 </ul>
 </li>
 <li>
-<p><code>..policy-delegation-settings    iam-permission=duo</code></p>
+<p><code>programmatic-clients=gubergren</code></p>
+<ul>
+<li>List of client ids allowed to use IAP programmatically.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..policy-delegation-settings    iam-permission=lorem</code></p>
 <ul>
 <li>Permission to check in IAM.</li>
 </ul>
 </li>
-<li><code>iam-service-name=ipsum</code><ul>
+<li><code>iam-service-name=gubergren</code><ul>
 <li>The DNS name of the service (e.g. &#34;resourcemanager.googleapis.com&#34;). This should be the domain name part of the full resource names (see https://aip.dev/122#full-resource-names), which is usually the same as IamServiceSpec.service of the service where the resource type is defined.</li>
 </ul>
 </li>
-<li><code>policy-name    id=gubergren</code><ul>
+<li><code>policy-name    id=eos</code><ul>
 <li>Identifies an instance of the type. ID format varies by type. The ID format is defined in the IAM .service file that defines the type, either in path_mapping or in a comment.</li>
 </ul>
 </li>
-<li><code>region=lorem</code><ul>
+<li><code>region=dolor</code><ul>
 <li>For Cloud IAM: The location of the Policy. Must be empty or &#34;global&#34; for Policies owned by global IAM. Must name a region from prodspec/cloud-iam-cloudspec for Regional IAM Policies, see go/iam-faq#where-is-iam-currently-deployed. For Local IAM: This field should be set to &#34;local&#34;.</li>
 </ul>
 </li>
 <li>
-<p><code>type=gubergren</code></p>
+<p><code>type=ea</code></p>
 <ul>
 <li>Resource type. Types are defined in IAM&#39;s .service files. Valid values for type might be &#39;gce&#39;, &#39;gcs&#39;, &#39;project&#39;, &#39;account&#39; etc.</li>
 </ul>
 </li>
 <li>
-<p><code>..resource    labels=key=eos</code></p>
+<p><code>..resource    labels=key=ipsum</code></p>
 <ul>
 <li>The service defined labels of the resource on which the conditions will be evaluated. The semantics - including the key names - are vague to IAM. If the effective condition has a reference to a <code>resource.labels[foo]</code> construct, IAM consults with this map to retrieve the values associated with <code>foo</code> key for Conditions evaluation. If the provided key is not found in the labels map, the condition would evaluate to false. This field is in limited use. If your intended use case is not expected to express resource.labels attribute in IAM Conditions, leave this field empty. Before planning on using this attribute please: * Read go/iam-conditions-labels-comm and ensure your service can meet the data availability and management requirements. * Talk to iam-conditions-eng@ about your use case.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>name=dolor</code><ul>
+<li><code>name=invidunt</code><ul>
 <li>Name of the resource on which conditions will be evaluated. Must use the Relative Resource Name of the resource, which is the URI path of the resource without the leading &#34;/&#34;. Examples are &#34;projects/_/buckets/[BUCKET-ID]&#34; for storage buckets or &#34;projects/[PROJECT-ID]/global/firewalls/[FIREWALL-ID]&#34; for a firewall. This field is required for evaluating conditions with rules on resource names. For a <code>list</code> permission check, the resource.name value must be set to the parent resource. If the parent resource is a project, this field should be left unset.</li>
 </ul>
 </li>
-<li><code>service=ea</code><ul>
+<li><code>service=amet</code><ul>
 <li>The name of the service this resource belongs to. It is configured using the official_service_name of the Service as defined in service configurations under //configs/cloud/resourcetypes. For example, the official_service_name of cloud resource manager service is set as &#39;cloudresourcemanager.googleapis.com&#39; according to //configs/cloud/resourcetypes/google/cloud/resourcemanager/prod.yaml</li>
 </ul>
 </li>
 <li>
-<p><code>type=ipsum</code></p>
+<p><code>type=duo</code></p>
 <ul>
 <li>The public resource type name of the resource on which conditions will be evaluated. It is configured using the official_name of the ResourceType as defined in service configurations under //configs/cloud/resourcetypes. For example, the official_name for GCP projects is set as &#39;cloudresourcemanager.googleapis.com/Project&#39; according to //configs/cloud/resourcetypes/google/cloud/resourcemanager/prod.yaml For details see go/iam-conditions-integration-guide.</li>
 </ul>
 </li>
 <li>
-<p><code>...reauth-settings    max-age=invidunt</code></p>
+<p><code>...reauth-settings    max-age=ipsum</code></p>
 <ul>
 <li>Reauth session lifetime, how long before a user has to reauthenticate again.</li>
 </ul>
 </li>
-<li><code>method=amet</code><ul>
-<li>Reauth method required by the policy.</li>
+<li><code>method=sed</code><ul>
+<li>Reauth method requested.</li>
 </ul>
 </li>
 <li>
-<p><code>policy-type=duo</code></p>
+<p><code>policy-type=ut</code></p>
 <ul>
-<li>How IAP determines the effective policy in cases of hierarchial policies. Policies are merged from higher in the hierarchy to lower in the hierarchy.</li>
+<li>How IAP determines the effective policy in cases of hierarchical policies. Policies are merged from higher in the hierarchy to lower in the hierarchy.</li>
 </ul>
 </li>
 <li>
-<p><code>...application-settings.access-denied-page-settings    access-denied-page-uri=ipsum</code></p>
+<p><code>...application-settings.access-denied-page-settings    access-denied-page-uri=gubergren</code></p>
 <ul>
 <li>The URI to be redirected to when access is denied.</li>
 </ul>
 </li>
-<li>
-<p><code>generate-troubleshooting-uri=false</code></p>
-<ul>
+<li><code>generate-troubleshooting-uri=true</code><ul>
 <li>Whether to generate a troubleshooting URL on access denied events to this application.</li>
 </ul>
 </li>
 <li>
-<p><code>..    cookie-domain=ut</code></p>
+<p><code>remediation-token-generation-enabled=true</code></p>
+<ul>
+<li>Whether to generate remediation token on access denied events to this application.</li>
+</ul>
+</li>
+<li>
+<p><code>..attribute-propagation-settings    enable=true</code></p>
+<ul>
+<li>Whether the provided attribute propagation settings should be evaluated on user requests. If set to true, attributes returned from the expression will be propagated in the set output credentials.</li>
+</ul>
+</li>
+<li><code>expression=est</code><ul>
+<li>Raw string CEL expression. Must return a list of attributes. A maximum of 45 attributes can be selected. Expressions can select different attribute types from <code>attributes</code>: <code>attributes.saml_attributes</code>, <code>attributes.iap_attributes</code>. The following functions are supported: - filter <code>.filter(, )</code>: Returns a subset of <code>where</code> is true for every item. - in <code>in</code>: Returns true if <code>contains</code>. - selectByName <code>.selectByName()</code>: Returns the attribute in <code>with the given</code> name, otherwise returns empty. - emitAs <code>.emitAs()</code>: Sets the <code>name field to the given</code> for propagation in selected output credentials. - strict <code>.strict()</code>: Ignores the <code>x-goog-iap-attr-</code> prefix for the provided <code>when propagating with the `HEADER` output credential, such as request headers. - append `.append()` OR `.append()`: Appends the provided</code> or <code>to the end of</code>. Example expression: <code>attributes.saml_attributes.filter(x, x.name in [&amp;#39;test&amp;#39;]).append(attributes.iap_attributes.selectByName(&amp;#39;exact&amp;#39;).emitAs(&amp;#39;custom&amp;#39;).strict())</code></li>
+</ul>
+</li>
+<li>
+<p><code>output-credentials=gubergren</code></p>
+<ul>
+<li>Which output credentials attributes selected by the CEL expression should be propagated in. All attributes will be fully duplicated in each selected output credential.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    cookie-domain=ea</code></p>
 <ul>
 <li>The Domain value to set for cookies generated by IAP. This value is not validated by the API, but will be ignored at runtime if invalid.</li>
 </ul>
 </li>
 <li>
-<p><code>csm-settings    rctoken-aud=gubergren</code></p>
+<p><code>csm-settings    rctoken-aud=dolor</code></p>
 <ul>
 <li>Audience claim set in the generated RCToken. This value is not validated by IAP.</li>
 </ul>
 </li>
 <li>
-<p><code>...    name=rebum.</code></p>
+<p><code>...    name=lorem</code></p>
 <ul>
 <li>Required. The resource name of the IAP protected resource.</li>
 </ul>
@@ -371,7 +359,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <code>-p</code> for completeness.</p>
 <ul>
 <li><strong>-p update-mask=string</strong><ul>
-<li>The field mask specifying which IAP settings should be updated. If omitted, the all of the settings are updated. See https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask</li>
+<li>The field mask specifying which IAP settings should be updated. If omitted, then all of the settings are updated. See https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask. Note: All IAP reauth settings must always be set together, using the field mask: <code>iapSettings.accessSettings.reauthSettings</code>.</li>
 </ul>
 </li>
 </ul>
@@ -445,32 +433,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_brands-create" class="btn btn-neutral float-right" title="Brands Create"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../methods_test-iam-permissions" class="btn btn-neutral" title="Test Iam Permissions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../methods_test-iam-permissions/" class="btn btn-neutral float-left" title="Test Iam Permissions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../methods_validate-attribute-expression/" class="btn btn-neutral float-right" title="Validate Attribute Expression">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -478,14 +458,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../methods_test-iam-permissions" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_brands-create" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/iap1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../methods_test-iam-permissions/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../methods_validate-attribute-expression/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

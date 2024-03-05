@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-monitoring3-cli/projects_snoozes-patch/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Snoozes Patch - Monitoring v5.0.4+20240225</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Snoozes Patch";
+        var mkdocs_page_input_path = "projects_snoozes-patch.md";
+        var mkdocs_page_url = "/google-apis-rs/google-monitoring3-cli/projects_snoozes-patch/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Monitoring v5.0.4+20240225
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Folders</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_time-series-list/">Time Series List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Organizations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_time-series-list/">Time Series List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_alert-policies-create/">Alert Policies Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_alert-policies-delete/">Alert Policies Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_alert-policies-get/">Alert Policies Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_alert-policies-list/">Alert Policies List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_alert-policies-patch/">Alert Policies Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_collectd-time-series-create/">Collectd Time Series Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_groups-create/">Groups Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_groups-delete/">Groups Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_groups-get/">Groups Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_groups-list/">Groups List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_groups-members-list/">Groups Members List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_groups-update/">Groups Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_metric-descriptors-create/">Metric Descriptors Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_metric-descriptors-delete/">Metric Descriptors Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_metric-descriptors-get/">Metric Descriptors Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_metric-descriptors-list/">Metric Descriptors List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_monitored-resource-descriptors-get/">Monitored Resource Descriptors Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_monitored-resource-descriptors-list/">Monitored Resource Descriptors List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channel-descriptors-get/">Notification Channel Descriptors Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channel-descriptors-list/">Notification Channel Descriptors List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-create/">Notification Channels Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-delete/">Notification Channels Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-get/">Notification Channels Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-get-verification-code/">Notification Channels Get Verification Code</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-list/">Notification Channels List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-patch/">Notification Channels Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-send-verification-code/">Notification Channels Send Verification Code</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-channels-verify/">Notification Channels Verify</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snoozes-create/">Snoozes Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snoozes-get/">Snoozes Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snoozes-list/">Snoozes List</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Snoozes Patch</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_time-series-create/">Time Series Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_time-series-create-service/">Time Series Create Service</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_time-series-list/">Time Series List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_time-series-query/">Time Series Query</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_uptime-check-configs-create/">Uptime Check Configs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_uptime-check-configs-delete/">Uptime Check Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_uptime-check-configs-get/">Uptime Check Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_uptime-check-configs-list/">Uptime Check Configs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_uptime-check-configs-patch/">Uptime Check Configs Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Services</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_service-level-objectives-create/">Service Level Objectives Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_service-level-objectives-delete/">Service Level Objectives Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_service-level-objectives-get/">Service Level Objectives Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_service-level-objectives-list/">Service Level Objectives List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../services_service-level-objectives-patch/">Service Level Objectives Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Uptime Check Ips</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../uptime-check-ips_list/">List</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Monitoring v5.0.4+20240225</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Snoozes Patch</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/monitoring3-cli/edit/master/docs/projects_snoozes-patch.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates a Snooze, identified by its name, with the parameters in the given Snooze object.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/cloud-platform</em></li>
+<li><em>https://www.googleapis.com/auth/monitoring</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>monitoring3 --scope &lt;scope&gt; projects snoozes-patch ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
+<li>Required. The name of the Snooze. The format is: projects/[PROJECT_ID_OR_NUMBER]/snoozes/[SNOOZE_ID] The ID of the Snooze will be generated by the system.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>Snooze:
+  criteria:
+    policies: [string]
+  display-name: string
+  interval:
+    end-time: string
+    start-time: string
+  name: string
+
+</code></pre>
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li>
+<p><code>-r .criteria    policies=voluptua.</code></p>
+<ul>
+<li>The specific AlertPolicy names for the alert that should be snoozed. The format is: projects/[PROJECT_ID_OR_NUMBER]/alertPolicies/[POLICY_ID] There is a limit of 16 policies per snooze. This limit is checked during snooze creation.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    display-name=amet.</code></p>
+<ul>
+<li>Required. A display name for the Snooze. This can be, at most, 512 unicode characters.</li>
+</ul>
+</li>
+<li><code>interval    end-time=ea</code><ul>
+<li>Required. The end of the time interval.</li>
+</ul>
+</li>
+<li>
+<p><code>start-time=sadipscing</code></p>
+<ul>
+<li>Optional. The beginning of the time interval. The default value for the start time is the end time. The start time must not be later than the end time.</li>
+</ul>
+</li>
+<li>
+<p><code>..    name=lorem</code></p>
+<ul>
+<li>Required. The name of the Snooze. The format is: projects/[PROJECT_ID_OR_NUMBER]/snoozes/[SNOOZE_ID] The ID of the Snooze will be generated by the system.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li><strong>-p update-mask=string</strong><ul>
+<li>Required. The fields to update.For each field listed in update_mask: If the Snooze object supplied in the UpdateSnoozeRequest has a value for that field, the value of the field in the existing Snooze will be set to the value of the field in the supplied Snooze. If the field does not have a value in the supplied Snooze, the field in the existing Snooze is set to its default value.Fields not listed retain their existing value.The following are the field names that are accepted in update_mask: display_name interval.start_time interval.end_timeThat said, the start time and end time of the Snooze determines which fields can legally be updated. Before attempting an update, users should consult the documentation for UpdateSnoozeRequest, which talks about which fields can be updated.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_snoozes-list/" class="btn btn-neutral float-left" title="Snoozes List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_time-series-create/" class="btn btn-neutral float-right" title="Time Series Create">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/monitoring3-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_snoozes-list/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_time-series-create/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

@@ -1,653 +1,331 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Insert - YouTube v3.0.0+20220303</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-youtube3-cli/live-chat-messages_insert/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Insert - YouTube v5.0.4+20240303</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Insert";
+        var mkdocs_page_input_path = "live-chat-messages_insert.md";
+        var mkdocs_page_url = "/google-apis-rs/google-youtube3-cli/live-chat-messages_insert/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> YouTube v3.0.0+20220303</a>
-        
+          <a href=".." class="icon icon-home"> YouTube v5.0.4+20240303
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Abuse Reports</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../abuse-reports_insert">Insert</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Activities</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../activities_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Captions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../captions_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../captions_download">Download</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../captions_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../captions_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../captions_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Channel Banners</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channel-banners_insert">Insert</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Channel Sections</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channel-sections_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channel-sections_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channel-sections_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channel-sections_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Channels</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channels_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channels_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Comment Threads</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comment-threads_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comment-threads_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Comments</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_mark-as-spam">Mark As Spam</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_set-moderation-status">Set Moderation Status</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>I18n Languages</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../i18n-languages_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>I18n Regions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../i18n-regions_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Live Broadcasts</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-broadcasts_bind">Bind</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-broadcasts_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-broadcasts_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-broadcasts_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-broadcasts_transition">Transition</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-broadcasts_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Live Chat Bans</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-chat-bans_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-chat-bans_insert">Insert</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Live Chat Messages</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-chat-messages_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Insert</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-chat-messages_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Live Chat Moderators</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-chat-moderators_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-chat-moderators_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-chat-moderators_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Live Streams</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-streams_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-streams_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-streams_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../live-streams_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Members</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../members_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Memberships Levels</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../memberships-levels_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Playlist Items</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlist-items_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlist-items_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlist-items_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlist-items_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Playlists</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlists_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlists_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlists_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../playlists_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Search</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../search_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Subscriptions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../subscriptions_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../subscriptions_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../subscriptions_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Super Chat Events</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../super-chat-events_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Tests</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../tests_insert">Insert</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Third Party Links</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../third-party-links_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../third-party-links_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../third-party-links_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../third-party-links_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Thumbnails</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../thumbnails_set">Set</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Video Abuse Report Reasons</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../video-abuse-report-reasons_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Video Categories</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../video-categories_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Videos</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../videos_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../videos_get-rating">Get Rating</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../videos_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../videos_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../videos_rate">Rate</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../videos_report-abuse">Report Abuse</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../videos_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Watermarks</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../watermarks_set">Set</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../watermarks_unset">Unset</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Youtube</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../youtube_v3-update-comment-threads">V3 Update Comment Threads</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Abuse Reports</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../abuse-reports_insert/">Insert</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Activities</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../activities_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Captions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../captions_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../captions_download/">Download</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../captions_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../captions_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../captions_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Channel Banners</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../channel-banners_insert/">Insert</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Channel Sections</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../channel-sections_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../channel-sections_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../channel-sections_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../channel-sections_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Channels</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../channels_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../channels_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Comment Threads</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../comment-threads_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comment-threads_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Comments</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_mark-as-spam/">Mark As Spam</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_set-moderation-status/">Set Moderation Status</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">I18n Languages</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../i18n-languages_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">I18n Regions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../i18n-regions_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Live Broadcasts</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-broadcasts_bind/">Bind</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-broadcasts_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-broadcasts_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-broadcasts_insert-cuepoint/">Insert Cuepoint</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-broadcasts_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-broadcasts_transition/">Transition</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-broadcasts_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Live Chat Bans</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-chat-bans_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-chat-bans_insert/">Insert</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Live Chat Messages</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../live-chat-messages_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Insert</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-chat-messages_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Live Chat Moderators</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-chat-moderators_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-chat-moderators_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-chat-moderators_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Live Streams</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-streams_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-streams_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-streams_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../live-streams_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Members</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../members_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Memberships Levels</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../memberships-levels_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Playlist Images</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-images_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-images_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-images_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-images_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Playlist Items</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-items_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-items_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-items_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlist-items_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Playlists</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlists_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlists_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlists_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../playlists_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Search</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../search_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Subscriptions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../subscriptions_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../subscriptions_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../subscriptions_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Super Chat Events</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../super-chat-events_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Tests</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../tests_insert/">Insert</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Third Party Links</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../third-party-links_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../third-party-links_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../third-party-links_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../third-party-links_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Thumbnails</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../thumbnails_set/">Set</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Video Abuse Report Reasons</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../video-abuse-report-reasons_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Video Categories</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../video-categories_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Videos</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../videos_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../videos_get-rating/">Get Rating</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../videos_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../videos_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../videos_rate/">Rate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../videos_report-abuse/">Report Abuse</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../videos_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Watermarks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../watermarks_set/">Set</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../watermarks_unset/">Unset</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Youtube</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../youtube_v3-update-comment-threads/">V3 Update Comment Threads</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">YouTube v5.0.4+20240303</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Insert</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/youtube3-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Live Chat Messages &raquo;</li>
+      <li>Insert</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/youtube3-cli/edit/master/docs/live-chat-messages_insert.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Inserts a new resource into this collection.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Inserts a new resource into this collection.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -681,12 +359,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       amount-micros: string
       currency: string
       user-comment: string
+    gift-membership-received-details:
+      associated-membership-gifting-message-id: string
+      gifter-channel-id: string
+      member-level-name: string
     has-display-content: boolean
     live-chat-id: string
     member-milestone-chat-details:
       member-level-name: string
       member-month: integer
       user-comment: string
+    membership-gifting-details:
+      gift-memberships-count: integer
+      gift-memberships-level-name: string
     message-deleted-details:
       deleted-message-id: string
     message-retracted-details:
@@ -694,6 +379,10 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     new-sponsor-details:
       is-upgrade: boolean
       member-level-name: string
+    poll-details:
+      metadata:
+        question-text: string
+      status: string
     published-at: string
     super-chat-details:
       amount-display-string: string
@@ -723,18 +412,17 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         profile-image-url: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .author-details    channel-id=diam</code><ul>
+<li><code>-r .author-details    channel-id=et</code><ul>
 <li>The YouTube channel ID.</li>
 </ul>
 </li>
-<li><code>channel-url=amet</code><ul>
+<li><code>channel-url=nonumy</code><ul>
 <li>The channel&#39;s URL.</li>
 </ul>
 </li>
-<li><code>display-name=at</code><ul>
+<li><code>display-name=accusam</code><ul>
 <li>The channel&#39;s display name.</li>
 </ul>
 </li>
@@ -742,15 +430,15 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the author is a moderator of the live chat.</li>
 </ul>
 </li>
-<li><code>is-chat-owner=false</code><ul>
+<li><code>is-chat-owner=true</code><ul>
 <li>Whether the author is the owner of the live chat.</li>
 </ul>
 </li>
-<li><code>is-chat-sponsor=true</code><ul>
+<li><code>is-chat-sponsor=false</code><ul>
 <li>Whether the author is a sponsor of the live chat.</li>
 </ul>
 </li>
-<li><code>is-verified=false</code><ul>
+<li><code>is-verified=true</code><ul>
 <li>Whether the author&#39;s identity has been verified by YouTube.</li>
 </ul>
 </li>
@@ -761,43 +449,59 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    etag=nonumy</code></p>
+<p><code>..    etag=aliquyam</code></p>
 <ul>
 <li>Etag of this resource.</li>
 </ul>
 </li>
-<li><code>id=accusam</code><ul>
+<li><code>id=ipsum</code><ul>
 <li>The ID that YouTube assigns to uniquely identify the message.</li>
 </ul>
 </li>
-<li><code>kind=ut</code><ul>
+<li><code>kind=gubergren</code><ul>
 <li>Identifies what kind of resource this is. Value: the fixed string &#34;youtube#liveChatMessage&#34;.</li>
 </ul>
 </li>
-<li><code>snippet    author-channel-id=voluptua.</code><ul>
-<li>The ID of the user that authored this message, this field is not always filled. textMessageEvent - the user that wrote the message fanFundingEvent - the user that funded the broadcast newSponsorEvent - the user that just became a sponsor memberMilestoneChatEvent - the member that sent the message messageDeletedEvent - the moderator that took the action messageRetractedEvent - the author that retracted their message userBannedEvent - the moderator that took the action superChatEvent - the user that made the purchase superStickerEvent - the user that made the purchase</li>
+<li><code>snippet    author-channel-id=invidunt</code><ul>
+<li>The ID of the user that authored this message, this field is not always filled. textMessageEvent - the user that wrote the message fanFundingEvent - the user that funded the broadcast newSponsorEvent - the user that just became a sponsor memberMilestoneChatEvent - the member that sent the message membershipGiftingEvent - the user that made the purchase giftMembershipReceivedEvent - the user that received the gift membership messageDeletedEvent - the moderator that took the action messageRetractedEvent - the author that retracted their message userBannedEvent - the moderator that took the action superChatEvent - the user that made the purchase superStickerEvent - the user that made the purchase pollEvent - the user that created the poll</li>
 </ul>
 </li>
-<li><code>display-message=consetetur</code><ul>
+<li><code>display-message=sea</code><ul>
 <li>Contains a string that can be displayed to the user. If this field is not present the message is silent, at the moment only messages of type TOMBSTONE and CHAT_ENDED_EVENT are silent.</li>
 </ul>
 </li>
-<li><code>fan-funding-event-details    amount-display-string=dolor</code><ul>
+<li><code>fan-funding-event-details    amount-display-string=duo</code><ul>
 <li>A rendered string that displays the fund amount and currency to the user.</li>
 </ul>
 </li>
-<li><code>amount-micros=amet</code><ul>
+<li><code>amount-micros=sea</code><ul>
 <li>The amount of the fund.</li>
 </ul>
 </li>
-<li><code>currency=et</code><ul>
+<li><code>currency=stet</code><ul>
 <li>The currency in which the fund was made.</li>
 </ul>
 </li>
 <li>
-<p><code>user-comment=aliquyam</code></p>
+<p><code>user-comment=sadipscing</code></p>
 <ul>
 <li>The comment added by the user to this fan funding event.</li>
+</ul>
+</li>
+<li>
+<p><code>..gift-membership-received-details    associated-membership-gifting-message-id=no</code></p>
+<ul>
+<li>The ID of the membership gifting message that is related to this gift membership. This ID will always refer to a message whose type is &#39;membershipGiftingEvent&#39;.</li>
+</ul>
+</li>
+<li><code>gifter-channel-id=tempor</code><ul>
+<li>The ID of the user that made the membership gifting purchase. This matches the <code>snippet.authorChannelId</code> of the associated membership gifting message.</li>
+</ul>
+</li>
+<li>
+<p><code>member-level-name=ipsum</code></p>
+<ul>
+<li>The name of the Level at which the viewer is a member. This matches the <code>snippet.membershipGiftingDetails.giftMembershipsLevelName</code> of the associated membership gifting message. The Level names are defined by the YouTube channel offering the Membership. In some situations this field isn&#39;t filled.</li>
 </ul>
 </li>
 <li>
@@ -806,143 +510,167 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether the message has display content that should be displayed to users.</li>
 </ul>
 </li>
-<li><code>live-chat-id=invidunt</code><ul>
+<li><code>live-chat-id=sit</code><ul>
 <li>No description provided.</li>
 </ul>
 </li>
-<li><code>member-milestone-chat-details    member-level-name=sea</code><ul>
+<li><code>member-milestone-chat-details    member-level-name=amet.</code><ul>
 <li>The name of the Level at which the viever is a member. The Level names are defined by the YouTube channel offering the Membership. In some situations this field isn&#39;t filled.</li>
 </ul>
 </li>
-<li><code>member-month=81</code><ul>
+<li><code>member-month=46</code><ul>
 <li>The total amount of months (rounded up) the viewer has been a member that granted them this Member Milestone Chat. This is the same number of months as is being displayed to YouTube users.</li>
 </ul>
 </li>
 <li>
-<p><code>user-comment=sea</code></p>
+<p><code>user-comment=at</code></p>
 <ul>
 <li>The comment added by the member to this Member Milestone Chat. This field is empty for messages without a comment from the member.</li>
 </ul>
 </li>
 <li>
-<p><code>..message-deleted-details    deleted-message-id=stet</code></p>
+<p><code>..membership-gifting-details    gift-memberships-count=75</code></p>
+<ul>
+<li>The number of gift memberships purchased by the user.</li>
+</ul>
+</li>
+<li>
+<p><code>gift-memberships-level-name=takimata</code></p>
+<ul>
+<li>The name of the level of the gift memberships purchased by the user. The Level names are defined by the YouTube channel offering the Membership. In some situations this field isn&#39;t filled.</li>
+</ul>
+</li>
+<li>
+<p><code>..message-deleted-details    deleted-message-id=gubergren</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>..message-retracted-details    retracted-message-id=sadipscing</code></p>
+<p><code>..message-retracted-details    retracted-message-id=et</code></p>
 <ul>
 <li>No description provided.</li>
 </ul>
 </li>
 <li>
-<p><code>..new-sponsor-details    is-upgrade=true</code></p>
+<p><code>..new-sponsor-details    is-upgrade=false</code></p>
 <ul>
 <li>If the viewer just had upgraded from a lower level. For viewers that were not members at the time of purchase, this field is false.</li>
 </ul>
 </li>
 <li>
-<p><code>member-level-name=ipsum</code></p>
+<p><code>member-level-name=magna</code></p>
 <ul>
 <li>The name of the Level that the viewer just had joined. The Level names are defined by the YouTube channel offering the Membership. In some situations this field isn&#39;t filled.</li>
 </ul>
 </li>
 <li>
-<p><code>..    published-at=sea</code></p>
+<p><code>..poll-details.metadata    question-text=sit</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>..    status=gubergren</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>..    published-at=elitr</code></p>
 <ul>
 <li>The date and time when the message was orignally published.</li>
 </ul>
 </li>
-<li><code>super-chat-details    amount-display-string=sit</code><ul>
+<li><code>super-chat-details    amount-display-string=ipsum</code><ul>
 <li>A rendered string that displays the fund amount and currency to the user.</li>
 </ul>
 </li>
-<li><code>amount-micros=amet.</code><ul>
+<li><code>amount-micros=kasd</code><ul>
 <li>The amount purchased by the user, in micros (1,750,000 micros = 1.75).</li>
 </ul>
 </li>
-<li><code>currency=ipsum</code><ul>
+<li><code>currency=dolore</code><ul>
 <li>The currency in which the purchase was made.</li>
 </ul>
 </li>
-<li><code>tier=74</code><ul>
+<li><code>tier=50</code><ul>
 <li>The tier in which the amount belongs. Lower amounts belong to lower tiers. The lowest tier is 1.</li>
 </ul>
 </li>
 <li>
-<p><code>user-comment=vero</code></p>
+<p><code>user-comment=amet</code></p>
 <ul>
 <li>The comment added by the user to this Super Chat event.</li>
 </ul>
 </li>
 <li>
-<p><code>..super-sticker-details    amount-display-string=takimata</code></p>
+<p><code>..super-sticker-details    amount-display-string=ipsum</code></p>
 <ul>
 <li>A rendered string that displays the fund amount and currency to the user.</li>
 </ul>
 </li>
-<li><code>amount-micros=gubergren</code><ul>
+<li><code>amount-micros=lorem</code><ul>
 <li>The amount purchased by the user, in micros (1,750,000 micros = 1.75).</li>
 </ul>
 </li>
-<li><code>currency=et</code><ul>
+<li><code>currency=dolores</code><ul>
 <li>The currency in which the purchase was made.</li>
 </ul>
 </li>
-<li><code>super-sticker-metadata    alt-text=invidunt</code><ul>
+<li><code>super-sticker-metadata    alt-text=consetetur</code><ul>
 <li>Internationalized alt text that describes the sticker image and any animation associated with it.</li>
 </ul>
 </li>
-<li><code>alt-text-language=magna</code><ul>
+<li><code>alt-text-language=stet</code><ul>
 <li>Specifies the localization language in which the alt text is returned.</li>
 </ul>
 </li>
 <li>
-<p><code>sticker-id=sit</code></p>
+<p><code>sticker-id=accusam</code></p>
 <ul>
 <li>Unique identifier of the Super Sticker. This is a shorter form of the alt_text that includes pack name and a recognizable characteristic of the sticker.</li>
 </ul>
 </li>
 <li>
-<p><code>..    tier=89</code></p>
+<p><code>..    tier=55</code></p>
 <ul>
 <li>The tier in which the amount belongs. Lower amounts belong to lower tiers. The lowest tier is 1.</li>
 </ul>
 </li>
 <li>
-<p><code>..text-message-details    message-text=elitr</code></p>
+<p><code>..text-message-details    message-text=takimata</code></p>
 <ul>
 <li>The user&#39;s message.</li>
 </ul>
 </li>
 <li>
-<p><code>..    type=ipsum</code></p>
+<p><code>..    type=sed</code></p>
 <ul>
 <li>The type of message, this will always be present, it determines the contents of the message as well as which fields will be present.</li>
 </ul>
 </li>
-<li><code>user-banned-details    ban-duration-seconds=kasd</code><ul>
+<li><code>user-banned-details    ban-duration-seconds=nonumy</code><ul>
 <li>The duration of the ban. This property is only present if the banType is temporary.</li>
 </ul>
 </li>
-<li><code>ban-type=dolore</code><ul>
+<li><code>ban-type=sea</code><ul>
 <li>The type of ban.</li>
 </ul>
 </li>
-<li><code>banned-user-details    channel-id=lorem</code><ul>
+<li><code>banned-user-details    channel-id=eos</code><ul>
 <li>The YouTube channel ID.</li>
 </ul>
 </li>
-<li><code>channel-url=amet</code><ul>
+<li><code>channel-url=dolore</code><ul>
 <li>The channel&#39;s URL.</li>
 </ul>
 </li>
-<li><code>display-name=ipsum</code><ul>
+<li><code>display-name=accusam</code><ul>
 <li>The channel&#39;s display name.</li>
 </ul>
 </li>
-<li><code>profile-image-url=lorem</code><ul>
+<li><code>profile-image-url=elitr</code><ul>
 <li>The channels&#39;s avatar URL.</li>
 </ul>
 </li>
@@ -1036,32 +764,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../live-chat-messages_list" class="btn btn-neutral float-right" title="List"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../live-chat-messages_delete" class="btn btn-neutral" title="Delete"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../live-chat-messages_delete/" class="btn btn-neutral float-left" title="Delete"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../live-chat-messages_list/" class="btn btn-neutral float-right" title="List">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -1069,14 +789,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../live-chat-messages_delete" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../live-chat-messages_list" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/youtube3-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../live-chat-messages_delete/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../live-chat-messages_list/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

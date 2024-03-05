@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-mybusinessverifications1-cli/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-mybusinessverifications1-cli/locations_fetch-verification-options/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-mybusinessverifications1-cli/locations_get-voice-of-merchant-state/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-mybusinessverifications1-cli/locations_verifications-complete/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-mybusinessverifications1-cli/locations_verifications-list/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-mybusinessverifications1-cli/locations_verify/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+</urlset>

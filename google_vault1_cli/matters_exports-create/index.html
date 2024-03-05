@@ -1,278 +1,150 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Exports Create - Vault v3.0.0+20220222</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-vault1-cli/matters_exports-create/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Exports Create - Vault v5.0.4+20240220</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Exports Create";
+        var mkdocs_page_input_path = "matters_exports-create.md";
+        var mkdocs_page_url = "/google-apis-rs/google-vault1-cli/matters_exports-create/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Vault v3.0.0+20220222</a>
-        
+          <a href=".." class="icon icon-home"> Vault v5.0.4+20240220
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Matters</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_add-permissions">Add Permissions</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_close">Close</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_count">Count</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_create">Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Exports Create</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_exports-delete">Exports Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_exports-get">Exports Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_exports-list">Exports List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_holds-accounts-create">Holds Accounts Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_holds-accounts-delete">Holds Accounts Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_holds-accounts-list">Holds Accounts List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_holds-add-held-accounts">Holds Add Held Accounts</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_holds-create">Holds Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_holds-delete">Holds Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_holds-get">Holds Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_holds-list">Holds List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_holds-remove-held-accounts">Holds Remove Held Accounts</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_holds-update">Holds Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_remove-permissions">Remove Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_reopen">Reopen</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_saved-queries-create">Saved Queries Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_saved-queries-delete">Saved Queries Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_saved-queries-get">Saved Queries Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_saved-queries-list">Saved Queries List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_undelete">Undelete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../matters_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Operations</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../operations_cancel">Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../operations_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../operations_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../operations_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Matters</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_add-permissions/">Add Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_close/">Close</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_count/">Count</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Exports Create</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_exports-delete/">Exports Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_exports-get/">Exports Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_exports-list/">Exports List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_holds-accounts-create/">Holds Accounts Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_holds-accounts-delete/">Holds Accounts Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_holds-accounts-list/">Holds Accounts List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_holds-add-held-accounts/">Holds Add Held Accounts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_holds-create/">Holds Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_holds-delete/">Holds Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_holds-get/">Holds Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_holds-list/">Holds List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_holds-remove-held-accounts/">Holds Remove Held Accounts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_holds-update/">Holds Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_remove-permissions/">Remove Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_reopen/">Reopen</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_saved-queries-create/">Saved Queries Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_saved-queries-delete/">Saved Queries Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_saved-queries-get/">Saved Queries Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_saved-queries-list/">Saved Queries List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_undelete/">Undelete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../matters_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Operations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations_cancel/">Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations_list/">List</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Vault v5.0.4+20240220</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Exports Create</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/vault1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Matters &raquo;</li>
+      <li>Exports Create</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/vault1-cli/edit/master/docs/matters_exports-create.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Creates an export.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Creates an export.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/ediscovery</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/ediscovery</em>.
@@ -291,6 +163,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <pre><code>Export:
   create-time: string
   export-options:
+    calendar-options:
+      export-format: string
     drive-options:
       include-access-info: boolean
     groups-options:
@@ -299,6 +173,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       export-format: string
     mail-options:
       export-format: string
+      export-linked-drive-files: boolean
       show-confidential-mode-content: boolean
       use-new-export: boolean
     region: string
@@ -307,12 +182,20 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   id: string
   matter-id: string
   name: string
+  parent-export-id: string
   query:
     account-info:
       emails: [string]
+    calendar-options:
+      location-query: [string]
+      minus-words: [string]
+      people-query: [string]
+      response-statuses: [string]
+      version-date: string
     corpus: string
     data-scope: string
     drive-options:
+      client-side-encrypted-option: string
       include-shared-drives: boolean
       include-team-drives: boolean
       version-date: string
@@ -322,6 +205,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     hangouts-chat-options:
       include-rooms: boolean
     mail-options:
+      client-side-encrypted-option: string
       exclude-drafts: boolean
     method: string
     org-unit-info:
@@ -329,6 +213,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     search-method: string
     shared-drive-info:
       shared-drive-ids: [string]
+    sites-url-info:
+      urls: [string]
     start-time: string
     team-drive-info:
       team-drive-ids: [string]
@@ -346,27 +232,32 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   status: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    create-time=lorem</code><ul>
+<li><code>-r .    create-time=et</code><ul>
 <li>Output only. The time when the export was created.</li>
 </ul>
 </li>
 <li>
-<p><code>export-options.drive-options    include-access-info=false</code></p>
+<p><code>export-options.calendar-options    export-format=sed</code></p>
+<ul>
+<li>The file format for exported text messages.</li>
+</ul>
+</li>
+<li>
+<p><code>..drive-options    include-access-info=true</code></p>
 <ul>
 <li>To include access level information for users with <a href="https://support.google.com/vault/answer/6099459#metadata">indirect access</a> to files, set to <strong>true</strong>.</li>
 </ul>
 </li>
 <li>
-<p><code>..groups-options    export-format=sed</code></p>
+<p><code>..groups-options    export-format=vero</code></p>
 <ul>
 <li>The file format for exported messages.</li>
 </ul>
 </li>
 <li>
-<p><code>..hangouts-chat-options    export-format=duo</code></p>
+<p><code>..hangouts-chat-options    export-format=erat</code></p>
 <ul>
 <li>The file format for exported messages.</li>
 </ul>
@@ -377,7 +268,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>The file format for exported messages.</li>
 </ul>
 </li>
-<li><code>show-confidential-mode-content=true</code><ul>
+<li><code>export-linked-drive-files=false</code><ul>
+<li>Optional. To enable exporting linked Drive files, set to <strong>true</strong>.</li>
+</ul>
+</li>
+<li><code>show-confidential-mode-content=false</code><ul>
 <li>To export confidential mode content, set to <strong>true</strong>.</li>
 </ul>
 </li>
@@ -400,52 +295,88 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>...    id=vero</code></p>
+<p><code>...    id=sadipscing</code></p>
 <ul>
 <li>Output only. The generated export ID.</li>
 </ul>
 </li>
-<li><code>matter-id=erat</code><ul>
+<li><code>matter-id=stet</code><ul>
 <li>Output only. The matter ID.</li>
 </ul>
 </li>
-<li><code>name=sed</code><ul>
-<li>The export name.</li>
+<li><code>name=dolor</code><ul>
+<li>The export name. Don&#39;t use special characters (~!$&#39;(),;@:/?) in the name, they can prevent you from downloading exports.</li>
+</ul>
+</li>
+<li><code>parent-export-id=duo</code><ul>
+<li>Output only. Identifies the parent export that spawned this child export. This is only set on child exports.</li>
 </ul>
 </li>
 <li>
-<p><code>query.account-info    emails=duo</code></p>
+<p><code>query.account-info    emails=vero</code></p>
 <ul>
 <li>A set of accounts to search.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    corpus=dolore</code></p>
+<p><code>..calendar-options    location-query=vero</code></p>
+<ul>
+<li>Matches only those events whose location contains all of the words in the given set. If the string contains quoted phrases, this method only matches those events whose location contain the exact phrase. Entries in the set are considered in &#34;and&#34;. Word splitting example: [&#34;New Zealand&#34;] vs [&#34;New&#34;,&#34;Zealand&#34;] &#34;New Zealand&#34;: matched by both &#34;New and better Zealand&#34;: only matched by the later</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>minus-words=invidunt</code><ul>
+<li>Matches only those events that do not contain any of the words in the given set in title, description, location, or attendees. Entries in the set are considered in &#34;or&#34;.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>people-query=stet</code><ul>
+<li>Matches only those events whose attendees contain all of the words in the given set. Entries in the set are considered in &#34;and&#34;.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>response-statuses=vero</code><ul>
+<li>Matches only events for which the custodian gave one of these responses. If the set is empty or contains ATTENDEE_RESPONSE_UNSPECIFIED there will be no filtering on responses.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>version-date=elitr</code></p>
+<ul>
+<li>Search the current version of the Calendar event, but export the contents of the last version saved before 12:00 AM UTC on the specified date. Enter the date in UTC.</li>
+</ul>
+</li>
+<li>
+<p><code>..    corpus=lorem</code></p>
 <ul>
 <li>The Google Workspace service to search.</li>
 </ul>
 </li>
-<li><code>data-scope=et</code><ul>
+<li><code>data-scope=diam</code><ul>
 <li>The data source to search.</li>
 </ul>
 </li>
-<li><code>drive-options    include-shared-drives=false</code><ul>
+<li><code>drive-options    client-side-encrypted-option=no</code><ul>
+<li>Set whether the results include only content encrypted with <a href="https://support.google.com/a?p=cse_ov">Google Workspace Client-side encryption</a> content, only unencrypted content, or both. Defaults to both. Currently supported for Drive.</li>
+</ul>
+</li>
+<li><code>include-shared-drives=false</code><ul>
 <li>Set to <strong>true</strong> to include shared drives.</li>
 </ul>
 </li>
-<li><code>include-team-drives=false</code><ul>
+<li><code>include-team-drives=true</code><ul>
 <li>Set to true to include Team Drive.</li>
 </ul>
 </li>
 <li>
-<p><code>version-date=dolor</code></p>
+<p><code>version-date=consetetur</code></p>
 <ul>
 <li>Search the current version of the Drive file, but export the contents of the last version saved before 12:00 AM UTC on the specified date. Enter the date in UTC.</li>
 </ul>
 </li>
 <li>
-<p><code>..    end-time=et</code></p>
+<p><code>..    end-time=voluptua.</code></p>
 <ul>
 <li>The end time for the search query. Specify in GMT. The value is rounded to 12 AM on the specified date.</li>
 </ul>
@@ -453,7 +384,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>hangouts-chat-info    room-id=et</code></p>
 <ul>
-<li>A list of Chat spaces IDs, as provided by the <a href="https://developers.google.com/hangouts/chat">Chat API</a>.</li>
+<li>A list of Chat spaces IDs, as provided by the <a href="https://developers.google.com/chat">Chat API</a>. There is a limit of exporting from 500 Chat spaces per request.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
@@ -464,96 +395,109 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..mail-options    exclude-drafts=false</code></p>
+<p><code>..mail-options    client-side-encrypted-option=amet.</code></p>
+<ul>
+<li>Specifies whether the results should include encrypted content, unencrypted content, or both. Defaults to including both.</li>
+</ul>
+</li>
+<li>
+<p><code>exclude-drafts=true</code></p>
 <ul>
 <li>Set to <strong>true</strong> to exclude drafts.</li>
 </ul>
 </li>
 <li>
-<p><code>..    method=duo</code></p>
+<p><code>..    method=et</code></p>
 <ul>
 <li>The entity to search. This field replaces <strong>searchMethod</strong> to support shared drives. When <strong>searchMethod</strong> is <strong>TEAM_DRIVE</strong>, the response of this field is <strong>SHARED_DRIVE</strong>.</li>
 </ul>
 </li>
 <li>
-<p><code>org-unit-info    org-unit-id=vero</code></p>
+<p><code>org-unit-info    org-unit-id=accusam</code></p>
 <ul>
 <li>The name of the organizational unit to search, as provided by the <a href="https://developers.google.com/admin-sdk/directory/">Admin SDK Directory API</a>.</li>
 </ul>
 </li>
 <li>
-<p><code>..    search-method=vero</code></p>
+<p><code>..    search-method=voluptua.</code></p>
 <ul>
 <li>The search method to use.</li>
 </ul>
 </li>
 <li>
-<p><code>shared-drive-info    shared-drive-ids=invidunt</code></p>
+<p><code>shared-drive-info    shared-drive-ids=dolore</code></p>
 <ul>
 <li>A list of shared drive IDs, as provided by the <a href="https://developers.google.com/drive">Drive API</a>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    start-time=stet</code></p>
+<p><code>..sites-url-info    urls=dolore</code></p>
+<ul>
+<li>A list of published site URLs.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..    start-time=dolore</code></p>
 <ul>
 <li>The start time for the search query. Specify in GMT. The value is rounded to 12 AM on the specified date.</li>
 </ul>
 </li>
 <li>
-<p><code>team-drive-info    team-drive-ids=vero</code></p>
+<p><code>team-drive-info    team-drive-ids=voluptua.</code></p>
 <ul>
 <li>List of Team Drive IDs, as provided by the <a href="https://developers.google.com/drive">Drive API</a>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    terms=elitr</code></p>
+<p><code>..    terms=amet.</code></p>
 <ul>
 <li>Service-specific <a href="https://support.google.com/vault/answer/2474474">search operators</a> to filter search results.</li>
 </ul>
 </li>
-<li><code>time-zone=lorem</code><ul>
+<li><code>time-zone=ea</code><ul>
 <li>The time zone name. It should be an IANA TZ name, such as &#34;America/Los_Angeles&#34;. For a list of time zone names, see <a href="https://en.wikipedia.org/wiki/List_of_tz_database_time_zones">Time Zone</a>. For more information about how Vault uses time zones, see <a href="https://support.google.com/vault/answer/6092995#time">the Vault help center</a>.</li>
 </ul>
 </li>
 <li>
-<p><code>voice-options    covered-data=diam</code></p>
+<p><code>voice-options    covered-data=sadipscing</code></p>
 <ul>
 <li>Datatypes to search</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>...requester    display-name=no</code></p>
+<p><code>...requester    display-name=lorem</code></p>
 <ul>
 <li>The displayed name of the user.</li>
 </ul>
 </li>
 <li>
-<p><code>email=ipsum</code></p>
+<p><code>email=invidunt</code></p>
 <ul>
 <li>The email address of the user.</li>
 </ul>
 </li>
 <li>
-<p><code>..stats    exported-artifact-count=-23</code></p>
+<p><code>..stats    exported-artifact-count=-11</code></p>
 <ul>
 <li>The number of messages or files already processed for export.</li>
 </ul>
 </li>
-<li><code>size-in-bytes=takimata</code><ul>
+<li><code>size-in-bytes=est</code><ul>
 <li>The size of export in bytes.</li>
 </ul>
 </li>
 <li>
-<p><code>total-artifact-count=-46</code></p>
+<p><code>total-artifact-count=-27</code></p>
 <ul>
 <li>The number of messages or files to be exported.</li>
 </ul>
 </li>
 <li>
-<p><code>..    status=voluptua.</code></p>
+<p><code>..    status=sed</code></p>
 <ul>
 <li>Output only. The status of the export.</li>
 </ul>
@@ -648,32 +592,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../matters_exports-delete" class="btn btn-neutral float-right" title="Exports Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../matters_delete" class="btn btn-neutral" title="Delete"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../matters_delete/" class="btn btn-neutral float-left" title="Delete"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../matters_exports-delete/" class="btn btn-neutral float-right" title="Exports Delete">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -681,14 +617,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../matters_delete" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../matters_exports-delete" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/vault1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../matters_delete/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../matters_exports-delete/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

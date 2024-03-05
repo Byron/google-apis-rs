@@ -1,195 +1,127 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Locations Instances Patch - Cloud Redis v3.0.0+20220301</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-redis1-cli/projects_locations-instances-patch/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Locations Instances Patch - Cloud Redis v5.0.4+20240226</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Locations Instances Patch";
+        var mkdocs_page_input_path = "projects_locations-instances-patch.md";
+        var mkdocs_page_url = "/google-apis-rs/google-redis1-cli/projects_locations-instances-patch/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Redis v3.0.0+20220301</a>
-        
+          <a href=".." class="icon icon-home"> Cloud Redis v5.0.4+20240226
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-get">Locations Get</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-instances-create">Locations Instances Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-instances-delete">Locations Instances Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-instances-export">Locations Instances Export</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-instances-failover">Locations Instances Failover</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-instances-get">Locations Instances Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-instances-get-auth-string">Locations Instances Get Auth String</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-instances-import">Locations Instances Import</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-instances-list">Locations Instances List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Locations Instances Patch</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-instances-reschedule-maintenance">Locations Instances Reschedule Maintenance</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-instances-upgrade">Locations Instances Upgrade</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-list">Locations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-delete">Locations Operations Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-create/">Locations Clusters Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-delete/">Locations Clusters Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-get/">Locations Clusters Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-get-certificate-authority/">Locations Clusters Get Certificate Authority</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-list/">Locations Clusters List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-patch/">Locations Clusters Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-create/">Locations Instances Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-delete/">Locations Instances Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-export/">Locations Instances Export</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-failover/">Locations Instances Failover</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-get/">Locations Instances Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-get-auth-string/">Locations Instances Get Auth String</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-import/">Locations Instances Import</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-list/">Locations Instances List</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Locations Instances Patch</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-reschedule-maintenance/">Locations Instances Reschedule Maintenance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-instances-upgrade/">Locations Instances Upgrade</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-list/">Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-delete/">Locations Operations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Cloud Redis v5.0.4+20240226</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Locations Instances Patch</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/redis1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Locations Instances Patch</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/redis1-cli/edit/master/docs/projects_locations-instances-patch.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates the metadata and configuration of a specific Redis instance. Completed longrunning.Operation will contain the new instance object in the response field. The returned operation is automatically deleted after a few hours, so there is no need to call DeleteOperation.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates the metadata and configuration of a specific Redis instance. Completed longrunning.Operation will contain the new instance object in the response field. The returned operation is automatically deleted after a few hours, so there is no need to call DeleteOperation.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -209,9 +141,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   alternative-location-id: string
   auth-enabled: boolean
   authorized-network: string
+  available-maintenance-versions: [string]
   connect-mode: string
   create-time: string
   current-location-id: string
+  customer-managed-key: string
   display-name: string
   host: string
   labels: { string: string }
@@ -225,6 +159,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     end-time: string
     schedule-deadline-time: string
     start-time: string
+  maintenance-version: string
   memory-size-gb: integer
   name: string
   persistence-config:
@@ -241,49 +176,60 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   redis-version: string
   replica-count: integer
   reserved-ip-range: string
+  satisfies-pzi: boolean
+  satisfies-pzs: boolean
   secondary-ip-range: string
   state: string
   status-message: string
+  suspension-reasons: [string]
   tier: string
   transit-encryption-mode: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    alternative-location-id=kasd</code><ul>
+<li><code>-r .    alternative-location-id=stet</code><ul>
 <li>Optional. If specified, at least one node will be provisioned in this zone in addition to the zone specified in location_id. Only applicable to standard tier. If provided, it must be a different zone from the one provided in [location_id]. Additional nodes beyond the first 2 will be placed in zones selected by the service.</li>
 </ul>
 </li>
-<li><code>auth-enabled=true</code><ul>
+<li><code>auth-enabled=false</code><ul>
 <li>Optional. Indicates whether OSS Redis AUTH is enabled for the instance. If set to &#34;true&#34; AUTH is enabled on the instance. Default value is &#34;false&#34; meaning AUTH is disabled.</li>
 </ul>
 </li>
-<li><code>authorized-network=et</code><ul>
+<li><code>authorized-network=elitr</code><ul>
 <li>Optional. The full name of the Google Compute Engine <a href="https://cloud.google.com/vpc/docs/vpc">network</a> to which the instance is connected. If left unspecified, the <code>default</code> network will be used.</li>
 </ul>
 </li>
-<li><code>connect-mode=et</code><ul>
+<li><code>available-maintenance-versions=lorem</code><ul>
+<li>Optional. The available maintenance versions that an instance could update to.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>connect-mode=diam</code><ul>
 <li>Optional. The network connect mode of the Redis instance. If not provided, the connect mode defaults to DIRECT_PEERING.</li>
 </ul>
 </li>
-<li><code>create-time=vero</code><ul>
+<li><code>create-time=no</code><ul>
 <li>Output only. The time the instance was created.</li>
 </ul>
 </li>
-<li><code>current-location-id=erat</code><ul>
+<li><code>current-location-id=ipsum</code><ul>
 <li>Output only. The current zone where the Redis primary node is located. In basic tier, this will always be the same as [location_id]. In standard tier, this can be the zone of any node in the instance.</li>
 </ul>
 </li>
-<li><code>display-name=sed</code><ul>
+<li><code>customer-managed-key=accusam</code><ul>
+<li>Optional. The KMS key reference that the customer provides when trying to create the instance.</li>
+</ul>
+</li>
+<li><code>display-name=takimata</code><ul>
 <li>An arbitrary and optional user-provided name for the instance.</li>
 </ul>
 </li>
-<li><code>host=duo</code><ul>
+<li><code>host=consetetur</code><ul>
 <li>Output only. Hostname or IP address of the exposed Redis endpoint used by clients to connect to the service.</li>
 </ul>
 </li>
-<li><code>labels=key=dolore</code><ul>
+<li><code>labels=key=voluptua.</code><ul>
 <li>Resource labels to represent user provided metadata</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
@@ -292,124 +238,141 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Optional. The zone where the instance will be provisioned. If not provided, the service will choose a zone from the specified region for the instance. For standard tier, additional nodes will be added across multiple zones for protection against zonal failures. If specified, at least one node will be provisioned in this zone.</li>
 </ul>
 </li>
-<li><code>maintenance-policy    create-time=voluptua.</code><ul>
+<li><code>maintenance-policy    create-time=erat</code><ul>
 <li>Output only. The time when the policy was created.</li>
 </ul>
 </li>
-<li><code>description=amet.</code><ul>
+<li><code>description=consetetur</code><ul>
 <li>Optional. Description of what this policy is for. Create/Update methods return INVALID_ARGUMENT if the length is greater than 512.</li>
 </ul>
 </li>
 <li>
-<p><code>update-time=consetetur</code></p>
+<p><code>update-time=amet.</code></p>
 <ul>
 <li>Output only. The time when the policy was last updated.</li>
 </ul>
 </li>
 <li>
-<p><code>..maintenance-schedule    can-reschedule=false</code></p>
+<p><code>..maintenance-schedule    can-reschedule=true</code></p>
 <ul>
 <li>If the scheduled maintenance can be rescheduled, default is true.</li>
 </ul>
 </li>
-<li><code>end-time=dolor</code><ul>
+<li><code>end-time=et</code><ul>
 <li>Output only. The end time of any upcoming scheduled maintenance for this instance.</li>
 </ul>
 </li>
-<li><code>schedule-deadline-time=et</code><ul>
+<li><code>schedule-deadline-time=accusam</code><ul>
 <li>Output only. The deadline that the maintenance schedule start time can not go beyond, including reschedule.</li>
 </ul>
 </li>
 <li>
-<p><code>start-time=et</code></p>
+<p><code>start-time=voluptua.</code></p>
 <ul>
 <li>Output only. The start time of any upcoming scheduled maintenance for this instance.</li>
 </ul>
 </li>
 <li>
-<p><code>..    memory-size-gb=6</code></p>
+<p><code>..    maintenance-version=dolore</code></p>
 <ul>
+<li>Optional. The self service update maintenance version. The version is date based such as &#34;20210712_00_00&#34;.</li>
+</ul>
+</li>
+<li><code>memory-size-gb=67</code><ul>
 <li>Required. Redis memory size in GiB.</li>
 </ul>
 </li>
-<li><code>name=stet</code><ul>
+<li><code>name=dolore</code><ul>
 <li>Required. Unique name of the resource in this scope including project and location using the form: <code>projects/{project_id}/locations/{location_id}/instances/{instance_id}</code> Note: Redis instances are managed and addressed at regional level so location_id here refers to a GCP region; however, users may choose which specific zone (or collection of zones for cross-zone instances) an instance should be provisioned in. Refer to location_id and alternative_location_id fields for more details.</li>
 </ul>
 </li>
-<li><code>persistence-config    persistence-mode=dolor</code><ul>
+<li><code>persistence-config    persistence-mode=voluptua.</code><ul>
 <li>Optional. Controls whether Persistence features are enabled. If not provided, the existing value will be used.</li>
 </ul>
 </li>
-<li><code>rdb-next-snapshot-time=duo</code><ul>
+<li><code>rdb-next-snapshot-time=amet.</code><ul>
 <li>Output only. The next time that a snapshot attempt is scheduled to occur.</li>
 </ul>
 </li>
-<li><code>rdb-snapshot-period=vero</code><ul>
+<li><code>rdb-snapshot-period=ea</code><ul>
 <li>Optional. Period between RDB snapshots. Snapshots will be attempted every period starting from the provided snapshot start time. For example, a start time of 01/01/2033 06:45 and SIX_HOURS snapshot period will do nothing until 01/01/2033, and then trigger snapshots every day at 06:45, 12:45, 18:45, and 00:45 the next day, and so on. If not provided, TWENTY_FOUR_HOURS will be used as default.</li>
 </ul>
 </li>
 <li>
-<p><code>rdb-snapshot-start-time=vero</code></p>
+<p><code>rdb-snapshot-start-time=sadipscing</code></p>
 <ul>
 <li>Optional. Date and time that the first snapshot was/will be attempted, and to which future snapshots will be aligned. If not provided, the current time will be used.</li>
 </ul>
 </li>
 <li>
-<p><code>..    persistence-iam-identity=invidunt</code></p>
+<p><code>..    persistence-iam-identity=lorem</code></p>
 <ul>
 <li>Output only. Cloud IAM identity used by import / export operations to transfer data to/from Cloud Storage. Format is &#34;serviceAccount:&#34;. The value may change over time for a given instance so should be checked before each import/export operation.</li>
 </ul>
 </li>
-<li><code>port=36</code><ul>
+<li><code>port=63</code><ul>
 <li>Output only. The port number of the exposed Redis endpoint.</li>
 </ul>
 </li>
-<li><code>read-endpoint=vero</code><ul>
+<li><code>read-endpoint=no</code><ul>
 <li>Output only. Hostname or IP address of the exposed readonly Redis endpoint. Standard tier only. Targets all healthy replica nodes in instance. Replication is asynchronous and replica nodes will exhibit some lag behind the primary. Write requests must target &#39;host&#39;.</li>
 </ul>
 </li>
-<li><code>read-endpoint-port=57</code><ul>
+<li><code>read-endpoint-port=94</code><ul>
 <li>Output only. The port number of the exposed readonly redis endpoint. Standard tier only. Write requests should target &#39;port&#39;.</li>
 </ul>
 </li>
-<li><code>read-replicas-mode=lorem</code><ul>
+<li><code>read-replicas-mode=at</code><ul>
 <li>Optional. Read replicas mode for the instance. Defaults to READ_REPLICAS_DISABLED.</li>
 </ul>
 </li>
-<li><code>redis-configs=key=diam</code><ul>
+<li><code>redis-configs=key=sed</code><ul>
 <li>Optional. Redis configuration parameters, according to http://redis.io/topics/config. Currently, the only supported parameters are: Redis version 3.2 and newer: * maxmemory-policy * notify-keyspace-events Redis version 4.0 and newer: * activedefrag * lfu-decay-time * lfu-log-factor * maxmemory-gb Redis version 5.0 and newer: * stream-node-max-bytes * stream-node-max-entries</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>redis-version=no</code><ul>
-<li>Optional. The version of Redis software. If not provided, latest supported version will be used. Currently, the supported values are: * <code>REDIS_3_2</code> for Redis 3.2 compatibility * <code>REDIS_4_0</code> for Redis 4.0 compatibility (default) * <code>REDIS_5_0</code> for Redis 5.0 compatibility * <code>REDIS_6_X</code> for Redis 6.x compatibility</li>
+<li><code>redis-version=sit</code><ul>
+<li>Optional. The version of Redis software. If not provided, latest supported version will be used. Currently, the supported values are: * <code>REDIS_3_2</code> for Redis 3.2 compatibility * <code>REDIS_4_0</code> for Redis 4.0 compatibility (default) * <code>REDIS_5_0</code> for Redis 5.0 compatibility * <code>REDIS_6_X</code> for Redis 6.x compatibility * <code>REDIS_7_0</code> for Redis 7.0 compatibility</li>
 </ul>
 </li>
-<li><code>replica-count=1</code><ul>
+<li><code>replica-count=66</code><ul>
 <li>Optional. The number of replica nodes. The valid range for the Standard Tier with read replicas enabled is [1-5] and defaults to 2. If read replicas are not enabled for a Standard Tier instance, the only valid value is 1 and the default is 1. The valid value for basic tier is 0 and the default is also 0.</li>
 </ul>
 </li>
-<li><code>reserved-ip-range=accusam</code><ul>
+<li><code>reserved-ip-range=tempor</code><ul>
 <li>Optional. For DIRECT_PEERING mode, the CIDR range of internal addresses that are reserved for this instance. Range must be unique and non-overlapping with existing subnets in an authorized network. For PRIVATE_SERVICE_ACCESS mode, the name of one allocated IP address ranges associated with this private service access connection. If not provided, the service will choose an unused /29 block, for example, 10.0.0.0/29 or 192.168.0.0/29. For READ_REPLICAS_ENABLED the default block size is /28.</li>
 </ul>
 </li>
-<li><code>secondary-ip-range=takimata</code><ul>
+<li><code>satisfies-pzi=true</code><ul>
+<li>Optional. Output only. Reserved for future use.</li>
+</ul>
+</li>
+<li><code>satisfies-pzs=true</code><ul>
+<li>Optional. Output only. Reserved for future use.</li>
+</ul>
+</li>
+<li><code>secondary-ip-range=et</code><ul>
 <li>Optional. Additional IP range for node placement. Required when enabling read replicas on an existing instance. For DIRECT_PEERING mode value must be a CIDR range of size /28, or &#34;auto&#34;. For PRIVATE_SERVICE_ACCESS mode value must be the name of an allocated address range associated with the private service access connection, or &#34;auto&#34;.</li>
 </ul>
 </li>
-<li><code>state=consetetur</code><ul>
+<li><code>state=sed</code><ul>
 <li>Output only. The current state of this instance.</li>
 </ul>
 </li>
-<li><code>status-message=voluptua.</code><ul>
+<li><code>status-message=no</code><ul>
 <li>Output only. Additional information about the current status of this instance, if available.</li>
 </ul>
 </li>
-<li><code>tier=et</code><ul>
+<li><code>suspension-reasons=et</code><ul>
+<li>Optional. reasons that causes instance in &#34;SUSPENDED&#34; state.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>tier=elitr</code><ul>
 <li>Required. The service tier of the instance.</li>
 </ul>
 </li>
-<li><code>transit-encryption-mode=erat</code><ul>
+<li><code>transit-encryption-mode=sed</code><ul>
 <li>Optional. The TLS mode of the Redis instance. If not provided, TLS is disabled for the instance.</li>
 </ul>
 </li>
@@ -513,32 +476,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_locations-instances-reschedule-maintenance" class="btn btn-neutral float-right" title="Locations Instances Reschedule Maintenance"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_locations-instances-list" class="btn btn-neutral" title="Locations Instances List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_locations-instances-list/" class="btn btn-neutral float-left" title="Locations Instances List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-instances-reschedule-maintenance/" class="btn btn-neutral float-right" title="Locations Instances Reschedule Maintenance">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -546,14 +501,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_locations-instances-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-instances-reschedule-maintenance" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/redis1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_locations-instances-list/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_locations-instances-reschedule-maintenance/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

@@ -1,275 +1,173 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Databases Patch - Firestore v3.0.0+20220221</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-firestore1-cli/projects_databases-patch/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Databases Patch - Firestore v5.0.4+20240226</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Databases Patch";
+        var mkdocs_page_input_path = "projects_databases-patch.md";
+        var mkdocs_page_url = "/google-apis-rs/google-firestore1-cli/projects_databases-patch/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Firestore v3.0.0+20220221</a>
-        
+          <a href=".." class="icon icon-home"> Firestore v5.0.4+20240226
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-collection-groups-fields-get">Databases Collection Groups Fields Get</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-collection-groups-fields-list">Databases Collection Groups Fields List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-collection-groups-fields-patch">Databases Collection Groups Fields Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-collection-groups-indexes-create">Databases Collection Groups Indexes Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-collection-groups-indexes-delete">Databases Collection Groups Indexes Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-collection-groups-indexes-get">Databases Collection Groups Indexes Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-collection-groups-indexes-list">Databases Collection Groups Indexes List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-batch-get">Databases Documents Batch Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-batch-write">Databases Documents Batch Write</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-begin-transaction">Databases Documents Begin Transaction</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-commit">Databases Documents Commit</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-create-document">Databases Documents Create Document</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-delete">Databases Documents Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-get">Databases Documents Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-list">Databases Documents List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-list-collection-ids">Databases Documents List Collection Ids</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-listen">Databases Documents Listen</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-partition-query">Databases Documents Partition Query</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-patch">Databases Documents Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-rollback">Databases Documents Rollback</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-run-query">Databases Documents Run Query</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-documents-write">Databases Documents Write</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-export-documents">Databases Export Documents</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-get">Databases Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-import-documents">Databases Import Documents</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-list">Databases List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-operations-cancel">Databases Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-operations-delete">Databases Operations Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-operations-get">Databases Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_databases-operations-list">Databases Operations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Databases Patch</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-get">Locations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-list">Locations List</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-backup-schedules-create/">Databases Backup Schedules Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-backup-schedules-delete/">Databases Backup Schedules Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-backup-schedules-get/">Databases Backup Schedules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-backup-schedules-list/">Databases Backup Schedules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-backup-schedules-patch/">Databases Backup Schedules Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-collection-groups-fields-get/">Databases Collection Groups Fields Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-collection-groups-fields-list/">Databases Collection Groups Fields List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-collection-groups-fields-patch/">Databases Collection Groups Fields Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-collection-groups-indexes-create/">Databases Collection Groups Indexes Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-collection-groups-indexes-delete/">Databases Collection Groups Indexes Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-collection-groups-indexes-get/">Databases Collection Groups Indexes Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-collection-groups-indexes-list/">Databases Collection Groups Indexes List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-create/">Databases Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-delete/">Databases Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-batch-get/">Databases Documents Batch Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-batch-write/">Databases Documents Batch Write</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-begin-transaction/">Databases Documents Begin Transaction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-commit/">Databases Documents Commit</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-create-document/">Databases Documents Create Document</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-delete/">Databases Documents Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-get/">Databases Documents Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-list/">Databases Documents List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-list-collection-ids/">Databases Documents List Collection Ids</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-list-documents/">Databases Documents List Documents</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-listen/">Databases Documents Listen</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-partition-query/">Databases Documents Partition Query</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-patch/">Databases Documents Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-rollback/">Databases Documents Rollback</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-run-aggregation-query/">Databases Documents Run Aggregation Query</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-run-query/">Databases Documents Run Query</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-documents-write/">Databases Documents Write</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-export-documents/">Databases Export Documents</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-get/">Databases Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-import-documents/">Databases Import Documents</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-list/">Databases List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-operations-cancel/">Databases Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-operations-delete/">Databases Operations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-operations-get/">Databases Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-operations-list/">Databases Operations List</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Databases Patch</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_databases-restore/">Databases Restore</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-backups-delete/">Locations Backups Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-backups-get/">Locations Backups Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-backups-list/">Locations Backups List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-list/">Locations List</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Firestore v5.0.4+20240226</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Databases Patch</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/firestore1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Databases Patch</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/firestore1-cli/edit/master/docs/projects_databases-patch.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates a database.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates a database.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -290,34 +188,78 @@ You can set the scope for this method like this: <code>firestore1 --scope &lt;sc
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>GoogleFirestoreAdminV1Database:
+  app-engine-integration-mode: string
   concurrency-mode: string
+  create-time: string
+  delete-protection-state: string
+  earliest-version-time: string
   etag: string
+  key-prefix: string
   location-id: string
   name: string
+  point-in-time-recovery-enablement: string
   type: string
+  uid: string
+  update-time: string
+  version-retention-period: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    concurrency-mode=et</code><ul>
+<li><code>-r .    app-engine-integration-mode=aliquyam</code><ul>
+<li>The App Engine integration mode to use for this database.</li>
+</ul>
+</li>
+<li><code>concurrency-mode=eos</code><ul>
 <li>The concurrency control mode to use for this database.</li>
 </ul>
 </li>
-<li><code>etag=sed</code><ul>
+<li><code>create-time=at</code><ul>
+<li>Output only. The timestamp at which this database was created. Databases created before 2016 do not populate create_time.</li>
+</ul>
+</li>
+<li><code>delete-protection-state=dolores</code><ul>
+<li>State of delete protection for the database.</li>
+</ul>
+</li>
+<li><code>earliest-version-time=consetetur</code><ul>
+<li>Output only. The earliest timestamp at which older versions of the data can be read from the database. See [version_retention_period] above; this field is populated with <code>now - version_retention_period</code>. This value is continuously updated, and becomes stale the moment it is queried. If you are using this value to recover data, make sure to account for the time from the moment when the value is queried to the moment when you initiate the recovery.</li>
+</ul>
+</li>
+<li><code>etag=gubergren</code><ul>
 <li>This checksum is computed by the server based on the value of other fields, and may be sent on update and delete requests to ensure the client has an up-to-date value before proceeding.</li>
 </ul>
 </li>
-<li><code>location-id=no</code><ul>
-<li>The location of the database. Available databases are listed at https://cloud.google.com/firestore/docs/locations.</li>
+<li><code>key-prefix=dolor</code><ul>
+<li>Output only. The key_prefix for this database. This key_prefix is used, in combination with the project id (&#34;~&#34;) to construct the application id that is returned from the Cloud Datastore APIs in Google App Engine first generation runtimes. This value may be empty in which case the appid to use for URL-encoded keys is the project_id (eg: foo instead of v~foo).</li>
 </ul>
 </li>
-<li><code>name=et</code><ul>
+<li><code>location-id=aliquyam</code><ul>
+<li>The location of the database. Available locations are listed at https://cloud.google.com/firestore/docs/locations.</li>
+</ul>
+</li>
+<li><code>name=no</code><ul>
 <li>The resource name of the Database. Format: <code>projects/{project}/databases/{database}</code></li>
 </ul>
 </li>
-<li><code>type=elitr</code><ul>
+<li><code>point-in-time-recovery-enablement=amet.</code><ul>
+<li>Whether to enable the PITR feature on this database.</li>
+</ul>
+</li>
+<li><code>type=ipsum</code><ul>
 <li>The type of the database. See https://cloud.google.com/datastore/docs/firestore-or-datastore for information about how to choose.</li>
+</ul>
+</li>
+<li><code>uid=lorem</code><ul>
+<li>Output only. The system-generated UUID4 for this Database.</li>
+</ul>
+</li>
+<li><code>update-time=accusam</code><ul>
+<li>Output only. The timestamp at which this database was most recently updated. Note this only includes updates to the database resource and not data contained by the database.</li>
+</ul>
+</li>
+<li><code>version-retention-period=gubergren</code><ul>
+<li>Output only. The period during which past versions of data are retained in the database. Any read or query can specify a <code>read_time</code> within this window, and will read the state of the database at that time. If the PITR feature is enabled, the retention period is 7 days. Otherwise, the retention period is 1 hour.</li>
 </ul>
 </li>
 </ul>
@@ -420,32 +362,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_locations-get" class="btn btn-neutral float-right" title="Locations Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_databases-operations-list" class="btn btn-neutral" title="Databases Operations List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_databases-operations-list/" class="btn btn-neutral float-left" title="Databases Operations List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_databases-restore/" class="btn btn-neutral float-right" title="Databases Restore">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -453,14 +387,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_databases-operations-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-get" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/firestore1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_databases-operations-list/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_databases-restore/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

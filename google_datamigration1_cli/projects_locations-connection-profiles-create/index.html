@@ -1,255 +1,201 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Locations Connection Profiles Create - Database Migration Service v3.0.0+20220216</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-datamigration1-cli/projects_locations-connection-profiles-create/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Locations Connection Profiles Create - Database Migration Service v5.0.4+20240221</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Locations Connection Profiles Create";
+        var mkdocs_page_input_path = "projects_locations-connection-profiles-create.md";
+        var mkdocs_page_url = "/google-apis-rs/google-datamigration1-cli/projects_locations-connection-profiles-create/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Database Migration Service v3.0.0+20220216</a>
-        
+          <a href=".." class="icon icon-home"> Database Migration Service v5.0.4+20240221
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Locations Connection Profiles Create</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connection-profiles-delete">Locations Connection Profiles Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connection-profiles-get">Locations Connection Profiles Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connection-profiles-get-iam-policy">Locations Connection Profiles Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connection-profiles-list">Locations Connection Profiles List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connection-profiles-patch">Locations Connection Profiles Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connection-profiles-set-iam-policy">Locations Connection Profiles Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connection-profiles-test-iam-permissions">Locations Connection Profiles Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-get">Locations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-list">Locations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-migration-jobs-create">Locations Migration Jobs Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-migration-jobs-delete">Locations Migration Jobs Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-migration-jobs-generate-ssh-script">Locations Migration Jobs Generate Ssh Script</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-migration-jobs-get">Locations Migration Jobs Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-migration-jobs-get-iam-policy">Locations Migration Jobs Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-migration-jobs-list">Locations Migration Jobs List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-migration-jobs-patch">Locations Migration Jobs Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-migration-jobs-promote">Locations Migration Jobs Promote</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-migration-jobs-restart">Locations Migration Jobs Restart</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-migration-jobs-resume">Locations Migration Jobs Resume</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-migration-jobs-set-iam-policy">Locations Migration Jobs Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-migration-jobs-start">Locations Migration Jobs Start</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-migration-jobs-stop">Locations Migration Jobs Stop</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-migration-jobs-test-iam-permissions">Locations Migration Jobs Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-migration-jobs-verify">Locations Migration Jobs Verify</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-delete">Locations Operations Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Locations Connection Profiles Create</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connection-profiles-delete/">Locations Connection Profiles Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connection-profiles-get/">Locations Connection Profiles Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connection-profiles-get-iam-policy/">Locations Connection Profiles Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connection-profiles-list/">Locations Connection Profiles List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connection-profiles-patch/">Locations Connection Profiles Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connection-profiles-set-iam-policy/">Locations Connection Profiles Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connection-profiles-test-iam-permissions/">Locations Connection Profiles Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-apply/">Locations Conversion Workspaces Apply</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-commit/">Locations Conversion Workspaces Commit</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-convert/">Locations Conversion Workspaces Convert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-create/">Locations Conversion Workspaces Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-delete/">Locations Conversion Workspaces Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-describe-conversion-workspace-revisions/">Locations Conversion Workspaces Describe Conversion Workspace Revisions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-describe-database-entities/">Locations Conversion Workspaces Describe Database Entities</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-get/">Locations Conversion Workspaces Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-get-iam-policy/">Locations Conversion Workspaces Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-list/">Locations Conversion Workspaces List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-mapping-rules-create/">Locations Conversion Workspaces Mapping Rules Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-mapping-rules-delete/">Locations Conversion Workspaces Mapping Rules Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-mapping-rules-get/">Locations Conversion Workspaces Mapping Rules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-mapping-rules-import/">Locations Conversion Workspaces Mapping Rules Import</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-mapping-rules-list/">Locations Conversion Workspaces Mapping Rules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-patch/">Locations Conversion Workspaces Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-rollback/">Locations Conversion Workspaces Rollback</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-search-background-jobs/">Locations Conversion Workspaces Search Background Jobs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-seed/">Locations Conversion Workspaces Seed</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-set-iam-policy/">Locations Conversion Workspaces Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-conversion-workspaces-test-iam-permissions/">Locations Conversion Workspaces Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-fetch-static-ips/">Locations Fetch Static Ips</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-list/">Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-create/">Locations Migration Jobs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-delete/">Locations Migration Jobs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-demote-destination/">Locations Migration Jobs Demote Destination</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-generate-ssh-script/">Locations Migration Jobs Generate Ssh Script</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-generate-tcp-proxy-script/">Locations Migration Jobs Generate Tcp Proxy Script</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-get/">Locations Migration Jobs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-get-iam-policy/">Locations Migration Jobs Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-list/">Locations Migration Jobs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-patch/">Locations Migration Jobs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-promote/">Locations Migration Jobs Promote</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-restart/">Locations Migration Jobs Restart</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-resume/">Locations Migration Jobs Resume</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-set-iam-policy/">Locations Migration Jobs Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-start/">Locations Migration Jobs Start</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-stop/">Locations Migration Jobs Stop</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-test-iam-permissions/">Locations Migration Jobs Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-migration-jobs-verify/">Locations Migration Jobs Verify</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-delete/">Locations Operations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-private-connections-create/">Locations Private Connections Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-private-connections-delete/">Locations Private Connections Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-private-connections-get/">Locations Private Connections Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-private-connections-get-iam-policy/">Locations Private Connections Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-private-connections-list/">Locations Private Connections List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-private-connections-set-iam-policy/">Locations Private Connections Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-private-connections-test-iam-permissions/">Locations Private Connections Test Iam Permissions</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Database Migration Service v5.0.4+20240221</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Locations Connection Profiles Create</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/datamigration1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Locations Connection Profiles Create</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/datamigration1-cli/edit/master/docs/projects_locations-connection-profiles-create.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Creates a new connection profile in a given project and location.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Creates a new connection profile in a given project and location.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -257,7 +203,7 @@ You can set the scope for this method like this: <code>datamigration1 --scope &l
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
-<li>Required. The parent, which owns this collection of connection profiles.</li>
+<li>Required. The parent which owns this collection of connection profiles.</li>
 </ul>
 </li>
 </ul>
@@ -266,25 +212,51 @@ You can set the scope for this method like this: <code>datamigration1 --scope &l
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
 <pre><code>ConnectionProfile:
+  alloydb:
+    cluster-id: string
+    settings:
+      database-version: string
+      encryption-config:
+        kms-key-name: string
+      initial-user:
+        password: string
+        password-set: boolean
+        user: string
+      labels: { string: string }
+      primary-instance-settings:
+        database-flags: { string: string }
+        id: string
+        labels: { string: string }
+        machine-config:
+          cpu-count: integer
+        private-ip: string
+      vpc-network: string
   cloudsql:
+    additional-public-ip: string
     cloud-sql-id: string
     private-ip: string
     public-ip: string
     settings:
       activation-policy: string
       auto-storage-increase: boolean
+      availability-type: string
       cmek-key-name: string
       collation: string
+      data-cache-config:
+        data-cache-enabled: boolean
       data-disk-size-gb: string
       data-disk-type: string
       database-flags: { string: string }
       database-version: string
+      edition: string
       ip-config:
+        allocated-ip-range: string
         enable-ipv4: boolean
         private-network: string
         require-ssl: boolean
       root-password: string
       root-password-set: boolean
+      secondary-zone: string
       source-id: string
       storage-auto-resize-limit: string
       tier: string
@@ -309,12 +281,36 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       type: string
     username: string
   name: string
-  postgresql:
-    cloud-sql-id: string
+  oracle:
+    database-service: string
+    forward-ssh-connectivity:
+      hostname: string
+      password: string
+      port: integer
+      private-key: string
+      username: string
     host: string
     password: string
     password-set: boolean
     port: integer
+    private-connectivity:
+      private-connection: string
+    ssl:
+      ca-certificate: string
+      client-certificate: string
+      client-key: string
+      type: string
+    username: string
+  postgresql:
+    alloydb-cluster-id: string
+    cloud-sql-id: string
+    host: string
+    network-architecture: string
+    password: string
+    password-set: boolean
+    port: integer
+    private-service-connect-connectivity:
+      service-attachment: string
     ssl:
       ca-certificate: string
       client-certificate: string
@@ -326,46 +322,132 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   update-time: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .cloudsql    cloud-sql-id=et</code><ul>
+<li><code>-r .alloydb    cluster-id=et</code><ul>
+<li>Required. The AlloyDB cluster ID that this connection profile is associated with.</li>
+</ul>
+</li>
+<li><code>settings    database-version=magna</code><ul>
+<li>Optional. The database engine major version. This is an optional field. If a database version is not supplied at cluster creation time, then a default database version will be used.</li>
+</ul>
+</li>
+<li>
+<p><code>encryption-config    kms-key-name=no</code></p>
+<ul>
+<li>The fully-qualified resource name of the KMS key. Each Cloud KMS key is regionalized and has the following format: projects/[PROJECT]/locations/[REGION]/keyRings/[RING]/cryptoKeys/[KEY_NAME]</li>
+</ul>
+</li>
+<li>
+<p><code>..initial-user    password=ipsum</code></p>
+<ul>
+<li>The initial password for the user.</li>
+</ul>
+</li>
+<li><code>password-set=false</code><ul>
+<li>Output only. Indicates if the initial_user.password field has been set.</li>
+</ul>
+</li>
+<li>
+<p><code>user=amet.</code></p>
+<ul>
+<li>The database username.</li>
+</ul>
+</li>
+<li>
+<p><code>..    labels=key=takimata</code></p>
+<ul>
+<li>Labels for the AlloyDB cluster created by DMS. An object containing a list of &#39;key&#39;, &#39;value&#39; pairs.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>primary-instance-settings    database-flags=key=amet.</code><ul>
+<li>Database flags to pass to AlloyDB when DMS is creating the AlloyDB cluster and instances. See the AlloyDB documentation for how these can be used.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>id=duo</code><ul>
+<li>Required. The ID of the AlloyDB primary instance. The ID must satisfy the regex expression &#34;[a-z0-9-]+&#34;.</li>
+</ul>
+</li>
+<li><code>labels=key=ipsum</code><ul>
+<li>Labels for the AlloyDB primary instance created by DMS. An object containing a list of &#39;key&#39;, &#39;value&#39; pairs.</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li>
+<p><code>machine-config    cpu-count=39</code></p>
+<ul>
+<li>The number of CPU&#39;s in the VM instance.</li>
+</ul>
+</li>
+<li>
+<p><code>..    private-ip=lorem</code></p>
+<ul>
+<li>Output only. The private IP address for the Instance. This is the connection endpoint for an end-user application.</li>
+</ul>
+</li>
+<li>
+<p><code>..    vpc-network=gubergren</code></p>
+<ul>
+<li>Required. The resource link for the VPC network in which cluster resources are created and from which they are accessible via Private IP. The network must belong to the same project as the cluster. It is specified in the form: &#34;projects/{project_number}/global/networks/{network_id}&#34;. This is required to create a cluster.</li>
+</ul>
+</li>
+<li>
+<p><code>...cloudsql    additional-public-ip=eos</code></p>
+<ul>
+<li>Output only. The Cloud SQL database instance&#39;s additional (outgoing) public IP. Used when the Cloud SQL database availability type is REGIONAL (i.e. multiple zones / highly available).</li>
+</ul>
+</li>
+<li><code>cloud-sql-id=dolor</code><ul>
 <li>Output only. The Cloud SQL instance ID that this connection profile is associated with.</li>
 </ul>
 </li>
-<li><code>private-ip=magna</code><ul>
+<li><code>private-ip=ea</code><ul>
 <li>Output only. The Cloud SQL database instance&#39;s private IP.</li>
 </ul>
 </li>
-<li><code>public-ip=no</code><ul>
+<li><code>public-ip=ipsum</code><ul>
 <li>Output only. The Cloud SQL database instance&#39;s public IP.</li>
 </ul>
 </li>
-<li><code>settings    activation-policy=ipsum</code><ul>
+<li><code>settings    activation-policy=invidunt</code><ul>
 <li>The activation policy specifies when the instance is activated; it is applicable only when the instance state is &#39;RUNNABLE&#39;. Valid values: &#39;ALWAYS&#39;: The instance is on, and remains so even in the absence of connection requests. <code>NEVER</code>: The instance is off; it is not activated, even if a connection request arrives.</li>
 </ul>
 </li>
-<li><code>auto-storage-increase=false</code><ul>
+<li><code>auto-storage-increase=true</code><ul>
 <li>[default: ON] If you enable this setting, Cloud SQL checks your available storage every 30 seconds. If the available storage falls below a threshold size, Cloud SQL automatically adds additional storage capacity. If the available storage repeatedly falls below the threshold size, Cloud SQL continues to add storage until it reaches the maximum of 30 TB.</li>
 </ul>
 </li>
-<li><code>cmek-key-name=amet.</code><ul>
+<li><code>availability-type=duo</code><ul>
+<li>Optional. Availability type. Potential values: * <code>ZONAL</code>: The instance serves data from only one zone. Outages in that zone affect data availability. * <code>REGIONAL</code>: The instance can serve data from more than one zone in a region (it is highly available).</li>
+</ul>
+</li>
+<li><code>cmek-key-name=ipsum</code><ul>
 <li>The KMS key name used for the csql instance.</li>
 </ul>
 </li>
-<li><code>collation=takimata</code><ul>
+<li><code>collation=sed</code><ul>
 <li>The Cloud SQL default instance level collation.</li>
 </ul>
 </li>
-<li><code>data-disk-size-gb=amet.</code><ul>
+<li>
+<p><code>data-cache-config    data-cache-enabled=true</code></p>
+<ul>
+<li>Optional. Whether data cache is enabled for the instance.</li>
+</ul>
+</li>
+<li>
+<p><code>..    data-disk-size-gb=ipsum</code></p>
+<ul>
 <li>The storage capacity available to the database, in GB. The minimum (and default) size is 10GB.</li>
 </ul>
 </li>
-<li><code>data-disk-type=duo</code><ul>
+<li><code>data-disk-type=ipsum</code><ul>
 <li>The type of storage: <code>PD_SSD</code> (default) or <code>PD_HDD</code>.</li>
 </ul>
 </li>
-<li><code>database-flags=key=ipsum</code><ul>
+<li><code>database-flags=key=est</code><ul>
 <li>The database flags passed to the Cloud SQL instance at startup. An object containing a list of &#34;key&#34;: value pairs. Example: { &#34;name&#34;: &#34;wrench&#34;, &#34;mass&#34;: &#34;1.3kg&#34;, &#34;count&#34;: &#34;3&#34; }.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
@@ -374,11 +456,19 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>The database engine type and version.</li>
 </ul>
 </li>
-<li><code>ip-config    enable-ipv4=true</code><ul>
+<li><code>edition=ea</code><ul>
+<li>Optional. The edition of the given Cloud SQL instance.</li>
+</ul>
+</li>
+<li><code>ip-config    allocated-ip-range=dolor</code><ul>
+<li>Optional. The name of the allocated IP address range for the private IP Cloud SQL instance. This name refers to an already allocated IP range address. If set, the instance IP address will be created in the allocated range. Note that this IP address range can&#39;t be modified after the instance is created. If you change the VPC when configuring connectivity settings for the migration job, this field is not relevant.</li>
+</ul>
+</li>
+<li><code>enable-ipv4=true</code><ul>
 <li>Whether the instance should be assigned an IPv4 address or not.</li>
 </ul>
 </li>
-<li><code>private-network=gubergren</code><ul>
+<li><code>private-network=eos</code><ul>
 <li>The resource link for the VPC network from which the Cloud SQL instance is accessible for private IP. For example, <code>projects/myProject/global/networks/default</code>. This setting can be updated, but it cannot be removed after it is set.</li>
 </ul>
 </li>
@@ -389,28 +479,32 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    root-password=dolor</code></p>
+<p><code>..    root-password=sed</code></p>
 <ul>
 <li>Input only. Initial root password.</li>
 </ul>
 </li>
-<li><code>root-password-set=true</code><ul>
+<li><code>root-password-set=false</code><ul>
 <li>Output only. Indicates If this connection profile root password is stored.</li>
 </ul>
 </li>
-<li><code>source-id=invidunt</code><ul>
+<li><code>secondary-zone=sed</code><ul>
+<li>Optional. The Google Cloud Platform zone where the failover Cloud SQL database instance is located. Used when the Cloud SQL database availability type is REGIONAL (i.e. multiple zones / highly available).</li>
+</ul>
+</li>
+<li><code>source-id=no</code><ul>
 <li>The Database Migration Service source connection profile ID, in the format: <code>projects/my_project_name/locations/us-central1/connectionProfiles/connection_profile_ID</code></li>
 </ul>
 </li>
-<li><code>storage-auto-resize-limit=amet</code><ul>
+<li><code>storage-auto-resize-limit=stet</code><ul>
 <li>The maximum size to which storage capacity can be automatically increased. The default value is 0, which specifies that there is no limit.</li>
 </ul>
 </li>
-<li><code>tier=duo</code><ul>
+<li><code>tier=kasd</code><ul>
 <li>The tier (or machine type) for this instance, for example: <code>db-n1-standard-1</code> (MySQL instances) or <code>db-custom-1-3840</code> (PostgreSQL instances). For more information, see <a href="https://cloud.google.com/sql/docs/mysql/instance-settings">Cloud SQL Instance Settings</a>.</li>
 </ul>
 </li>
-<li><code>user-labels=key=ipsum</code><ul>
+<li><code>user-labels=key=et</code><ul>
 <li>The resource labels for a Cloud SQL instance to use to annotate any related underlying resources such as Compute Engine VMs. An object containing a list of &#34;key&#34;: &#34;value&#34; pairs. Example: <code>{ &amp;#34;name&amp;#34;: &amp;#34;wrench&amp;#34;, &amp;#34;mass&amp;#34;: &amp;#34;18kg&amp;#34;, &amp;#34;count&amp;#34;: &amp;#34;3&amp;#34; }</code>.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
@@ -418,45 +512,45 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>zone=sed</code></p>
 <ul>
-<li>The Google Cloud Platform zone where your Cloud SQL datdabse instance is located.</li>
+<li>The Google Cloud Platform zone where your Cloud SQL database instance is located.</li>
 </ul>
 </li>
 <li>
-<p><code>...    create-time=ut</code></p>
+<p><code>...    create-time=et</code></p>
 <ul>
 <li>Output only. The timestamp when the resource was created. A timestamp in RFC3339 UTC &#34;Zulu&#34; format, accurate to nanoseconds. Example: &#34;2014-10-02T15:01:23.045123456Z&#34;.</li>
 </ul>
 </li>
-<li><code>display-name=gubergren</code><ul>
+<li><code>display-name=et</code><ul>
 <li>The connection profile display name.</li>
 </ul>
 </li>
-<li><code>error    code=85</code><ul>
+<li><code>error    code=25</code><ul>
 <li>The status code, which should be an enum value of google.rpc.Code.</li>
 </ul>
 </li>
 <li>
-<p><code>message=est</code></p>
+<p><code>message=erat</code></p>
 <ul>
 <li>A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.</li>
 </ul>
 </li>
 <li>
-<p><code>..    labels=key=ipsum</code></p>
+<p><code>..    labels=key=sed</code></p>
 <ul>
 <li>The resource labels for connection profile to use to annotate any related underlying resources such as Compute Engine VMs. An object containing a list of &#34;key&#34;: &#34;value&#34; pairs. Example: <code>{ &amp;#34;name&amp;#34;: &amp;#34;wrench&amp;#34;, &amp;#34;mass&amp;#34;: &amp;#34;1.3kg&amp;#34;, &amp;#34;count&amp;#34;: &amp;#34;3&amp;#34; }</code>.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>mysql    cloud-sql-id=ipsum</code><ul>
+<li><code>mysql    cloud-sql-id=duo</code><ul>
 <li>If the source is a Cloud SQL database, use this field to provide the Cloud SQL instance ID of the source.</li>
 </ul>
 </li>
-<li><code>host=est</code><ul>
+<li><code>host=dolore</code><ul>
 <li>Required. The IP or hostname of the source MySQL database.</li>
 </ul>
 </li>
-<li><code>password=gubergren</code><ul>
+<li><code>password=et</code><ul>
 <li>Required. Input only. The password for the user that Database Migration Service will be using to connect to the database. This field is not returned on request, and the value is encrypted when stored in Database Migration Service.</li>
 </ul>
 </li>
@@ -464,49 +558,135 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Output only. Indicates If this connection profile password is stored.</li>
 </ul>
 </li>
-<li><code>port=45</code><ul>
+<li><code>port=9</code><ul>
 <li>Required. The network port of the source MySQL database.</li>
 </ul>
 </li>
-<li><code>ssl    ca-certificate=eos</code><ul>
+<li><code>ssl    ca-certificate=dolor</code><ul>
 <li>Required. Input only. The x509 PEM-encoded certificate of the CA that signed the source database server&#39;s certificate. The replica will use this certificate to verify it&#39;s connecting to the right host.</li>
 </ul>
 </li>
-<li><code>client-certificate=labore</code><ul>
+<li><code>client-certificate=et</code><ul>
 <li>Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.If this field is used then the &#39;client_key&#39; field is mandatory.</li>
 </ul>
 </li>
-<li><code>client-key=sed</code><ul>
+<li><code>client-key=et</code><ul>
 <li>Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate. If this field is used then the &#39;client_certificate&#39; field is mandatory.</li>
 </ul>
 </li>
 <li>
-<p><code>type=duo</code></p>
+<p><code>type=sadipscing</code></p>
 <ul>
 <li>Output only. The ssl config type according to &#39;client_key&#39;, &#39;client_certificate&#39; and &#39;ca_certificate&#39;.</li>
 </ul>
 </li>
 <li>
-<p><code>..    username=sed</code></p>
+<p><code>..    username=stet</code></p>
 <ul>
 <li>Required. The username that Database Migration Service will use to connect to the database. The value is encrypted when stored in Database Migration Service.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=no</code></p>
+<p><code>..    name=dolor</code></p>
 <ul>
 <li>The name of this connection profile resource in the form of projects/{project}/locations/{location}/connectionProfiles/{connectionProfile}.</li>
 </ul>
 </li>
-<li><code>postgresql    cloud-sql-id=stet</code><ul>
+<li><code>oracle    database-service=duo</code><ul>
+<li>Required. Database service for the Oracle connection.</li>
+</ul>
+</li>
+<li><code>forward-ssh-connectivity    hostname=vero</code><ul>
+<li>Required. Hostname for the SSH tunnel.</li>
+</ul>
+</li>
+<li><code>password=vero</code><ul>
+<li>Input only. SSH password.</li>
+</ul>
+</li>
+<li><code>port=13</code><ul>
+<li>Port for the SSH tunnel, default value is 22.</li>
+</ul>
+</li>
+<li><code>private-key=stet</code><ul>
+<li>Input only. SSH private key.</li>
+</ul>
+</li>
+<li>
+<p><code>username=vero</code></p>
+<ul>
+<li>Required. Username for the SSH tunnel.</li>
+</ul>
+</li>
+<li>
+<p><code>..    host=elitr</code></p>
+<ul>
+<li>Required. The IP or hostname of the source Oracle database.</li>
+</ul>
+</li>
+<li><code>password=lorem</code><ul>
+<li>Required. Input only. The password for the user that Database Migration Service will be using to connect to the database. This field is not returned on request, and the value is encrypted when stored in Database Migration Service.</li>
+</ul>
+</li>
+<li><code>password-set=true</code><ul>
+<li>Output only. Indicates whether a new password is included in the request.</li>
+</ul>
+</li>
+<li><code>port=1</code><ul>
+<li>Required. The network port of the source Oracle database.</li>
+</ul>
+</li>
+<li>
+<p><code>private-connectivity    private-connection=accusam</code></p>
+<ul>
+<li>Required. The resource name (URI) of the private connection.</li>
+</ul>
+</li>
+<li>
+<p><code>..ssl    ca-certificate=takimata</code></p>
+<ul>
+<li>Required. Input only. The x509 PEM-encoded certificate of the CA that signed the source database server&#39;s certificate. The replica will use this certificate to verify it&#39;s connecting to the right host.</li>
+</ul>
+</li>
+<li><code>client-certificate=consetetur</code><ul>
+<li>Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.If this field is used then the &#39;client_key&#39; field is mandatory.</li>
+</ul>
+</li>
+<li><code>client-key=voluptua.</code><ul>
+<li>Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate. If this field is used then the &#39;client_certificate&#39; field is mandatory.</li>
+</ul>
+</li>
+<li>
+<p><code>type=et</code></p>
+<ul>
+<li>Output only. The ssl config type according to &#39;client_key&#39;, &#39;client_certificate&#39; and &#39;ca_certificate&#39;.</li>
+</ul>
+</li>
+<li>
+<p><code>..    username=erat</code></p>
+<ul>
+<li>Required. The username that Database Migration Service will use to connect to the database. The value is encrypted when stored in Database Migration Service.</li>
+</ul>
+</li>
+<li>
+<p><code>..postgresql    alloydb-cluster-id=consetetur</code></p>
+<ul>
+<li>Optional. If the destination is an AlloyDB database, use this field to provide the AlloyDB cluster ID.</li>
+</ul>
+</li>
+<li><code>cloud-sql-id=amet.</code><ul>
 <li>If the source is a Cloud SQL database, use this field to provide the Cloud SQL instance ID of the source.</li>
 </ul>
 </li>
-<li><code>host=kasd</code><ul>
+<li><code>host=sed</code><ul>
 <li>Required. The IP or hostname of the source PostgreSQL database.</li>
 </ul>
 </li>
-<li><code>password=et</code><ul>
+<li><code>network-architecture=takimata</code><ul>
+<li>Output only. If the source is a Cloud SQL database, this field indicates the network architecture it&#39;s associated with.</li>
+</ul>
+</li>
+<li><code>password=dolores</code><ul>
 <li>Required. Input only. The password for the user that Database Migration Service will be using to connect to the database. This field is not returned on request, and the value is encrypted when stored in Database Migration Service.</li>
 </ul>
 </li>
@@ -514,45 +694,53 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Output only. Indicates If this connection profile password is stored.</li>
 </ul>
 </li>
-<li><code>port=77</code><ul>
+<li><code>port=27</code><ul>
 <li>Required. The network port of the source PostgreSQL database.</li>
 </ul>
 </li>
-<li><code>ssl    ca-certificate=et</code><ul>
+<li>
+<p><code>private-service-connect-connectivity    service-attachment=accusam</code></p>
+<ul>
+<li>Required. A service attachment that exposes a database, and has the following format: projects/{project}/regions/{region}/serviceAttachments/{service_attachment_name}</li>
+</ul>
+</li>
+<li>
+<p><code>..ssl    ca-certificate=voluptua.</code></p>
+<ul>
 <li>Required. Input only. The x509 PEM-encoded certificate of the CA that signed the source database server&#39;s certificate. The replica will use this certificate to verify it&#39;s connecting to the right host.</li>
 </ul>
 </li>
-<li><code>client-certificate=vero</code><ul>
+<li><code>client-certificate=dolore</code><ul>
 <li>Input only. The x509 PEM-encoded certificate that will be used by the replica to authenticate against the source database server.If this field is used then the &#39;client_key&#39; field is mandatory.</li>
 </ul>
 </li>
-<li><code>client-key=erat</code><ul>
+<li><code>client-key=dolore</code><ul>
 <li>Input only. The unencrypted PKCS#1 or PKCS#8 PEM-encoded private key associated with the Client Certificate. If this field is used then the &#39;client_certificate&#39; field is mandatory.</li>
 </ul>
 </li>
 <li>
-<p><code>type=sed</code></p>
+<p><code>type=dolore</code></p>
 <ul>
 <li>Output only. The ssl config type according to &#39;client_key&#39;, &#39;client_certificate&#39; and &#39;ca_certificate&#39;.</li>
 </ul>
 </li>
 <li>
-<p><code>..    username=duo</code></p>
+<p><code>..    username=voluptua.</code></p>
 <ul>
 <li>Required. The username that Database Migration Service will use to connect to the database. The value is encrypted when stored in Database Migration Service.</li>
 </ul>
 </li>
 <li>
-<p><code>..    provider=dolore</code></p>
+<p><code>..    provider=amet.</code></p>
 <ul>
 <li>The database provider.</li>
 </ul>
 </li>
-<li><code>state=et</code><ul>
+<li><code>state=ea</code><ul>
 <li>The current connection profile state (e.g. DRAFT, READY, or FAILED).</li>
 </ul>
 </li>
-<li><code>update-time=voluptua.</code><ul>
+<li><code>update-time=sadipscing</code><ul>
 <li>Output only. The timestamp when the resource was last updated. A timestamp in RFC3339 UTC &#34;Zulu&#34; format, accurate to nanoseconds. Example: &#34;2014-10-02T15:01:23.045123456Z&#34;.</li>
 </ul>
 </li>
@@ -590,7 +778,19 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p request-id=string</strong></p>
 <ul>
-<li>A unique id used to identify the request. If the server receives two requests with the same id, then the second request will be ignored. It is recommended to always set this value to a UUID. The id must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.</li>
+<li>Optional. A unique ID used to identify the request. If the server receives two requests with the same ID, then the second request is ignored. It is recommended to always set this value to a UUID. The ID must contain only letters (a-z, A-Z), numbers (0-9), underscores (_), and hyphens (-). The maximum length is 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p skip-validation=boolean</strong></p>
+<ul>
+<li>Optional. Create the connection profile without validating it. The default is false. Only supported for Oracle connection profiles.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p validate-only=boolean</strong></p>
+<ul>
+<li>Optional. Only validate the connection profile, but don&#39;t create any resources. The default is false. Only supported for Oracle connection profiles.</li>
 </ul>
 </li>
 </ul>
@@ -664,32 +864,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_locations-connection-profiles-delete" class="btn btn-neutral float-right" title="Locations Connection Profiles Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-connection-profiles-delete/" class="btn btn-neutral float-right" title="Locations Connection Profiles Delete">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -697,14 +889,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-connection-profiles-delete" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/datamigration1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_locations-connection-profiles-delete/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

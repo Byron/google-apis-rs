@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["SecAuthenticationType","SecProtocolType"],"fn":["find_generic_password","find_internet_password"],"struct":["SecKeychainItemPassword"]};

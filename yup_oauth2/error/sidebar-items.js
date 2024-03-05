@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["AuthErrorCode","Error"],"struct":["AuthError"]};

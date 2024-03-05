@@ -1,181 +1,123 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>coordinate v3.0.0+20150811</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="./css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="./css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="./js/highlight.pack.js"></script>
-  <script src="./js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="A complete library to interact with coordinate (protocol v1)" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-coordinate1-cli/" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>coordinate v5.0.4+20150811</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Home";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = "/google-apis-rs/google-coordinate1-cli/";
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> coordinate v3.0.0+20150811</a>
-        
+          <a href="." class="icon icon-home"> coordinate v5.0.4+20150811
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Custom Field Def</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="custom-field-def_list/">List</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+    <ul class="current">
+    </ul>
                 </li>
-            
-        
-
-    
-        
-        <span>Jobs</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="jobs_get/">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="jobs_insert/">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="jobs_list/">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="jobs_patch/">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="jobs_update/">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Location</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="location_list/">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Schedule</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="schedule_get/">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="schedule_patch/">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="schedule_update/">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Team</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="team_list/">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Worker</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="worker_list/">List</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Field Def</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="custom-field-def_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Jobs</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="jobs_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="jobs_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="jobs_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="jobs_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="jobs_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Location</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="location_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Schedule</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="schedule_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="schedule_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="schedule_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Team</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="team_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Worker</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="worker_list/">List</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href="."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">coordinate v5.0.4+20150811</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".">Docs</a> &raquo;</li>
-    <li>Home</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/coordinate1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+      <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/coordinate1-cli/edit/master/docs/index.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <!---
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <!---
 DO NOT EDIT !
-This file was generated automatically from 'src/mako/cli/README.md.mako'
+This file was generated automatically from 'src/generator/templates/cli/README.md.mako'
 DO NOT EDIT !
 -->
-
 <p>The <code>coordinate1</code> command-line interface <em>(CLI)</em> allows to use most features of the <em>Google coordinate</em> service from the comfort of your terminal.</p>
 <p>By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.</p>
@@ -184,13 +126,12 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 <a href="https://developers.google.com/coordinate/">official documentation site</a>.</p>
 <h1 id="installation-and-source-code">Installation and Source Code</h1>
 <p>Install the command-line interface with cargo using:</p>
-<pre><code class="bash">cargo install google-coordinate1-cli
+<pre><code class="language-bash">cargo install google-coordinate1-cli
 </code></pre>
-
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/coordinate1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>coordinate</em> API at revision <em>20150811</em>. The CLI is at version <em>3.0.0</em>.</p>
-<pre><code class="bash">coordinate1 [options]
+<p>This documentation was generated from the <em>coordinate</em> API at revision <em>20150811</em>. The CLI is at version <em>5.0.4</em>.</p>
+<pre><code class="language-bash">coordinate1 [options]
         custom-field-def
                 list &lt;team-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
         jobs
@@ -222,7 +163,6 @@ Configuration:
             [default: ~/.google-service-cli]
 
 </code></pre>
-
 <h1 id="configuration">Configuration</h1>
 <p>The program will store all persistent data in the <code>~/.google-service-cli</code> directory in <em>JSON</em> files prefixed with <code>coordinate1-</code>.  You can change the directory used to store configuration with the <code>--config-dir</code> flag on a per-invocation basis.</p>
 <p>More information about the various kinds of persistent data are given in the following paragraphs.</p>
@@ -257,30 +197,23 @@ what exactly led to a particular issue. This is done by allowing all client-serv
 output to standard error <em>as-is</em>.</p>
 <p>The <code>--debug</code> flag will print errors using the <code>Debug</code> representation to standard error.</p>
 <p>You may consider redirecting standard error into a file for ease of use, e.g. <code>coordinate1 --debug &lt;resource&gt; &lt;method&gt; [options] 2&gt;debug.txt</code>.</p>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="custom-field-def_list/" class="btn btn-neutral float-right" title="List"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="custom-field-def_list/" class="btn btn-neutral float-right" title="List">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -288,14 +221,33 @@ output to standard error <em>as-is</em>.</p>
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="custom-field-def_list/" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/coordinate1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+      <span><a href="custom-field-def_list/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>
+
+<!--
+MkDocs version : 1.3.1
+Build Date UTC : 2024-03-05 20:04:40.858024+00:00
+-->

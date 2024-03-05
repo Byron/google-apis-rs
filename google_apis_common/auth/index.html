@@ -1,0 +1,65 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Authentication for Google API endpoints"><title>google_apis_common::auth - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="google_apis_common" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../google_apis_common/index.html">google_apis_common</a><span class="version">6.0.1</span></h2></div><h2 class="location"><a href="#">Module auth</a></h2><div class="sidebar-elems"><section><ul class="block"><li><a href="#structs">Structs</a></li><li><a href="#traits">Traits</a></li></ul></section><h2><a href="../index.html">In crate google_apis_common</a></h2></div></nav><div class="sidebar-resizer"></div>
+    <main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../google_apis_common/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Module <a href="../index.html">google_apis_common</a>::<wbr><a class="mod" href="#">auth</a><button id="copy-path" title="Copy item path to clipboard"><img src="../../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../../src/google_apis_common/auth.rs.html#1-168">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Authentication for Google API endpoints</p>
+<p>Allows users to provide custom authentication implementations to suite their needs.</p>
+<p>By default, <a href="trait.GetToken.html" title="trait google_apis_common::auth::GetToken"><code>GetToken</code></a> is implemented for:</p>
+<ul>
+<li><a href="../../yup_oauth2/authenticator/struct.Authenticator.html" title="struct yup_oauth2::authenticator::Authenticator"><code>Authenticator</code></a> : An authenticator which supports a variety of authentication methods</li>
+<li><a href="https://doc.rust-lang.org/1.76.0/alloc/string/struct.String.html" title="struct alloc::string::String"><code>String</code></a> : Plain oauth2 token in String format</li>
+<li><a href="struct.NoToken.html" title="struct google_apis_common::auth::NoToken"><code>NoToken</code></a> : No token, used for APIs which do not require a token</li>
+</ul>
+<h2 id="usage"><a href="#usage">Usage</a></h2>
+<p><a href="trait.GetToken.html" title="trait google_apis_common::auth::GetToken"><code>GetToken</code></a> instances are designed to be used with the Hub constructor provided by the
+generated APIs.</p>
+<p>If you intend to use the API libraries on client devices,
+<a href="../../yup_oauth2/authenticator/struct.Authenticator.html" title="struct yup_oauth2::authenticator::Authenticator"><code>Authenticator</code></a> supports a variety of client-side authentication methods,
+and should be used to provide authentication.</p>
+<p>If you intend to use the API libraries server-side, with server-side client authentication,
+use the <a href="https://docs.rs/oauth2/latest/oauth2/"><code>oauth2</code></a> crate and convert the resulting <a href="https://docs.rs/oauth2/latest/oauth2/struct.AccessToken.html"><code>AccessToken</code></a> to <a href="https://doc.rust-lang.org/1.76.0/alloc/string/struct.String.html" title="struct alloc::string::String"><code>String</code></a>.</p>
+<p>If you intend to use APIs which do not require authentication, use <a href="struct.NoToken.html" title="struct google_apis_common::auth::NoToken"><code>NoToken</code></a>.</p>
+<p>If you have custom authentication requirements, you can implement <a href="trait.GetToken.html" title="trait google_apis_common::auth::GetToken"><code>GetToken</code></a> manually.</p>
+<h2 id="example"><a href="#example">Example</a></h2>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>core::future::Future;
+<span class="kw">use </span>core::pin::Pin;
+
+<span class="kw">use </span>google_apis_common::{GetToken, oauth2};
+
+<span class="kw">use </span>http::Uri;
+<span class="kw">use </span>hyper::client::connect::Connection;
+<span class="kw">use </span>tokio::io::{AsyncRead, AsyncWrite};
+<span class="kw">use </span>tower_service::Service;
+<span class="kw">use </span>oauth2::authenticator::Authenticator;
+
+<span class="attr">#[derive(Clone)]
+</span><span class="kw">struct </span>AuthenticatorWithRetry&lt;S&gt; {
+    auth: Authenticator&lt;S&gt;,
+    retries: usize,
+}
+
+<span class="kw">impl</span>&lt;S&gt; GetToken <span class="kw">for </span>AuthenticatorWithRetry&lt;S&gt;
+<span class="kw">where
+    </span>S: Service&lt;Uri&gt; + Clone + Send + Sync + <span class="lifetime">'static</span>,
+    S::Response: Connection + AsyncRead + AsyncWrite + Send + Unpin + <span class="lifetime">'static</span>,
+    S::Future: Send + Unpin + <span class="lifetime">'static</span>,
+    S::Error: Into&lt;Box&lt;<span class="kw">dyn </span>std::error::Error + Send + Sync&gt;&gt;,
+{
+    <span class="kw">fn </span>get_token&lt;<span class="lifetime">'a</span>&gt;(
+        <span class="kw-2">&amp;</span><span class="lifetime">'a </span><span class="self">self</span>,
+        scopes: <span class="kw-2">&amp;</span><span class="lifetime">'a </span>[<span class="kw-2">&amp;</span>str],
+    ) -&gt; Pin&lt;Box&lt;<span class="kw">dyn </span>Future&lt;Output = <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Option</span>&lt;String&gt;, Box&lt;<span class="kw">dyn </span>std::error::Error + Send + Sync&gt;&gt;&gt; + Send + <span class="lifetime">'a</span>&gt;&gt; {
+        Box::pin(<span class="kw">async move </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>auth_token = <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>);
+            <span class="kw">for _ in </span><span class="number">0</span>..=<span class="self">self</span>.retries {
+                <span class="kw">match </span><span class="self">self</span>.auth.token(scopes).<span class="kw">await </span>{
+                    <span class="prelude-val">Ok</span>(token) =&gt; {
+                        auth_token = <span class="prelude-val">Ok</span>(token.token().map(|t| t.to_owned()));
+                        <span class="kw">break</span>;
+                    },
+                    <span class="prelude-val">Err</span>(e) =&gt; auth_token = <span class="prelude-val">Err</span>(e.into()),
+                }
+            }
+            auth_token
+        })
+    }
+}</code></pre></div>
+</div></details><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.NoToken.html" title="struct google_apis_common::auth::NoToken">NoToken</a></div><div class="desc docblock-short">In the event that the API endpoint does not require an oauth2 token, <code>NoToken</code> should be provided to the hub to avoid specifying an
+authenticator.</div></li></ul><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2><ul class="item-table"><li><div class="item-name"><a class="trait" href="trait.GetToken.html" title="trait google_apis_common::auth::GetToken">GetToken</a></div></li><li><div class="item-name"><a class="trait" href="trait.GetTokenClone.html" title="trait google_apis_common::auth::GetTokenClone">GetTokenClone</a></div></li></ul></section></div></main></body></html>

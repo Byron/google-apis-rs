@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-apigee1-cli/organizations_envgroups-get-deployed-ingress-config/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Envgroups Get Deployed Ingress Config - Apigee v5.0.4+20240222</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Envgroups Get Deployed Ingress Config";
+        var mkdocs_page_input_path = "organizations_envgroups-get-deployed-ingress-config.md";
+        var mkdocs_page_url = "/google-apis-rs/google-apigee1-cli/organizations_envgroups-get-deployed-ingress-config/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Apigee v5.0.4+20240222
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Hybrid</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../hybrid_issuers-list/">Issuers List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Organizations</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_analytics-datastores-create/">Analytics Datastores Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_analytics-datastores-delete/">Analytics Datastores Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_analytics-datastores-get/">Analytics Datastores Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_analytics-datastores-list/">Analytics Datastores List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_analytics-datastores-test/">Analytics Datastores Test</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_analytics-datastores-update/">Analytics Datastores Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apiproducts-attributes/">Apiproducts Attributes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apiproducts-attributes-delete/">Apiproducts Attributes Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apiproducts-attributes-get/">Apiproducts Attributes Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apiproducts-attributes-list/">Apiproducts Attributes List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apiproducts-attributes-update-api-product-attribute/">Apiproducts Attributes Update Api Product Attribute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apiproducts-create/">Apiproducts Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apiproducts-delete/">Apiproducts Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apiproducts-get/">Apiproducts Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apiproducts-list/">Apiproducts List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apiproducts-rateplans-create/">Apiproducts Rateplans Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apiproducts-rateplans-delete/">Apiproducts Rateplans Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apiproducts-rateplans-get/">Apiproducts Rateplans Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apiproducts-rateplans-list/">Apiproducts Rateplans List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apiproducts-rateplans-update/">Apiproducts Rateplans Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apiproducts-update/">Apiproducts Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-create/">Apis Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-delete/">Apis Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-deployments-list/">Apis Deployments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-get/">Apis Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-keyvaluemaps-create/">Apis Keyvaluemaps Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-keyvaluemaps-delete/">Apis Keyvaluemaps Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-keyvaluemaps-entries-create/">Apis Keyvaluemaps Entries Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-keyvaluemaps-entries-delete/">Apis Keyvaluemaps Entries Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-keyvaluemaps-entries-get/">Apis Keyvaluemaps Entries Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-keyvaluemaps-entries-list/">Apis Keyvaluemaps Entries List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-keyvaluemaps-entries-update/">Apis Keyvaluemaps Entries Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-list/">Apis List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-patch/">Apis Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-revisions-delete/">Apis Revisions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-revisions-deployments-list/">Apis Revisions Deployments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-revisions-get/">Apis Revisions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apis-revisions-update-api-proxy-revision/">Apis Revisions Update Api Proxy Revision</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-apps-create/">Appgroups Apps Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-apps-delete/">Appgroups Apps Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-apps-get/">Appgroups Apps Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-apps-keys-apiproducts-delete/">Appgroups Apps Keys Apiproducts Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-apps-keys-apiproducts-update-app-group-app-key-api-product/">Appgroups Apps Keys Apiproducts Update App Group App Key Api Product</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-apps-keys-create/">Appgroups Apps Keys Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-apps-keys-delete/">Appgroups Apps Keys Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-apps-keys-get/">Appgroups Apps Keys Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-apps-keys-update-app-group-app-key/">Appgroups Apps Keys Update App Group App Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-apps-list/">Appgroups Apps List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-apps-update/">Appgroups Apps Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-create/">Appgroups Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-delete/">Appgroups Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-get/">Appgroups Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-list/">Appgroups List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_appgroups-update/">Appgroups Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apps-get/">Apps Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_apps-list/">Apps List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_datacollectors-create/">Datacollectors Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_datacollectors-delete/">Datacollectors Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_datacollectors-get/">Datacollectors Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_datacollectors-list/">Datacollectors List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_datacollectors-patch/">Datacollectors Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_deployments-list/">Deployments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-attributes/">Developers Apps Attributes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-attributes-delete/">Developers Apps Attributes Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-attributes-get/">Developers Apps Attributes Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-attributes-list/">Developers Apps Attributes List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-attributes-update-developer-app-attribute/">Developers Apps Attributes Update Developer App Attribute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-create/">Developers Apps Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-delete/">Developers Apps Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-generate-key-pair-or-update-developer-app-status/">Developers Apps Generate Key Pair Or Update Developer App Status</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-get/">Developers Apps Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-keys-apiproducts-delete/">Developers Apps Keys Apiproducts Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-keys-apiproducts-update-developer-app-key-api-product/">Developers Apps Keys Apiproducts Update Developer App Key Api Product</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-keys-create/">Developers Apps Keys Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-keys-create-create/">Developers Apps Keys Create Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-keys-delete/">Developers Apps Keys Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-keys-get/">Developers Apps Keys Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-keys-replace-developer-app-key/">Developers Apps Keys Replace Developer App Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-keys-update-developer-app-key/">Developers Apps Keys Update Developer App Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-list/">Developers Apps List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-apps-update/">Developers Apps Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-attributes/">Developers Attributes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-attributes-delete/">Developers Attributes Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-attributes-get/">Developers Attributes Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-attributes-list/">Developers Attributes List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-attributes-update-developer-attribute/">Developers Attributes Update Developer Attribute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-balance-adjust/">Developers Balance Adjust</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-balance-credit/">Developers Balance Credit</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-create/">Developers Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-delete/">Developers Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-get/">Developers Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-get-balance/">Developers Get Balance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-get-monetization-config/">Developers Get Monetization Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-list/">Developers List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-set-developer-status/">Developers Set Developer Status</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-subscriptions-create/">Developers Subscriptions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-subscriptions-expire/">Developers Subscriptions Expire</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-subscriptions-get/">Developers Subscriptions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-subscriptions-list/">Developers Subscriptions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-update/">Developers Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_developers-update-monetization-config/">Developers Update Monetization Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_endpoint-attachments-create/">Endpoint Attachments Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_endpoint-attachments-delete/">Endpoint Attachments Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_endpoint-attachments-get/">Endpoint Attachments Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_endpoint-attachments-list/">Endpoint Attachments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_envgroups-attachments-create/">Envgroups Attachments Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_envgroups-attachments-delete/">Envgroups Attachments Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_envgroups-attachments-get/">Envgroups Attachments Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_envgroups-attachments-list/">Envgroups Attachments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_envgroups-create/">Envgroups Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_envgroups-delete/">Envgroups Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_envgroups-get/">Envgroups Get</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Envgroups Get Deployed Ingress Config</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_envgroups-list/">Envgroups List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_envgroups-patch/">Envgroups Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-addons-config-set-addon-enablement/">Environments Addons Config Set Addon Enablement</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-analytics-admin-get-schemav2/">Environments Analytics Admin Get Schemav2</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-analytics-exports-create/">Environments Analytics Exports Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-analytics-exports-get/">Environments Analytics Exports Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-analytics-exports-list/">Environments Analytics Exports List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-apis-deployments-list/">Environments Apis Deployments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-apis-revisions-debugsessions-create/">Environments Apis Revisions Debugsessions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-apis-revisions-debugsessions-data-get/">Environments Apis Revisions Debugsessions Data Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-apis-revisions-debugsessions-delete-data/">Environments Apis Revisions Debugsessions Delete Data</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-apis-revisions-debugsessions-get/">Environments Apis Revisions Debugsessions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-apis-revisions-debugsessions-list/">Environments Apis Revisions Debugsessions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-apis-revisions-deploy/">Environments Apis Revisions Deploy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-apis-revisions-deployments-generate-deploy-change-report/">Environments Apis Revisions Deployments Generate Deploy Change Report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-apis-revisions-deployments-generate-undeploy-change-report/">Environments Apis Revisions Deployments Generate Undeploy Change Report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-apis-revisions-get-deployments/">Environments Apis Revisions Get Deployments</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-apis-revisions-undeploy/">Environments Apis Revisions Undeploy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-archive-deployments-create/">Environments Archive Deployments Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-archive-deployments-delete/">Environments Archive Deployments Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-archive-deployments-generate-download-url/">Environments Archive Deployments Generate Download Url</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-archive-deployments-generate-upload-url/">Environments Archive Deployments Generate Upload Url</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-archive-deployments-get/">Environments Archive Deployments Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-archive-deployments-list/">Environments Archive Deployments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-archive-deployments-patch/">Environments Archive Deployments Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-caches-delete/">Environments Caches Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-create/">Environments Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-delete/">Environments Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-deployments-list/">Environments Deployments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-flowhooks-attach-shared-flow-to-flow-hook/">Environments Flowhooks Attach Shared Flow To Flow Hook</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-flowhooks-detach-shared-flow-from-flow-hook/">Environments Flowhooks Detach Shared Flow From Flow Hook</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-flowhooks-get/">Environments Flowhooks Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-get/">Environments Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-get-addons-config/">Environments Get Addons Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-get-api-security-runtime-config/">Environments Get Api Security Runtime Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-get-debugmask/">Environments Get Debugmask</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-get-deployed-config/">Environments Get Deployed Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-get-iam-policy/">Environments Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-get-security-actions-config/">Environments Get Security Actions Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-get-trace-config/">Environments Get Trace Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keystores-aliases-create/">Environments Keystores Aliases Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keystores-aliases-csr/">Environments Keystores Aliases Csr</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keystores-aliases-delete/">Environments Keystores Aliases Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keystores-aliases-get/">Environments Keystores Aliases Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keystores-aliases-get-certificate/">Environments Keystores Aliases Get Certificate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keystores-aliases-update/">Environments Keystores Aliases Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keystores-create/">Environments Keystores Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keystores-delete/">Environments Keystores Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keystores-get/">Environments Keystores Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keyvaluemaps-create/">Environments Keyvaluemaps Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keyvaluemaps-delete/">Environments Keyvaluemaps Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keyvaluemaps-entries-create/">Environments Keyvaluemaps Entries Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keyvaluemaps-entries-delete/">Environments Keyvaluemaps Entries Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keyvaluemaps-entries-get/">Environments Keyvaluemaps Entries Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keyvaluemaps-entries-list/">Environments Keyvaluemaps Entries List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-keyvaluemaps-entries-update/">Environments Keyvaluemaps Entries Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-modify-environment/">Environments Modify Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-optimized-stats-get/">Environments Optimized Stats Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-queries-create/">Environments Queries Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-queries-get/">Environments Queries Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-queries-get-result/">Environments Queries Get Result</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-queries-get-resulturl/">Environments Queries Get Resulturl</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-queries-list/">Environments Queries List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-references-create/">Environments References Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-references-delete/">Environments References Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-references-get/">Environments References Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-references-update/">Environments References Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-resourcefiles-create/">Environments Resourcefiles Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-resourcefiles-delete/">Environments Resourcefiles Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-resourcefiles-get/">Environments Resourcefiles Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-resourcefiles-list/">Environments Resourcefiles List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-resourcefiles-list-environment-resources/">Environments Resourcefiles List Environment Resources</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-resourcefiles-update/">Environments Resourcefiles Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-actions-create/">Environments Security Actions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-actions-disable/">Environments Security Actions Disable</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-actions-enable/">Environments Security Actions Enable</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-actions-get/">Environments Security Actions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-actions-list/">Environments Security Actions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-incidents-batch-update/">Environments Security Incidents Batch Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-incidents-get/">Environments Security Incidents Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-incidents-list/">Environments Security Incidents List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-incidents-patch/">Environments Security Incidents Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-reports-create/">Environments Security Reports Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-reports-get/">Environments Security Reports Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-reports-get-result/">Environments Security Reports Get Result</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-reports-get-result-view/">Environments Security Reports Get Result View</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-reports-list/">Environments Security Reports List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-stats-query-tabular-stats/">Environments Security Stats Query Tabular Stats</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-security-stats-query-time-series-stats/">Environments Security Stats Query Time Series Stats</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-set-iam-policy/">Environments Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-sharedflows-deployments-list/">Environments Sharedflows Deployments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-sharedflows-revisions-deploy/">Environments Sharedflows Revisions Deploy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-sharedflows-revisions-get-deployments/">Environments Sharedflows Revisions Get Deployments</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-sharedflows-revisions-undeploy/">Environments Sharedflows Revisions Undeploy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-stats-get/">Environments Stats Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-subscribe/">Environments Subscribe</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-targetservers-create/">Environments Targetservers Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-targetservers-delete/">Environments Targetservers Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-targetservers-get/">Environments Targetservers Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-targetservers-update/">Environments Targetservers Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-test-iam-permissions/">Environments Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-trace-config-overrides-create/">Environments Trace Config Overrides Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-trace-config-overrides-delete/">Environments Trace Config Overrides Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-trace-config-overrides-get/">Environments Trace Config Overrides Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-trace-config-overrides-list/">Environments Trace Config Overrides List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-trace-config-overrides-patch/">Environments Trace Config Overrides Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-unsubscribe/">Environments Unsubscribe</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-update/">Environments Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-update-debugmask/">Environments Update Debugmask</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-update-environment/">Environments Update Environment</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-update-security-actions-config/">Environments Update Security Actions Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_environments-update-trace-config/">Environments Update Trace Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_get-deployed-ingress-config/">Get Deployed Ingress Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_get-project-mapping/">Get Project Mapping</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_get-runtime-config/">Get Runtime Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_get-security-settings/">Get Security Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_get-sync-authorization/">Get Sync Authorization</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_host-queries-create/">Host Queries Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_host-queries-get/">Host Queries Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_host-queries-get-result/">Host Queries Get Result</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_host-queries-get-result-view/">Host Queries Get Result View</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_host-queries-list/">Host Queries List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_host-security-reports-create/">Host Security Reports Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_host-security-reports-get/">Host Security Reports Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_host-security-reports-get-result/">Host Security Reports Get Result</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_host-security-reports-get-result-view/">Host Security Reports Get Result View</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_host-security-reports-list/">Host Security Reports List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_host-stats-get/">Host Stats Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-attachments-create/">Instances Attachments Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-attachments-delete/">Instances Attachments Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-attachments-get/">Instances Attachments Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-attachments-list/">Instances Attachments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-canaryevaluations-create/">Instances Canaryevaluations Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-canaryevaluations-get/">Instances Canaryevaluations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-create/">Instances Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-delete/">Instances Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-get/">Instances Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-list/">Instances List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-nat-addresses-activate/">Instances Nat Addresses Activate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-nat-addresses-create/">Instances Nat Addresses Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-nat-addresses-delete/">Instances Nat Addresses Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-nat-addresses-get/">Instances Nat Addresses Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-nat-addresses-list/">Instances Nat Addresses List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-patch/">Instances Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_instances-report-status/">Instances Report Status</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_keyvaluemaps-create/">Keyvaluemaps Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_keyvaluemaps-delete/">Keyvaluemaps Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_keyvaluemaps-entries-create/">Keyvaluemaps Entries Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_keyvaluemaps-entries-delete/">Keyvaluemaps Entries Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_keyvaluemaps-entries-get/">Keyvaluemaps Entries Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_keyvaluemaps-entries-list/">Keyvaluemaps Entries List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_keyvaluemaps-entries-update/">Keyvaluemaps Entries Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_operations-get/">Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_operations-list/">Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_optimized-host-stats-get/">Optimized Host Stats Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_reports-create/">Reports Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_reports-delete/">Reports Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_reports-get/">Reports Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_reports-list/">Reports List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_reports-update/">Reports Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-profiles-create/">Security Profiles Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-profiles-delete/">Security Profiles Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-profiles-environments-compute-environment-scores/">Security Profiles Environments Compute Environment Scores</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-profiles-environments-create/">Security Profiles Environments Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-profiles-environments-delete/">Security Profiles Environments Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-profiles-get/">Security Profiles Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-profiles-list/">Security Profiles List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-profiles-list-revisions/">Security Profiles List Revisions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-profiles-patch/">Security Profiles Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_set-addons/">Set Addons</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_set-sync-authorization/">Set Sync Authorization</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sharedflows-create/">Sharedflows Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sharedflows-delete/">Sharedflows Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sharedflows-deployments-list/">Sharedflows Deployments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sharedflows-get/">Sharedflows Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sharedflows-list/">Sharedflows List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sharedflows-revisions-delete/">Sharedflows Revisions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sharedflows-revisions-deployments-list/">Sharedflows Revisions Deployments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sharedflows-revisions-get/">Sharedflows Revisions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sharedflows-revisions-update-shared-flow-revision/">Sharedflows Revisions Update Shared Flow Revision</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sites-apicategories-create/">Sites Apicategories Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sites-apicategories-delete/">Sites Apicategories Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sites-apicategories-get/">Sites Apicategories Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sites-apicategories-list/">Sites Apicategories List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sites-apicategories-patch/">Sites Apicategories Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sites-apidocs-create/">Sites Apidocs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sites-apidocs-delete/">Sites Apidocs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sites-apidocs-get/">Sites Apidocs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sites-apidocs-get-documentation/">Sites Apidocs Get Documentation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sites-apidocs-list/">Sites Apidocs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sites-apidocs-update/">Sites Apidocs Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sites-apidocs-update-documentation/">Sites Apidocs Update Documentation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_update/">Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_update-security-settings/">Update Security Settings</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_provision-organization/">Provision Organization</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Apigee v5.0.4+20240222</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Organizations &raquo;</li>
+      <li>Envgroups Get Deployed Ingress Config</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/apigee1-cli/edit/master/docs/organizations_envgroups-get-deployed-ingress-config.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Gets the deployed ingress configuration for an environment group.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>apigee1 --scope &lt;scope&gt; organizations envgroups-get-deployed-ingress-config ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
+<li>Required. Name of the deployed configuration for the environment group in the following format: &#39;organizations/{org}/envgroups/{envgroup}/deployedIngressConfig&#39;.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li><strong>-p view=string</strong><ul>
+<li>When set to FULL, additional details about the specific deployments receiving traffic will be included in the IngressConfig response&#39;s RoutingRules.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../organizations_envgroups-get/" class="btn btn-neutral float-left" title="Envgroups Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../organizations_envgroups-list/" class="btn btn-neutral float-right" title="Envgroups List">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/apigee1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../organizations_envgroups-get/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../organizations_envgroups-list/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

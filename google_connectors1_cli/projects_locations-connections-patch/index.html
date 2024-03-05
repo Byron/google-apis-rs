@@ -1,245 +1,213 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Locations Connections Patch - Connectors v3.0.0+20220214</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-connectors1-cli/projects_locations-connections-patch/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Locations Connections Patch - Connectors v5.0.4+20240221</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Locations Connections Patch";
+        var mkdocs_page_input_path = "projects_locations-connections-patch.md";
+        var mkdocs_page_url = "/google-apis-rs/google-connectors1-cli/projects_locations-connections-patch/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Connectors v3.0.0+20220214</a>
-        
+          <a href=".." class="icon icon-home"> Connectors v5.0.4+20240221
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connections-create">Locations Connections Create</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connections-delete">Locations Connections Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connections-get">Locations Connections Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connections-get-connection-schema-metadata">Locations Connections Get Connection Schema Metadata</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connections-get-iam-policy">Locations Connections Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connections-list">Locations Connections List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Locations Connections Patch</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connections-runtime-action-schemas-list">Locations Connections Runtime Action Schemas List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connections-runtime-entity-schemas-list">Locations Connections Runtime Entity Schemas List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connections-set-iam-policy">Locations Connections Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-connections-test-iam-permissions">Locations Connections Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-get">Locations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-get-runtime-config">Locations Get Runtime Config</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-global-providers-connectors-get">Locations Global Providers Connectors Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-global-providers-connectors-list">Locations Global Providers Connectors List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-global-providers-connectors-versions-get">Locations Global Providers Connectors Versions Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-global-providers-connectors-versions-list">Locations Global Providers Connectors Versions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-global-providers-get">Locations Global Providers Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-global-providers-list">Locations Global Providers List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-list">Locations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-delete">Locations Operations Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-providers-get-iam-policy">Locations Providers Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-providers-set-iam-policy">Locations Providers Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-providers-test-iam-permissions">Locations Providers Test Iam Permissions</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-connection-schema-metadata-get-action/">Locations Connections Connection Schema Metadata Get Action</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-connection-schema-metadata-get-entity-type/">Locations Connections Connection Schema Metadata Get Entity Type</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-connection-schema-metadata-list-actions/">Locations Connections Connection Schema Metadata List Actions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-connection-schema-metadata-list-entity-types/">Locations Connections Connection Schema Metadata List Entity Types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-connection-schema-metadata-refresh/">Locations Connections Connection Schema Metadata Refresh</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-create/">Locations Connections Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-delete/">Locations Connections Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-event-subscriptions-create/">Locations Connections Event Subscriptions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-event-subscriptions-delete/">Locations Connections Event Subscriptions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-event-subscriptions-get/">Locations Connections Event Subscriptions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-event-subscriptions-list/">Locations Connections Event Subscriptions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-event-subscriptions-patch/">Locations Connections Event Subscriptions Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-event-subscriptions-retry/">Locations Connections Event Subscriptions Retry</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-get/">Locations Connections Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-get-connection-schema-metadata/">Locations Connections Get Connection Schema Metadata</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-get-iam-policy/">Locations Connections Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-list/">Locations Connections List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-listen-event/">Locations Connections Listen Event</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Locations Connections Patch</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-repair-eventing/">Locations Connections Repair Eventing</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-runtime-action-schemas-list/">Locations Connections Runtime Action Schemas List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-runtime-entity-schemas-list/">Locations Connections Runtime Entity Schemas List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-set-iam-policy/">Locations Connections Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-connections-test-iam-permissions/">Locations Connections Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-endpoint-attachments-create/">Locations Endpoint Attachments Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-endpoint-attachments-delete/">Locations Endpoint Attachments Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-endpoint-attachments-get/">Locations Endpoint Attachments Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-endpoint-attachments-list/">Locations Endpoint Attachments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-endpoint-attachments-patch/">Locations Endpoint Attachments Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-get-regional-settings/">Locations Get Regional Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-get-runtime-config/">Locations Get Runtime Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-custom-connectors-create/">Locations Global Custom Connectors Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-custom-connectors-custom-connector-versions-create/">Locations Global Custom Connectors Custom Connector Versions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-custom-connectors-custom-connector-versions-delete/">Locations Global Custom Connectors Custom Connector Versions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-custom-connectors-custom-connector-versions-get/">Locations Global Custom Connectors Custom Connector Versions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-custom-connectors-custom-connector-versions-list/">Locations Global Custom Connectors Custom Connector Versions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-custom-connectors-custom-connector-versions-patch/">Locations Global Custom Connectors Custom Connector Versions Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-custom-connectors-delete/">Locations Global Custom Connectors Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-custom-connectors-get/">Locations Global Custom Connectors Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-custom-connectors-list/">Locations Global Custom Connectors List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-custom-connectors-patch/">Locations Global Custom Connectors Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-get-settings/">Locations Global Get Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-managed-zones-create/">Locations Global Managed Zones Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-managed-zones-delete/">Locations Global Managed Zones Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-managed-zones-get/">Locations Global Managed Zones Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-managed-zones-list/">Locations Global Managed Zones List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-managed-zones-patch/">Locations Global Managed Zones Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-global-update-settings/">Locations Global Update Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-list/">Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-delete/">Locations Operations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-providers-connectors-get/">Locations Providers Connectors Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-providers-connectors-list/">Locations Providers Connectors List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-providers-connectors-versions-eventtypes-get/">Locations Providers Connectors Versions Eventtypes Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-providers-connectors-versions-eventtypes-list/">Locations Providers Connectors Versions Eventtypes List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-providers-connectors-versions-get/">Locations Providers Connectors Versions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-providers-connectors-versions-list/">Locations Providers Connectors Versions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-providers-get/">Locations Providers Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-providers-get-iam-policy/">Locations Providers Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-providers-list/">Locations Providers List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-providers-set-iam-policy/">Locations Providers Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-providers-test-iam-permissions/">Locations Providers Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-update-regional-settings/">Locations Update Regional Settings</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Connectors v5.0.4+20240221</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Locations Connections Patch</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/connectors1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Locations Connections Patch</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/connectors1-cli/edit/master/docs/projects_locations-connections-patch.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates the parameters of a single Connection.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates the parameters of a single Connection.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -257,7 +225,18 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>For example, a structure like this:</p>
 <pre><code>Connection:
   auth-config:
+    auth-key: string
     auth-type: string
+    oauth2-auth-code-flow:
+      auth-code: string
+      auth-uri: string
+      client-id: string
+      client-secret:
+        secret-version: string
+      enable-pkce: boolean
+      pkce-verifier: string
+      redirect-uri: string
+      scopes: [string]
     oauth2-client-credentials:
       client-id: string
       client-secret:
@@ -269,110 +248,675 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         audience: string
         issuer: string
         subject: string
+    ssh-public-key:
+      cert-type: string
+      ssh-client-cert:
+        secret-version: string
+      ssh-client-cert-pass:
+        secret-version: string
+      username: string
     user-password:
       password:
         secret-version: string
       username: string
+  connection-revision: string
   connector-version: string
+  connector-version-infra-config:
+    connection-ratelimit-window-seconds: string
+    deployment-model: string
+    hpa-config:
+      cpu-utilization-threshold: string
+      memory-utilization-threshold: string
+    internalclient-ratelimit-threshold: string
+    ratelimit-threshold: string
+    resource-limits:
+      cpu: string
+      memory: string
+    resource-requests:
+      cpu: string
+      memory: string
+    shared-deployment: string
+  connector-version-launch-stage: string
   create-time: string
   description: string
-  egress-backends: [string]
   envoy-image-location: string
+  eventing-config:
+    auth-config:
+      auth-key: string
+      auth-type: string
+      oauth2-auth-code-flow:
+        auth-code: string
+        auth-uri: string
+        client-id: string
+        client-secret:
+          secret-version: string
+        enable-pkce: boolean
+        pkce-verifier: string
+        redirect-uri: string
+        scopes: [string]
+      oauth2-client-credentials:
+        client-id: string
+        client-secret:
+          secret-version: string
+      oauth2-jwt-bearer:
+        client-key:
+          secret-version: string
+        jwt-claims:
+          audience: string
+          issuer: string
+          subject: string
+      ssh-public-key:
+        cert-type: string
+        ssh-client-cert:
+          secret-version: string
+        ssh-client-cert-pass:
+          secret-version: string
+        username: string
+      user-password:
+        password:
+          secret-version: string
+        username: string
+    dead-letter-config:
+      project-id: string
+      topic: string
+    enrichment-enabled: boolean
+    events-listener-ingress-endpoint: string
+    listener-auth-config:
+      auth-key: string
+      auth-type: string
+      oauth2-auth-code-flow:
+        auth-code: string
+        auth-uri: string
+        client-id: string
+        client-secret:
+          secret-version: string
+        enable-pkce: boolean
+        pkce-verifier: string
+        redirect-uri: string
+        scopes: [string]
+      oauth2-client-credentials:
+        client-id: string
+        client-secret:
+          secret-version: string
+      oauth2-jwt-bearer:
+        client-key:
+          secret-version: string
+        jwt-claims:
+          audience: string
+          issuer: string
+          subject: string
+      ssh-public-key:
+        cert-type: string
+        ssh-client-cert:
+          secret-version: string
+        ssh-client-cert-pass:
+          secret-version: string
+        username: string
+      user-password:
+        password:
+          secret-version: string
+        username: string
+    private-connectivity-enabled: boolean
+    proxy-destination-config:
+      key: string
+    registration-destination-config:
+      key: string
+  eventing-enablement-type: string
+  eventing-runtime-data:
+    events-listener-endpoint: string
+    events-listener-psc-sa: string
+    status:
+      description: string
+      state: string
   image-location: string
+  is-trusted-tester: boolean
   labels: { string: string }
   lock-config:
     locked: boolean
     reason: string
+  log-config:
+    enabled: boolean
   name: string
+  node-config:
+    max-node-count: integer
+    min-node-count: integer
   service-account: string
   service-directory: string
+  ssl-config:
+    client-cert-type: string
+    client-certificate:
+      secret-version: string
+    client-private-key:
+      secret-version: string
+    client-private-key-pass:
+      secret-version: string
+    private-server-certificate:
+      secret-version: string
+    server-cert-type: string
+    trust-model: string
+    type: string
+    use-ssl: boolean
   status:
     description: string
     state: string
     status: string
+  subscription-type: string
   suspended: boolean
   update-time: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .auth-config    auth-type=gubergren</code><ul>
+<li><code>-r .auth-config    auth-key=et</code><ul>
+<li>Identifier key for auth config</li>
+</ul>
+</li>
+<li><code>auth-type=sea</code><ul>
 <li>The type of authentication configured.</li>
 </ul>
 </li>
-<li><code>oauth2-client-credentials    client-id=rebum.</code><ul>
+<li><code>oauth2-auth-code-flow    auth-code=et</code><ul>
+<li>Authorization code to be exchanged for access and refresh tokens.</li>
+</ul>
+</li>
+<li><code>auth-uri=at</code><ul>
+<li>Auth URL for Authorization Code Flow</li>
+</ul>
+</li>
+<li><code>client-id=dolore</code><ul>
+<li>Client ID for user-provided OAuth app.</li>
+</ul>
+</li>
+<li>
+<p><code>client-secret    secret-version=eirmod</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    enable-pkce=true</code></p>
+<ul>
+<li>Whether to enable PKCE when the user performs the auth code flow.</li>
+</ul>
+</li>
+<li><code>pkce-verifier=accusam</code><ul>
+<li>PKCE verifier to be used during the auth code exchange.</li>
+</ul>
+</li>
+<li><code>redirect-uri=amet</code><ul>
+<li>Redirect URI to be provided during the auth code exchange.</li>
+</ul>
+</li>
+<li>
+<p><code>scopes=erat</code></p>
+<ul>
+<li>Scopes the connection will request when the user performs the auth code flow.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..oauth2-client-credentials    client-id=dolores</code></p>
+<ul>
 <li>The client identifier.</li>
 </ul>
 </li>
 <li>
-<p><code>client-secret    secret-version=est</code></p>
+<p><code>client-secret    secret-version=erat</code></p>
 <ul>
 <li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>...oauth2-jwt-bearer.client-key    secret-version=ipsum</code></p>
+<p><code>...oauth2-jwt-bearer.client-key    secret-version=accusam</code></p>
 <ul>
 <li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..jwt-claims    audience=ipsum</code></p>
+<p><code>..jwt-claims    audience=sea</code></p>
 <ul>
 <li>Value for the &#34;aud&#34; claim.</li>
 </ul>
 </li>
-<li><code>issuer=est</code><ul>
+<li><code>issuer=takimata</code><ul>
 <li>Value for the &#34;iss&#34; claim.</li>
 </ul>
 </li>
 <li>
-<p><code>subject=gubergren</code></p>
+<p><code>subject=lorem</code></p>
 <ul>
 <li>Value for the &#34;sub&#34; claim.</li>
 </ul>
 </li>
 <li>
-<p><code>...user-password.password    secret-version=ea</code></p>
+<p><code>...ssh-public-key    cert-type=et</code></p>
+<ul>
+<li>Format of SSH Client cert.</li>
+</ul>
+</li>
+<li>
+<p><code>ssh-client-cert    secret-version=at</code></p>
 <ul>
 <li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..    username=dolor</code></p>
+<p><code>..ssh-client-cert-pass    secret-version=dolor</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    username=et</code></p>
+<ul>
+<li>The user account used to authenticate.</li>
+</ul>
+</li>
+<li>
+<p><code>..user-password.password    secret-version=sit</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    username=erat</code></p>
 <ul>
 <li>Username.</li>
 </ul>
 </li>
 <li>
-<p><code>...    connector-version=lorem</code></p>
+<p><code>...    connection-revision=sea</code></p>
 <ul>
-<li>Required. Connector version on which the connection is created. The format is: projects/<em>/locations/global/providers/</em>/connectors/<em>/versions/</em></li>
+<li>Output only. Connection revision. This field is only updated when the connection is created or updated by User.</li>
 </ul>
 </li>
-<li><code>create-time=eos</code><ul>
+<li><code>connector-version=nonumy</code><ul>
+<li>Required. Connector version on which the connection is created. The format is: projects/<em>/locations/</em>/providers/<em>/connectors/</em>/versions/* Only global location is supported for ConnectorVersion resource.</li>
+</ul>
+</li>
+<li><code>connector-version-infra-config    connection-ratelimit-window-seconds=et</code><ul>
+<li>Output only. The window used for ratelimiting runtime requests to connections.</li>
+</ul>
+</li>
+<li><code>deployment-model=gubergren</code><ul>
+<li>Optional. Indicates whether connector is deployed on GKE/CloudRun</li>
+</ul>
+</li>
+<li><code>hpa-config    cpu-utilization-threshold=justo</code><ul>
+<li>Output only. Percent CPU utilization where HPA triggers autoscaling.</li>
+</ul>
+</li>
+<li>
+<p><code>memory-utilization-threshold=sea</code></p>
+<ul>
+<li>Output only. Percent Memory utilization where HPA triggers autoscaling.</li>
+</ul>
+</li>
+<li>
+<p><code>..    internalclient-ratelimit-threshold=consetetur</code></p>
+<ul>
+<li>Output only. Max QPS supported for internal requests originating from Connd.</li>
+</ul>
+</li>
+<li><code>ratelimit-threshold=sit</code><ul>
+<li>Output only. Max QPS supported by the connector version before throttling of requests.</li>
+</ul>
+</li>
+<li><code>resource-limits    cpu=aliquyam</code><ul>
+<li>Output only. CPU limit.</li>
+</ul>
+</li>
+<li>
+<p><code>memory=eos</code></p>
+<ul>
+<li>Output only. Memory limit.</li>
+</ul>
+</li>
+<li>
+<p><code>..resource-requests    cpu=at</code></p>
+<ul>
+<li>Output only. CPU request.</li>
+</ul>
+</li>
+<li>
+<p><code>memory=dolores</code></p>
+<ul>
+<li>Output only. Memory request.</li>
+</ul>
+</li>
+<li>
+<p><code>..    shared-deployment=consetetur</code></p>
+<ul>
+<li>Output only. The name of shared connector deployment.</li>
+</ul>
+</li>
+<li>
+<p><code>..    connector-version-launch-stage=gubergren</code></p>
+<ul>
+<li>Output only. Flag to mark the version indicating the launch stage.</li>
+</ul>
+</li>
+<li><code>create-time=dolor</code><ul>
 <li>Output only. Created time.</li>
 </ul>
 </li>
-<li><code>description=labore</code><ul>
+<li><code>description=aliquyam</code><ul>
 <li>Optional. Description of the resource.</li>
 </ul>
 </li>
-<li><code>egress-backends=sed</code><ul>
-<li>Output only. Outbound domains/hosts needs to be allowlisted.</li>
-<li>Each invocation of this argument appends the given value to the array.</li>
-</ul>
-</li>
-<li><code>envoy-image-location=duo</code><ul>
+<li><code>envoy-image-location=no</code><ul>
 <li>Output only. GCR location where the envoy image is stored. formatted like: gcr.io/{bucketName}/{imageName}</li>
 </ul>
 </li>
-<li><code>image-location=sed</code><ul>
+<li><code>eventing-config.auth-config    auth-key=amet.</code><ul>
+<li>Identifier key for auth config</li>
+</ul>
+</li>
+<li><code>auth-type=ipsum</code><ul>
+<li>The type of authentication configured.</li>
+</ul>
+</li>
+<li><code>oauth2-auth-code-flow    auth-code=lorem</code><ul>
+<li>Authorization code to be exchanged for access and refresh tokens.</li>
+</ul>
+</li>
+<li><code>auth-uri=accusam</code><ul>
+<li>Auth URL for Authorization Code Flow</li>
+</ul>
+</li>
+<li><code>client-id=gubergren</code><ul>
+<li>Client ID for user-provided OAuth app.</li>
+</ul>
+</li>
+<li>
+<p><code>client-secret    secret-version=sadipscing</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    enable-pkce=true</code></p>
+<ul>
+<li>Whether to enable PKCE when the user performs the auth code flow.</li>
+</ul>
+</li>
+<li><code>pkce-verifier=duo</code><ul>
+<li>PKCE verifier to be used during the auth code exchange.</li>
+</ul>
+</li>
+<li><code>redirect-uri=sit</code><ul>
+<li>Redirect URI to be provided during the auth code exchange.</li>
+</ul>
+</li>
+<li>
+<p><code>scopes=magna</code></p>
+<ul>
+<li>Scopes the connection will request when the user performs the auth code flow.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..oauth2-client-credentials    client-id=et</code></p>
+<ul>
+<li>The client identifier.</li>
+</ul>
+</li>
+<li>
+<p><code>client-secret    secret-version=rebum.</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>...oauth2-jwt-bearer.client-key    secret-version=dolor</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..jwt-claims    audience=lorem</code></p>
+<ul>
+<li>Value for the &#34;aud&#34; claim.</li>
+</ul>
+</li>
+<li><code>issuer=justo</code><ul>
+<li>Value for the &#34;iss&#34; claim.</li>
+</ul>
+</li>
+<li>
+<p><code>subject=amet.</code></p>
+<ul>
+<li>Value for the &#34;sub&#34; claim.</li>
+</ul>
+</li>
+<li>
+<p><code>...ssh-public-key    cert-type=no</code></p>
+<ul>
+<li>Format of SSH Client cert.</li>
+</ul>
+</li>
+<li>
+<p><code>ssh-client-cert    secret-version=nonumy</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..ssh-client-cert-pass    secret-version=sed</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    username=kasd</code></p>
+<ul>
+<li>The user account used to authenticate.</li>
+</ul>
+</li>
+<li>
+<p><code>..user-password.password    secret-version=lorem</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    username=sanctus</code></p>
+<ul>
+<li>Username.</li>
+</ul>
+</li>
+<li>
+<p><code>...dead-letter-config    project-id=nonumy</code></p>
+<ul>
+<li>Optional. Project which has the topic given.</li>
+</ul>
+</li>
+<li>
+<p><code>topic=rebum.</code></p>
+<ul>
+<li>Optional. Topic to push events which couldn&#39;t be processed.</li>
+</ul>
+</li>
+<li>
+<p><code>..    enrichment-enabled=true</code></p>
+<ul>
+<li>Enrichment Enabled.</li>
+</ul>
+</li>
+<li><code>events-listener-ingress-endpoint=dolore</code><ul>
+<li>Optional. Ingress endpoint of the event listener. This is used only when private connectivity is enabled.</li>
+</ul>
+</li>
+<li><code>listener-auth-config    auth-key=eos</code><ul>
+<li>Identifier key for auth config</li>
+</ul>
+</li>
+<li><code>auth-type=amet.</code><ul>
+<li>The type of authentication configured.</li>
+</ul>
+</li>
+<li><code>oauth2-auth-code-flow    auth-code=dolore</code><ul>
+<li>Authorization code to be exchanged for access and refresh tokens.</li>
+</ul>
+</li>
+<li><code>auth-uri=amet</code><ul>
+<li>Auth URL for Authorization Code Flow</li>
+</ul>
+</li>
+<li><code>client-id=ut</code><ul>
+<li>Client ID for user-provided OAuth app.</li>
+</ul>
+</li>
+<li>
+<p><code>client-secret    secret-version=at</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    enable-pkce=true</code></p>
+<ul>
+<li>Whether to enable PKCE when the user performs the auth code flow.</li>
+</ul>
+</li>
+<li><code>pkce-verifier=vero</code><ul>
+<li>PKCE verifier to be used during the auth code exchange.</li>
+</ul>
+</li>
+<li><code>redirect-uri=duo</code><ul>
+<li>Redirect URI to be provided during the auth code exchange.</li>
+</ul>
+</li>
+<li>
+<p><code>scopes=sadipscing</code></p>
+<ul>
+<li>Scopes the connection will request when the user performs the auth code flow.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..oauth2-client-credentials    client-id=ut</code></p>
+<ul>
+<li>The client identifier.</li>
+</ul>
+</li>
+<li>
+<p><code>client-secret    secret-version=rebum.</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>...oauth2-jwt-bearer.client-key    secret-version=duo</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..jwt-claims    audience=kasd</code></p>
+<ul>
+<li>Value for the &#34;aud&#34; claim.</li>
+</ul>
+</li>
+<li><code>issuer=sadipscing</code><ul>
+<li>Value for the &#34;iss&#34; claim.</li>
+</ul>
+</li>
+<li>
+<p><code>subject=tempor</code></p>
+<ul>
+<li>Value for the &#34;sub&#34; claim.</li>
+</ul>
+</li>
+<li>
+<p><code>...ssh-public-key    cert-type=sea</code></p>
+<ul>
+<li>Format of SSH Client cert.</li>
+</ul>
+</li>
+<li>
+<p><code>ssh-client-cert    secret-version=et</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..ssh-client-cert-pass    secret-version=lorem</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    username=magna</code></p>
+<ul>
+<li>The user account used to authenticate.</li>
+</ul>
+</li>
+<li>
+<p><code>..user-password.password    secret-version=takimata</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    username=rebum.</code></p>
+<ul>
+<li>Username.</li>
+</ul>
+</li>
+<li>
+<p><code>...    private-connectivity-enabled=false</code></p>
+<ul>
+<li>Optional. Private Connectivity Enabled.</li>
+</ul>
+</li>
+<li>
+<p><code>proxy-destination-config    key=clita</code></p>
+<ul>
+<li>The key is the destination identifier that is supported by the Connector.</li>
+</ul>
+</li>
+<li>
+<p><code>..registration-destination-config    key=stet</code></p>
+<ul>
+<li>The key is the destination identifier that is supported by the Connector.</li>
+</ul>
+</li>
+<li>
+<p><code>...    eventing-enablement-type=aliquyam</code></p>
+<ul>
+<li>Optional. Eventing enablement type. Will be nil if eventing is not enabled.</li>
+</ul>
+</li>
+<li><code>eventing-runtime-data    events-listener-endpoint=ut</code><ul>
+<li>Output only. Events listener endpoint. The value will populated after provisioning the events listener.</li>
+</ul>
+</li>
+<li><code>events-listener-psc-sa=sit</code><ul>
+<li>Output only. Events listener PSC Service attachment. The value will be populated after provisioning the events listener with private connectivity enabled.</li>
+</ul>
+</li>
+<li><code>status    description=vero</code><ul>
+<li>Output only. Description of error if State is set to &#34;ERROR&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>state=rebum.</code></p>
+<ul>
+<li>Output only. State.</li>
+</ul>
+</li>
+<li>
+<p><code>...    image-location=dolores</code></p>
+<ul>
 <li>Output only. GCR location where the runtime image is stored. formatted like: gcr.io/{bucketName}/{imageName}</li>
 </ul>
 </li>
-<li><code>labels=key=no</code><ul>
+<li><code>is-trusted-tester=false</code><ul>
+<li>Output only. Is trusted tester program enabled for the project.</li>
+</ul>
+</li>
+<li><code>labels=key=dolores</code><ul>
 <li>Optional. Resource labels to represent user-provided metadata. Refer to cloud documentation on labels for more details. https://cloud.google.com/compute/docs/labeling-resources</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
@@ -382,46 +926,118 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>reason=et</code></p>
+<p><code>reason=clita</code></p>
 <ul>
 <li>Describes why a connection is locked.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=et</code></p>
+<p><code>..log-config    enabled=false</code></p>
+<ul>
+<li>Enabled represents whether logging is enabled or not for a connection.</li>
+</ul>
+</li>
+<li>
+<p><code>..    name=aliquyam</code></p>
 <ul>
 <li>Output only. Resource name of the Connection. Format: projects/{project}/locations/{location}/connections/{connection}</li>
 </ul>
 </li>
-<li><code>service-account=vero</code><ul>
-<li>Optional. Service account needed for runtime plane to access GCP resources.</li>
+<li><code>node-config    max-node-count=18</code><ul>
+<li>Maximum number of nodes in the runtime nodes.</li>
 </ul>
 </li>
-<li><code>service-directory=erat</code><ul>
+<li>
+<p><code>min-node-count=59</code></p>
+<ul>
+<li>Minimum number of nodes in the runtime nodes.</li>
+</ul>
+</li>
+<li>
+<p><code>..    service-account=nonumy</code></p>
+<ul>
+<li>Optional. Service account needed for runtime plane to access Google Cloud resources.</li>
+</ul>
+</li>
+<li><code>service-directory=et</code><ul>
 <li>Output only. The name of the Service Directory service name. Used for Private Harpoon to resolve the ILB address. e.g. &#34;projects/cloud-connectors-e2e-testing/locations/us-central1/namespaces/istio-system/services/istio-ingressgateway-connectors&#34;</li>
 </ul>
 </li>
-<li><code>status    description=sed</code><ul>
+<li><code>ssl-config    client-cert-type=sanctus</code><ul>
+<li>Type of Client Cert (PEM/JKS/.. etc.)</li>
+</ul>
+</li>
+<li>
+<p><code>client-certificate    secret-version=accusam</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..client-private-key    secret-version=tempor</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..client-private-key-pass    secret-version=sed</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..private-server-certificate    secret-version=est</code></p>
+<ul>
+<li>The resource name of the secret version in the format, format as: <code>projects/*/secrets/*/versions/*</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    server-cert-type=takimata</code></p>
+<ul>
+<li>Type of Server Cert (PEM/JKS/.. etc.)</li>
+</ul>
+</li>
+<li><code>trust-model=dolor</code><ul>
+<li>Trust Model of the SSL connection</li>
+</ul>
+</li>
+<li><code>type=diam</code><ul>
+<li>Controls the ssl type for the given connector version.</li>
+</ul>
+</li>
+<li>
+<p><code>use-ssl=false</code></p>
+<ul>
+<li>Bool for enabling SSL</li>
+</ul>
+</li>
+<li>
+<p><code>..status    description=erat</code></p>
+<ul>
 <li>Description.</li>
 </ul>
 </li>
-<li><code>state=duo</code><ul>
+<li><code>state=justo</code><ul>
 <li>State.</li>
 </ul>
 </li>
 <li>
-<p><code>status=dolore</code></p>
+<p><code>status=ipsum</code></p>
 <ul>
 <li>Status provides detailed information for the state.</li>
 </ul>
 </li>
 <li>
-<p><code>..    suspended=false</code></p>
+<p><code>..    subscription-type=accusam</code></p>
 <ul>
+<li>Output only. This subscription type enum states the subscription type of the project.</li>
+</ul>
+</li>
+<li><code>suspended=false</code><ul>
 <li>Optional. Suspended indicates if a user has suspended a connection or not.</li>
 </ul>
 </li>
-<li><code>update-time=diam</code><ul>
+<li><code>update-time=no</code><ul>
 <li>Output only. Updated time.</li>
 </ul>
 </li>
@@ -451,7 +1067,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <code>-p</code> for completeness.</p>
 <ul>
 <li><strong>-p update-mask=string</strong><ul>
-<li>Field mask is used to specify the fields to be overwritten in the Connection resource by the update. The fields specified in the update_mask are relative to the resource, not the full request. A field will be overwritten if it is in the mask. If the user does not provide a mask then all fields will be overwritten.</li>
+<li>Required. You can modify only the fields listed below. To lock/unlock a connection: * <code>lock_config</code> To suspend/resume a connection: * <code>suspended</code> To update the connection details: * <code>description</code> * <code>labels</code> * <code>connector_version</code> * <code>config_variables</code> * <code>auth_config</code> * <code>destination_configs</code> * <code>node_config</code> * <code>log_config</code> * <code>ssl_config</code> * <code>eventing_enablement_type</code> * <code>eventing_config</code></li>
 </ul>
 </li>
 </ul>
@@ -525,32 +1141,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_locations-connections-runtime-action-schemas-list" class="btn btn-neutral float-right" title="Locations Connections Runtime Action Schemas List"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_locations-connections-list" class="btn btn-neutral" title="Locations Connections List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_locations-connections-listen-event/" class="btn btn-neutral float-left" title="Locations Connections Listen Event"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-connections-repair-eventing/" class="btn btn-neutral float-right" title="Locations Connections Repair Eventing">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -558,14 +1166,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_locations-connections-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-connections-runtime-action-schemas-list" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/connectors1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_locations-connections-listen-event/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_locations-connections-repair-eventing/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

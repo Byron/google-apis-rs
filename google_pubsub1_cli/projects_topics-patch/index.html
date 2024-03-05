@@ -1,317 +1,173 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Topics Patch - Pubsub v3.0.0+20220221</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-pubsub1-cli/projects_topics-patch/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Topics Patch - Pubsub v5.0.4+20240227</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Topics Patch";
+        var mkdocs_page_input_path = "projects_topics-patch.md";
+        var mkdocs_page_url = "/google-apis-rs/google-pubsub1-cli/projects_topics-patch/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Pubsub v3.0.0+20220221</a>
-        
+          <a href=".." class="icon icon-home"> Pubsub v5.0.4+20240227
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-create">Schemas Create</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-delete">Schemas Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-get">Schemas Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-get-iam-policy">Schemas Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-list">Schemas List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-set-iam-policy">Schemas Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-test-iam-permissions">Schemas Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-validate">Schemas Validate</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-validate-message">Schemas Validate Message</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-create">Snapshots Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-delete">Snapshots Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-get">Snapshots Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-get-iam-policy">Snapshots Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-list">Snapshots List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-patch">Snapshots Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-set-iam-policy">Snapshots Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-test-iam-permissions">Snapshots Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-acknowledge">Subscriptions Acknowledge</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-create">Subscriptions Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-delete">Subscriptions Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-detach">Subscriptions Detach</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-get">Subscriptions Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-get-iam-policy">Subscriptions Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-list">Subscriptions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-modify-ack-deadline">Subscriptions Modify Ack Deadline</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-modify-push-config">Subscriptions Modify Push Config</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-patch">Subscriptions Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-pull">Subscriptions Pull</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-seek">Subscriptions Seek</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-set-iam-policy">Subscriptions Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-test-iam-permissions">Subscriptions Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-create">Topics Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-delete">Topics Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-get">Topics Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-get-iam-policy">Topics Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-list">Topics List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Topics Patch</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-publish">Topics Publish</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-set-iam-policy">Topics Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-snapshots-list">Topics Snapshots List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-subscriptions-list">Topics Subscriptions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-test-iam-permissions">Topics Test Iam Permissions</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-commit/">Schemas Commit</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-create/">Schemas Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-delete/">Schemas Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-delete-revision/">Schemas Delete Revision</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-get/">Schemas Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-get-iam-policy/">Schemas Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-list/">Schemas List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-list-revisions/">Schemas List Revisions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-rollback/">Schemas Rollback</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-set-iam-policy/">Schemas Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-test-iam-permissions/">Schemas Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-validate/">Schemas Validate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-validate-message/">Schemas Validate Message</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-create/">Snapshots Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-delete/">Snapshots Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-get/">Snapshots Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-get-iam-policy/">Snapshots Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-list/">Snapshots List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-patch/">Snapshots Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-set-iam-policy/">Snapshots Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-test-iam-permissions/">Snapshots Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-acknowledge/">Subscriptions Acknowledge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-create/">Subscriptions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-delete/">Subscriptions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-detach/">Subscriptions Detach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-get/">Subscriptions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-get-iam-policy/">Subscriptions Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-list/">Subscriptions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-modify-ack-deadline/">Subscriptions Modify Ack Deadline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-modify-push-config/">Subscriptions Modify Push Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-patch/">Subscriptions Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-pull/">Subscriptions Pull</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-seek/">Subscriptions Seek</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-set-iam-policy/">Subscriptions Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-test-iam-permissions/">Subscriptions Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-create/">Topics Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-delete/">Topics Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-get/">Topics Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-get-iam-policy/">Topics Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-list/">Topics List</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Topics Patch</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-publish/">Topics Publish</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-set-iam-policy/">Topics Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-snapshots-list/">Topics Snapshots List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-subscriptions-list/">Topics Subscriptions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-test-iam-permissions/">Topics Test Iam Permissions</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Pubsub v5.0.4+20240227</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Topics Patch</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/pubsub1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Topics Patch</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/pubsub1-cli/edit/master/docs/projects_topics-patch.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates an existing topic. Note that certain properties of a topic are not modifiable.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates an existing topic by updating the fields specified in the update mask. Note that certain properties of a topic are not modifiable.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -333,64 +189,116 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <p>For example, a structure like this:</p>
 <pre><code>UpdateTopicRequest:
   topic:
+    ingestion-data-source-settings:
+      aws-kinesis:
+        aws-role-arn: string
+        consumer-arn: string
+        gcp-service-account: string
+        state: string
+        stream-arn: string
     kms-key-name: string
     labels: { string: string }
     message-retention-duration: string
     message-storage-policy:
       allowed-persistence-regions: [string]
+      enforce-in-transit: boolean
     name: string
     satisfies-pzs: boolean
     schema-settings:
       encoding: string
+      first-revision-id: string
+      last-revision-id: string
       schema: string
+    state: string
   update-mask: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .topic    kms-key-name=at</code><ul>
-<li>The resource name of the Cloud KMS CryptoKey to be used to protect access to messages published on this topic. The expected format is <code>projects/*/locations/*/keyRings/*/cryptoKeys/*</code>.</li>
+<li><code>-r .topic.ingestion-data-source-settings.aws-kinesis    aws-role-arn=amet</code><ul>
+<li>Required. AWS role ARN to be used for Federated Identity authentication with Kinesis. Check the Pub/Sub docs for how to set up this role and the required permissions that need to be attached to it.</li>
 </ul>
 </li>
-<li><code>labels=key=sed</code><ul>
-<li>See [Creating and managing labels] (https://cloud.google.com/pubsub/docs/labels).</li>
-<li>the value will be associated with the given <code>key</code></li>
+<li><code>consumer-arn=erat</code><ul>
+<li>Required. The Kinesis consumer ARN to used for ingestion in Enhanced Fan-Out mode. The consumer must be already created and ready to be used.</li>
 </ul>
 </li>
-<li><code>message-retention-duration=sit</code><ul>
-<li>Indicates the minimum duration to retain a message after it is published to the topic. If this field is set, messages published to the topic in the last <code>message_retention_duration</code> are always available to subscribers. For instance, it allows any attached subscription to <a href="https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time">seek to a timestamp</a> that is up to <code>message_retention_duration</code> in the past. If this field is not set, message retention is controlled by settings on individual subscriptions. Cannot be more than 31 days or less than 10 minutes.</li>
+<li><code>gcp-service-account=dolores</code><ul>
+<li>Required. The GCP service account to be used for Federated Identity authentication with Kinesis (via a <code>AssumeRoleWithWebIdentity</code> call for the provided role). The <code>aws_role_arn</code> must be set up with <code>accounts.google.com:sub</code> equals to this service account number.</li>
+</ul>
+</li>
+<li><code>state=erat</code><ul>
+<li>Output only. An output-only field that indicates the state of the Kinesis ingestion source.</li>
 </ul>
 </li>
 <li>
-<p><code>message-storage-policy    allowed-persistence-regions=et</code></p>
+<p><code>stream-arn=accusam</code></p>
 <ul>
-<li>A list of IDs of GCP regions where messages that are published to the topic may be persisted in storage. Messages published by publishers running in non-allowed GCP regions (or running outside of GCP altogether) will be routed for storage in one of the allowed regions. An empty list means that no regions are allowed, and is not a valid configuration.</li>
+<li>Required. The Kinesis stream ARN to ingest data from.</li>
+</ul>
+</li>
+<li>
+<p><code>...    kms-key-name=sea</code></p>
+<ul>
+<li>Optional. The resource name of the Cloud KMS CryptoKey to be used to protect access to messages published on this topic. The expected format is <code>projects/*/locations/*/keyRings/*/cryptoKeys/*</code>.</li>
+</ul>
+</li>
+<li><code>labels=key=takimata</code><ul>
+<li>Optional. See [Creating and managing labels] (https://cloud.google.com/pubsub/docs/labels).</li>
+<li>the value will be associated with the given <code>key</code></li>
+</ul>
+</li>
+<li><code>message-retention-duration=lorem</code><ul>
+<li>Optional. Indicates the minimum duration to retain a message after it is published to the topic. If this field is set, messages published to the topic in the last <code>message_retention_duration</code> are always available to subscribers. For instance, it allows any attached subscription to <a href="https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time">seek to a timestamp</a> that is up to <code>message_retention_duration</code> in the past. If this field is not set, message retention is controlled by settings on individual subscriptions. Cannot be more than 31 days or less than 10 minutes.</li>
+</ul>
+</li>
+<li><code>message-storage-policy    allowed-persistence-regions=et</code><ul>
+<li>Optional. A list of IDs of Google Cloud regions where messages that are published to the topic may be persisted in storage. Messages published by publishers running in non-allowed Google Cloud regions (or running outside of Google Cloud altogether) are routed for storage in one of the allowed regions. An empty list means that no regions are allowed, and is not a valid configuration.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=tempor</code></p>
+<p><code>enforce-in-transit=false</code></p>
+<ul>
+<li>Optional. If true, <code>allowed_persistence_regions</code> is also used to enforce in-transit guarantees for messages. That is, Pub/Sub will fail Publish operations on this topic and subscribe operations on any subscription attached to this topic in any region that is not in <code>allowed_persistence_regions</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    name=dolor</code></p>
 <ul>
 <li>Required. The name of the topic. It must have the format <code>&amp;#34;projects/{project}/topics/{topic}&amp;#34;</code>. <code>{topic}</code> must start with a letter, and contain only letters (<code>[A-Za-z]</code>), numbers (<code>[0-9]</code>), dashes (<code>-</code>), underscores (<code>_</code>), periods (<code>.</code>), tildes (<code>~</code>), plus (<code>+</code>) or percent signs (<code>%</code>). It must be between 3 and 255 characters in length, and it must not start with <code>&amp;#34;goog&amp;#34;</code>.</li>
 </ul>
 </li>
 <li><code>satisfies-pzs=true</code><ul>
-<li>Reserved for future use. This field is set only in responses from the server; it is ignored if it is set in any requests.</li>
+<li>Optional. Reserved for future use. This field is set only in responses from the server; it is ignored if it is set in any requests.</li>
 </ul>
 </li>
-<li><code>schema-settings    encoding=est</code><ul>
-<li>The encoding of messages validated against <code>schema</code>.</li>
+<li><code>schema-settings    encoding=erat</code><ul>
+<li>Optional. The encoding of messages validated against <code>schema</code>.</li>
+</ul>
+</li>
+<li><code>first-revision-id=sea</code><ul>
+<li>Optional. The minimum (inclusive) revision allowed for validating messages. If empty or not present, allow any revision to be validated against last_revision or any revision created before.</li>
+</ul>
+</li>
+<li><code>last-revision-id=nonumy</code><ul>
+<li>Optional. The maximum (inclusive) revision allowed for validating messages. If empty or not present, allow any revision to be validated against first_revision or any revision created after.</li>
 </ul>
 </li>
 <li>
-<p><code>schema=sed</code></p>
+<p><code>schema=et</code></p>
 <ul>
 <li>Required. The name of the schema that messages published should be validated against. Format is <code>projects/{project}/schemas/{schema}</code>. The value of this field will be <code>_deleted-schema_</code> if the schema has been deleted.</li>
 </ul>
 </li>
 <li>
-<p><code>...    update-mask=diam</code></p>
+<p><code>..    state=gubergren</code></p>
+<ul>
+<li>Output only. An output-only field indicating the state of the topic.</li>
+</ul>
+</li>
+<li>
+<p><code>..    update-mask=justo</code></p>
 <ul>
 <li>Required. Indicates which fields in the provided topic to update. Must be specified and non-empty. Note that if <code>update_mask</code> contains &#34;message_storage_policy&#34; but the <code>message_storage_policy</code> is not set in the <code>topic</code> provided above, then the updated value is determined by the policy configured at the project or organization level.</li>
 </ul>
@@ -485,32 +393,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_topics-publish" class="btn btn-neutral float-right" title="Topics Publish"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_topics-list" class="btn btn-neutral" title="Topics List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_topics-list/" class="btn btn-neutral float-left" title="Topics List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_topics-publish/" class="btn btn-neutral float-right" title="Topics Publish">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -518,14 +418,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_topics-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_topics-publish" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/pubsub1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_topics-list/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_topics-publish/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

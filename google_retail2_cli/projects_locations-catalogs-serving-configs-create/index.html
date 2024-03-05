@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-retail2-cli/projects_locations-catalogs-serving-configs-create/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Locations Catalogs Serving Configs Create - Cloud Retail v5.0.4+20240222</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Locations Catalogs Serving Configs Create";
+        var mkdocs_page_input_path = "projects_locations-catalogs-serving-configs-create.md";
+        var mkdocs_page_url = "/google-apis-rs/google-retail2-cli/projects_locations-catalogs-serving-configs-create/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Cloud Retail v5.0.4+20240222
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-attributes-config-add-catalog-attribute/">Locations Catalogs Attributes Config Add Catalog Attribute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-attributes-config-remove-catalog-attribute/">Locations Catalogs Attributes Config Remove Catalog Attribute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-attributes-config-replace-catalog-attribute/">Locations Catalogs Attributes Config Replace Catalog Attribute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-operations-get/">Locations Catalogs Branches Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-add-fulfillment-places/">Locations Catalogs Branches Products Add Fulfillment Places</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-add-local-inventories/">Locations Catalogs Branches Products Add Local Inventories</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-create/">Locations Catalogs Branches Products Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-delete/">Locations Catalogs Branches Products Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-get/">Locations Catalogs Branches Products Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-import/">Locations Catalogs Branches Products Import</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-list/">Locations Catalogs Branches Products List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-patch/">Locations Catalogs Branches Products Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-purge/">Locations Catalogs Branches Products Purge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-remove-fulfillment-places/">Locations Catalogs Branches Products Remove Fulfillment Places</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-remove-local-inventories/">Locations Catalogs Branches Products Remove Local Inventories</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-set-inventory/">Locations Catalogs Branches Products Set Inventory</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-complete-query/">Locations Catalogs Complete Query</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-completion-data-import/">Locations Catalogs Completion Data Import</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-controls-create/">Locations Catalogs Controls Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-controls-delete/">Locations Catalogs Controls Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-controls-get/">Locations Catalogs Controls Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-controls-list/">Locations Catalogs Controls List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-controls-patch/">Locations Catalogs Controls Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-export-analytics-metrics/">Locations Catalogs Export Analytics Metrics</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-get-attributes-config/">Locations Catalogs Get Attributes Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-get-completion-config/">Locations Catalogs Get Completion Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-get-default-branch/">Locations Catalogs Get Default Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-list/">Locations Catalogs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-create/">Locations Catalogs Models Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-delete/">Locations Catalogs Models Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-get/">Locations Catalogs Models Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-list/">Locations Catalogs Models List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-patch/">Locations Catalogs Models Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-pause/">Locations Catalogs Models Pause</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-resume/">Locations Catalogs Models Resume</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-tune/">Locations Catalogs Models Tune</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-operations-get/">Locations Catalogs Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-operations-list/">Locations Catalogs Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-patch/">Locations Catalogs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-placements-predict/">Locations Catalogs Placements Predict</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-placements-search/">Locations Catalogs Placements Search</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-add-control/">Locations Catalogs Serving Configs Add Control</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Locations Catalogs Serving Configs Create</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-delete/">Locations Catalogs Serving Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-get/">Locations Catalogs Serving Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-list/">Locations Catalogs Serving Configs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-patch/">Locations Catalogs Serving Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-predict/">Locations Catalogs Serving Configs Predict</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-remove-control/">Locations Catalogs Serving Configs Remove Control</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-search/">Locations Catalogs Serving Configs Search</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-set-default-branch/">Locations Catalogs Set Default Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-update-attributes-config/">Locations Catalogs Update Attributes Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-update-completion-config/">Locations Catalogs Update Completion Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-user-events-collect/">Locations Catalogs User Events Collect</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-user-events-import/">Locations Catalogs User Events Import</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-user-events-purge/">Locations Catalogs User Events Purge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-user-events-rejoin/">Locations Catalogs User Events Rejoin</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-user-events-write/">Locations Catalogs User Events Write</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_operations-get/">Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_operations-list/">Operations List</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Cloud Retail v5.0.4+20240222</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Locations Catalogs Serving Configs Create</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/retail2-cli/edit/master/docs/projects_locations-catalogs-serving-configs-create.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Creates a ServingConfig. A maximum of 100 ServingConfigs are allowed in a Catalog, otherwise a FAILED_PRECONDITION error is returned.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>retail2 --scope &lt;scope&gt; projects locations-catalogs-serving-configs-create ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
+<li>Required. Full resource name of parent. Format: <code>projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}</code></li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>GoogleCloudRetailV2ServingConfig:
+  boost-control-ids: [string]
+  display-name: string
+  diversity-level: string
+  diversity-type: string
+  do-not-associate-control-ids: [string]
+  dynamic-facet-spec:
+    mode: string
+  enable-category-filter-level: string
+  facet-control-ids: [string]
+  filter-control-ids: [string]
+  ignore-control-ids: [string]
+  model-id: string
+  name: string
+  oneway-synonyms-control-ids: [string]
+  personalization-spec:
+    mode: string
+  price-reranking-level: string
+  redirect-control-ids: [string]
+  replacement-control-ids: [string]
+  solution-types: [string]
+  twoway-synonyms-control-ids: [string]
+
+</code></pre>
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    boost-control-ids=ipsum</code><ul>
+<li>Condition boost specifications. If a product matches multiple conditions in the specifications, boost scores from these specifications are all applied and combined in a non-linear way. Maximum number of specifications is 100. Notice that if both ServingConfig.boost_control_ids and SearchRequest.boost_spec are set, the boost conditions from both places are evaluated. If a search request matches multiple boost conditions, the final boost score is equal to the sum of the boost scores from all matched boost conditions. Can only be set if solution_types is SOLUTION_TYPE_SEARCH.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>display-name=invidunt</code><ul>
+<li>Required. The human readable serving config display name. Used in Retail UI. This field must be a UTF-8 encoded string with a length limit of 128 characters. Otherwise, an INVALID_ARGUMENT error is returned.</li>
+</ul>
+</li>
+<li><code>diversity-level=stet</code><ul>
+<li>How much diversity to use in recommendation model results e.g. <code>medium-diversity</code> or <code>high-diversity</code>. Currently supported values: * <code>no-diversity</code> * <code>low-diversity</code> * <code>medium-diversity</code> * <code>high-diversity</code> * <code>auto-diversity</code> If not specified, we choose default based on recommendation model type. Default value: <code>no-diversity</code>. Can only be set if solution_types is SOLUTION_TYPE_RECOMMENDATION.</li>
+</ul>
+</li>
+<li><code>diversity-type=voluptua.</code><ul>
+<li>What kind of diversity to use - data driven or rule based. If unset, the server behavior defaults to RULE_BASED_DIVERSITY.</li>
+</ul>
+</li>
+<li><code>do-not-associate-control-ids=at</code><ul>
+<li>Condition do not associate specifications. If multiple do not associate conditions match, all matching do not associate controls in the list will execute. - Order does not matter. - Maximum number of specifications is 100. Can only be set if solution_types is SOLUTION_TYPE_SEARCH.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>dynamic-facet-spec    mode=diam</code></p>
+<ul>
+<li>Mode of the DynamicFacet feature. Defaults to Mode.DISABLED if it&#39;s unset.</li>
+</ul>
+</li>
+<li>
+<p><code>..    enable-category-filter-level=amet</code></p>
+<ul>
+<li>Whether to add additional category filters on the <code>similar-items</code> model. If not specified, we enable it by default. Allowed values are: * <code>no-category-match</code>: No additional filtering of original results from the model and the customer&#39;s filters. * <code>relaxed-category-match</code>: Only keep results with categories that match at least one item categories in the PredictRequests&#39;s context item. * If customer also sends filters in the PredictRequest, then the results will satisfy both conditions (user given and category match). Can only be set if solution_types is SOLUTION_TYPE_RECOMMENDATION.</li>
+</ul>
+</li>
+<li><code>facet-control-ids=at</code><ul>
+<li>Facet specifications for faceted search. If empty, no facets are returned. The ids refer to the ids of Control resources with only the Facet control set. These controls are assumed to be in the same Catalog as the ServingConfig. A maximum of 100 values are allowed. Otherwise, an INVALID_ARGUMENT error is returned. Can only be set if solution_types is SOLUTION_TYPE_SEARCH.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>filter-control-ids=eirmod</code><ul>
+<li>Condition filter specifications. If a product matches multiple conditions in the specifications, filters from these specifications are all applied and combined via the AND operator. Maximum number of specifications is 100. Can only be set if solution_types is SOLUTION_TYPE_SEARCH.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>ignore-control-ids=erat</code><ul>
+<li>Condition ignore specifications. If multiple ignore conditions match, all matching ignore controls in the list will execute. - Order does not matter. - Maximum number of specifications is 100. Can only be set if solution_types is SOLUTION_TYPE_SEARCH.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>model-id=duo</code><ul>
+<li>The id of the model in the same Catalog to use at serving time. Currently only RecommendationModels are supported: https://cloud.google.com/retail/recommendations-ai/docs/create-models Can be changed but only to a compatible model (e.g. others-you-may-like CTR to others-you-may-like CVR). Required when solution_types is SOLUTION_TYPE_RECOMMENDATION.</li>
+</ul>
+</li>
+<li><code>name=et</code><ul>
+<li>Immutable. Fully qualified name <code>projects/*/locations/global/catalogs/*/servingConfig/*</code></li>
+</ul>
+</li>
+<li><code>oneway-synonyms-control-ids=erat</code><ul>
+<li>Condition oneway synonyms specifications. If multiple oneway synonyms conditions match, all matching oneway synonyms controls in the list will execute. Order of controls in the list will not matter. Maximum number of specifications is 100. Can only be set if solution_types is SOLUTION_TYPE_SEARCH.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>personalization-spec    mode=sit</code></p>
+<ul>
+<li>Defaults to Mode.AUTO.</li>
+</ul>
+</li>
+<li>
+<p><code>..    price-reranking-level=accusam</code></p>
+<ul>
+<li>How much price ranking we want in serving results. Price reranking causes product items with a similar recommendation probability to be ordered by price, with the highest-priced items first. This setting could result in a decrease in click-through and conversion rates. Allowed values are: * <code>no-price-reranking</code> * <code>low-price-reranking</code> * <code>medium-price-reranking</code> * <code>high-price-reranking</code> If not specified, we choose default based on model type. Default value: <code>no-price-reranking</code>. Can only be set if solution_types is SOLUTION_TYPE_RECOMMENDATION.</li>
+</ul>
+</li>
+<li><code>redirect-control-ids=et</code><ul>
+<li>Condition redirect specifications. Only the first triggered redirect action is applied, even if multiple apply. Maximum number of specifications is 1000. Can only be set if solution_types is SOLUTION_TYPE_SEARCH.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>replacement-control-ids=nonumy</code><ul>
+<li>Condition replacement specifications. - Applied according to the order in the list. - A previously replaced term can not be re-replaced. - Maximum number of specifications is 100. Can only be set if solution_types is SOLUTION_TYPE_SEARCH.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>solution-types=accusam</code><ul>
+<li>Required. Immutable. Specifies the solution types that a serving config can be associated with. Currently we support setting only one type of solution.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>twoway-synonyms-control-ids=ut</code><ul>
+<li>Condition synonyms specifications. If multiple syonyms conditions match, all matching synonyms control in the list will execute. Order of controls in the list will not matter. Maximum number of specifications is 100. Can only be set if solution_types is SOLUTION_TYPE_SEARCH.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li><strong>-p serving-config-id=string</strong><ul>
+<li>Required. The ID to use for the ServingConfig, which will become the final component of the ServingConfig&#39;s resource name. This value should be 4-63 characters, and valid characters are /a-z-_/.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_locations-catalogs-serving-configs-add-control/" class="btn btn-neutral float-left" title="Locations Catalogs Serving Configs Add Control"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-catalogs-serving-configs-delete/" class="btn btn-neutral float-right" title="Locations Catalogs Serving Configs Delete">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/retail2-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_locations-catalogs-serving-configs-add-control/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_locations-catalogs-serving-configs-delete/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

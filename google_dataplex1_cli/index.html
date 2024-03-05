@@ -1,441 +1,336 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Cloud Dataplex v3.0.0+20220223</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="./css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="./css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="./css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="./js/highlight.pack.js"></script>
-  <script src="./js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="A complete library to interact with Cloud Dataplex (protocol v1)" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-dataplex1-cli/" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>Cloud Dataplex v5.0.4+20240224</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Home";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = "/google-apis-rs/google-dataplex1-cli/";
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href="." class="icon icon-home"> Cloud Dataplex v3.0.0+20220223</a>
-        
+          <a href="." class="icon icon-home"> Cloud Dataplex v5.0.4+20240224
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-get/">Locations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-actions-list/">Locations Lakes Actions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-content-get-iam-policy/">Locations Lakes Content Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-content-set-iam-policy/">Locations Lakes Content Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-content-test-iam-permissions/">Locations Lakes Content Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-contentitems-create/">Locations Lakes Contentitems Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-contentitems-delete/">Locations Lakes Contentitems Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-contentitems-get/">Locations Lakes Contentitems Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-contentitems-list/">Locations Lakes Contentitems List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-contentitems-patch/">Locations Lakes Contentitems Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-create/">Locations Lakes Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-delete/">Locations Lakes Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-environments-create/">Locations Lakes Environments Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-environments-delete/">Locations Lakes Environments Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-environments-get/">Locations Lakes Environments Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-environments-get-iam-policy/">Locations Lakes Environments Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-environments-list/">Locations Lakes Environments List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-environments-patch/">Locations Lakes Environments Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-environments-sessions-list/">Locations Lakes Environments Sessions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-environments-set-iam-policy/">Locations Lakes Environments Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-environments-test-iam-permissions/">Locations Lakes Environments Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-get/">Locations Lakes Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-get-iam-policy/">Locations Lakes Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-list/">Locations Lakes List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-patch/">Locations Lakes Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-set-iam-policy/">Locations Lakes Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-tasks-create/">Locations Lakes Tasks Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-tasks-delete/">Locations Lakes Tasks Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-tasks-get/">Locations Lakes Tasks Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-tasks-get-iam-policy/">Locations Lakes Tasks Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-tasks-jobs-cancel/">Locations Lakes Tasks Jobs Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-tasks-jobs-get/">Locations Lakes Tasks Jobs Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-tasks-jobs-list/">Locations Lakes Tasks Jobs List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-tasks-list/">Locations Lakes Tasks List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-tasks-patch/">Locations Lakes Tasks Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-tasks-set-iam-policy/">Locations Lakes Tasks Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-tasks-test-iam-permissions/">Locations Lakes Tasks Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-test-iam-permissions/">Locations Lakes Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-actions-list/">Locations Lakes Zones Actions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-assets-actions-list/">Locations Lakes Zones Assets Actions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-assets-create/">Locations Lakes Zones Assets Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-assets-delete/">Locations Lakes Zones Assets Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-assets-get/">Locations Lakes Zones Assets Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-assets-get-iam-policy/">Locations Lakes Zones Assets Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-assets-list/">Locations Lakes Zones Assets List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-assets-patch/">Locations Lakes Zones Assets Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-assets-set-iam-policy/">Locations Lakes Zones Assets Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-assets-test-iam-permissions/">Locations Lakes Zones Assets Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-create/">Locations Lakes Zones Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-delete/">Locations Lakes Zones Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-entities-create/">Locations Lakes Zones Entities Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-entities-delete/">Locations Lakes Zones Entities Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-entities-get/">Locations Lakes Zones Entities Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-entities-list/">Locations Lakes Zones Entities List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-entities-partitions-create/">Locations Lakes Zones Entities Partitions Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-entities-partitions-delete/">Locations Lakes Zones Entities Partitions Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-entities-partitions-get/">Locations Lakes Zones Entities Partitions Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-entities-partitions-list/">Locations Lakes Zones Entities Partitions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-entities-update/">Locations Lakes Zones Entities Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-get/">Locations Lakes Zones Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-get-iam-policy/">Locations Lakes Zones Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-list/">Locations Lakes Zones List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-patch/">Locations Lakes Zones Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-set-iam-policy/">Locations Lakes Zones Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-lakes-zones-test-iam-permissions/">Locations Lakes Zones Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-list/">Locations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-operations-cancel/">Locations Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-operations-delete/">Locations Operations Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-operations-get/">Locations Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="projects_locations-operations-list/">Locations Operations List</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-aspect-types-get-iam-policy/">Locations Aspect Types Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-aspect-types-set-iam-policy/">Locations Aspect Types Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-aspect-types-test-iam-permissions/">Locations Aspect Types Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-attribute-bindings-create/">Locations Data Attribute Bindings Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-attribute-bindings-delete/">Locations Data Attribute Bindings Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-attribute-bindings-get/">Locations Data Attribute Bindings Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-attribute-bindings-get-iam-policy/">Locations Data Attribute Bindings Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-attribute-bindings-list/">Locations Data Attribute Bindings List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-attribute-bindings-patch/">Locations Data Attribute Bindings Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-attribute-bindings-set-iam-policy/">Locations Data Attribute Bindings Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-attribute-bindings-test-iam-permissions/">Locations Data Attribute Bindings Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-scans-create/">Locations Data Scans Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-scans-delete/">Locations Data Scans Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-scans-get/">Locations Data Scans Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-scans-get-iam-policy/">Locations Data Scans Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-scans-jobs-get/">Locations Data Scans Jobs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-scans-jobs-list/">Locations Data Scans Jobs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-scans-list/">Locations Data Scans List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-scans-patch/">Locations Data Scans Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-scans-run/">Locations Data Scans Run</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-scans-set-iam-policy/">Locations Data Scans Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-scans-test-iam-permissions/">Locations Data Scans Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-attributes-create/">Locations Data Taxonomies Attributes Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-attributes-delete/">Locations Data Taxonomies Attributes Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-attributes-get/">Locations Data Taxonomies Attributes Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-attributes-get-iam-policy/">Locations Data Taxonomies Attributes Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-attributes-list/">Locations Data Taxonomies Attributes List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-attributes-patch/">Locations Data Taxonomies Attributes Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-attributes-set-iam-policy/">Locations Data Taxonomies Attributes Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-attributes-test-iam-permissions/">Locations Data Taxonomies Attributes Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-create/">Locations Data Taxonomies Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-delete/">Locations Data Taxonomies Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-get/">Locations Data Taxonomies Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-get-iam-policy/">Locations Data Taxonomies Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-list/">Locations Data Taxonomies List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-patch/">Locations Data Taxonomies Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-set-iam-policy/">Locations Data Taxonomies Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-data-taxonomies-test-iam-permissions/">Locations Data Taxonomies Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-entry-groups-get-iam-policy/">Locations Entry Groups Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-entry-groups-set-iam-policy/">Locations Entry Groups Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-entry-groups-test-iam-permissions/">Locations Entry Groups Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-entry-types-get-iam-policy/">Locations Entry Types Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-entry-types-set-iam-policy/">Locations Entry Types Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-entry-types-test-iam-permissions/">Locations Entry Types Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-governance-rules-get-iam-policy/">Locations Governance Rules Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-governance-rules-set-iam-policy/">Locations Governance Rules Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-governance-rules-test-iam-permissions/">Locations Governance Rules Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-actions-list/">Locations Lakes Actions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-content-create/">Locations Lakes Content Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-content-delete/">Locations Lakes Content Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-content-get/">Locations Lakes Content Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-content-get-iam-policy/">Locations Lakes Content Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-content-list/">Locations Lakes Content List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-content-patch/">Locations Lakes Content Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-content-set-iam-policy/">Locations Lakes Content Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-content-test-iam-permissions/">Locations Lakes Content Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-contentitems-create/">Locations Lakes Contentitems Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-contentitems-delete/">Locations Lakes Contentitems Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-contentitems-get/">Locations Lakes Contentitems Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-contentitems-get-iam-policy/">Locations Lakes Contentitems Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-contentitems-list/">Locations Lakes Contentitems List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-contentitems-patch/">Locations Lakes Contentitems Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-contentitems-set-iam-policy/">Locations Lakes Contentitems Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-contentitems-test-iam-permissions/">Locations Lakes Contentitems Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-create/">Locations Lakes Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-delete/">Locations Lakes Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-environments-create/">Locations Lakes Environments Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-environments-delete/">Locations Lakes Environments Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-environments-get/">Locations Lakes Environments Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-environments-get-iam-policy/">Locations Lakes Environments Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-environments-list/">Locations Lakes Environments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-environments-patch/">Locations Lakes Environments Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-environments-sessions-list/">Locations Lakes Environments Sessions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-environments-set-iam-policy/">Locations Lakes Environments Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-environments-test-iam-permissions/">Locations Lakes Environments Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-get/">Locations Lakes Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-get-iam-policy/">Locations Lakes Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-list/">Locations Lakes List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-patch/">Locations Lakes Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-set-iam-policy/">Locations Lakes Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-tasks-create/">Locations Lakes Tasks Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-tasks-delete/">Locations Lakes Tasks Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-tasks-get/">Locations Lakes Tasks Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-tasks-get-iam-policy/">Locations Lakes Tasks Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-tasks-jobs-cancel/">Locations Lakes Tasks Jobs Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-tasks-jobs-get/">Locations Lakes Tasks Jobs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-tasks-jobs-list/">Locations Lakes Tasks Jobs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-tasks-list/">Locations Lakes Tasks List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-tasks-patch/">Locations Lakes Tasks Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-tasks-run/">Locations Lakes Tasks Run</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-tasks-set-iam-policy/">Locations Lakes Tasks Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-tasks-test-iam-permissions/">Locations Lakes Tasks Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-test-iam-permissions/">Locations Lakes Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-actions-list/">Locations Lakes Zones Actions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-assets-actions-list/">Locations Lakes Zones Assets Actions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-assets-create/">Locations Lakes Zones Assets Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-assets-delete/">Locations Lakes Zones Assets Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-assets-get/">Locations Lakes Zones Assets Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-assets-get-iam-policy/">Locations Lakes Zones Assets Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-assets-list/">Locations Lakes Zones Assets List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-assets-patch/">Locations Lakes Zones Assets Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-assets-set-iam-policy/">Locations Lakes Zones Assets Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-assets-test-iam-permissions/">Locations Lakes Zones Assets Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-create/">Locations Lakes Zones Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-delete/">Locations Lakes Zones Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-entities-create/">Locations Lakes Zones Entities Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-entities-delete/">Locations Lakes Zones Entities Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-entities-get/">Locations Lakes Zones Entities Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-entities-list/">Locations Lakes Zones Entities List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-entities-partitions-create/">Locations Lakes Zones Entities Partitions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-entities-partitions-delete/">Locations Lakes Zones Entities Partitions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-entities-partitions-get/">Locations Lakes Zones Entities Partitions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-entities-partitions-list/">Locations Lakes Zones Entities Partitions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-entities-update/">Locations Lakes Zones Entities Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-get/">Locations Lakes Zones Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-get-iam-policy/">Locations Lakes Zones Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-list/">Locations Lakes Zones List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-patch/">Locations Lakes Zones Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-set-iam-policy/">Locations Lakes Zones Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-lakes-zones-test-iam-permissions/">Locations Lakes Zones Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-list/">Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-operations-delete/">Locations Operations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href="."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">Cloud Dataplex v5.0.4+20240224</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href=".">Docs</a> &raquo;</li>
-    <li>Home</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dataplex1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+      <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dataplex1-cli/edit/master/docs/index.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <!---
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <!---
 DO NOT EDIT !
-This file was generated automatically from 'src/mako/cli/README.md.mako'
+This file was generated automatically from 'src/generator/templates/cli/README.md.mako'
 DO NOT EDIT !
 -->
-
 <p>The <code>dataplex1</code> command-line interface <em>(CLI)</em> allows to use most features of the <em>Google Cloud Dataplex</em> service from the comfort of your terminal.</p>
 <p>By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
 capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.</p>
@@ -444,24 +339,78 @@ capabilities. Errors will be printed to standard error, and cause the program's 
 <a href="https://cloud.google.com/dataplex/docs">official documentation site</a>.</p>
 <h1 id="installation-and-source-code">Installation and Source Code</h1>
 <p>Install the command-line interface with cargo using:</p>
-<pre><code class="bash">cargo install google-dataplex1-cli
+<pre><code class="language-bash">cargo install google-dataplex1-cli
 </code></pre>
-
 <p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dataplex1-cli">on github</a>.</p>
 <h1 id="usage">Usage</h1>
-<p>This documentation was generated from the <em>Cloud Dataplex</em> API at revision <em>20220223</em>. The CLI is at version <em>3.0.0</em>.</p>
-<pre><code class="bash">dataplex1 [options]
+<p>This documentation was generated from the <em>Cloud Dataplex</em> API at revision <em>20240224</em>. The CLI is at version <em>5.0.4</em>.</p>
+<pre><code class="language-bash">dataplex1 [options]
         projects
+                locations-aspect-types-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-aspect-types-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-aspect-types-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-attribute-bindings-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-attribute-bindings-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-attribute-bindings-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-attribute-bindings-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-attribute-bindings-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-attribute-bindings-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-attribute-bindings-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-attribute-bindings-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-scans-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-scans-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-scans-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-scans-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-scans-jobs-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-scans-jobs-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-scans-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-scans-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-scans-run &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-scans-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-scans-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-attributes-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-attributes-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-attributes-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-attributes-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-attributes-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-attributes-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-attributes-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-attributes-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-data-taxonomies-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-entry-groups-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-entry-groups-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-entry-groups-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-entry-types-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-entry-types-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-entry-types-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-governance-rules-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-governance-rules-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-governance-rules-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-actions-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-lakes-content-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-lakes-content-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-lakes-content-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-content-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-lakes-content-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-lakes-content-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-content-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-content-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-contentitems-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-contentitems-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-contentitems-get &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-lakes-contentitems-get-iam-policy &lt;resource&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-contentitems-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-contentitems-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-lakes-contentitems-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-lakes-contentitems-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-delete &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-environments-create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -487,6 +436,7 @@ capabilities. Errors will be printed to standard error, and cause the program's 
                 locations-lakes-tasks-jobs-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-tasks-list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-tasks-patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                locations-lakes-tasks-run &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-tasks-set-iam-policy &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-tasks-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
                 locations-lakes-test-iam-permissions &lt;resource&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
@@ -535,7 +485,6 @@ Configuration:
             [default: ~/.google-service-cli]
 
 </code></pre>
-
 <h1 id="configuration">Configuration</h1>
 <p>The program will store all persistent data in the <code>~/.google-service-cli</code> directory in <em>JSON</em> files prefixed with <code>dataplex1-</code>.  You can change the directory used to store configuration with the <code>--config-dir</code> flag on a per-invocation basis.</p>
 <p>More information about the various kinds of persistent data are given in the following paragraphs.</p>
@@ -570,30 +519,23 @@ what exactly led to a particular issue. This is done by allowing all client-serv
 output to standard error <em>as-is</em>.</p>
 <p>The <code>--debug</code> flag will print errors using the <code>Debug</code> representation to standard error.</p>
 <p>You may consider redirecting standard error into a file for ease of use, e.g. <code>dataplex1 --debug &lt;resource&gt; &lt;method&gt; [options] 2&gt;debug.txt</code>.</p>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="projects_locations-get/" class="btn btn-neutral float-right" title="Locations Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="projects_locations-aspect-types-get-iam-policy/" class="btn btn-neutral float-right" title="Locations Aspect Types Get Iam Policy">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -601,14 +543,33 @@ output to standard error <em>as-is</em>.</p>
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="projects_locations-get/" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dataplex1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+      <span><a href="projects_locations-aspect-types-get-iam-policy/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>
+
+<!--
+MkDocs version : 1.3.1
+Build Date UTC : 2024-03-05 20:04:44.037857+00:00
+-->

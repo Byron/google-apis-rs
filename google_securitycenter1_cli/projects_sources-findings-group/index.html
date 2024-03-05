@@ -1,544 +1,427 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Sources Findings Group - Security Command Center v3.0.0+20220224</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-securitycenter1-cli/projects_sources-findings-group/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Sources Findings Group - Security Command Center v5.0.4+20240302</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Sources Findings Group";
+        var mkdocs_page_input_path = "projects_sources-findings-group.md";
+        var mkdocs_page_url = "/google-apis-rs/google-securitycenter1-cli/projects_sources-findings-group/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Security Command Center v3.0.0+20220224</a>
-        
+          <a href=".." class="icon icon-home"> Security Command Center v5.0.4+20240302
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Folders</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_assets-group">Assets Group</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_assets-list">Assets List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_assets-update-security-marks">Assets Update Security Marks</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_big-query-exports-create">Big Query Exports Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_big-query-exports-delete">Big Query Exports Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_big-query-exports-get">Big Query Exports Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_big-query-exports-list">Big Query Exports List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_big-query-exports-patch">Big Query Exports Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_findings-bulk-mute">Findings Bulk Mute</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_mute-configs-create">Mute Configs Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_mute-configs-delete">Mute Configs Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_mute-configs-get">Mute Configs Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_mute-configs-list">Mute Configs List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_mute-configs-patch">Mute Configs Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_sources-findings-external-systems-patch">Sources Findings External Systems Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_sources-findings-group">Sources Findings Group</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_sources-findings-list">Sources Findings List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_sources-findings-patch">Sources Findings Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_sources-findings-set-mute">Sources Findings Set Mute</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_sources-findings-set-state">Sources Findings Set State</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_sources-findings-update-security-marks">Sources Findings Update Security Marks</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_sources-list">Sources List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Organizations</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_assets-group">Assets Group</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_assets-list">Assets List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_assets-run-discovery">Assets Run Discovery</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_assets-update-security-marks">Assets Update Security Marks</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_big-query-exports-create">Big Query Exports Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_big-query-exports-delete">Big Query Exports Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_big-query-exports-get">Big Query Exports Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_big-query-exports-list">Big Query Exports List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_big-query-exports-patch">Big Query Exports Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_findings-bulk-mute">Findings Bulk Mute</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_get-organization-settings">Get Organization Settings</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_mute-configs-create">Mute Configs Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_mute-configs-delete">Mute Configs Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_mute-configs-get">Mute Configs Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_mute-configs-list">Mute Configs List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_mute-configs-patch">Mute Configs Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_notification-configs-create">Notification Configs Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_notification-configs-delete">Notification Configs Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_notification-configs-get">Notification Configs Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_notification-configs-list">Notification Configs List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_notification-configs-patch">Notification Configs Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_operations-cancel">Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_operations-delete">Operations Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_operations-get">Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_operations-list">Operations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sources-create">Sources Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sources-findings-create">Sources Findings Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sources-findings-external-systems-patch">Sources Findings External Systems Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sources-findings-group">Sources Findings Group</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sources-findings-list">Sources Findings List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sources-findings-patch">Sources Findings Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sources-findings-set-mute">Sources Findings Set Mute</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sources-findings-set-state">Sources Findings Set State</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sources-findings-update-security-marks">Sources Findings Update Security Marks</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sources-get">Sources Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sources-get-iam-policy">Sources Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sources-list">Sources List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sources-patch">Sources Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sources-set-iam-policy">Sources Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sources-test-iam-permissions">Sources Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_update-organization-settings">Update Organization Settings</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_assets-group">Assets Group</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_assets-list">Assets List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_assets-update-security-marks">Assets Update Security Marks</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_big-query-exports-create">Big Query Exports Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_big-query-exports-delete">Big Query Exports Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_big-query-exports-get">Big Query Exports Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_big-query-exports-list">Big Query Exports List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_big-query-exports-patch">Big Query Exports Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_findings-bulk-mute">Findings Bulk Mute</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_mute-configs-create">Mute Configs Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_mute-configs-delete">Mute Configs Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_mute-configs-get">Mute Configs Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_mute-configs-list">Mute Configs List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_mute-configs-patch">Mute Configs Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_sources-findings-external-systems-patch">Sources Findings External Systems Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Sources Findings Group</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_sources-findings-list">Sources Findings List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_sources-findings-patch">Sources Findings Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_sources-findings-set-mute">Sources Findings Set Mute</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_sources-findings-set-state">Sources Findings Set State</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_sources-findings-update-security-marks">Sources Findings Update Security Marks</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_sources-list">Sources List</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Folders</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_assets-group/">Assets Group</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_assets-list/">Assets List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_assets-update-security-marks/">Assets Update Security Marks</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_big-query-exports-create/">Big Query Exports Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_big-query-exports-delete/">Big Query Exports Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_big-query-exports-get/">Big Query Exports Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_big-query-exports-list/">Big Query Exports List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_big-query-exports-patch/">Big Query Exports Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_event-threat-detection-settings-custom-modules-create/">Event Threat Detection Settings Custom Modules Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_event-threat-detection-settings-custom-modules-delete/">Event Threat Detection Settings Custom Modules Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_event-threat-detection-settings-custom-modules-get/">Event Threat Detection Settings Custom Modules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_event-threat-detection-settings-custom-modules-list/">Event Threat Detection Settings Custom Modules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_event-threat-detection-settings-custom-modules-list-descendant/">Event Threat Detection Settings Custom Modules List Descendant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_event-threat-detection-settings-custom-modules-patch/">Event Threat Detection Settings Custom Modules Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_event-threat-detection-settings-effective-custom-modules-get/">Event Threat Detection Settings Effective Custom Modules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_event-threat-detection-settings-effective-custom-modules-list/">Event Threat Detection Settings Effective Custom Modules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_event-threat-detection-settings-validate-custom-module/">Event Threat Detection Settings Validate Custom Module</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_findings-bulk-mute/">Findings Bulk Mute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-mute-configs-delete/">Locations Mute Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-mute-configs-get/">Locations Mute Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-mute-configs-patch/">Locations Mute Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_mute-configs-create/">Mute Configs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_mute-configs-delete/">Mute Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_mute-configs-get/">Mute Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_mute-configs-list/">Mute Configs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_mute-configs-patch/">Mute Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_notification-configs-create/">Notification Configs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_notification-configs-delete/">Notification Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_notification-configs-get/">Notification Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_notification-configs-list/">Notification Configs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_notification-configs-patch/">Notification Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_security-health-analytics-settings-custom-modules-create/">Security Health Analytics Settings Custom Modules Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_security-health-analytics-settings-custom-modules-delete/">Security Health Analytics Settings Custom Modules Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_security-health-analytics-settings-custom-modules-get/">Security Health Analytics Settings Custom Modules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_security-health-analytics-settings-custom-modules-list/">Security Health Analytics Settings Custom Modules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_security-health-analytics-settings-custom-modules-list-descendant/">Security Health Analytics Settings Custom Modules List Descendant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_security-health-analytics-settings-custom-modules-patch/">Security Health Analytics Settings Custom Modules Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_security-health-analytics-settings-custom-modules-simulate/">Security Health Analytics Settings Custom Modules Simulate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_security-health-analytics-settings-effective-custom-modules-get/">Security Health Analytics Settings Effective Custom Modules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_security-health-analytics-settings-effective-custom-modules-list/">Security Health Analytics Settings Effective Custom Modules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_sources-findings-external-systems-patch/">Sources Findings External Systems Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_sources-findings-group/">Sources Findings Group</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_sources-findings-list/">Sources Findings List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_sources-findings-patch/">Sources Findings Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_sources-findings-set-mute/">Sources Findings Set Mute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_sources-findings-set-state/">Sources Findings Set State</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_sources-findings-update-security-marks/">Sources Findings Update Security Marks</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_sources-list/">Sources List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Organizations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_assets-group/">Assets Group</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_assets-list/">Assets List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_assets-run-discovery/">Assets Run Discovery</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_assets-update-security-marks/">Assets Update Security Marks</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_big-query-exports-create/">Big Query Exports Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_big-query-exports-delete/">Big Query Exports Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_big-query-exports-get/">Big Query Exports Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_big-query-exports-list/">Big Query Exports List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_big-query-exports-patch/">Big Query Exports Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_event-threat-detection-settings-custom-modules-create/">Event Threat Detection Settings Custom Modules Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_event-threat-detection-settings-custom-modules-delete/">Event Threat Detection Settings Custom Modules Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_event-threat-detection-settings-custom-modules-get/">Event Threat Detection Settings Custom Modules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_event-threat-detection-settings-custom-modules-list/">Event Threat Detection Settings Custom Modules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_event-threat-detection-settings-custom-modules-list-descendant/">Event Threat Detection Settings Custom Modules List Descendant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_event-threat-detection-settings-custom-modules-patch/">Event Threat Detection Settings Custom Modules Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_event-threat-detection-settings-effective-custom-modules-get/">Event Threat Detection Settings Effective Custom Modules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_event-threat-detection-settings-effective-custom-modules-list/">Event Threat Detection Settings Effective Custom Modules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_event-threat-detection-settings-validate-custom-module/">Event Threat Detection Settings Validate Custom Module</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_findings-bulk-mute/">Findings Bulk Mute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_get-organization-settings/">Get Organization Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-mute-configs-delete/">Locations Mute Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-mute-configs-get/">Locations Mute Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-mute-configs-patch/">Locations Mute Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_mute-configs-create/">Mute Configs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_mute-configs-delete/">Mute Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_mute-configs-get/">Mute Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_mute-configs-list/">Mute Configs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_mute-configs-patch/">Mute Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_notification-configs-create/">Notification Configs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_notification-configs-delete/">Notification Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_notification-configs-get/">Notification Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_notification-configs-list/">Notification Configs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_notification-configs-patch/">Notification Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_operations-cancel/">Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_operations-delete/">Operations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_operations-get/">Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_operations-list/">Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_resource-value-configs-batch-create/">Resource Value Configs Batch Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_resource-value-configs-delete/">Resource Value Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_resource-value-configs-get/">Resource Value Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_resource-value-configs-list/">Resource Value Configs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_resource-value-configs-patch/">Resource Value Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-health-analytics-settings-custom-modules-create/">Security Health Analytics Settings Custom Modules Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-health-analytics-settings-custom-modules-delete/">Security Health Analytics Settings Custom Modules Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-health-analytics-settings-custom-modules-get/">Security Health Analytics Settings Custom Modules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-health-analytics-settings-custom-modules-list/">Security Health Analytics Settings Custom Modules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-health-analytics-settings-custom-modules-list-descendant/">Security Health Analytics Settings Custom Modules List Descendant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-health-analytics-settings-custom-modules-patch/">Security Health Analytics Settings Custom Modules Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-health-analytics-settings-custom-modules-simulate/">Security Health Analytics Settings Custom Modules Simulate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-health-analytics-settings-effective-custom-modules-get/">Security Health Analytics Settings Effective Custom Modules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_security-health-analytics-settings-effective-custom-modules-list/">Security Health Analytics Settings Effective Custom Modules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_simulations-attack-exposure-results-attack-paths-list/">Simulations Attack Exposure Results Attack Paths List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_simulations-attack-exposure-results-valued-resources-list/">Simulations Attack Exposure Results Valued Resources List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_simulations-attack-paths-list/">Simulations Attack Paths List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_simulations-get/">Simulations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_simulations-valued-resources-attack-paths-list/">Simulations Valued Resources Attack Paths List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_simulations-valued-resources-get/">Simulations Valued Resources Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_simulations-valued-resources-list/">Simulations Valued Resources List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sources-create/">Sources Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sources-findings-create/">Sources Findings Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sources-findings-external-systems-patch/">Sources Findings External Systems Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sources-findings-group/">Sources Findings Group</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sources-findings-list/">Sources Findings List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sources-findings-patch/">Sources Findings Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sources-findings-set-mute/">Sources Findings Set Mute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sources-findings-set-state/">Sources Findings Set State</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sources-findings-update-security-marks/">Sources Findings Update Security Marks</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sources-get/">Sources Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sources-get-iam-policy/">Sources Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sources-list/">Sources List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sources-patch/">Sources Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sources-set-iam-policy/">Sources Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sources-test-iam-permissions/">Sources Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_update-organization-settings/">Update Organization Settings</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_assets-group/">Assets Group</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_assets-list/">Assets List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_assets-update-security-marks/">Assets Update Security Marks</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_big-query-exports-create/">Big Query Exports Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_big-query-exports-delete/">Big Query Exports Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_big-query-exports-get/">Big Query Exports Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_big-query-exports-list/">Big Query Exports List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_big-query-exports-patch/">Big Query Exports Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_event-threat-detection-settings-custom-modules-create/">Event Threat Detection Settings Custom Modules Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_event-threat-detection-settings-custom-modules-delete/">Event Threat Detection Settings Custom Modules Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_event-threat-detection-settings-custom-modules-get/">Event Threat Detection Settings Custom Modules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_event-threat-detection-settings-custom-modules-list/">Event Threat Detection Settings Custom Modules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_event-threat-detection-settings-custom-modules-list-descendant/">Event Threat Detection Settings Custom Modules List Descendant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_event-threat-detection-settings-custom-modules-patch/">Event Threat Detection Settings Custom Modules Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_event-threat-detection-settings-effective-custom-modules-get/">Event Threat Detection Settings Effective Custom Modules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_event-threat-detection-settings-effective-custom-modules-list/">Event Threat Detection Settings Effective Custom Modules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_event-threat-detection-settings-validate-custom-module/">Event Threat Detection Settings Validate Custom Module</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_findings-bulk-mute/">Findings Bulk Mute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-mute-configs-delete/">Locations Mute Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-mute-configs-get/">Locations Mute Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-mute-configs-patch/">Locations Mute Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_mute-configs-create/">Mute Configs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_mute-configs-delete/">Mute Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_mute-configs-get/">Mute Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_mute-configs-list/">Mute Configs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_mute-configs-patch/">Mute Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-configs-create/">Notification Configs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-configs-delete/">Notification Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-configs-get/">Notification Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-configs-list/">Notification Configs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_notification-configs-patch/">Notification Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_security-health-analytics-settings-custom-modules-create/">Security Health Analytics Settings Custom Modules Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_security-health-analytics-settings-custom-modules-delete/">Security Health Analytics Settings Custom Modules Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_security-health-analytics-settings-custom-modules-get/">Security Health Analytics Settings Custom Modules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_security-health-analytics-settings-custom-modules-list/">Security Health Analytics Settings Custom Modules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_security-health-analytics-settings-custom-modules-list-descendant/">Security Health Analytics Settings Custom Modules List Descendant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_security-health-analytics-settings-custom-modules-patch/">Security Health Analytics Settings Custom Modules Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_security-health-analytics-settings-custom-modules-simulate/">Security Health Analytics Settings Custom Modules Simulate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_security-health-analytics-settings-effective-custom-modules-get/">Security Health Analytics Settings Effective Custom Modules Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_security-health-analytics-settings-effective-custom-modules-list/">Security Health Analytics Settings Effective Custom Modules List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_sources-findings-external-systems-patch/">Sources Findings External Systems Patch</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Sources Findings Group</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_sources-findings-list/">Sources Findings List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_sources-findings-patch/">Sources Findings Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_sources-findings-set-mute/">Sources Findings Set Mute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_sources-findings-set-state/">Sources Findings Set State</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_sources-findings-update-security-marks/">Sources Findings Update Security Marks</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_sources-list/">Sources List</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Security Command Center v5.0.4+20240302</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Sources Findings Group</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/securitycenter1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Sources Findings Group</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/securitycenter1-cli/edit/master/docs/projects_sources-findings-group.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Filters an organization or source&#39;s findings and groups them by their specified properties. To group across all sources provide a <code>-</code> as the source id. Example: /v1/organizations/{organization_id}/sources/-/findings, /v1/folders/{folder_id}/sources/-/findings, /v1/projects/{project_id}/sources/-/findings</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Filters an organization or source&#39;s findings and groups them by their specified properties. To group across all sources provide a <code>-</code> as the source id. Example: /v1/organizations/{organization_id}/sources/-/findings, /v1/folders/{folder_id}/sources/-/findings, /v1/projects/{project_id}/sources/-/findings</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -563,14 +446,13 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   read-time: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    compare-duration=takimata</code><ul>
+<li><code>-r .    compare-duration=clita</code><ul>
 <li>When compare_duration is set, the GroupResult&#39;s &#34;state_change&#34; attribute is updated to indicate whether the finding had its state changed, the finding&#39;s state remained unchanged, or if the finding was added during the compare_duration period of time that precedes the read_time. This is the time between (read_time - compare_duration) and read_time. The state_change value is derived based on the presence and state of the finding at the two points in time. Intermediate state changes between the two times don&#39;t affect the result. For example, the results aren&#39;t affected if the finding is made inactive and then active again. Possible &#34;state_change&#34; values when compare_duration is specified: * &#34;CHANGED&#34;: indicates that the finding was present and matched the given filter at the start of compare_duration, but changed its state at read_time. * &#34;UNCHANGED&#34;: indicates that the finding was present and matched the given filter at the start of compare_duration and did not change state at read_time. * &#34;ADDED&#34;: indicates that the finding did not match the given filter or was not present at the start of compare_duration, but was present at read_time. * &#34;REMOVED&#34;: indicates that the finding was present and matched the filter at the start of compare_duration, but did not match the filter at read_time. If compare_duration is not specified, then the only possible state_change is &#34;UNUSED&#34;, which will be the state_change set for all findings present at read_time. If this field is set then <code>state_change</code> must be a specified field in <code>group_by</code>.</li>
 </ul>
 </li>
-<li><code>filter=erat</code><ul>
+<li><code>filter=et</code><ul>
 <li>Expression that defines the filter to apply across findings. The expression is a list of one or more restrictions combined via logical operators <code>AND</code> and <code>OR</code>. Parentheses are supported, and <code>OR</code> has higher precedence than <code>AND</code>. Restrictions have the form <code></code> and may have a <code>-</code> character in front of them to indicate negation. Examples include: * name * source_properties.a_property * security_marks.marks.marka The supported operators are: * <code>=</code> for all value types. * <code>&amp;gt;</code>, <code>&amp;lt;</code>, <code>&amp;gt;=</code>, <code>&amp;lt;=</code> for integer values. * <code>:</code>, meaning substring matching, for strings. The supported value types are: * string literals in quotes. * integer literals without quotes. * boolean literals <code>true</code> and <code>false</code> without quotes. The following field and operator combinations are supported: * name: <code>=</code> * parent: <code>=</code>, <code>:</code> * resource_name: <code>=</code>, <code>:</code> * state: <code>=</code>, <code>:</code> * category: <code>=</code>, <code>:</code> * external_uri: <code>=</code>, <code>:</code> * event_time: <code>=</code>, <code>&amp;gt;</code>, <code>&amp;lt;</code>, <code>&amp;gt;=</code>, <code>&amp;lt;=</code> Usage: This should be milliseconds since epoch or an RFC3339 string. Examples: <code>event_time = &amp;#34;2019-06-10T16:07:18-07:00&amp;#34;</code> <code>event_time = 1560208038000</code> * severity: <code>=</code>, <code>:</code> * workflow_state: <code>=</code>, <code>:</code> * security_marks.marks: <code>=</code>, <code>:</code> * source_properties: <code>=</code>, <code>:</code>, <code>&amp;gt;</code>, <code>&amp;lt;</code>, <code>&amp;gt;=</code>, <code>&amp;lt;=</code> For example, <code>source_properties.size = 100</code> is a valid filter string. Use a partial match on the empty string to filter based on a property existing: <code>source_properties.my_property : &amp;#34;&amp;#34;</code> Use a negated partial match on the empty string to filter based on a property not existing: <code>-source_properties.my_property : &amp;#34;&amp;#34;</code> * resource: * resource.name: <code>=</code>, <code>:</code> * resource.parent_name: <code>=</code>, <code>:</code> * resource.parent_display_name: <code>=</code>, <code>:</code> * resource.project_name: <code>=</code>, <code>:</code> * resource.project_display_name: <code>=</code>, <code>:</code> * resource.type: <code>=</code>, <code>:</code></li>
 </ul>
 </li>
@@ -578,15 +460,15 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Required. Expression that defines what assets fields to use for grouping (including <code>state_change</code>). The string value should follow SQL syntax: comma separated list of fields. For example: &#34;parent,resource_name&#34;. The following fields are supported: * resource_name * category * state * parent * severity The following fields are supported when compare_duration is set: * state_change</li>
 </ul>
 </li>
-<li><code>page-size=60</code><ul>
+<li><code>page-size=93</code><ul>
 <li>The maximum number of results to return in a single response. Default is 10, minimum is 1, maximum is 1000.</li>
 </ul>
 </li>
-<li><code>page-token=lorem</code><ul>
+<li><code>page-token=ipsum</code><ul>
 <li>The value returned by the last <code>GroupFindingsResponse</code>; indicates that this is a continuation of a prior <code>GroupFindings</code> call, and that the system should return the next page of data.</li>
 </ul>
 </li>
-<li><code>read-time=at</code><ul>
+<li><code>read-time=lorem</code><ul>
 <li>Time used as a reference point when filtering findings. The filter is limited to findings existing at the supplied time and their values are those at that specific time. Absence of this field will default to the API&#39;s version of NOW.</li>
 </ul>
 </li>
@@ -680,32 +562,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_sources-findings-list" class="btn btn-neutral float-right" title="Sources Findings List"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_sources-findings-external-systems-patch" class="btn btn-neutral" title="Sources Findings External Systems Patch"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_sources-findings-external-systems-patch/" class="btn btn-neutral float-left" title="Sources Findings External Systems Patch"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_sources-findings-list/" class="btn btn-neutral float-right" title="Sources Findings List">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -713,14 +587,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_sources-findings-external-systems-patch" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_sources-findings-list" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/securitycenter1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_sources-findings-external-systems-patch/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_sources-findings-list/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

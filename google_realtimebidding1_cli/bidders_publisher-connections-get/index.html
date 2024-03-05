@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-realtimebidding1-cli/bidders_publisher-connections-get/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Publisher Connections Get - Real-time Bidding v5.0.4+20240305</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Publisher Connections Get";
+        var mkdocs_page_input_path = "bidders_publisher-connections-get.md";
+        var mkdocs_page_url = "/google-apis-rs/google-realtimebidding1-cli/bidders_publisher-connections-get/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Real-time Bidding v5.0.4+20240305
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bidders</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_creatives-list/">Creatives List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_creatives-watch/">Creatives Watch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_endpoints-get/">Endpoints Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_endpoints-list/">Endpoints List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_endpoints-patch/">Endpoints Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-activate/">Pretargeting Configs Activate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-add-targeted-apps/">Pretargeting Configs Add Targeted Apps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-add-targeted-publishers/">Pretargeting Configs Add Targeted Publishers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-add-targeted-sites/">Pretargeting Configs Add Targeted Sites</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-create/">Pretargeting Configs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-delete/">Pretargeting Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-get/">Pretargeting Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-list/">Pretargeting Configs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-patch/">Pretargeting Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-remove-targeted-apps/">Pretargeting Configs Remove Targeted Apps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-remove-targeted-publishers/">Pretargeting Configs Remove Targeted Publishers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-remove-targeted-sites/">Pretargeting Configs Remove Targeted Sites</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-suspend/">Pretargeting Configs Suspend</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_publisher-connections-batch-approve/">Publisher Connections Batch Approve</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_publisher-connections-batch-reject/">Publisher Connections Batch Reject</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Publisher Connections Get</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_publisher-connections-list/">Publisher Connections List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Buyers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_creatives-create/">Creatives Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_creatives-get/">Creatives Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_creatives-list/">Creatives List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_creatives-patch/">Creatives Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_get-remarketing-tag/">Get Remarketing Tag</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_user-lists-close/">User Lists Close</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_user-lists-create/">User Lists Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_user-lists-get/">User Lists Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_user-lists-get-remarketing-tag/">User Lists Get Remarketing Tag</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_user-lists-list/">User Lists List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_user-lists-open/">User Lists Open</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_user-lists-update/">User Lists Update</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Real-time Bidding v5.0.4+20240305</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Bidders &raquo;</li>
+      <li>Publisher Connections Get</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/realtimebidding1-cli/edit/master/docs/bidders_publisher-connections-get.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Gets a publisher connection.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/realtime-bidding</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/realtime-bidding</em>.
+You can set the scope for this method like this: <code>realtimebidding1 --scope &lt;scope&gt; bidders publisher-connections-get ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
+<li>Required. Name of the publisher whose connection information is to be retrieved. In the pattern <code>bidders/{bidder}/publisherConnections/{publisher}</code> where <code>{bidder}</code> is the account ID of the bidder, and <code>{publisher}</code> is the ads.txt/app-ads.txt publisher ID. See publisherConnection.name.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../bidders_publisher-connections-batch-reject/" class="btn btn-neutral float-left" title="Publisher Connections Batch Reject"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../bidders_publisher-connections-list/" class="btn btn-neutral float-right" title="Publisher Connections List">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/realtimebidding1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../bidders_publisher-connections-batch-reject/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../bidders_publisher-connections-list/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

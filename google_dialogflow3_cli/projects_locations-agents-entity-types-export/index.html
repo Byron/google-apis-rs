@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-dialogflow3-cli/projects_locations-agents-entity-types-export/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Locations Agents Entity Types Export - Dialogflow v5.0.4+20240227</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Locations Agents Entity Types Export";
+        var mkdocs_page_input_path = "projects_locations-agents-entity-types-export.md";
+        var mkdocs_page_url = "/google-apis-rs/google-dialogflow3-cli/projects_locations-agents-entity-types-export/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Dialogflow v5.0.4+20240227
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-changelogs-get/">Locations Agents Changelogs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-changelogs-list/">Locations Agents Changelogs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-create/">Locations Agents Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-delete/">Locations Agents Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-entity-types-create/">Locations Agents Entity Types Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-entity-types-delete/">Locations Agents Entity Types Delete</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Locations Agents Entity Types Export</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-entity-types-get/">Locations Agents Entity Types Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-entity-types-import/">Locations Agents Entity Types Import</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-entity-types-list/">Locations Agents Entity Types List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-entity-types-patch/">Locations Agents Entity Types Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-continuous-test-results-list/">Locations Agents Environments Continuous Test Results List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-create/">Locations Agents Environments Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-delete/">Locations Agents Environments Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-deploy-flow/">Locations Agents Environments Deploy Flow</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-deployments-get/">Locations Agents Environments Deployments Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-deployments-list/">Locations Agents Environments Deployments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-experiments-create/">Locations Agents Environments Experiments Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-experiments-delete/">Locations Agents Environments Experiments Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-experiments-get/">Locations Agents Environments Experiments Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-experiments-list/">Locations Agents Environments Experiments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-experiments-patch/">Locations Agents Environments Experiments Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-experiments-start/">Locations Agents Environments Experiments Start</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-experiments-stop/">Locations Agents Environments Experiments Stop</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-get/">Locations Agents Environments Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-list/">Locations Agents Environments List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-lookup-environment-history/">Locations Agents Environments Lookup Environment History</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-patch/">Locations Agents Environments Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-run-continuous-test/">Locations Agents Environments Run Continuous Test</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-sessions-detect-intent/">Locations Agents Environments Sessions Detect Intent</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-sessions-entity-types-create/">Locations Agents Environments Sessions Entity Types Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-sessions-entity-types-delete/">Locations Agents Environments Sessions Entity Types Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-sessions-entity-types-get/">Locations Agents Environments Sessions Entity Types Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-sessions-entity-types-list/">Locations Agents Environments Sessions Entity Types List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-sessions-entity-types-patch/">Locations Agents Environments Sessions Entity Types Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-sessions-fulfill-intent/">Locations Agents Environments Sessions Fulfill Intent</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-sessions-match-intent/">Locations Agents Environments Sessions Match Intent</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-environments-sessions-server-streaming-detect-intent/">Locations Agents Environments Sessions Server Streaming Detect Intent</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-export/">Locations Agents Export</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-create/">Locations Agents Flows Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-delete/">Locations Agents Flows Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-export/">Locations Agents Flows Export</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-get/">Locations Agents Flows Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-get-validation-result/">Locations Agents Flows Get Validation Result</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-import/">Locations Agents Flows Import</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-list/">Locations Agents Flows List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-pages-create/">Locations Agents Flows Pages Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-pages-delete/">Locations Agents Flows Pages Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-pages-get/">Locations Agents Flows Pages Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-pages-list/">Locations Agents Flows Pages List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-pages-patch/">Locations Agents Flows Pages Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-patch/">Locations Agents Flows Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-train/">Locations Agents Flows Train</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-transition-route-groups-create/">Locations Agents Flows Transition Route Groups Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-transition-route-groups-delete/">Locations Agents Flows Transition Route Groups Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-transition-route-groups-get/">Locations Agents Flows Transition Route Groups Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-transition-route-groups-list/">Locations Agents Flows Transition Route Groups List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-transition-route-groups-patch/">Locations Agents Flows Transition Route Groups Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-validate/">Locations Agents Flows Validate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-versions-compare-versions/">Locations Agents Flows Versions Compare Versions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-versions-create/">Locations Agents Flows Versions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-versions-delete/">Locations Agents Flows Versions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-versions-get/">Locations Agents Flows Versions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-versions-list/">Locations Agents Flows Versions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-versions-load/">Locations Agents Flows Versions Load</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-flows-versions-patch/">Locations Agents Flows Versions Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-generators-create/">Locations Agents Generators Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-generators-delete/">Locations Agents Generators Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-generators-get/">Locations Agents Generators Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-generators-list/">Locations Agents Generators List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-generators-patch/">Locations Agents Generators Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-get/">Locations Agents Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-get-generative-settings/">Locations Agents Get Generative Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-get-validation-result/">Locations Agents Get Validation Result</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-intents-create/">Locations Agents Intents Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-intents-delete/">Locations Agents Intents Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-intents-export/">Locations Agents Intents Export</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-intents-get/">Locations Agents Intents Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-intents-import/">Locations Agents Intents Import</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-intents-list/">Locations Agents Intents List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-intents-patch/">Locations Agents Intents Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-list/">Locations Agents List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-patch/">Locations Agents Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-restore/">Locations Agents Restore</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-sessions-detect-intent/">Locations Agents Sessions Detect Intent</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-sessions-entity-types-create/">Locations Agents Sessions Entity Types Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-sessions-entity-types-delete/">Locations Agents Sessions Entity Types Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-sessions-entity-types-get/">Locations Agents Sessions Entity Types Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-sessions-entity-types-list/">Locations Agents Sessions Entity Types List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-sessions-entity-types-patch/">Locations Agents Sessions Entity Types Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-sessions-fulfill-intent/">Locations Agents Sessions Fulfill Intent</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-sessions-match-intent/">Locations Agents Sessions Match Intent</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-sessions-server-streaming-detect-intent/">Locations Agents Sessions Server Streaming Detect Intent</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-sessions-submit-answer-feedback/">Locations Agents Sessions Submit Answer Feedback</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-test-cases-batch-delete/">Locations Agents Test Cases Batch Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-test-cases-batch-run/">Locations Agents Test Cases Batch Run</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-test-cases-calculate-coverage/">Locations Agents Test Cases Calculate Coverage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-test-cases-create/">Locations Agents Test Cases Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-test-cases-export/">Locations Agents Test Cases Export</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-test-cases-get/">Locations Agents Test Cases Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-test-cases-import/">Locations Agents Test Cases Import</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-test-cases-list/">Locations Agents Test Cases List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-test-cases-patch/">Locations Agents Test Cases Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-test-cases-results-get/">Locations Agents Test Cases Results Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-test-cases-results-list/">Locations Agents Test Cases Results List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-test-cases-run/">Locations Agents Test Cases Run</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-transition-route-groups-create/">Locations Agents Transition Route Groups Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-transition-route-groups-delete/">Locations Agents Transition Route Groups Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-transition-route-groups-get/">Locations Agents Transition Route Groups Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-transition-route-groups-list/">Locations Agents Transition Route Groups List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-transition-route-groups-patch/">Locations Agents Transition Route Groups Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-update-generative-settings/">Locations Agents Update Generative Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-validate/">Locations Agents Validate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-webhooks-create/">Locations Agents Webhooks Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-webhooks-delete/">Locations Agents Webhooks Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-webhooks-get/">Locations Agents Webhooks Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-webhooks-list/">Locations Agents Webhooks List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-agents-webhooks-patch/">Locations Agents Webhooks Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-list/">Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-security-settings-create/">Locations Security Settings Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-security-settings-delete/">Locations Security Settings Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-security-settings-get/">Locations Security Settings Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-security-settings-list/">Locations Security Settings List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-security-settings-patch/">Locations Security Settings Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_operations-cancel/">Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_operations-get/">Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_operations-list/">Operations List</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Dialogflow v5.0.4+20240227</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Locations Agents Entity Types Export</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dialogflow3-cli/edit/master/docs/projects_locations-agents-entity-types-export.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Exports the selected entity types.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for at least one of the following scopes to make a valid call:</p>
+<ul>
+<li><em>https://www.googleapis.com/auth/cloud-platform</em></li>
+<li><em>https://www.googleapis.com/auth/dialogflow</em></li>
+</ul>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>dialogflow3 --scope &lt;scope&gt; projects locations-agents-entity-types-export ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
+<li>Required. The name of the parent agent to export entity types. Format: <code>projects//locations//agents/</code>.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>GoogleCloudDialogflowCxV3ExportEntityTypesRequest:
+  data-format: string
+  entity-types: [string]
+  entity-types-content-inline: boolean
+  entity-types-uri: string
+  language-code: string
+
+</code></pre>
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    data-format=stet</code><ul>
+<li>Optional. The data format of the exported entity types. If not specified, <code>BLOB</code> is assumed.</li>
+</ul>
+</li>
+<li><code>entity-types=kasd</code><ul>
+<li>Required. The name of the entity types to export. Format: <code>projects//locations//agents//entityTypes/</code>.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>entity-types-content-inline=true</code><ul>
+<li>Optional. The option to return the serialized entity types inline.</li>
+</ul>
+</li>
+<li><code>entity-types-uri=et</code><ul>
+<li>Optional. The <a href="https://cloud.google.com/storage/docs/">Google Cloud Storage</a> URI to export the entity types to. The format of this URI must be <code>gs:///</code>. Dialogflow performs a write operation for the Cloud Storage object on the caller&#39;s behalf, so your request authentication must have write permissions for the object. For more information, see <a href="https://cloud.google.com/dialogflow/cx/docs/concept/access-control#storage">Dialogflow access control</a>.</li>
+</ul>
+</li>
+<li><code>language-code=et</code><ul>
+<li>Optional. The language to retrieve the entity type for. The following fields are language dependent: * <code>EntityType.entities.value</code> * <code>EntityType.entities.synonyms</code> * <code>EntityType.excluded_phrases.value</code> If not specified, all language dependent fields will be retrieved. <a href="https://cloud.google.com/dialogflow/docs/reference/language">Many languages</a> are supported. Note: languages must be enabled in the agent before they can be used.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_locations-agents-entity-types-delete/" class="btn btn-neutral float-left" title="Locations Agents Entity Types Delete"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-agents-entity-types-get/" class="btn btn-neutral float-right" title="Locations Agents Entity Types Get">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dialogflow3-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_locations-agents-entity-types-delete/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_locations-agents-entity-types-get/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

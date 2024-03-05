@@ -1,340 +1,173 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Models Versions Patch - Cloud Machine Learning Engine v3.0.0+20220212</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-ml1-cli/projects_models-versions-patch/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Models Versions Patch - Cloud Machine Learning Engine v5.0.4+20240127</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Models Versions Patch";
+        var mkdocs_page_input_path = "projects_models-versions-patch.md";
+        var mkdocs_page_url = "/google-apis-rs/google-ml1-cli/projects_models-versions-patch/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Machine Learning Engine v3.0.0+20220212</a>
-        
+          <a href=".." class="icon icon-home"> Cloud Machine Learning Engine v5.0.4+20240127
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_explain">Explain</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_get-config">Get Config</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_jobs-cancel">Jobs Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_jobs-create">Jobs Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_jobs-get">Jobs Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_jobs-get-iam-policy">Jobs Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_jobs-list">Jobs List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_jobs-patch">Jobs Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_jobs-set-iam-policy">Jobs Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_jobs-test-iam-permissions">Jobs Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-get">Locations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-list">Locations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-studies-create">Locations Studies Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-studies-delete">Locations Studies Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-studies-get">Locations Studies Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-studies-list">Locations Studies List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-studies-trials-add-measurement">Locations Studies Trials Add Measurement</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-studies-trials-check-early-stopping-state">Locations Studies Trials Check Early Stopping State</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-studies-trials-complete">Locations Studies Trials Complete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-studies-trials-create">Locations Studies Trials Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-studies-trials-delete">Locations Studies Trials Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-studies-trials-get">Locations Studies Trials Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-studies-trials-list">Locations Studies Trials List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-studies-trials-list-optimal-trials">Locations Studies Trials List Optimal Trials</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-studies-trials-stop">Locations Studies Trials Stop</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-studies-trials-suggest">Locations Studies Trials Suggest</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_models-create">Models Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_models-delete">Models Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_models-get">Models Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_models-get-iam-policy">Models Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_models-list">Models List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_models-patch">Models Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_models-set-iam-policy">Models Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_models-test-iam-permissions">Models Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_models-versions-create">Models Versions Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_models-versions-delete">Models Versions Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_models-versions-get">Models Versions Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_models-versions-list">Models Versions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Models Versions Patch</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_models-versions-set-default">Models Versions Set Default</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_operations-cancel">Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_operations-get">Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_operations-list">Operations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_predict">Predict</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_explain/">Explain</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_get-config/">Get Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_jobs-cancel/">Jobs Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_jobs-create/">Jobs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_jobs-get/">Jobs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_jobs-get-iam-policy/">Jobs Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_jobs-list/">Jobs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_jobs-patch/">Jobs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_jobs-set-iam-policy/">Jobs Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_jobs-test-iam-permissions/">Jobs Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-list/">Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-studies-create/">Locations Studies Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-studies-delete/">Locations Studies Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-studies-get/">Locations Studies Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-studies-list/">Locations Studies List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-studies-trials-add-measurement/">Locations Studies Trials Add Measurement</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-studies-trials-check-early-stopping-state/">Locations Studies Trials Check Early Stopping State</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-studies-trials-complete/">Locations Studies Trials Complete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-studies-trials-create/">Locations Studies Trials Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-studies-trials-delete/">Locations Studies Trials Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-studies-trials-get/">Locations Studies Trials Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-studies-trials-list/">Locations Studies Trials List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-studies-trials-list-optimal-trials/">Locations Studies Trials List Optimal Trials</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-studies-trials-stop/">Locations Studies Trials Stop</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-studies-trials-suggest/">Locations Studies Trials Suggest</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_models-create/">Models Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_models-delete/">Models Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_models-get/">Models Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_models-get-iam-policy/">Models Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_models-list/">Models List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_models-patch/">Models Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_models-set-iam-policy/">Models Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_models-test-iam-permissions/">Models Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_models-versions-create/">Models Versions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_models-versions-delete/">Models Versions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_models-versions-get/">Models Versions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_models-versions-list/">Models Versions List</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Models Versions Patch</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_models-versions-set-default/">Models Versions Set Default</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_operations-cancel/">Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_operations-get/">Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_operations-list/">Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_predict/">Predict</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Cloud Machine Learning Engine v5.0.4+20240127</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Models Versions Patch</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/ml1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Models Versions Patch</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/ml1-cli/edit/master/docs/projects_models-versions-patch.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates the specified Version resource. Currently the only update-able fields are <code>description</code>, <code>requestLoggingConfig</code>, <code>autoScaling.minNodes</code>, and <code>manualScaling.nodes</code>.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates the specified Version resource. Currently the only update-able fields are <code>description</code>, <code>requestLoggingConfig</code>, <code>autoScaling.minNodes</code>, and <code>manualScaling.nodes</code>.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -397,7 +230,6 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   state: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .accelerator-config    count=dolor</code><ul>
@@ -419,25 +251,25 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>min-nodes=79</code></p>
 <ul>
-<li>Optional. The minimum number of nodes to allocate for this model. These nodes are always up, starting from the time the model is deployed. Therefore, the cost of operating this model will be at least <code>rate</code> * <code>min_nodes</code> * number of hours since last billing cycle, where <code>rate</code> is the cost per node-hour as documented in the <a href="..//ml-engine/docs/pricing">pricing guide</a>, even if no predictions are performed. There is additional cost for each prediction performed. Unlike manual scaling, if the load gets too heavy for the nodes that are up, the service will automatically add nodes to handle the increased load as well as scale back as traffic drops, always maintaining at least <code>min_nodes</code>. You will be charged for the time in which additional nodes are used. If <code>min_nodes</code> is not specified and AutoScaling is used with a <a href="..//ml-engine/docs/machine-types-online-prediction">legacy (MLS1) machine type</a>, <code>min_nodes</code> defaults to 0, in which case, when traffic to a model stops (and after a cool-down period), nodes will be shut down and no charges will be incurred until traffic to the model resumes. If <code>min_nodes</code> is not specified and AutoScaling is used with a <a href="..//ml-engine/docs/machine-types-online-prediction">Compute Engine (N1) machine type</a>, <code>min_nodes</code> defaults to 1. <code>min_nodes</code> must be at least 1 for use with a Compute Engine machine type. You can set <code>min_nodes</code> when creating the model version, and you can also update <code>min_nodes</code> for an existing version: update_body.json: { &#39;autoScaling&#39;: { &#39;minNodes&#39;: 5 } } HTTP request: PATCH https://ml.googleapis.com/v1/{name=projects/<em>/models/</em>/versions/*}?update_mask=autoScaling.minNodes -d @./update_body.json </li>
+<li>Optional. The minimum number of nodes to allocate for this model. These nodes are always up, starting from the time the model is deployed. Therefore, the cost of operating this model will be at least <code>rate</code> * <code>min_nodes</code> * number of hours since last billing cycle, where <code>rate</code> is the cost per node-hour as documented in the <a href="/ml-engine/docs/pricing">pricing guide</a>, even if no predictions are performed. There is additional cost for each prediction performed. Unlike manual scaling, if the load gets too heavy for the nodes that are up, the service will automatically add nodes to handle the increased load as well as scale back as traffic drops, always maintaining at least <code>min_nodes</code>. You will be charged for the time in which additional nodes are used. If <code>min_nodes</code> is not specified and AutoScaling is used with a <a href="/ml-engine/docs/machine-types-online-prediction">legacy (MLS1) machine type</a>, <code>min_nodes</code> defaults to 0, in which case, when traffic to a model stops (and after a cool-down period), nodes will be shut down and no charges will be incurred until traffic to the model resumes. If <code>min_nodes</code> is not specified and AutoScaling is used with a <a href="/ml-engine/docs/machine-types-online-prediction">Compute Engine (N1) machine type</a>, <code>min_nodes</code> defaults to 1. <code>min_nodes</code> must be at least 1 for use with a Compute Engine machine type. You can set <code>min_nodes</code> when creating the model version, and you can also update <code>min_nodes</code> for an existing version: update_body.json: { &#39;autoScaling&#39;: { &#39;minNodes&#39;: 5 } } HTTP request: PATCH https://ml.googleapis.com/v1/{name=projects/<em>/models/</em>/versions/*}?update_mask=autoScaling.minNodes -d @./update_body.json </li>
 </ul>
 </li>
 <li>
 <p><code>..container    args=sit</code></p>
 <ul>
-<li>Immutable. Specifies arguments for the command that runs when the container starts. This overrides the container&#39;s <a href="https://docs.docker.com/engine/reference/builder/#cmd"><code>CMD</code></a>. Specify this field as an array of executable and arguments, similar to a Docker <code>CMD</code>&#39;s &#34;default parameters&#34; form. If you don&#39;t specify this field but do specify the command field, then the command from the <code>command</code> field runs without any additional arguments. See the <a href="https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#notes">Kubernetes documentation about how the <code>command</code> and <code>args</code> fields interact with a container&#39;s <code>ENTRYPOINT</code> and <code>CMD</code></a>. If you don&#39;t specify this field and don&#39;t specify the <code>commmand</code> field, then the container&#39;s <a href="https://docs.docker.com/engine/reference/builder/#cmd"><code>ENTRYPOINT</code></a> and <code>CMD</code> determine what runs based on their default behavior. See the <a href="https://docs.docker.com/engine/reference/builder/#understand-how-cmd-and-entrypoint-interact">Docker documentation about how <code>CMD</code> and <code>ENTRYPOINT</code> interact</a>. In this field, you can reference <a href="..//ai-platform/prediction/docs/custom-container-requirements#aip-variables">environment variables set by AI Platform Prediction</a> and environment variables set in the env field. You cannot reference environment variables set in the Docker image. In order for environment variables to be expanded, reference them by using the following syntax: $( VARIABLE_NAME) Note that this differs from Bash variable expansion, which does not use parentheses. If a variable cannot be resolved, the reference in the input string is used unchanged. To avoid variable expansion, you can escape this syntax with <code>$$</code>; for example: $$(VARIABLE_NAME) This field corresponds to the <code>args</code> field of the <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#container-v1-core">Kubernetes Containers v1 core API</a>.</li>
+<li>Immutable. Specifies arguments for the command that runs when the container starts. This overrides the container&#39;s <a href="https://docs.docker.com/engine/reference/builder/#cmd"><code>CMD</code></a>. Specify this field as an array of executable and arguments, similar to a Docker <code>CMD</code>&#39;s &#34;default parameters&#34; form. If you don&#39;t specify this field but do specify the command field, then the command from the <code>command</code> field runs without any additional arguments. See the <a href="https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#notes">Kubernetes documentation about how the <code>command</code> and <code>args</code> fields interact with a container&#39;s <code>ENTRYPOINT</code> and <code>CMD</code></a>. If you don&#39;t specify this field and don&#39;t specify the <code>commmand</code> field, then the container&#39;s <a href="https://docs.docker.com/engine/reference/builder/#cmd"><code>ENTRYPOINT</code></a> and <code>CMD</code> determine what runs based on their default behavior. See the <a href="https://docs.docker.com/engine/reference/builder/#understand-how-cmd-and-entrypoint-interact">Docker documentation about how <code>CMD</code> and <code>ENTRYPOINT</code> interact</a>. In this field, you can reference <a href="/ai-platform/prediction/docs/custom-container-requirements#aip-variables">environment variables set by AI Platform Prediction</a> and environment variables set in the env field. You cannot reference environment variables set in the Docker image. In order for environment variables to be expanded, reference them by using the following syntax: $( VARIABLE_NAME) Note that this differs from Bash variable expansion, which does not use parentheses. If a variable cannot be resolved, the reference in the input string is used unchanged. To avoid variable expansion, you can escape this syntax with <code>$$</code>; for example: $$(VARIABLE_NAME) This field corresponds to the <code>args</code> field of the <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#container-v1-core">Kubernetes Containers v1 core API</a>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li><code>command=lorem</code><ul>
-<li>Immutable. Specifies the command that runs when the container starts. This overrides the container&#39;s <a href="https://docs.docker.com/engine/reference/builder/#entrypoint"><code>ENTRYPOINT</code></a>. Specify this field as an array of executable and arguments, similar to a Docker <code>ENTRYPOINT</code>&#39;s &#34;exec&#34; form, not its &#34;shell&#34; form. If you do not specify this field, then the container&#39;s <code>ENTRYPOINT</code> runs, in conjunction with the args field or the container&#39;s <a href="https://docs.docker.com/engine/reference/builder/#cmd"><code>CMD</code></a>, if either exists. If this field is not specified and the container does not have an <code>ENTRYPOINT</code>, then refer to the <a href="https://docs.docker.com/engine/reference/builder/#understand-how-cmd-and-entrypoint-interact">Docker documentation about how <code>CMD</code> and <code>ENTRYPOINT</code> interact</a>. If you specify this field, then you can also specify the <code>args</code> field to provide additional arguments for this command. However, if you specify this field, then the container&#39;s <code>CMD</code> is ignored. See the <a href="https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#notes">Kubernetes documentation about how the <code>command</code> and <code>args</code> fields interact with a container&#39;s <code>ENTRYPOINT</code> and <code>CMD</code></a>. In this field, you can reference <a href="..//ai-platform/prediction/docs/custom-container-requirements#aip-variables">environment variables set by AI Platform Prediction</a> and environment variables set in the env field. You cannot reference environment variables set in the Docker image. In order for environment variables to be expanded, reference them by using the following syntax: $( VARIABLE_NAME) Note that this differs from Bash variable expansion, which does not use parentheses. If a variable cannot be resolved, the reference in the input string is used unchanged. To avoid variable expansion, you can escape this syntax with <code>$$</code>; for example: $$(VARIABLE_NAME) This field corresponds to the <code>command</code> field of the <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#container-v1-core">Kubernetes Containers v1 core API</a>.</li>
+<li>Immutable. Specifies the command that runs when the container starts. This overrides the container&#39;s <a href="https://docs.docker.com/engine/reference/builder/#entrypoint"><code>ENTRYPOINT</code></a>. Specify this field as an array of executable and arguments, similar to a Docker <code>ENTRYPOINT</code>&#39;s &#34;exec&#34; form, not its &#34;shell&#34; form. If you do not specify this field, then the container&#39;s <code>ENTRYPOINT</code> runs, in conjunction with the args field or the container&#39;s <a href="https://docs.docker.com/engine/reference/builder/#cmd"><code>CMD</code></a>, if either exists. If this field is not specified and the container does not have an <code>ENTRYPOINT</code>, then refer to the <a href="https://docs.docker.com/engine/reference/builder/#understand-how-cmd-and-entrypoint-interact">Docker documentation about how <code>CMD</code> and <code>ENTRYPOINT</code> interact</a>. If you specify this field, then you can also specify the <code>args</code> field to provide additional arguments for this command. However, if you specify this field, then the container&#39;s <code>CMD</code> is ignored. See the <a href="https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#notes">Kubernetes documentation about how the <code>command</code> and <code>args</code> fields interact with a container&#39;s <code>ENTRYPOINT</code> and <code>CMD</code></a>. In this field, you can reference <a href="/ai-platform/prediction/docs/custom-container-requirements#aip-variables">environment variables set by AI Platform Prediction</a> and environment variables set in the env field. You cannot reference environment variables set in the Docker image. In order for environment variables to be expanded, reference them by using the following syntax: $( VARIABLE_NAME) Note that this differs from Bash variable expansion, which does not use parentheses. If a variable cannot be resolved, the reference in the input string is used unchanged. To avoid variable expansion, you can escape this syntax with <code>$$</code>; for example: $$(VARIABLE_NAME) This field corresponds to the <code>command</code> field of the <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#container-v1-core">Kubernetes Containers v1 core API</a>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
 <p><code>image=nonumy</code></p>
 <ul>
-<li>URI of the Docker image to be used as the custom container for serving predictions. This URI must identify <a href="..//artifact-registry/docs/overview">an image in Artifact Registry</a> and begin with the hostname <code>{REGION}-docker.pkg.dev</code>, where <code>{REGION}</code> is replaced by the region that matches AI Platform Prediction <a href="..//ai-platform/prediction/docs/regional-endpoints">regional endpoint</a> that you are using. For example, if you are using the <code>us-central1-ml.googleapis.com</code> endpoint, then this URI must begin with <code>us-central1-docker.pkg.dev</code>. To use a custom container, the <a href="..//ai-platform/prediction/docs/custom-service-account#default">AI Platform Google-managed service account</a> must have permission to pull (read) the Docker image at this URI. The AI Platform Google-managed service account has the following format: <code>service-{PROJECT_NUMBER}@cloud-ml.google.com.iam.gserviceaccount.com</code> {PROJECT_NUMBER} is replaced by your Google Cloud project number. By default, this service account has necessary permissions to pull an Artifact Registry image in the same Google Cloud project where you are using AI Platform Prediction. In this case, no configuration is necessary. If you want to use an image from a different Google Cloud project, learn how to <a href="..//artifact-registry/docs/access-control#grant-repo">grant the Artifact Registry Reader (roles/artifactregistry.reader) role for a repository</a> to your projet&#39;s AI Platform Google-managed service account. To learn about the requirements for the Docker image itself, read <a href="..//ai-platform/prediction/docs/custom-container-requirements">Custom container requirements</a>.</li>
+<li>URI of the Docker image to be used as the custom container for serving predictions. This URI must identify <a href="/artifact-registry/docs/overview">an image in Artifact Registry</a> and begin with the hostname <code>{REGION}-docker.pkg.dev</code>, where <code>{REGION}</code> is replaced by the region that matches AI Platform Prediction <a href="/ai-platform/prediction/docs/regional-endpoints">regional endpoint</a> that you are using. For example, if you are using the <code>us-central1-ml.googleapis.com</code> endpoint, then this URI must begin with <code>us-central1-docker.pkg.dev</code>. To use a custom container, the <a href="/ai-platform/prediction/docs/custom-service-account#default">AI Platform Google-managed service account</a> must have permission to pull (read) the Docker image at this URI. The AI Platform Google-managed service account has the following format: <code>service-{PROJECT_NUMBER}@cloud-ml.google.com.iam.gserviceaccount.com</code> {PROJECT_NUMBER} is replaced by your Google Cloud project number. By default, this service account has necessary permissions to pull an Artifact Registry image in the same Google Cloud project where you are using AI Platform Prediction. In this case, no configuration is necessary. If you want to use an image from a different Google Cloud project, learn how to <a href="/artifact-registry/docs/access-control#grant-repo">grant the Artifact Registry Reader (roles/artifactregistry.reader) role for a repository</a> to your projet&#39;s AI Platform Google-managed service account. To learn about the requirements for the Docker image itself, read <a href="/ai-platform/prediction/docs/custom-container-requirements">Custom container requirements</a>.</li>
 </ul>
 </li>
 <li>
@@ -447,7 +279,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>deployment-uri=ipsum</code><ul>
-<li>The Cloud Storage URI of a directory containing trained model artifacts to be used to create the model version. See the <a href="..//ai-platform/prediction/docs/deploying-models">guide to deploying models</a> for more information. The total number of files under this directory must not exceed 1000. During projects.models.versions.create, AI Platform Prediction copies all files from the specified directory to a location managed by the service. From then on, AI Platform Prediction uses these copies of the model artifacts to serve predictions, not the original files in Cloud Storage, so this location is useful only as a historical record. If you specify container, then this field is optional. Otherwise, it is required. Learn <a href="..//ai-platform/prediction/docs/custom-container-requirements#artifacts">how to use this field with a custom container</a>.</li>
+<li>The Cloud Storage URI of a directory containing trained model artifacts to be used to create the model version. See the <a href="/ai-platform/prediction/docs/deploying-models">guide to deploying models</a> for more information. The total number of files under this directory must not exceed 1000. During projects.models.versions.create, AI Platform Prediction copies all files from the specified directory to a location managed by the service. From then on, AI Platform Prediction uses these copies of the model artifacts to serve predictions, not the original files in Cloud Storage, so this location is useful only as a historical record. If you specify container, then this field is optional. Otherwise, it is required. Learn <a href="/ai-platform/prediction/docs/custom-container-requirements#artifacts">how to use this field with a custom container</a>.</li>
 </ul>
 </li>
 <li><code>description=invidunt</code><ul>
@@ -483,7 +315,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>...    framework=at</code></p>
 <ul>
-<li>Optional. The machine learning framework AI Platform uses to train this version of the model. Valid values are <code>TENSORFLOW</code>, <code>SCIKIT_LEARN</code>, <code>XGBOOST</code>. If you do not specify a framework, AI Platform will analyze files in the deployment_uri to determine a framework. If you choose <code>SCIKIT_LEARN</code> or <code>XGBOOST</code>, you must also set the runtime version of the model to 1.4 or greater. Do <strong>not</strong> specify a framework if you&#39;re deploying a <a href="..//ai-platform/prediction/docs/custom-prediction-routines">custom prediction routine</a> or if you&#39;re using a <a href="..//ai-platform/prediction/docs/use-custom-container">custom container</a>.</li>
+<li>Optional. The machine learning framework AI Platform uses to train this version of the model. Valid values are <code>TENSORFLOW</code>, <code>SCIKIT_LEARN</code>, <code>XGBOOST</code>. If you do not specify a framework, AI Platform will analyze files in the deployment_uri to determine a framework. If you choose <code>SCIKIT_LEARN</code> or <code>XGBOOST</code>, you must also set the runtime version of the model to 1.4 or greater. Do <strong>not</strong> specify a framework if you&#39;re deploying a <a href="/ai-platform/prediction/docs/custom-prediction-routines">custom prediction routine</a> or if you&#39;re using a <a href="/ai-platform/prediction/docs/use-custom-container">custom container</a>.</li>
 </ul>
 </li>
 <li><code>is-default=false</code><ul>
@@ -491,7 +323,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>labels=key=erat</code><ul>
-<li>Optional. One or more labels that you can add, to organize your model versions. Each label is a key-value pair, where both the key and the value are arbitrary strings that you supply. For more information, see the documentation on using labels.</li>
+<li>Optional. One or more labels that you can add, to organize your model versions. Each label is a key-value pair, where both the key and the value are arbitrary strings that you supply. For more information, see the documentation on using labels. Note that this field is not updatable for mls1* models.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
@@ -508,7 +340,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>machine-type=sit</code><ul>
-<li>Optional. The type of machine on which to serve the model. Currently only applies to online prediction service. To learn about valid values for this field, read <a href="..//ai-platform/prediction/docs/machine-types-online-prediction">Choosing a machine type for online prediction</a>. If this field is not specified and you are using a <a href="..//ai-platform/prediction/docs/regional-endpoints">regional endpoint</a>, then the machine type defaults to <code>n1-standard-2</code>. If this field is not specified and you are using the global endpoint (<code>ml.googleapis.com</code>), then the machine type defaults to <code>mls1-c1-m2</code>.</li>
+<li>Optional. The type of machine on which to serve the model. Currently only applies to online prediction service. To learn about valid values for this field, read <a href="/ai-platform/prediction/docs/machine-types-online-prediction">Choosing a machine type for online prediction</a>. If this field is not specified and you are using a <a href="/ai-platform/prediction/docs/regional-endpoints">regional endpoint</a>, then the machine type defaults to <code>n1-standard-2</code>. If this field is not specified and you are using the global endpoint (<code>ml.googleapis.com</code>), then the machine type defaults to <code>mls1-c1-m2</code>.</li>
 </ul>
 </li>
 <li>
@@ -524,20 +356,20 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>package-uris=nonumy</code><ul>
-<li>Optional. Cloud Storage paths (<code>gs://…</code>) of packages for <a href="..//ml-engine/docs/tensorflow/custom-prediction-routines">custom prediction routines</a> or <a href="..//ml-engine/docs/scikit/exporting-for-prediction#custom-pipeline-code">scikit-learn pipelines with custom code</a>. For a custom prediction routine, one of these packages must contain your Predictor class (see <a href="#Version.FIELDS.prediction_class"><code>predictionClass</code></a>). Additionally, include any dependencies used by your Predictor or scikit-learn pipeline uses that are not already included in your selected <a href="..//ml-engine/docs/tensorflow/runtime-version-list">runtime version</a>. If you specify this field, you must also set <a href="#Version.FIELDS.runtime_version"><code>runtimeVersion</code></a> to 1.4 or greater.</li>
+<li>Optional. Cloud Storage paths (<code>gs://…</code>) of packages for <a href="/ml-engine/docs/tensorflow/custom-prediction-routines">custom prediction routines</a> or <a href="/ml-engine/docs/scikit/exporting-for-prediction#custom-pipeline-code">scikit-learn pipelines with custom code</a>. For a custom prediction routine, one of these packages must contain your Predictor class (see <a href="#Version.FIELDS.prediction_class"><code>predictionClass</code></a>). Additionally, include any dependencies used by your Predictor or scikit-learn pipeline uses that are not already included in your selected <a href="/ml-engine/docs/tensorflow/runtime-version-list">runtime version</a>. If you specify this field, you must also set <a href="#Version.FIELDS.runtime_version"><code>runtimeVersion</code></a> to 1.4 or greater.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li><code>prediction-class=accusam</code><ul>
-<li>Optional. The fully qualified name (module_name.class_name) of a class that implements the Predictor interface described in this reference field. The module containing this class should be included in a package provided to the <a href="#Version.FIELDS.package_uris"><code>packageUris</code> field</a>. Specify this field if and only if you are deploying a <a href="..//ml-engine/docs/tensorflow/custom-prediction-routines">custom prediction routine (beta)</a>. If you specify this field, you must set <a href="#Version.FIELDS.runtime_version"><code>runtimeVersion</code></a> to 1.4 or greater and you must set <code>machineType</code> to a <a href="..//ml-engine/docs/machine-types-online-prediction">legacy (MLS1) machine type</a>. The following code sample provides the Predictor interface: class Predictor(object): &#34;&#34;&#34;Interface for constructing custom predictors.&#34;&#34;&#34; def predict(self, instances, <strong>kwargs): &#34;&#34;&#34;Performs custom prediction. Instances are the decoded values from the request. They have already been deserialized from JSON. Args: instances: A list of prediction input instances. </strong>kwargs: A dictionary of keyword args provided as additional fields on the predict request body. Returns: A list of outputs containing the prediction results. This list must be JSON serializable. &#34;&#34;&#34; raise NotImplementedError() @classmethod def from_path(cls, model_dir): &#34;&#34;&#34;Creates an instance of Predictor using the given path. Loading of the predictor should be done in this method. Args: model_dir: The local directory that contains the exported model file along with any additional files uploaded when creating the version resource. Returns: An instance implementing this Predictor class. &#34;&#34;&#34; raise NotImplementedError() Learn more about <a href="..//ml-engine/docs/tensorflow/custom-prediction-routines">the Predictor interface and custom prediction routines</a>.</li>
+<li>Optional. The fully qualified name (module_name.class_name) of a class that implements the Predictor interface described in this reference field. The module containing this class should be included in a package provided to the <a href="#Version.FIELDS.package_uris"><code>packageUris</code> field</a>. Specify this field if and only if you are deploying a <a href="/ml-engine/docs/tensorflow/custom-prediction-routines">custom prediction routine (beta)</a>. If you specify this field, you must set <a href="#Version.FIELDS.runtime_version"><code>runtimeVersion</code></a> to 1.4 or greater and you must set <code>machineType</code> to a <a href="/ml-engine/docs/machine-types-online-prediction">legacy (MLS1) machine type</a>. The following code sample provides the Predictor interface: class Predictor(object): &#34;&#34;&#34;Interface for constructing custom predictors.&#34;&#34;&#34; def predict(self, instances, <strong>kwargs): &#34;&#34;&#34;Performs custom prediction. Instances are the decoded values from the request. They have already been deserialized from JSON. Args: instances: A list of prediction input instances. </strong>kwargs: A dictionary of keyword args provided as additional fields on the predict request body. Returns: A list of outputs containing the prediction results. This list must be JSON serializable. &#34;&#34;&#34; raise NotImplementedError() @classmethod def from_path(cls, model_dir): &#34;&#34;&#34;Creates an instance of Predictor using the given path. Loading of the predictor should be done in this method. Args: model_dir: The local directory that contains the exported model file along with any additional files uploaded when creating the version resource. Returns: An instance implementing this Predictor class. &#34;&#34;&#34; raise NotImplementedError() Learn more about <a href="/ml-engine/docs/tensorflow/custom-prediction-routines">the Predictor interface and custom prediction routines</a>.</li>
 </ul>
 </li>
 <li><code>python-version=ut</code><ul>
-<li>Required. The version of Python used in prediction. The following Python versions are available: * Python &#39;3.7&#39; is available when <code>runtime_version</code> is set to &#39;1.15&#39; or later. * Python &#39;3.5&#39; is available when <code>runtime_version</code> is set to a version from &#39;1.4&#39; to &#39;1.14&#39;. * Python &#39;2.7&#39; is available when <code>runtime_version</code> is set to &#39;1.15&#39; or earlier. Read more about the Python versions available for <a href="..//ml-engine/docs/runtime-version-list">each runtime version</a>.</li>
+<li>Required. The version of Python used in prediction. The following Python versions are available: * Python &#39;3.7&#39; is available when <code>runtime_version</code> is set to &#39;1.15&#39; or later. * Python &#39;3.5&#39; is available when <code>runtime_version</code> is set to a version from &#39;1.4&#39; to &#39;1.14&#39;. * Python &#39;2.7&#39; is available when <code>runtime_version</code> is set to &#39;1.15&#39; or earlier. Read more about the Python versions available for <a href="/ml-engine/docs/runtime-version-list">each runtime version</a>.</li>
 </ul>
 </li>
 <li><code>request-logging-config    bigquery-table-name=voluptua.</code><ul>
-<li>Required. Fully qualified BigQuery table name in the following format: &#34; project_id.dataset_name.table_name&#34; The specified table must already exist, and the &#34;Cloud ML Service Agent&#34; for your project must have permission to write to it. The table must have the following <a href="..//bigquery/docs/schemas">schema</a>: Field nameType Mode model STRING REQUIRED model_version STRING REQUIRED time TIMESTAMP REQUIRED raw_data STRING REQUIRED raw_prediction STRING NULLABLE groundtruth STRING NULLABLE </li>
+<li>Required. Fully qualified BigQuery table name in the following format: &#34; project_id.dataset_name.table_name&#34; The specified table must already exist, and the &#34;Cloud ML Service Agent&#34; for your project must have permission to write to it. The table must have the following <a href="/bigquery/docs/schemas">schema</a>: Field nameType Mode model STRING REQUIRED model_version STRING REQUIRED time TIMESTAMP REQUIRED raw_data STRING REQUIRED raw_prediction STRING NULLABLE groundtruth STRING NULLABLE </li>
 </ul>
 </li>
 <li>
@@ -549,7 +381,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..routes    health=amet</code></p>
 <ul>
-<li>HTTP path on the container to send health checkss to. AI Platform Prediction intermittently sends GET requests to this path on the container&#39;s IP address and port to check that the container is healthy. Read more about <a href="..//ai-platform/prediction/docs/custom-container-requirements#checks">health checks</a>. For example, if you set this field to <code>/bar</code>, then AI Platform Prediction intermittently sends a GET request to the <code>/bar</code> path on the port of your container specified by the first value of Version.container.ports. If you don&#39;t specify this field, it defaults to the following value: /v1/models/ MODEL/versions/VERSION The placeholders in this value are replaced as follows: * MODEL: The name of the parent Model. This does not include the &#34;projects/PROJECT_ID/models/&#34; prefix that the API returns in output; it is the bare model name, as provided to projects.models.create. * VERSION: The name of the model version. This does not include the &#34;projects/PROJECT_ID /models/MODEL/versions/&#34; prefix that the API returns in output; it is the bare version name, as provided to projects.models.versions.create.</li>
+<li>HTTP path on the container to send health checkss to. AI Platform Prediction intermittently sends GET requests to this path on the container&#39;s IP address and port to check that the container is healthy. Read more about <a href="/ai-platform/prediction/docs/custom-container-requirements#checks">health checks</a>. For example, if you set this field to <code>/bar</code>, then AI Platform Prediction intermittently sends a GET request to the <code>/bar</code> path on the port of your container specified by the first value of Version.container.ports. If you don&#39;t specify this field, it defaults to the following value: /v1/models/ MODEL/versions/VERSION The placeholders in this value are replaced as follows: * MODEL: The name of the parent Model. This does not include the &#34;projects/PROJECT_ID/models/&#34; prefix that the API returns in output; it is the bare model name, as provided to projects.models.create. * VERSION: The name of the model version. This does not include the &#34;projects/PROJECT_ID /models/MODEL/versions/&#34; prefix that the API returns in output; it is the bare version name, as provided to projects.models.versions.create.</li>
 </ul>
 </li>
 <li>
@@ -561,11 +393,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..    runtime-version=aliquyam</code></p>
 <ul>
-<li>Required. The AI Platform runtime version to use for this deployment. For more information, see the <a href="..//ml-engine/docs/runtime-version-list">runtime version list</a> and <a href="..//ml-engine/docs/versioning">how to manage runtime versions</a>.</li>
+<li>Required. The AI Platform runtime version to use for this deployment. For more information, see the <a href="/ml-engine/docs/runtime-version-list">runtime version list</a> and <a href="/ml-engine/docs/versioning">how to manage runtime versions</a>.</li>
 </ul>
 </li>
 <li><code>service-account=ipsum</code><ul>
-<li>Optional. Specifies the service account for resource access control. If you specify this field, then you must also specify either the <code>containerSpec</code> or the <code>predictionClass</code> field. Learn more about <a href="..//ai-platform/prediction/docs/custom-service-account">using a custom service account</a>.</li>
+<li>Optional. Specifies the service account for resource access control. If you specify this field, then you must also specify either the <code>containerSpec</code> or the <code>predictionClass</code> field. Learn more about <a href="/ai-platform/prediction/docs/custom-service-account">using a custom service account</a>.</li>
 </ul>
 </li>
 <li><code>state=gubergren</code><ul>
@@ -598,7 +430,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <code>-p</code> for completeness.</p>
 <ul>
 <li><strong>-p update-mask=string</strong><ul>
-<li>Required. Specifies the path, relative to <code>Version</code>, of the field to update. Must be present and non-empty. For example, to change the description of a version to &#34;foo&#34;, the <code>update_mask</code> parameter would be specified as <code>description</code>, and the <code>PATCH</code> request body would specify the new value, as follows: <code>{ &amp;#34;description&amp;#34;: &amp;#34;foo&amp;#34; }</code> Currently the only supported update mask fields are <code>description</code>, <code>requestLoggingConfig</code>, <code>autoScaling.minNodes</code>, and <code>manualScaling.nodes</code>. However, you can only update <code>manualScaling.nodes</code> if the version uses a <a href="..//ml-engine/docs/machine-types-online-prediction">Compute Engine (N1) machine type</a>.</li>
+<li>Required. Specifies the path, relative to <code>Version</code>, of the field to update. Must be present and non-empty. For example, to change the description of a version to &#34;foo&#34;, the <code>update_mask</code> parameter would be specified as <code>description</code>, and the <code>PATCH</code> request body would specify the new value, as follows: <code>{ &amp;#34;description&amp;#34;: &amp;#34;foo&amp;#34; }</code> Currently the only supported update mask fields are <code>description</code>, <code>requestLoggingConfig</code>, <code>autoScaling.minNodes</code>, and <code>manualScaling.nodes</code>. However, you can only update <code>manualScaling.nodes</code> if the version uses a <a href="/ml-engine/docs/machine-types-online-prediction">Compute Engine (N1) machine type</a>.</li>
 </ul>
 </li>
 </ul>
@@ -672,32 +504,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_models-versions-set-default" class="btn btn-neutral float-right" title="Models Versions Set Default"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_models-versions-list" class="btn btn-neutral" title="Models Versions List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_models-versions-list/" class="btn btn-neutral float-left" title="Models Versions List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_models-versions-set-default/" class="btn btn-neutral float-right" title="Models Versions Set Default">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -705,14 +529,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_models-versions-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_models-versions-set-default" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/ml1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_models-versions-list/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_models-versions-set-default/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

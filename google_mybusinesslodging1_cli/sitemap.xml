@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-mybusinesslodging1-cli/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-mybusinesslodging1-cli/locations_get-lodging/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-mybusinesslodging1-cli/locations_lodging-get-google-updated/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-mybusinesslodging1-cli/locations_update-lodging/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+</urlset>

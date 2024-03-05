@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-displayvideo1-cli/inventory-sources_patch/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Patch - Display Video v5.0.4+20240229</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Patch";
+        var mkdocs_page_input_path = "inventory-sources_patch.md";
+        var mkdocs_page_url = "/google-apis-rs/google-displayvideo1-cli/inventory-sources_patch/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Display Video v5.0.4+20240229
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Advertisers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_assets-upload/">Assets Upload</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_audit/">Audit</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_bulk-edit-advertiser-assigned-targeting-options/">Bulk Edit Advertiser Assigned Targeting Options</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_bulk-list-advertiser-assigned-targeting-options/">Bulk List Advertiser Assigned Targeting Options</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_campaigns-bulk-list-campaign-assigned-targeting-options/">Campaigns Bulk List Campaign Assigned Targeting Options</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_campaigns-create/">Campaigns Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_campaigns-delete/">Campaigns Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_campaigns-get/">Campaigns Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_campaigns-list/">Campaigns List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_campaigns-patch/">Campaigns Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_campaigns-targeting-types-assigned-targeting-options-get/">Campaigns Targeting Types Assigned Targeting Options Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_campaigns-targeting-types-assigned-targeting-options-list/">Campaigns Targeting Types Assigned Targeting Options List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_channels-create/">Channels Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_channels-get/">Channels Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_channels-list/">Channels List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_channels-patch/">Channels Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_channels-sites-bulk-edit/">Channels Sites Bulk Edit</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_channels-sites-create/">Channels Sites Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_channels-sites-delete/">Channels Sites Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_channels-sites-list/">Channels Sites List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_channels-sites-replace/">Channels Sites Replace</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_creatives-create/">Creatives Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_creatives-delete/">Creatives Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_creatives-get/">Creatives Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_creatives-list/">Creatives List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_creatives-patch/">Creatives Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_insertion-orders-bulk-list-insertion-order-assigned-targeting-options/">Insertion Orders Bulk List Insertion Order Assigned Targeting Options</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_insertion-orders-create/">Insertion Orders Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_insertion-orders-delete/">Insertion Orders Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_insertion-orders-get/">Insertion Orders Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_insertion-orders-list/">Insertion Orders List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_insertion-orders-patch/">Insertion Orders Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_insertion-orders-targeting-types-assigned-targeting-options-get/">Insertion Orders Targeting Types Assigned Targeting Options Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_insertion-orders-targeting-types-assigned-targeting-options-list/">Insertion Orders Targeting Types Assigned Targeting Options List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_invoices-list/">Invoices List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_invoices-lookup-invoice-currency/">Invoices Lookup Invoice Currency</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_line-items-bulk-edit-line-item-assigned-targeting-options/">Line Items Bulk Edit Line Item Assigned Targeting Options</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_line-items-bulk-list-line-item-assigned-targeting-options/">Line Items Bulk List Line Item Assigned Targeting Options</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_line-items-create/">Line Items Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_line-items-delete/">Line Items Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_line-items-generate-default/">Line Items Generate Default</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_line-items-get/">Line Items Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_line-items-list/">Line Items List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_line-items-patch/">Line Items Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_line-items-targeting-types-assigned-targeting-options-create/">Line Items Targeting Types Assigned Targeting Options Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_line-items-targeting-types-assigned-targeting-options-delete/">Line Items Targeting Types Assigned Targeting Options Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_line-items-targeting-types-assigned-targeting-options-get/">Line Items Targeting Types Assigned Targeting Options Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_line-items-targeting-types-assigned-targeting-options-list/">Line Items Targeting Types Assigned Targeting Options List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_location-lists-assigned-locations-bulk-edit/">Location Lists Assigned Locations Bulk Edit</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_location-lists-assigned-locations-create/">Location Lists Assigned Locations Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_location-lists-assigned-locations-delete/">Location Lists Assigned Locations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_location-lists-assigned-locations-list/">Location Lists Assigned Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_location-lists-create/">Location Lists Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_location-lists-get/">Location Lists Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_location-lists-list/">Location Lists List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_location-lists-patch/">Location Lists Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_manual-triggers-activate/">Manual Triggers Activate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_manual-triggers-create/">Manual Triggers Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_manual-triggers-deactivate/">Manual Triggers Deactivate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_manual-triggers-get/">Manual Triggers Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_manual-triggers-list/">Manual Triggers List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_manual-triggers-patch/">Manual Triggers Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_negative-keyword-lists-create/">Negative Keyword Lists Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_negative-keyword-lists-delete/">Negative Keyword Lists Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_negative-keyword-lists-get/">Negative Keyword Lists Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_negative-keyword-lists-list/">Negative Keyword Lists List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_negative-keyword-lists-negative-keywords-bulk-edit/">Negative Keyword Lists Negative Keywords Bulk Edit</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_negative-keyword-lists-negative-keywords-create/">Negative Keyword Lists Negative Keywords Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_negative-keyword-lists-negative-keywords-delete/">Negative Keyword Lists Negative Keywords Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_negative-keyword-lists-negative-keywords-list/">Negative Keyword Lists Negative Keywords List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_negative-keyword-lists-negative-keywords-replace/">Negative Keyword Lists Negative Keywords Replace</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_negative-keyword-lists-patch/">Negative Keyword Lists Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_targeting-types-assigned-targeting-options-create/">Targeting Types Assigned Targeting Options Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_targeting-types-assigned-targeting-options-delete/">Targeting Types Assigned Targeting Options Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_targeting-types-assigned-targeting-options-get/">Targeting Types Assigned Targeting Options Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_targeting-types-assigned-targeting-options-list/">Targeting Types Assigned Targeting Options List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Combined Audiences</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../combined-audiences_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../combined-audiences_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Bidding Algorithms</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-bidding-algorithms_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-bidding-algorithms_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-bidding-algorithms_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-bidding-algorithms_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-bidding-algorithms_scripts-create/">Scripts Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-bidding-algorithms_scripts-get/">Scripts Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-bidding-algorithms_scripts-list/">Scripts List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-bidding-algorithms_upload-script/">Upload Script</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Custom Lists</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-lists_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../custom-lists_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">First And Third Party Audiences</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../first-and-third-party-audiences_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../first-and-third-party-audiences_edit-customer-match-members/">Edit Customer Match Members</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../first-and-third-party-audiences_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../first-and-third-party-audiences_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../first-and-third-party-audiences_patch/">Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Floodlight Groups</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-groups_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-groups_patch/">Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Google Audiences</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../google-audiences_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../google-audiences_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Guaranteed Orders</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../guaranteed-orders_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../guaranteed-orders_edit-guaranteed-order-read-accessors/">Edit Guaranteed Order Read Accessors</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../guaranteed-orders_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../guaranteed-orders_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../guaranteed-orders_patch/">Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Inventory Source Groups</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../inventory-source-groups_assigned-inventory-sources-bulk-edit/">Assigned Inventory Sources Bulk Edit</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inventory-source-groups_assigned-inventory-sources-create/">Assigned Inventory Sources Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inventory-source-groups_assigned-inventory-sources-delete/">Assigned Inventory Sources Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inventory-source-groups_assigned-inventory-sources-list/">Assigned Inventory Sources List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inventory-source-groups_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inventory-source-groups_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inventory-source-groups_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inventory-source-groups_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inventory-source-groups_patch/">Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Inventory Sources</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../inventory-sources_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inventory-sources_edit-inventory-source-read-write-accessors/">Edit Inventory Source Read Write Accessors</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inventory-sources_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inventory-sources_list/">List</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Patch</a>
+    <ul class="current">
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Media</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../media_download/">Download</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../media_upload/">Upload</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Partners</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_bulk-edit-partner-assigned-targeting-options/">Bulk Edit Partner Assigned Targeting Options</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_channels-create/">Channels Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_channels-get/">Channels Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_channels-list/">Channels List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_channels-patch/">Channels Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_channels-sites-bulk-edit/">Channels Sites Bulk Edit</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_channels-sites-create/">Channels Sites Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_channels-sites-delete/">Channels Sites Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_channels-sites-list/">Channels Sites List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_channels-sites-replace/">Channels Sites Replace</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_targeting-types-assigned-targeting-options-create/">Targeting Types Assigned Targeting Options Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_targeting-types-assigned-targeting-options-delete/">Targeting Types Assigned Targeting Options Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_targeting-types-assigned-targeting-options-get/">Targeting Types Assigned Targeting Options Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../partners_targeting-types-assigned-targeting-options-list/">Targeting Types Assigned Targeting Options List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Sdfdownloadtasks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../sdfdownloadtasks_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../sdfdownloadtasks_operations-get/">Operations Get</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Targeting Types</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../targeting-types_targeting-options-get/">Targeting Options Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../targeting-types_targeting-options-list/">Targeting Options List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../targeting-types_targeting-options-search/">Targeting Options Search</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Users</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_bulk-edit-assigned-user-roles/">Bulk Edit Assigned User Roles</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../users_patch/">Patch</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Display Video v5.0.4+20240229</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Inventory Sources &raquo;</li>
+      <li>Patch</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/displayvideo1-cli/edit/master/docs/inventory-sources_patch.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates an existing inventory source. Returns the updated inventory source if successful.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/display-video</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/display-video</em>.
+You can set the scope for this method like this: <code>displayvideo1 --scope &lt;scope&gt; inventory-sources patch ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;inventory-source-id&gt;</strong> <em>(string)</em><ul>
+<li>Output only. The unique ID of the inventory source. Assigned by the system.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>InventorySource:
+  commitment: string
+  deal-id: string
+  delivery-method: string
+  display-name: string
+  exchange: string
+  guaranteed-order-id: string
+  inventory-source-id: string
+  inventory-source-product-type: string
+  inventory-source-type: string
+  name: string
+  publisher-name: string
+  rate-details:
+    inventory-source-rate-type: string
+    minimum-spend:
+      currency-code: string
+      nanos: integer
+      units: string
+    rate:
+      currency-code: string
+      nanos: integer
+      units: string
+    units-purchased: string
+  read-advertiser-ids: [string]
+  read-partner-ids: [string]
+  read-write-accessors:
+    advertisers:
+      advertiser-ids: [string]
+    partner:
+      partner-id: string
+  status:
+    config-status: string
+    entity-pause-reason: string
+    entity-status: string
+    seller-pause-reason: string
+    seller-status: string
+  time-range:
+    end-time: string
+    start-time: string
+  update-time: string
+
+</code></pre>
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .    commitment=justo</code><ul>
+<li>Whether the inventory source has a guaranteed or non-guaranteed delivery.</li>
+</ul>
+</li>
+<li><code>deal-id=clita</code><ul>
+<li>The ID in the exchange space that uniquely identifies the inventory source. Must be unique across buyers within each exchange but not necessarily unique across exchanges.</li>
+</ul>
+</li>
+<li><code>delivery-method=stet</code><ul>
+<li>The delivery method of the inventory source. * For non-guaranteed inventory sources, the only acceptable value is <code>INVENTORY_SOURCE_DELIVERY_METHOD_PROGRAMMATIC</code>. * For guaranteed inventory sources, acceptable values are <code>INVENTORY_SOURCE_DELIVERY_METHOD_TAG</code> and <code>INVENTORY_SOURCE_DELIVERY_METHOD_PROGRAMMATIC</code>.</li>
+</ul>
+</li>
+<li><code>display-name=sea</code><ul>
+<li>The display name of the inventory source. Must be UTF-8 encoded with a maximum size of 240 bytes.</li>
+</ul>
+</li>
+<li><code>exchange=sit</code><ul>
+<li>The exchange to which the inventory source belongs.</li>
+</ul>
+</li>
+<li><code>guaranteed-order-id=sed</code><ul>
+<li>Immutable. The ID of the guaranteed order that this inventory source belongs to. Only applicable when commitment is <code>INVENTORY_SOURCE_COMMITMENT_GUARANTEED</code>.</li>
+</ul>
+</li>
+<li><code>inventory-source-id=et</code><ul>
+<li>Output only. The unique ID of the inventory source. Assigned by the system.</li>
+</ul>
+</li>
+<li><code>inventory-source-product-type=no</code><ul>
+<li>Output only. The product type of the inventory source, denoting the way through which it sells inventory.</li>
+</ul>
+</li>
+<li><code>inventory-source-type=sit</code><ul>
+<li>Denotes the type of the inventory source.</li>
+</ul>
+</li>
+<li><code>name=labore</code><ul>
+<li>Output only. The resource name of the inventory source.</li>
+</ul>
+</li>
+<li><code>publisher-name=sea</code><ul>
+<li>The publisher/seller name of the inventory source.</li>
+</ul>
+</li>
+<li><code>rate-details    inventory-source-rate-type=sea</code><ul>
+<li>The rate type. Acceptable values are <code>INVENTORY_SOURCE_RATE_TYPE_CPM_FIXED</code>, <code>INVENTORY_SOURCE_RATE_TYPE_CPM_FLOOR</code>, and <code>INVENTORY_SOURCE_RATE_TYPE_CPD</code>.</li>
+</ul>
+</li>
+<li><code>minimum-spend    currency-code=sadipscing</code><ul>
+<li>The three-letter currency code defined in ISO 4217.</li>
+</ul>
+</li>
+<li><code>nanos=80</code><ul>
+<li>Number of nano (10^-9) units of the amount. The value must be between -999,999,999 and +999,999,999 inclusive. If <code>units</code> is positive, <code>nanos</code> must be positive or zero. If <code>units</code> is zero, <code>nanos</code> can be positive, zero, or negative. If <code>units</code> is negative, <code>nanos</code> must be negative or zero. For example $-1.75 is represented as <code>units</code>=-1 and <code>nanos</code>=-750,000,000.</li>
+</ul>
+</li>
+<li>
+<p><code>units=aliquyam</code></p>
+<ul>
+<li>The whole units of the amount. For example if <code>currencyCode</code> is <code>&amp;#34;USD&amp;#34;</code>, then 1 unit is one US dollar.</li>
+</ul>
+</li>
+<li>
+<p><code>..rate    currency-code=eirmod</code></p>
+<ul>
+<li>The three-letter currency code defined in ISO 4217.</li>
+</ul>
+</li>
+<li><code>nanos=81</code><ul>
+<li>Number of nano (10^-9) units of the amount. The value must be between -999,999,999 and +999,999,999 inclusive. If <code>units</code> is positive, <code>nanos</code> must be positive or zero. If <code>units</code> is zero, <code>nanos</code> can be positive, zero, or negative. If <code>units</code> is negative, <code>nanos</code> must be negative or zero. For example $-1.75 is represented as <code>units</code>=-1 and <code>nanos</code>=-750,000,000.</li>
+</ul>
+</li>
+<li>
+<p><code>units=labore</code></p>
+<ul>
+<li>The whole units of the amount. For example if <code>currencyCode</code> is <code>&amp;#34;USD&amp;#34;</code>, then 1 unit is one US dollar.</li>
+</ul>
+</li>
+<li>
+<p><code>..    units-purchased=eos</code></p>
+<ul>
+<li>Required for guaranteed inventory sources. The number of impressions guaranteed by the seller.</li>
+</ul>
+</li>
+<li>
+<p><code>..    read-advertiser-ids=invidunt</code></p>
+<ul>
+<li>Output only. The IDs of advertisers with read-only access to the inventory source.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>read-partner-ids=at</code><ul>
+<li>Output only. The IDs of partners with read-only access to the inventory source. All advertisers of partners in this field inherit read-only access to the inventory source.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>read-write-accessors.advertisers    advertiser-ids=sea</code></p>
+<ul>
+<li>The IDs of the advertisers.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>..partner    partner-id=sed</code></p>
+<ul>
+<li>The ID of the partner.</li>
+</ul>
+</li>
+<li>
+<p><code>...status    config-status=dolor</code></p>
+<ul>
+<li>Output only. The configuration status of the inventory source. Only applicable for guaranteed inventory sources. Acceptable values are <code>INVENTORY_SOURCE_CONFIG_STATUS_PENDING</code> and <code>INVENTORY_SOURCE_CONFIG_STATUS_COMPLETED</code>. An inventory source must be configured (fill in the required fields, choose creatives, and select a default campaign) before it can serve.</li>
+</ul>
+</li>
+<li><code>entity-pause-reason=dolor</code><ul>
+<li>The user-provided reason for pausing this inventory source. Must not exceed 100 characters. Only applicable when entity_status is set to <code>ENTITY_STATUS_PAUSED</code>.</li>
+</ul>
+</li>
+<li><code>entity-status=sed</code><ul>
+<li>Whether or not the inventory source is servable. Acceptable values are <code>ENTITY_STATUS_ACTIVE</code>, <code>ENTITY_STATUS_ARCHIVED</code>, and <code>ENTITY_STATUS_PAUSED</code>. Default value is <code>ENTITY_STATUS_ACTIVE</code>.</li>
+</ul>
+</li>
+<li><code>seller-pause-reason=et</code><ul>
+<li>Output only. The seller-provided reason for pausing this inventory source. Only applicable for inventory sources synced directly from the publishers and when seller_status is set to <code>ENTITY_STATUS_PAUSED</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>seller-status=et</code></p>
+<ul>
+<li>Output only. The status set by the seller for the inventory source. Only applicable for inventory sources synced directly from the publishers. Acceptable values are <code>ENTITY_STATUS_ACTIVE</code> and <code>ENTITY_STATUS_PAUSED</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..time-range    end-time=duo</code></p>
+<ul>
+<li>Required. The upper bound of a time range, inclusive.</li>
+</ul>
+</li>
+<li>
+<p><code>start-time=dolor</code></p>
+<ul>
+<li>Required. The lower bound of a time range, inclusive.</li>
+</ul>
+</li>
+<li>
+<p><code>..    update-time=voluptua.</code></p>
+<ul>
+<li>Output only. The timestamp when the inventory source was last updated. Assigned by the system.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li>
+<p><strong>-p advertiser-id=string</strong></p>
+<ul>
+<li>The ID of the advertiser that the request is being made within.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p partner-id=string</strong></p>
+<ul>
+<li>The ID of the partner that the request is being made within.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p update-mask=string</strong></p>
+<ul>
+<li>Required. The mask to control which fields to update.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../inventory-sources_list/" class="btn btn-neutral float-left" title="List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../media_download/" class="btn btn-neutral float-right" title="Download">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/displayvideo1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../inventory-sources_list/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../media_download/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

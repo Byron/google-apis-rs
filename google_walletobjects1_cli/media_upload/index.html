@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-walletobjects1-cli/media_upload/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Upload - Walletobjects v5.0.4+20240304</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Upload";
+        var mkdocs_page_input_path = "media_upload.md";
+        var mkdocs_page_url = "/google-apis-rs/google-walletobjects1-cli/media_upload/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Walletobjects v5.0.4+20240304
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Eventticketclass</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketclass_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketclass_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketclass_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketclass_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketclass_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketclass_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Eventticketobject</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketobject_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketobject_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketobject_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketobject_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketobject_modifylinkedofferobjects/">Modifylinkedofferobjects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketobject_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketobject_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Flightclass</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightclass_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightclass_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightclass_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightclass_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightclass_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightclass_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Flightobject</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightobject_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightobject_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightobject_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightobject_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightobject_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightobject_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Genericclass</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericclass_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericclass_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericclass_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericclass_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericclass_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericclass_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Genericobject</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericobject_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericobject_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericobject_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericobject_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericobject_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericobject_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Giftcardclass</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardclass_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardclass_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardclass_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardclass_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardclass_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardclass_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Giftcardobject</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardobject_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardobject_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardobject_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardobject_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardobject_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardobject_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Issuer</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../issuer_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../issuer_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../issuer_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../issuer_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../issuer_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Jwt</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../jwt_insert/">Insert</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Loyaltyclass</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyclass_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyclass_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyclass_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyclass_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyclass_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyclass_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Loyaltyobject</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyobject_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyobject_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyobject_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyobject_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyobject_modifylinkedofferobjects/">Modifylinkedofferobjects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyobject_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyobject_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Media</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../media_download/">Download</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Upload</a>
+    <ul class="current">
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Offerclass</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerclass_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerclass_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerclass_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerclass_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerclass_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerclass_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Offerobject</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerobject_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerobject_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerobject_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerobject_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerobject_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerobject_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Permissions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Smarttap</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../smarttap_insert/">Insert</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Transitclass</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitclass_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitclass_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitclass_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitclass_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitclass_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitclass_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Transitobject</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitobject_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitobject_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitobject_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitobject_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitobject_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitobject_update/">Update</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Walletobjects v5.0.4+20240304</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Media &raquo;</li>
+      <li>Upload</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/walletobjects1-cli/edit/master/docs/media_upload.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Uploads rotating barcode values for the transit object referenced by the given object ID. Note the max upload size is specified in google3/production/config/cdd/apps-upload/customers/payments-consumer-passes/config.gcl and enforced by Scotty.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/wallet_object.issuer</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/wallet_object.issuer</em>.
+You can set the scope for this method like this: <code>walletobjects1 --scope &lt;scope&gt; media upload ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;resource-id&gt;</strong> <em>(string)</em><ul>
+<li>The unique identifier for an object. This ID must be unique across all objects from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, &#39;.&#39;, &#39;_&#39;, or &#39;-&#39;.</li>
+</ul>
+</li>
+</ul>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>TransitObjectUploadRotatingBarcodeValuesRequest:
+  blob:
+    algorithm: string
+    bigstore-object-ref: string
+    blob-ref: string
+    blobstore2-info:
+      blob-generation: string
+      blob-id: string
+      download-read-handle: string
+      read-token: string
+      upload-metadata-container: string
+    content-type: string
+    content-type-info:
+      best-guess: string
+      from-bytes: string
+      from-file-name: string
+      from-header: string
+      from-url-path: string
+    cosmo-binary-reference: string
+    crc32c-hash: integer
+    diff-checksums-response:
+      checksums-location:
+        blob-ref: string
+        blobstore2-info:
+          blob-generation: string
+          blob-id: string
+          download-read-handle: string
+          read-token: string
+          upload-metadata-container: string
+        cosmo-binary-reference: string
+        crc32c-hash: integer
+        inline: string
+        length: string
+        md5-hash: string
+        object-id:
+          bucket-name: string
+          generation: string
+          object-name: string
+        path: string
+        reference-type: string
+        sha1-hash: string
+      chunk-size-bytes: string
+      object-location:
+        blob-ref: string
+        blobstore2-info:
+          blob-generation: string
+          blob-id: string
+          download-read-handle: string
+          read-token: string
+          upload-metadata-container: string
+        cosmo-binary-reference: string
+        crc32c-hash: integer
+        inline: string
+        length: string
+        md5-hash: string
+        object-id:
+          bucket-name: string
+          generation: string
+          object-name: string
+        path: string
+        reference-type: string
+        sha1-hash: string
+      object-size-bytes: string
+      object-version: string
+    diff-download-response:
+      object-location:
+        blob-ref: string
+        blobstore2-info:
+          blob-generation: string
+          blob-id: string
+          download-read-handle: string
+          read-token: string
+          upload-metadata-container: string
+        cosmo-binary-reference: string
+        crc32c-hash: integer
+        inline: string
+        length: string
+        md5-hash: string
+        object-id:
+          bucket-name: string
+          generation: string
+          object-name: string
+        path: string
+        reference-type: string
+        sha1-hash: string
+    diff-upload-request:
+      checksums-info:
+        blob-ref: string
+        blobstore2-info:
+          blob-generation: string
+          blob-id: string
+          download-read-handle: string
+          read-token: string
+          upload-metadata-container: string
+        cosmo-binary-reference: string
+        crc32c-hash: integer
+        inline: string
+        length: string
+        md5-hash: string
+        object-id:
+          bucket-name: string
+          generation: string
+          object-name: string
+        path: string
+        reference-type: string
+        sha1-hash: string
+      object-info:
+        blob-ref: string
+        blobstore2-info:
+          blob-generation: string
+          blob-id: string
+          download-read-handle: string
+          read-token: string
+          upload-metadata-container: string
+        cosmo-binary-reference: string
+        crc32c-hash: integer
+        inline: string
+        length: string
+        md5-hash: string
+        object-id:
+          bucket-name: string
+          generation: string
+          object-name: string
+        path: string
+        reference-type: string
+        sha1-hash: string
+      object-version: string
+    diff-upload-response:
+      object-version: string
+      original-object:
+        blob-ref: string
+        blobstore2-info:
+          blob-generation: string
+          blob-id: string
+          download-read-handle: string
+          read-token: string
+          upload-metadata-container: string
+        cosmo-binary-reference: string
+        crc32c-hash: integer
+        inline: string
+        length: string
+        md5-hash: string
+        object-id:
+          bucket-name: string
+          generation: string
+          object-name: string
+        path: string
+        reference-type: string
+        sha1-hash: string
+    diff-version-response:
+      object-size-bytes: string
+      object-version: string
+    download-parameters:
+      allow-gzip-compression: boolean
+      ignore-range: boolean
+    filename: string
+    hash: string
+    hash-verified: boolean
+    inline: string
+    is-potential-retry: boolean
+    length: string
+    md5-hash: string
+    media-id: string
+    object-id:
+      bucket-name: string
+      generation: string
+      object-name: string
+    path: string
+    reference-type: string
+    sha1-hash: string
+    sha256-hash: string
+    timestamp: string
+    token: string
+  media-request-info:
+    current-bytes: string
+    custom-data: string
+    diff-object-version: string
+    final-status: integer
+    notification-type: string
+    request-id: string
+    request-received-params-serving-info: string
+    total-bytes: string
+    total-bytes-is-estimated: boolean
+
+</code></pre>
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .blob    algorithm=nonumy</code><ul>
+<li>Deprecated, use one of explicit hash type fields instead. Algorithm used for calculating the hash. As of 2011/01/21, &#34;MD5&#34; is the only possible value for this field. New values may be added at any time.</li>
+</ul>
+</li>
+<li><code>bigstore-object-ref=rebum.</code><ul>
+<li>Use object_id instead.</li>
+</ul>
+</li>
+<li><code>blob-ref=ipsum</code><ul>
+<li>Blobstore v1 reference, set if reference_type is BLOBSTORE_REF This should be the byte representation of a blobstore.BlobRef. Since Blobstore is deprecating v1, use blobstore2_info instead. For now, any v2 blob will also be represented in this field as v1 BlobRef.</li>
+</ul>
+</li>
+<li><code>blobstore2-info    blob-generation=et</code><ul>
+<li>The blob generation id.</li>
+</ul>
+</li>
+<li><code>blob-id=vero</code><ul>
+<li>The blob id, e.g., /blobstore/prod/playground/scotty</li>
+</ul>
+</li>
+<li><code>download-read-handle=elitr</code><ul>
+<li>Read handle passed from Bigstore -&gt; Scotty for a GCS download. This is a signed, serialized blobstore2.ReadHandle proto which must never be set outside of Bigstore, and is not applicable to non-GCS media downloads.</li>
+</ul>
+</li>
+<li><code>read-token=consetetur</code><ul>
+<li>The blob read token. Needed to read blobs that have not been replicated. Might not be available until the final call.</li>
+</ul>
+</li>
+<li>
+<p><code>upload-metadata-container=dolor</code></p>
+<ul>
+<li>Metadata passed from Blobstore -&gt; Scotty for a new GCS upload. This is a signed, serialized blobstore2.BlobMetadataContainer proto which must never be consumed outside of Bigstore, and is not applicable to non-GCS media uploads.</li>
+</ul>
+</li>
+<li>
+<p><code>..    content-type=voluptua.</code></p>
+<ul>
+<li>MIME type of the data</li>
+</ul>
+</li>
+<li><code>content-type-info    best-guess=eirmod</code><ul>
+<li>Scotty&#39;s best guess of what the content type of the file is.</li>
+</ul>
+</li>
+<li><code>from-bytes=accusam</code><ul>
+<li>The content type of the file derived by looking at specific bytes (i.e. &#34;magic bytes&#34;) of the actual file.</li>
+</ul>
+</li>
+<li><code>from-file-name=est</code><ul>
+<li>The content type of the file derived from the file extension of the original file name used by the client.</li>
+</ul>
+</li>
+<li><code>from-header=et</code><ul>
+<li>The content type of the file as specified in the request headers, multipart headers, or RUPIO start request.</li>
+</ul>
+</li>
+<li>
+<p><code>from-url-path=at</code></p>
+<ul>
+<li>The content type of the file derived from the file extension of the URL path. The URL path is assumed to represent a file name (which is typically only true for agents that are providing a REST API).</li>
+</ul>
+</li>
+<li>
+<p><code>..    cosmo-binary-reference=magna</code></p>
+<ul>
+<li>A binary data reference for a media download. Serves as a technology-agnostic binary reference in some Google infrastructure. This value is a serialized storage_cosmo.BinaryReference proto. Storing it as bytes is a hack to get around the fact that the cosmo proto (as well as others it includes) doesn&#39;t support JavaScript. This prevents us from including the actual type of this field.</li>
+</ul>
+</li>
+<li><code>crc32c-hash=9</code><ul>
+<li>For Scotty Uploads: Scotty-provided hashes for uploads For Scotty Downloads: (WARNING: DO NOT USE WITHOUT PERMISSION FROM THE SCOTTY TEAM.) A Hash provided by the agent to be used to verify the data being downloaded. Currently only supported for inline payloads. Further, only crc32c_hash is currently supported.</li>
+</ul>
+</li>
+<li><code>diff-checksums-response.checksums-location    blob-ref=sadipscing</code><ul>
+<li>Blobstore v1 reference, set if reference_type is BLOBSTORE_REF This should be the byte representation of a blobstore.BlobRef. Since Blobstore is deprecating v1, use blobstore2_info instead. For now, any v2 blob will also be represented in this field as v1 BlobRef.</li>
+</ul>
+</li>
+<li><code>blobstore2-info    blob-generation=amet</code><ul>
+<li>The blob generation id.</li>
+</ul>
+</li>
+<li><code>blob-id=tempor</code><ul>
+<li>The blob id, e.g., /blobstore/prod/playground/scotty</li>
+</ul>
+</li>
+<li><code>download-read-handle=tempor</code><ul>
+<li>Read handle passed from Bigstore -&gt; Scotty for a GCS download. This is a signed, serialized blobstore2.ReadHandle proto which must never be set outside of Bigstore, and is not applicable to non-GCS media downloads.</li>
+</ul>
+</li>
+<li><code>read-token=et</code><ul>
+<li>The blob read token. Needed to read blobs that have not been replicated. Might not be available until the final call.</li>
+</ul>
+</li>
+<li>
+<p><code>upload-metadata-container=gubergren</code></p>
+<ul>
+<li>Metadata passed from Blobstore -&gt; Scotty for a new GCS upload. This is a signed, serialized blobstore2.BlobMetadataContainer proto which must never be consumed outside of Bigstore, and is not applicable to non-GCS media uploads.</li>
+</ul>
+</li>
+<li>
+<p><code>..    cosmo-binary-reference=et</code></p>
+<ul>
+<li>A binary data reference for a media download. Serves as a technology-agnostic binary reference in some Google infrastructure. This value is a serialized storage_cosmo.BinaryReference proto. Storing it as bytes is a hack to get around the fact that the cosmo proto (as well as others it includes) doesn&#39;t support JavaScript. This prevents us from including the actual type of this field.</li>
+</ul>
+</li>
+<li><code>crc32c-hash=61</code><ul>
+<li>crc32.c hash for the payload.</li>
+</ul>
+</li>
+<li><code>inline=dolor</code><ul>
+<li>Media data, set if reference_type is INLINE</li>
+</ul>
+</li>
+<li><code>length=rebum.</code><ul>
+<li>Size of the data, in bytes</li>
+</ul>
+</li>
+<li><code>md5-hash=nonumy</code><ul>
+<li>MD5 hash for the payload.</li>
+</ul>
+</li>
+<li><code>object-id    bucket-name=kasd</code><ul>
+<li>The name of the bucket to which this object belongs.</li>
+</ul>
+</li>
+<li><code>generation=ut</code><ul>
+<li>Generation of the object. Generations are monotonically increasing across writes, allowing them to be be compared to determine which generation is newer. If this is omitted in a request, then you are requesting the live object. See http://go/bigstore-versions</li>
+</ul>
+</li>
+<li>
+<p><code>object-name=dolores</code></p>
+<ul>
+<li>The name of the object.</li>
+</ul>
+</li>
+<li>
+<p><code>..    path=lorem</code></p>
+<ul>
+<li>Path to the data, set if reference_type is PATH</li>
+</ul>
+</li>
+<li><code>reference-type=justo</code><ul>
+<li>Describes what the field reference contains.</li>
+</ul>
+</li>
+<li>
+<p><code>sha1-hash=nonumy</code></p>
+<ul>
+<li>SHA-1 hash for the payload.</li>
+</ul>
+</li>
+<li>
+<p><code>..    chunk-size-bytes=kasd</code></p>
+<ul>
+<li>The chunk size of checksums. Must be a multiple of 256KB.</li>
+</ul>
+</li>
+<li><code>object-location    blob-ref=invidunt</code><ul>
+<li>Blobstore v1 reference, set if reference_type is BLOBSTORE_REF This should be the byte representation of a blobstore.BlobRef. Since Blobstore is deprecating v1, use blobstore2_info instead. For now, any v2 blob will also be represented in this field as v1 BlobRef.</li>
+</ul>
+</li>
+<li><code>blobstore2-info    blob-generation=ipsum</code><ul>
+<li>The blob generation id.</li>
+</ul>
+</li>
+<li><code>blob-id=no</code><ul>
+<li>The blob id, e.g., /blobstore/prod/playground/scotty</li>
+</ul>
+</li>
+<li><code>download-read-handle=diam</code><ul>
+<li>Read handle passed from Bigstore -&gt; Scotty for a GCS download. This is a signed, serialized blobstore2.ReadHandle proto which must never be set outside of Bigstore, and is not applicable to non-GCS media downloads.</li>
+</ul>
+</li>
+<li><code>read-token=stet</code><ul>
+<li>The blob read token. Needed to read blobs that have not been replicated. Might not be available until the final call.</li>
+</ul>
+</li>
+<li>
+<p><code>upload-metadata-container=dolor</code></p>
+<ul>
+<li>Metadata passed from Blobstore -&gt; Scotty for a new GCS upload. This is a signed, serialized blobstore2.BlobMetadataContainer proto which must never be consumed outside of Bigstore, and is not applicable to non-GCS media uploads.</li>
+</ul>
+</li>
+<li>
+<p><code>..    cosmo-binary-reference=sit</code></p>
+<ul>
+<li>A binary data reference for a media download. Serves as a technology-agnostic binary reference in some Google infrastructure. This value is a serialized storage_cosmo.BinaryReference proto. Storing it as bytes is a hack to get around the fact that the cosmo proto (as well as others it includes) doesn&#39;t support JavaScript. This prevents us from including the actual type of this field.</li>
+</ul>
+</li>
+<li><code>crc32c-hash=41</code><ul>
+<li>crc32.c hash for the payload.</li>
+</ul>
+</li>
+<li><code>inline=dolores</code><ul>
+<li>Media data, set if reference_type is INLINE</li>
+</ul>
+</li>
+<li><code>length=elitr</code><ul>
+<li>Size of the data, in bytes</li>
+</ul>
+</li>
+<li><code>md5-hash=takimata</code><ul>
+<li>MD5 hash for the payload.</li>
+</ul>
+</li>
+<li><code>object-id    bucket-name=dolor</code><ul>
+<li>The name of the bucket to which this object belongs.</li>
+</ul>
+</li>
+<li><code>generation=voluptua.</code><ul>
+<li>Generation of the object. Generations are monotonically increasing across writes, allowing them to be be compared to determine which generation is newer. If this is omitted in a request, then you are requesting the live object. See http://go/bigstore-versions</li>
+</ul>
+</li>
+<li>
+<p><code>object-name=vero</code></p>
+<ul>
+<li>The name of the object.</li>
+</ul>
+</li>
+<li>
+<p><code>..    path=ea</code></p>
+<ul>
+<li>Path to the data, set if reference_type is PATH</li>
+</ul>
+</li>
+<li><code>reference-type=rebum.</code><ul>
+<li>Describes what the field reference contains.</li>
+</ul>
+</li>
+<li>
+<p><code>sha1-hash=dolor</code></p>
+<ul>
+<li>SHA-1 hash for the payload.</li>
+</ul>
+</li>
+<li>
+<p><code>..    object-size-bytes=ipsum</code></p>
+<ul>
+<li>The total size of the server object.</li>
+</ul>
+</li>
+<li>
+<p><code>object-version=labore</code></p>
+<ul>
+<li>The object version of the object the checksums are being returned for.</li>
+</ul>
+</li>
+<li>
+<p><code>..diff-download-response.object-location    blob-ref=ipsum</code></p>
+<ul>
+<li>Blobstore v1 reference, set if reference_type is BLOBSTORE_REF This should be the byte representation of a blobstore.BlobRef. Since Blobstore is deprecating v1, use blobstore2_info instead. For now, any v2 blob will also be represented in this field as v1 BlobRef.</li>
+</ul>
+</li>
+<li><code>blobstore2-info    blob-generation=consetetur</code><ul>
+<li>The blob generation id.</li>
+</ul>
+</li>
+<li><code>blob-id=eos</code><ul>
+<li>The blob id, e.g., /blobstore/prod/playground/scotty</li>
+</ul>
+</li>
+<li><code>download-read-handle=et</code><ul>
+<li>Read handle passed from Bigstore -&gt; Scotty for a GCS download. This is a signed, serialized blobstore2.ReadHandle proto which must never be set outside of Bigstore, and is not applicable to non-GCS media downloads.</li>
+</ul>
+</li>
+<li><code>read-token=dolore</code><ul>
+<li>The blob read token. Needed to read blobs that have not been replicated. Might not be available until the final call.</li>
+</ul>
+</li>
+<li>
+<p><code>upload-metadata-container=accusam</code></p>
+<ul>
+<li>Metadata passed from Blobstore -&gt; Scotty for a new GCS upload. This is a signed, serialized blobstore2.BlobMetadataContainer proto which must never be consumed outside of Bigstore, and is not applicable to non-GCS media uploads.</li>
+</ul>
+</li>
+<li>
+<p><code>..    cosmo-binary-reference=sed</code></p>
+<ul>
+<li>A binary data reference for a media download. Serves as a technology-agnostic binary reference in some Google infrastructure. This value is a serialized storage_cosmo.BinaryReference proto. Storing it as bytes is a hack to get around the fact that the cosmo proto (as well as others it includes) doesn&#39;t support JavaScript. This prevents us from including the actual type of this field.</li>
+</ul>
+</li>
+<li><code>crc32c-hash=54</code><ul>
+<li>crc32.c hash for the payload.</li>
+</ul>
+</li>
+<li><code>inline=et</code><ul>
+<li>Media data, set if reference_type is INLINE</li>
+</ul>
+</li>
+<li><code>length=at</code><ul>
+<li>Size of the data, in bytes</li>
+</ul>
+</li>
+<li><code>md5-hash=accusam</code><ul>
+<li>MD5 hash for the payload.</li>
+</ul>
+</li>
+<li><code>object-id    bucket-name=sea</code><ul>
+<li>The name of the bucket to which this object belongs.</li>
+</ul>
+</li>
+<li><code>generation=et</code><ul>
+<li>Generation of the object. Generations are monotonically increasing across writes, allowing them to be be compared to determine which generation is newer. If this is omitted in a request, then you are requesting the live object. See http://go/bigstore-versions</li>
+</ul>
+</li>
+<li>
+<p><code>object-name=ea</code></p>
+<ul>
+<li>The name of the object.</li>
+</ul>
+</li>
+<li>
+<p><code>..    path=aliquyam</code></p>
+<ul>
+<li>Path to the data, set if reference_type is PATH</li>
+</ul>
+</li>
+<li><code>reference-type=nonumy</code><ul>
+<li>Describes what the field reference contains.</li>
+</ul>
+</li>
+<li>
+<p><code>sha1-hash=sit</code></p>
+<ul>
+<li>SHA-1 hash for the payload.</li>
+</ul>
+</li>
+<li>
+<p><code>...diff-upload-request.checksums-info    blob-ref=lorem</code></p>
+<ul>
+<li>Blobstore v1 reference, set if reference_type is BLOBSTORE_REF This should be the byte representation of a blobstore.BlobRef. Since Blobstore is deprecating v1, use blobstore2_info instead. For now, any v2 blob will also be represented in this field as v1 BlobRef.</li>
+</ul>
+</li>
+<li><code>blobstore2-info    blob-generation=ipsum</code><ul>
+<li>The blob generation id.</li>
+</ul>
+</li>
+<li><code>blob-id=tempor</code><ul>
+<li>The blob id, e.g., /blobstore/prod/playground/scotty</li>
+</ul>
+</li>
+<li><code>download-read-handle=erat</code><ul>
+<li>Read handle passed from Bigstore -&gt; Scotty for a GCS download. This is a signed, serialized blobstore2.ReadHandle proto which must never be set outside of Bigstore, and is not applicable to non-GCS media downloads.</li>
+</ul>
+</li>
+<li><code>read-token=at</code><ul>
+<li>The blob read token. Needed to read blobs that have not been replicated. Might not be available until the final call.</li>
+</ul>
+</li>
+<li>
+<p><code>upload-metadata-container=gubergren</code></p>
+<ul>
+<li>Metadata passed from Blobstore -&gt; Scotty for a new GCS upload. This is a signed, serialized blobstore2.BlobMetadataContainer proto which must never be consumed outside of Bigstore, and is not applicable to non-GCS media uploads.</li>
+</ul>
+</li>
+<li>
+<p><code>..    cosmo-binary-reference=eos</code></p>
+<ul>
+<li>A binary data reference for a media download. Serves as a technology-agnostic binary reference in some Google infrastructure. This value is a serialized storage_cosmo.BinaryReference proto. Storing it as bytes is a hack to get around the fact that the cosmo proto (as well as others it includes) doesn&#39;t support JavaScript. This prevents us from including the actual type of this field.</li>
+</ul>
+</li>
+<li><code>crc32c-hash=3</code><ul>
+<li>crc32.c hash for the payload.</li>
+</ul>
+</li>
+<li><code>inline=kasd</code><ul>
+<li>Media data, set if reference_type is INLINE</li>
+</ul>
+</li>
+<li><code>length=et</code><ul>
+<li>Size of the data, in bytes</li>
+</ul>
+</li>
+<li><code>md5-hash=eirmod</code><ul>
+<li>MD5 hash for the payload.</li>
+</ul>
+</li>
+<li><code>object-id    bucket-name=sanctus</code><ul>
+<li>The name of the bucket to which this object belongs.</li>
+</ul>
+</li>
+<li><code>generation=ipsum</code><ul>
+<li>Generation of the object. Generations are monotonically increasing across writes, allowing them to be be compared to determine which generation is newer. If this is omitted in a request, then you are requesting the live object. See http://go/bigstore-versions</li>
+</ul>
+</li>
+<li>
+<p><code>object-name=dolor</code></p>
+<ul>
+<li>The name of the object.</li>
+</ul>
+</li>
+<li>
+<p><code>..    path=ipsum</code></p>
+<ul>
+<li>Path to the data, set if reference_type is PATH</li>
+</ul>
+</li>
+<li><code>reference-type=dolor</code><ul>
+<li>Describes what the field reference contains.</li>
+</ul>
+</li>
+<li>
+<p><code>sha1-hash=tempor</code></p>
+<ul>
+<li>SHA-1 hash for the payload.</li>
+</ul>
+</li>
+<li>
+<p><code>..object-info    blob-ref=rebum.</code></p>
+<ul>
+<li>Blobstore v1 reference, set if reference_type is BLOBSTORE_REF This should be the byte representation of a blobstore.BlobRef. Since Blobstore is deprecating v1, use blobstore2_info instead. For now, any v2 blob will also be represented in this field as v1 BlobRef.</li>
+</ul>
+</li>
+<li><code>blobstore2-info    blob-generation=sed</code><ul>
+<li>The blob generation id.</li>
+</ul>
+</li>
+<li><code>blob-id=justo</code><ul>
+<li>The blob id, e.g., /blobstore/prod/playground/scotty</li>
+</ul>
+</li>
+<li><code>download-read-handle=voluptua.</code><ul>
+<li>Read handle passed from Bigstore -&gt; Scotty for a GCS download. This is a signed, serialized blobstore2.ReadHandle proto which must never be set outside of Bigstore, and is not applicable to non-GCS media downloads.</li>
+</ul>
+</li>
+<li><code>read-token=consetetur</code><ul>
+<li>The blob read token. Needed to read blobs that have not been replicated. Might not be available until the final call.</li>
+</ul>
+</li>
+<li>
+<p><code>upload-metadata-container=lorem</code></p>
+<ul>
+<li>Metadata passed from Blobstore -&gt; Scotty for a new GCS upload. This is a signed, serialized blobstore2.BlobMetadataContainer proto which must never be consumed outside of Bigstore, and is not applicable to non-GCS media uploads.</li>
+</ul>
+</li>
+<li>
+<p><code>..    cosmo-binary-reference=ipsum</code></p>
+<ul>
+<li>A binary data reference for a media download. Serves as a technology-agnostic binary reference in some Google infrastructure. This value is a serialized storage_cosmo.BinaryReference proto. Storing it as bytes is a hack to get around the fact that the cosmo proto (as well as others it includes) doesn&#39;t support JavaScript. This prevents us from including the actual type of this field.</li>
+</ul>
+</li>
+<li><code>crc32c-hash=82</code><ul>
+<li>crc32.c hash for the payload.</li>
+</ul>
+</li>
+<li><code>inline=vero</code><ul>
+<li>Media data, set if reference_type is INLINE</li>
+</ul>
+</li>
+<li><code>length=lorem</code><ul>
+<li>Size of the data, in bytes</li>
+</ul>
+</li>
+<li><code>md5-hash=dolores</code><ul>
+<li>MD5 hash for the payload.</li>
+</ul>
+</li>
+<li><code>object-id    bucket-name=diam</code><ul>
+<li>The name of the bucket to which this object belongs.</li>
+</ul>
+</li>
+<li><code>generation=erat</code><ul>
+<li>Generation of the object. Generations are monotonically increasing across writes, allowing them to be be compared to determine which generation is newer. If this is omitted in a request, then you are requesting the live object. See http://go/bigstore-versions</li>
+</ul>
+</li>
+<li>
+<p><code>object-name=dolor</code></p>
+<ul>
+<li>The name of the object.</li>
+</ul>
+</li>
+<li>
+<p><code>..    path=invidunt</code></p>
+<ul>
+<li>Path to the data, set if reference_type is PATH</li>
+</ul>
+</li>
+<li><code>reference-type=ut</code><ul>
+<li>Describes what the field reference contains.</li>
+</ul>
+</li>
+<li>
+<p><code>sha1-hash=rebum.</code></p>
+<ul>
+<li>SHA-1 hash for the payload.</li>
+</ul>
+</li>
+<li>
+<p><code>..    object-version=erat</code></p>
+<ul>
+<li>The object version of the object that is the base version the incoming diff script will be applied to. This field will always be filled in.</li>
+</ul>
+</li>
+<li>
+<p><code>..diff-upload-response    object-version=at</code></p>
+<ul>
+<li>The object version of the object at the server. Must be included in the end notification response. The version in the end notification response must correspond to the new version of the object that is now stored at the server, after the upload.</li>
+</ul>
+</li>
+<li><code>original-object    blob-ref=sed</code><ul>
+<li>Blobstore v1 reference, set if reference_type is BLOBSTORE_REF This should be the byte representation of a blobstore.BlobRef. Since Blobstore is deprecating v1, use blobstore2_info instead. For now, any v2 blob will also be represented in this field as v1 BlobRef.</li>
+</ul>
+</li>
+<li><code>blobstore2-info    blob-generation=takimata</code><ul>
+<li>The blob generation id.</li>
+</ul>
+</li>
+<li><code>blob-id=invidunt</code><ul>
+<li>The blob id, e.g., /blobstore/prod/playground/scotty</li>
+</ul>
+</li>
+<li><code>download-read-handle=sadipscing</code><ul>
+<li>Read handle passed from Bigstore -&gt; Scotty for a GCS download. This is a signed, serialized blobstore2.ReadHandle proto which must never be set outside of Bigstore, and is not applicable to non-GCS media downloads.</li>
+</ul>
+</li>
+<li><code>read-token=diam</code><ul>
+<li>The blob read token. Needed to read blobs that have not been replicated. Might not be available until the final call.</li>
+</ul>
+</li>
+<li>
+<p><code>upload-metadata-container=sed</code></p>
+<ul>
+<li>Metadata passed from Blobstore -&gt; Scotty for a new GCS upload. This is a signed, serialized blobstore2.BlobMetadataContainer proto which must never be consumed outside of Bigstore, and is not applicable to non-GCS media uploads.</li>
+</ul>
+</li>
+<li>
+<p><code>..    cosmo-binary-reference=sanctus</code></p>
+<ul>
+<li>A binary data reference for a media download. Serves as a technology-agnostic binary reference in some Google infrastructure. This value is a serialized storage_cosmo.BinaryReference proto. Storing it as bytes is a hack to get around the fact that the cosmo proto (as well as others it includes) doesn&#39;t support JavaScript. This prevents us from including the actual type of this field.</li>
+</ul>
+</li>
+<li><code>crc32c-hash=54</code><ul>
+<li>crc32.c hash for the payload.</li>
+</ul>
+</li>
+<li><code>inline=justo</code><ul>
+<li>Media data, set if reference_type is INLINE</li>
+</ul>
+</li>
+<li><code>length=aliquyam</code><ul>
+<li>Size of the data, in bytes</li>
+</ul>
+</li>
+<li><code>md5-hash=et</code><ul>
+<li>MD5 hash for the payload.</li>
+</ul>
+</li>
+<li><code>object-id    bucket-name=sadipscing</code><ul>
+<li>The name of the bucket to which this object belongs.</li>
+</ul>
+</li>
+<li><code>generation=accusam</code><ul>
+<li>Generation of the object. Generations are monotonically increasing across writes, allowing them to be be compared to determine which generation is newer. If this is omitted in a request, then you are requesting the live object. See http://go/bigstore-versions</li>
+</ul>
+</li>
+<li>
+<p><code>object-name=justo</code></p>
+<ul>
+<li>The name of the object.</li>
+</ul>
+</li>
+<li>
+<p><code>..    path=diam</code></p>
+<ul>
+<li>Path to the data, set if reference_type is PATH</li>
+</ul>
+</li>
+<li><code>reference-type=sea</code><ul>
+<li>Describes what the field reference contains.</li>
+</ul>
+</li>
+<li>
+<p><code>sha1-hash=consetetur</code></p>
+<ul>
+<li>SHA-1 hash for the payload.</li>
+</ul>
+</li>
+<li>
+<p><code>...diff-version-response    object-size-bytes=tempor</code></p>
+<ul>
+<li>The total size of the server object.</li>
+</ul>
+</li>
+<li>
+<p><code>object-version=duo</code></p>
+<ul>
+<li>The version of the object stored at the server.</li>
+</ul>
+</li>
+<li>
+<p><code>..download-parameters    allow-gzip-compression=true</code></p>
+<ul>
+<li>A boolean to be returned in the response to Scotty. Allows/disallows gzip encoding of the payload content when the server thinks it&#39;s advantageous (hence, does not guarantee compression) which allows Scotty to GZip the response to the client.</li>
+</ul>
+</li>
+<li>
+<p><code>ignore-range=false</code></p>
+<ul>
+<li>Determining whether or not Apiary should skip the inclusion of any Content-Range header on its response to Scotty.</li>
+</ul>
+</li>
+<li>
+<p><code>..    filename=diam</code></p>
+<ul>
+<li>Original file name</li>
+</ul>
+</li>
+<li><code>hash=justo</code><ul>
+<li>Deprecated, use one of explicit hash type fields instead. These two hash related fields will only be populated on Scotty based media uploads and will contain the content of the hash group in the NotificationRequest: http://cs/#google3/uploader/service/proto/upload_listener.proto&amp;q=class:Hash Hex encoded hash value of the uploaded media.</li>
+</ul>
+</li>
+<li><code>hash-verified=false</code><ul>
+<li>For Scotty uploads only. If a user sends a hash code and the backend has requested that Scotty verify the upload against the client hash, Scotty will perform the check on behalf of the backend and will reject it if the hashes don&#39;t match. This is set to true if Scotty performed this verification.</li>
+</ul>
+</li>
+<li><code>inline=ipsum</code><ul>
+<li>Media data, set if reference_type is INLINE</li>
+</ul>
+</li>
+<li><code>is-potential-retry=false</code><ul>
+<li>|is_potential_retry| is set false only when Scotty is certain that it has not sent the request before. When a client resumes an upload, this field must be set true in agent calls, because Scotty cannot be certain that it has never sent the request before due to potential failure in the session state persistence.</li>
+</ul>
+</li>
+<li><code>length=sed</code><ul>
+<li>Size of the data, in bytes</li>
+</ul>
+</li>
+<li><code>md5-hash=et</code><ul>
+<li>Scotty-provided MD5 hash for an upload.</li>
+</ul>
+</li>
+<li><code>media-id=no</code><ul>
+<li>Media id to forward to the operation GetMedia. Can be set if reference_type is GET_MEDIA.</li>
+</ul>
+</li>
+<li><code>object-id    bucket-name=diam</code><ul>
+<li>The name of the bucket to which this object belongs.</li>
+</ul>
+</li>
+<li><code>generation=vero</code><ul>
+<li>Generation of the object. Generations are monotonically increasing across writes, allowing them to be be compared to determine which generation is newer. If this is omitted in a request, then you are requesting the live object. See http://go/bigstore-versions</li>
+</ul>
+</li>
+<li>
+<p><code>object-name=et</code></p>
+<ul>
+<li>The name of the object.</li>
+</ul>
+</li>
+<li>
+<p><code>..    path=et</code></p>
+<ul>
+<li>Path to the data, set if reference_type is PATH</li>
+</ul>
+</li>
+<li><code>reference-type=eirmod</code><ul>
+<li>Describes what the field reference contains.</li>
+</ul>
+</li>
+<li><code>sha1-hash=dolore</code><ul>
+<li>Scotty-provided SHA1 hash for an upload.</li>
+</ul>
+</li>
+<li><code>sha256-hash=sea</code><ul>
+<li>Scotty-provided SHA256 hash for an upload.</li>
+</ul>
+</li>
+<li><code>timestamp=sadipscing</code><ul>
+<li>Time at which the media data was last updated, in milliseconds since UNIX epoch</li>
+</ul>
+</li>
+<li>
+<p><code>token=ea</code></p>
+<ul>
+<li>A unique fingerprint/version id for the media data</li>
+</ul>
+</li>
+<li>
+<p><code>..media-request-info    current-bytes=sadipscing</code></p>
+<ul>
+<li>The number of current bytes uploaded or downloaded.</li>
+</ul>
+</li>
+<li><code>custom-data=erat</code><ul>
+<li>Data to be copied to backend requests. Custom data is returned to Scotty in the agent_state field, which Scotty will then provide in subsequent upload notifications.</li>
+</ul>
+</li>
+<li><code>diff-object-version=erat</code><ul>
+<li>Set if the http request info is diff encoded. The value of this field is the version number of the base revision. This is corresponding to Apiary&#39;s mediaDiffObjectVersion (//depot/google3/java/com/google/api/server/media/variable/DiffObjectVersionVariable.java). See go/esf-scotty-diff-upload for more information.</li>
+</ul>
+</li>
+<li><code>final-status=94</code><ul>
+<li>The existence of the final_status field indicates that this is the last call to the agent for this request_id. http://google3/uploader/agent/scotty_agent.proto?l=737&amp;rcl=347601929</li>
+</ul>
+</li>
+<li><code>notification-type=lorem</code><ul>
+<li>The type of notification received from Scotty.</li>
+</ul>
+</li>
+<li><code>request-id=gubergren</code><ul>
+<li>The Scotty request ID.</li>
+</ul>
+</li>
+<li><code>request-received-params-serving-info=erat</code><ul>
+<li>The partition of the Scotty server handling this request. type is uploader_service.RequestReceivedParamsServingInfo LINT.IfChange(request_received_params_serving_info_annotations) LINT.ThenChange()</li>
+</ul>
+</li>
+<li><code>total-bytes=nonumy</code><ul>
+<li>The total size of the file.</li>
+</ul>
+</li>
+<li><code>total-bytes-is-estimated=true</code><ul>
+<li>Whether the total bytes field contains an estimated data.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="required-upload-flags">Required Upload Flags</h1>
+<p>This method supports the upload of data, which <em>requires</em> all of the following flags to be set:</p>
+<ul>
+<li><strong>-u simple</strong><ul>
+<li><strong>simple</strong> - Upload media all at once.</li>
+</ul>
+</li>
+<li><strong>-f file</strong><ul>
+<li>Path to file to upload. It must be seekable.</li>
+</ul>
+</li>
+</ul>
+<p>The following flag <em>may</em> be set: </p>
+<ul>
+<li><strong>-m mime</strong><ul>
+<li>the mime type, like 'application/octet-stream', which is the default</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../media_download/" class="btn btn-neutral float-left" title="Download"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../offerclass_addmessage/" class="btn btn-neutral float-right" title="Addmessage">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/walletobjects1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../media_download/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../offerclass_addmessage/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

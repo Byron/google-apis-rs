@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-walletobjects1-cli/transitclass_insert/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Insert - Walletobjects v5.0.4+20240304</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Insert";
+        var mkdocs_page_input_path = "transitclass_insert.md";
+        var mkdocs_page_url = "/google-apis-rs/google-walletobjects1-cli/transitclass_insert/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Walletobjects v5.0.4+20240304
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Eventticketclass</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketclass_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketclass_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketclass_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketclass_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketclass_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketclass_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Eventticketobject</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketobject_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketobject_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketobject_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketobject_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketobject_modifylinkedofferobjects/">Modifylinkedofferobjects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketobject_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../eventticketobject_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Flightclass</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightclass_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightclass_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightclass_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightclass_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightclass_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightclass_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Flightobject</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightobject_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightobject_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightobject_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightobject_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightobject_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../flightobject_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Genericclass</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericclass_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericclass_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericclass_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericclass_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericclass_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericclass_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Genericobject</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericobject_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericobject_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericobject_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericobject_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericobject_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../genericobject_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Giftcardclass</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardclass_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardclass_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardclass_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardclass_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardclass_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardclass_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Giftcardobject</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardobject_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardobject_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardobject_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardobject_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardobject_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../giftcardobject_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Issuer</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../issuer_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../issuer_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../issuer_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../issuer_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../issuer_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Jwt</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../jwt_insert/">Insert</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Loyaltyclass</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyclass_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyclass_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyclass_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyclass_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyclass_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyclass_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Loyaltyobject</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyobject_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyobject_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyobject_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyobject_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyobject_modifylinkedofferobjects/">Modifylinkedofferobjects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyobject_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../loyaltyobject_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Media</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../media_download/">Download</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../media_upload/">Upload</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Offerclass</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerclass_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerclass_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerclass_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerclass_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerclass_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerclass_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Offerobject</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerobject_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerobject_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerobject_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerobject_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerobject_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../offerobject_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Permissions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Smarttap</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../smarttap_insert/">Insert</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Transitclass</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../transitclass_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitclass_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Insert</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitclass_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitclass_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitclass_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Transitobject</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitobject_addmessage/">Addmessage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitobject_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitobject_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitobject_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitobject_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transitobject_update/">Update</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Walletobjects v5.0.4+20240304</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Transitclass &raquo;</li>
+      <li>Insert</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/walletobjects1-cli/edit/master/docs/transitclass_insert.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Inserts a transit class with the given ID and properties.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/wallet_object.issuer</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/wallet_object.issuer</em>.
+You can set the scope for this method like this: <code>walletobjects1 --scope &lt;scope&gt; transitclass insert ...</code></p>
+<h1 id="required-request-value">Required Request Value</h1>
+<p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
+In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
+<p>For example, a structure like this:</p>
+<pre><code>TransitClass:
+  activation-options:
+    activation-url: string
+    allow-reactivation: boolean
+  allow-multiple-users-per-object: boolean
+  callback-options:
+    update-request-url: string
+    url: string
+  class-template-info:
+    list-template-override:
+      first-row-option:
+        transit-option: string
+  country-code: string
+  custom-carriage-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-coach-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-concession-category-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-confirmation-code-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-discount-message-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-fare-class-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-fare-name-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-other-restrictions-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-platform-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-purchase-face-value-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-purchase-price-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-purchase-receipt-number-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-route-restrictions-details-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-route-restrictions-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-seat-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-ticket-number-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-time-restrictions-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-transit-terminus-name-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  custom-zone-label:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  enable-single-leg-itinerary: boolean
+  enable-smart-tap: boolean
+  hero-image:
+    content-description:
+      default-value:
+        kind: string
+        language: string
+        value: string
+      kind: string
+    kind: string
+    source-uri:
+      description: string
+      localized-description:
+        default-value:
+          kind: string
+          language: string
+          value: string
+        kind: string
+      uri: string
+  hex-background-color: string
+  homepage-uri:
+    description: string
+    id: string
+    kind: string
+    localized-description:
+      default-value:
+        kind: string
+        language: string
+        value: string
+      kind: string
+    uri: string
+  id: string
+  info-module-data:
+    show-last-update-time: boolean
+  issuer-name: string
+  language-override: string
+  localized-issuer-name:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  logo:
+    content-description:
+      default-value:
+        kind: string
+        language: string
+        value: string
+      kind: string
+    kind: string
+    source-uri:
+      description: string
+      localized-description:
+        default-value:
+          kind: string
+          language: string
+          value: string
+        kind: string
+      uri: string
+  multiple-devices-and-holders-allowed-status: string
+  redemption-issuers: [string]
+  review:
+    comments: string
+  review-status: string
+  security-animation:
+    animation-type: string
+  transit-operator-name:
+    default-value:
+      kind: string
+      language: string
+      value: string
+    kind: string
+  transit-type: string
+  version: string
+  view-unlock-requirement: string
+  watermark:
+    content-description:
+      default-value:
+        kind: string
+        language: string
+        value: string
+      kind: string
+    kind: string
+    source-uri:
+      description: string
+      localized-description:
+        default-value:
+          kind: string
+          language: string
+          value: string
+        kind: string
+      uri: string
+  wide-logo:
+    content-description:
+      default-value:
+        kind: string
+        language: string
+        value: string
+      kind: string
+    kind: string
+    source-uri:
+      description: string
+      localized-description:
+        default-value:
+          kind: string
+          language: string
+          value: string
+        kind: string
+      uri: string
+  word-mark:
+    content-description:
+      default-value:
+        kind: string
+        language: string
+        value: string
+      kind: string
+    kind: string
+    source-uri:
+      description: string
+      localized-description:
+        default-value:
+          kind: string
+          language: string
+          value: string
+        kind: string
+      uri: string
+
+</code></pre>
+<p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
+<ul>
+<li><code>-r .activation-options    activation-url=sanctus</code><ul>
+<li>HTTPS URL that supports REST semantics. Would be used for requesting activation from partners for given valuable, triggered by the users.</li>
+</ul>
+</li>
+<li>
+<p><code>allow-reactivation=false</code></p>
+<ul>
+<li>Flag to allow users to make activation call from different device. This allows client to render the activation button enabled even if the activationStatus is ACTIVATED but the requested device is different than the current device.</li>
+</ul>
+</li>
+<li>
+<p><code>..    allow-multiple-users-per-object=true</code></p>
+<ul>
+<li>Deprecated. Use <code>multipleDevicesAndHoldersAllowedStatus</code> instead.</li>
+</ul>
+</li>
+<li><code>callback-options    update-request-url=dolor</code><ul>
+<li>URL for the merchant endpoint that would be called to request updates. The URL should be hosted on HTTPS and robots.txt should allow the URL path to be accessible by UserAgent:Google-Valuables. Deprecated.</li>
+</ul>
+</li>
+<li>
+<p><code>url=tempor</code></p>
+<ul>
+<li>The HTTPS url configured by the merchant. The URL should be hosted on HTTPS and robots.txt should allow the URL path to be accessible by UserAgent:Google-Valuables.</li>
+</ul>
+</li>
+<li>
+<p><code>..class-template-info.list-template-override.first-row-option    transit-option=consetetur</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>....    country-code=sadipscing</code></p>
+<ul>
+<li>Country code used to display the card&#39;s country (when the user is not in that country), as well as to display localized content when content is not available in the user&#39;s locale.</li>
+</ul>
+</li>
+<li><code>custom-carriage-label.default-value    kind=lorem</code><ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=erat</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=amet.</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=diam</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-coach-label.default-value    kind=stet</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=labore</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=gubergren</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=diam</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-concession-category-label.default-value    kind=vero</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=ea</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=clita</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=gubergren</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-confirmation-code-label.default-value    kind=rebum.</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=nonumy</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=et</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=eos</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-discount-message-label.default-value    kind=ipsum</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=elitr</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=eos</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=dolore</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-fare-class-label.default-value    kind=clita</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=dolor</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=dolores</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=ut</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-fare-name-label.default-value    kind=diam</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=diam</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=sit</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=labore</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-other-restrictions-label.default-value    kind=duo</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=sed</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=ut</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=sit</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-platform-label.default-value    kind=tempor</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=accusam</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=tempor</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=lorem</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-purchase-face-value-label.default-value    kind=et</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=et</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=eos</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=consetetur</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-purchase-price-label.default-value    kind=consetetur</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=dolore</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=ea</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=ea</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-purchase-receipt-number-label.default-value    kind=nonumy</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=eirmod</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=sanctus</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=invidunt</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-route-restrictions-details-label.default-value    kind=et</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=voluptua.</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=vero</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=et</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-route-restrictions-label.default-value    kind=lorem</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=sit</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=ea</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=kasd</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-seat-label.default-value    kind=eirmod</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=ut</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=est</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=accusam</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-ticket-number-label.default-value    kind=sed</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=nonumy</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=sed</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=no</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-time-restrictions-label.default-value    kind=consetetur</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=clita</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=ipsum</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=dolor</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-transit-terminus-name-label.default-value    kind=invidunt</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=et</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=ut</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=gubergren</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..custom-zone-label.default-value    kind=voluptua.</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=dolor</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=sanctus</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=eos</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    enable-single-leg-itinerary=true</code></p>
+<ul>
+<li>Controls the display of the single-leg itinerary for this class. By default, an itinerary will only display for multi-leg trips.</li>
+</ul>
+</li>
+<li><code>enable-smart-tap=true</code><ul>
+<li>Identifies whether this class supports Smart Tap. The <code>redemptionIssuers</code> and object level <code>smartTapRedemptionLevel</code> fields must also be set up correctly in order for a pass to support Smart Tap.</li>
+</ul>
+</li>
+<li><code>hero-image.content-description.default-value    kind=et</code><ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=lorem</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=sit</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=sed</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=aliquyam</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#image&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>source-uri    description=ipsum</code><ul>
+<li>Additional information about the image, which is unused and retained only for backward compatibility.</li>
+</ul>
+</li>
+<li><code>localized-description.default-value    kind=amet</code><ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=aliquyam</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=diam</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=sea</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    uri=ipsum</code></p>
+<ul>
+<li>The location of the image. URIs must have a scheme.</li>
+</ul>
+</li>
+<li>
+<p><code>...    hex-background-color=diam</code></p>
+<ul>
+<li>The background color for the card. If not set the dominant color of the hero image is used, and if no hero image is set, the dominant color of the logo is used. The format is #rrggbb where rrggbb is a hex RGB triplet, such as <code>#ffcc00</code>. You can also use the shorthand version of the RGB triplet which is #rgb, such as <code>#fc0</code>.</li>
+</ul>
+</li>
+<li><code>homepage-uri    description=consetetur</code><ul>
+<li>The URI&#39;s title appearing in the app as text. Recommended maximum is 20 characters to ensure full string is displayed on smaller screens. Note that in some contexts this text is not used, such as when <code>description</code> is part of an image.</li>
+</ul>
+</li>
+<li><code>id=eirmod</code><ul>
+<li>The ID associated with a uri. This field is here to enable ease of management of uris.</li>
+</ul>
+</li>
+<li><code>kind=sanctus</code><ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#uri&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>localized-description.default-value    kind=ipsum</code><ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=et</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=elitr</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=erat</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    uri=lorem</code></p>
+<ul>
+<li>The location of a web page, image, or other resource. URIs in the <code>LinksModuleData</code> module can have different prefixes indicating the type of URI (a link to a web page, a link to a map, a telephone number, or an email address). URIs must have a scheme.</li>
+</ul>
+</li>
+<li>
+<p><code>..    id=et</code></p>
+<ul>
+<li>Required. The unique identifier for a class. This ID must be unique across all classes from an issuer. This value should follow the format issuer ID. identifier where the former is issued by Google and latter is chosen by you. Your unique identifier should only include alphanumeric characters, &#39;.&#39;, &#39;_&#39;, or &#39;-&#39;.</li>
+</ul>
+</li>
+<li>
+<p><code>info-module-data    show-last-update-time=true</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>..    issuer-name=sit</code></p>
+<ul>
+<li>Required. The issuer name. Recommended maximum length is 20 characters to ensure full string is displayed on smaller screens.</li>
+</ul>
+</li>
+<li><code>language-override=diam</code><ul>
+<li>If this field is present, transit tickets served to a user&#39;s device will always be in this language. Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li><code>localized-issuer-name.default-value    kind=diam</code><ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=erat</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=consetetur</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=diam</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..logo.content-description.default-value    kind=dolor</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=sadipscing</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=accusam</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=et</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=sit</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#image&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>source-uri    description=sed</code><ul>
+<li>Additional information about the image, which is unused and retained only for backward compatibility.</li>
+</ul>
+</li>
+<li><code>localized-description.default-value    kind=magna</code><ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=erat</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=voluptua.</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=gubergren</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    uri=eos</code></p>
+<ul>
+<li>The location of the image. URIs must have a scheme.</li>
+</ul>
+</li>
+<li>
+<p><code>...    multiple-devices-and-holders-allowed-status=eirmod</code></p>
+<ul>
+<li>Identifies whether multiple users and devices will save the same object referencing this class.</li>
+</ul>
+</li>
+<li><code>redemption-issuers=dolor</code><ul>
+<li>Identifies which redemption issuers can redeem the pass over Smart Tap. Redemption issuers are identified by their issuer ID. Redemption issuers must have at least one Smart Tap key configured. The <code>enableSmartTap</code> and object level <code>smartTapRedemptionLevel</code> fields must also be set up correctly in order for a pass to support Smart Tap.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li>
+<p><code>review    comments=diam</code></p>
+<ul>
+<li>No description provided.</li>
+</ul>
+</li>
+<li>
+<p><code>..    review-status=elitr</code></p>
+<ul>
+<li>Required. The status of the class. This field can be set to <code>draft</code> or <code>underReview</code> using the insert, patch, or update API calls. Once the review state is changed from <code>draft</code> it may not be changed back to <code>draft</code>. You should keep this field to <code>draft</code> when the class is under development. A <code>draft</code> class cannot be used to create any object. You should set this field to <code>underReview</code> when you believe the class is ready for use. The platform will automatically set this field to <code>approved</code> and it can be immediately used to create or migrate objects. When updating an already <code>approved</code> class you should keep setting this field to <code>underReview</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>security-animation    animation-type=ea</code></p>
+<ul>
+<li>Type of animation.</li>
+</ul>
+</li>
+<li>
+<p><code>..transit-operator-name.default-value    kind=dolor</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=ut</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=lorem</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=justo</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    transit-type=tempor</code></p>
+<ul>
+<li>Required. The type of transit this class represents, such as &#34;bus&#34;.</li>
+</ul>
+</li>
+<li><code>version=sit</code><ul>
+<li>Deprecated</li>
+</ul>
+</li>
+<li><code>view-unlock-requirement=consetetur</code><ul>
+<li>View Unlock Requirement options for the transit ticket.</li>
+</ul>
+</li>
+<li><code>watermark.content-description.default-value    kind=sanctus</code><ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=et</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=et</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=at</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=vero</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#image&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>source-uri    description=dolor</code><ul>
+<li>Additional information about the image, which is unused and retained only for backward compatibility.</li>
+</ul>
+</li>
+<li><code>localized-description.default-value    kind=sed</code><ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=lorem</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=aliquyam</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=amet</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    uri=diam</code></p>
+<ul>
+<li>The location of the image. URIs must have a scheme.</li>
+</ul>
+</li>
+<li>
+<p><code>...wide-logo.content-description.default-value    kind=eos</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=ut</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=et</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=et</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=at</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#image&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>source-uri    description=dolores</code><ul>
+<li>Additional information about the image, which is unused and retained only for backward compatibility.</li>
+</ul>
+</li>
+<li><code>localized-description.default-value    kind=sed</code><ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=lorem</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=gubergren</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=rebum.</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    uri=amet.</code></p>
+<ul>
+<li>The location of the image. URIs must have a scheme.</li>
+</ul>
+</li>
+<li>
+<p><code>...word-mark.content-description.default-value    kind=gubergren</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=accusam</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=sanctus</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=lorem</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=clita</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#image&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>source-uri    description=sed</code><ul>
+<li>Additional information about the image, which is unused and retained only for backward compatibility.</li>
+</ul>
+</li>
+<li><code>localized-description.default-value    kind=accusam</code><ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#translatedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li><code>language=et</code><ul>
+<li>Represents the BCP 47 language tag. Example values are &#34;en-US&#34;, &#34;en-GB&#34;, &#34;de&#34;, or &#34;de-AT&#34;.</li>
+</ul>
+</li>
+<li>
+<p><code>value=sanctus</code></p>
+<ul>
+<li>The UTF-8 encoded translated string.</li>
+</ul>
+</li>
+<li>
+<p><code>..    kind=lorem</code></p>
+<ul>
+<li>Identifies what kind of resource this is. Value: the fixed string <code>&amp;#34;walletobjects#localizedString&amp;#34;</code>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    uri=sanctus</code></p>
+<ul>
+<li>The location of the image. URIs must have a scheme.</li>
+</ul>
+</li>
+</ul>
+<h3 id="about-cursors">About Cursors</h3>
+<p>The cursor position is key to comfortably set complex nested structures. The following rules apply:</p>
+<ul>
+<li>The cursor position is always set relative to the current one, unless the field name starts with the <code>.</code> character. Fields can be nested such as in <code>-r f.s.o</code> .</li>
+<li>The cursor position is set relative to the top-level structure if it starts with <code>.</code>, e.g. <code>-r .s.s</code></li>
+<li>You can also set nested fields without setting the cursor explicitly. For example, to set a value relative to the current cursor position, you would specify <code>-r struct.sub_struct=bar</code>.</li>
+<li>You can move the cursor one level up by using <code>..</code>. Each additional <code>.</code> moves it up one additional level. E.g. <code>...</code> would go three levels up.</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../transitclass_get/" class="btn btn-neutral float-left" title="Get"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../transitclass_list/" class="btn btn-neutral float-right" title="List">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/walletobjects1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../transitclass_get/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../transitclass_list/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

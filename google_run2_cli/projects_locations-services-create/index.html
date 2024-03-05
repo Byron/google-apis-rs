@@ -1,180 +1,141 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Locations Services Create - Cloud Run v3.0.0+20220225</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-run2-cli/projects_locations-services-create/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Locations Services Create - Cloud Run v5.0.4+20240225</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Locations Services Create";
+        var mkdocs_page_input_path = "projects_locations-services-create.md";
+        var mkdocs_page_url = "/google-apis-rs/google-run2-cli/projects_locations-services-create/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Cloud Run v3.0.0+20220225</a>
-        
+          <a href=".." class="icon icon-home"> Cloud Run v5.0.4+20240225
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-delete">Locations Operations Delete</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Locations Services Create</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-delete">Locations Services Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-get">Locations Services Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-get-iam-policy">Locations Services Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-list">Locations Services List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-patch">Locations Services Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-revisions-delete">Locations Services Revisions Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-revisions-get">Locations Services Revisions Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-revisions-list">Locations Services Revisions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-set-iam-policy">Locations Services Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-services-test-iam-permissions">Locations Services Test Iam Permissions</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-create/">Locations Jobs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-delete/">Locations Jobs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-executions-cancel/">Locations Jobs Executions Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-executions-delete/">Locations Jobs Executions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-executions-get/">Locations Jobs Executions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-executions-list/">Locations Jobs Executions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-executions-tasks-get/">Locations Jobs Executions Tasks Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-executions-tasks-list/">Locations Jobs Executions Tasks List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-get/">Locations Jobs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-get-iam-policy/">Locations Jobs Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-list/">Locations Jobs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-patch/">Locations Jobs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-run/">Locations Jobs Run</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-set-iam-policy/">Locations Jobs Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-jobs-test-iam-permissions/">Locations Jobs Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-delete/">Locations Operations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-wait/">Locations Operations Wait</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Locations Services Create</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-delete/">Locations Services Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-get/">Locations Services Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-get-iam-policy/">Locations Services Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-list/">Locations Services List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-patch/">Locations Services Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-revisions-delete/">Locations Services Revisions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-revisions-get/">Locations Services Revisions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-revisions-list/">Locations Services Revisions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-set-iam-policy/">Locations Services Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-services-test-iam-permissions/">Locations Services Test Iam Permissions</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Cloud Run v5.0.4+20240225</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Locations Services Create</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/run2-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Locations Services Create</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/run2-cli/edit/master/docs/projects_locations-services-create.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Creates a new Service in a given project and location.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Creates a new Service in a given project and location.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -182,7 +143,7 @@ You can set the scope for this method like this: <code>run2 --scope &lt;scope&gt
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
 <ul>
 <li><strong>&lt;parent&gt;</strong> <em>(string)</em><ul>
-<li>Required. The location and project in which this service should be created. Format: projects/{projectnumber}/locations/{location}</li>
+<li>Required. The location and project in which this service should be created. Format: projects/{project}/locations/{location}, where {project} can be project id or number. Only lowercase characters, digits, and hyphens.</li>
 </ul>
 </li>
 </ul>
@@ -190,7 +151,7 @@ You can set the scope for this method like this: <code>run2 --scope &lt;scope&gt
 <p>The request value is a data-structure with various fields. Each field may be a simple scalar or another data-structure.
 In the latter case it is advised to set the field-cursor to the data-structure's field to specify values more concisely.</p>
 <p>For example, a structure like this:</p>
-<pre><code>GoogleCloudRunOpV2Service:
+<pre><code>GoogleCloudRunV2Service:
   annotations: { string: string }
   binary-authorization:
     breakglass-justification: string
@@ -199,6 +160,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   client-version: string
   create-time: string
   creator: string
+  custom-audiences: [string]
+  default-uri-disabled: boolean
   delete-time: string
   description: string
   etag: string
@@ -213,26 +176,28 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   name: string
   observed-generation: string
   reconciling: boolean
+  satisfies-pzs: boolean
+  scaling:
+    min-instance-count: integer
   template:
     annotations: { string: string }
-    confidential: boolean
-    container-concurrency: integer
     encryption-key: string
     execution-environment: string
+    health-check-disabled: boolean
     labels: { string: string }
+    max-instance-request-concurrency: integer
     revision: string
     scaling:
       max-instance-count: integer
       min-instance-count: integer
     service-account: string
+    session-affinity: boolean
     timeout: string
     vpc-access:
       connector: string
       egress: string
   terminal-condition:
-    domain-mapping-reason: string
     execution-reason: string
-    internal-reason: string
     last-transition-time: string
     message: string
     reason: string
@@ -245,15 +210,14 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   uri: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    annotations=key=et</code><ul>
-<li>Unstructured key value map that may be set by external tools to store and arbitrary metadata. They are not queryable and should be preserved when modifying objects. Cloud Run will populate some annotations using &#39;run.googleapis.com&#39; or &#39;serving.knative.dev&#39; namespaces. This field follows Kubernetes annotations&#39; namespacing, limits, and rules. More info: https://kubernetes.io/docs/user-guide/annotations</li>
+<li><code>-r .    annotations=key=sed</code><ul>
+<li>Optional. Unstructured key value map that may be set by external tools to store and arbitrary metadata. They are not queryable and should be preserved when modifying objects. Cloud Run API v2 does not support annotations with <code>run.googleapis.com</code>, <code>cloud.googleapis.com</code>, <code>serving.knative.dev</code>, or <code>autoscaling.knative.dev</code> namespaces, and they will be rejected in new resources. All system annotations in v1 now have a corresponding field in v2 Service. This field follows Kubernetes annotations&#39; namespacing, limits, and rules.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>binary-authorization    breakglass-justification=magna</code><ul>
+<li><code>binary-authorization    breakglass-justification=sit</code><ul>
 <li>If present, indicates to use Breakglass using this justification. If use_default is False, then it must be empty. For more information on breakglass, see https://cloud.google.com/binary-authorization/docs/using-breakglass</li>
 </ul>
 </li>
@@ -264,175 +228,192 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    client=voluptua.</code></p>
+<p><code>..    client=aliquyam</code></p>
 <ul>
 <li>Arbitrary identifier for the API client.</li>
 </ul>
 </li>
-<li><code>client-version=at</code><ul>
+<li><code>client-version=ipsum</code><ul>
 <li>Arbitrary version identifier for the API client.</li>
 </ul>
 </li>
-<li><code>create-time=sanctus</code><ul>
+<li><code>create-time=et</code><ul>
 <li>Output only. The creation time.</li>
 </ul>
 </li>
-<li><code>creator=sed</code><ul>
+<li><code>creator=sanctus</code><ul>
 <li>Output only. Email address of the authenticated creator.</li>
 </ul>
 </li>
-<li><code>delete-time=amet.</code><ul>
+<li><code>custom-audiences=lorem</code><ul>
+<li>One or more custom audiences that you want this service to support. Specify each custom audience as the full URL in a string. The custom audiences are encoded in the token and used to authenticate requests. For more information, see https://cloud.google.com/run/docs/configuring/custom-audiences.</li>
+<li>Each invocation of this argument appends the given value to the array.</li>
+</ul>
+</li>
+<li><code>default-uri-disabled=true</code><ul>
+<li>Optional. Disables public resolution of the default URI of this service.</li>
+</ul>
+</li>
+<li><code>delete-time=et</code><ul>
 <li>Output only. The deletion time.</li>
 </ul>
 </li>
-<li><code>description=takimata</code><ul>
+<li><code>description=sed</code><ul>
 <li>User-provided description of the Service. This field currently has a 512-character limit.</li>
 </ul>
 </li>
-<li><code>etag=amet.</code><ul>
+<li><code>etag=no</code><ul>
 <li>Output only. A system-generated fingerprint for this version of the resource. May be used to detect modification conflict during updates.</li>
 </ul>
 </li>
-<li><code>expire-time=duo</code><ul>
+<li><code>expire-time=et</code><ul>
 <li>Output only. For a deleted resource, the time after which it will be permamently deleted.</li>
 </ul>
 </li>
-<li><code>generation=ipsum</code><ul>
-<li>Output only. A number that monotonically increases every time the user modifies the desired state.</li>
+<li><code>generation=elitr</code><ul>
+<li>Output only. A number that monotonically increases every time the user modifies the desired state. Please note that unlike v1, this is an int64 value. As with most Google APIs, its JSON representation will be a <code>string</code> instead of an <code>integer</code>.</li>
 </ul>
 </li>
-<li><code>ingress=gubergren</code><ul>
+<li><code>ingress=sed</code><ul>
 <li>Provides the ingress settings for this Service. On output, returns the currently observed ingress settings, or INGRESS_TRAFFIC_UNSPECIFIED if no revision is active.</li>
 </ul>
 </li>
-<li><code>labels=key=lorem</code><ul>
-<li>Map of string keys and values that can be used to organize and categorize objects. User-provided labels are shared with Google&#39;s billing system, so they can be used to filter, or break down billing charges by team, component, environment, state, etc. For more information, visit https://cloud.google.com/resource-manager/docs/creating-managing-labels or https://cloud.google.com/run/docs/configuring/labels Cloud Run will populate some labels with &#39;run.googleapis.com&#39; or &#39;serving.knative.dev&#39; namespaces. Those labels are read-only, and user changes will not be preserved.</li>
+<li><code>labels=key=no</code><ul>
+<li>Optional. Unstructured key value map that can be used to organize and categorize objects. User-provided labels are shared with Google&#39;s billing system, so they can be used to filter, or break down billing charges by team, component, environment, state, etc. For more information, visit https://cloud.google.com/resource-manager/docs/creating-managing-labels or https://cloud.google.com/run/docs/configuring/labels. Cloud Run API v2 does not support labels with <code>run.googleapis.com</code>, <code>cloud.googleapis.com</code>, <code>serving.knative.dev</code>, or <code>autoscaling.knative.dev</code> namespaces, and they will be rejected. All system labels in v1 now have a corresponding field in v2 Service.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>last-modifier=gubergren</code><ul>
+<li><code>last-modifier=nonumy</code><ul>
 <li>Output only. Email address of the last authenticated modifier.</li>
 </ul>
 </li>
-<li><code>latest-created-revision=eos</code><ul>
+<li><code>latest-created-revision=at</code><ul>
 <li>Output only. Name of the last created revision. See comments in <code>reconciling</code> for additional information on reconciliation process in Cloud Run.</li>
 </ul>
 </li>
-<li><code>latest-ready-revision=dolor</code><ul>
+<li><code>latest-ready-revision=sadipscing</code><ul>
 <li>Output only. Name of the latest revision that is serving traffic. See comments in <code>reconciling</code> for additional information on reconciliation process in Cloud Run.</li>
 </ul>
 </li>
-<li><code>launch-stage=ea</code><ul>
-<li>The launch stage as defined by <a href="https://cloud.google.com/terms/launch-stages">Google Cloud Platform Launch Stages</a>. Cloud Run supports <code>ALPHA</code>, <code>BETA</code>, and <code>GA</code>. If no value is specified, GA is assumed.</li>
+<li><code>launch-stage=aliquyam</code><ul>
+<li>The launch stage as defined by <a href="https://cloud.google.com/terms/launch-stages">Google Cloud Platform Launch Stages</a>. Cloud Run supports <code>ALPHA</code>, <code>BETA</code>, and <code>GA</code>. If no value is specified, GA is assumed. Set the launch stage to a preview stage on input to allow use of preview features in that stage. On read (or output), describes whether the resource uses preview features. For example, if ALPHA is provided as input, but only BETA and GA-level features are used, this field will be BETA on output.</li>
 </ul>
 </li>
-<li><code>name=ipsum</code><ul>
+<li><code>name=dolores</code><ul>
 <li>The fully qualified name of this Service. In CreateServiceRequest, this field is ignored, and instead composed from CreateServiceRequest.parent and CreateServiceRequest.service_id. Format: projects/{project}/locations/{location}/services/{service_id}</li>
 </ul>
 </li>
-<li><code>observed-generation=invidunt</code><ul>
-<li>Output only. The generation of this Service currently serving traffic. See comments in <code>reconciling</code> for additional information on reconciliation process in Cloud Run.</li>
+<li><code>observed-generation=sadipscing</code><ul>
+<li>Output only. The generation of this Service currently serving traffic. See comments in <code>reconciling</code> for additional information on reconciliation process in Cloud Run. Please note that unlike v1, this is an int64 value. As with most Google APIs, its JSON representation will be a <code>string</code> instead of an <code>integer</code>.</li>
 </ul>
 </li>
-<li><code>reconciling=true</code><ul>
+<li><code>reconciling=false</code><ul>
 <li>Output only. Returns true if the Service is currently being acted upon by the system to bring it into the desired state. When a new Service is created, or an existing one is updated, Cloud Run will asynchronously perform all necessary steps to bring the Service to the desired serving state. This process is called reconciliation. While reconciliation is in process, <code>observed_generation</code>, <code>latest_ready_revison</code>, <code>traffic_statuses</code>, and <code>uri</code> will have transient values that might mismatch the intended state: Once reconciliation is over (and this field is false), there are two possible outcomes: reconciliation succeeded and the serving state matches the Service, or there was an error, and reconciliation failed. This state can be found in <code>terminal_condition.state</code>. If reconciliation succeeded, the following fields will match: <code>traffic</code> and <code>traffic_statuses</code>, <code>observed_generation</code> and <code>generation</code>, <code>latest_ready_revision</code> and <code>latest_created_revision</code>. If reconciliation failed, <code>traffic_statuses</code>, <code>observed_generation</code>, and <code>latest_ready_revision</code> will have the state of the last serving revision, or empty for newly created Services. Additional information on the failure can be found in <code>terminal_condition</code> and <code>conditions</code>.</li>
 </ul>
 </li>
-<li><code>template    annotations=key=duo</code><ul>
-<li>KRM-style annotations for the resource.</li>
+<li><code>satisfies-pzs=true</code><ul>
+<li>Output only. Reserved for future use.</li>
+</ul>
+</li>
+<li>
+<p><code>scaling    min-instance-count=44</code></p>
+<ul>
+<li>total min instances for the service. This number of instances is divided among all revisions with specified traffic based on the percent of traffic they are receiving. (ALPHA)</li>
+</ul>
+</li>
+<li>
+<p><code>..template    annotations=key=et</code></p>
+<ul>
+<li>Unstructured key value map that may be set by external tools to store and arbitrary metadata. They are not queryable and should be preserved when modifying objects. Cloud Run API v2 does not support annotations with <code>run.googleapis.com</code>, <code>cloud.googleapis.com</code>, <code>serving.knative.dev</code>, or <code>autoscaling.knative.dev</code> namespaces, and they will be rejected. All system annotations in v1 now have a corresponding field in v2 RevisionTemplate. This field follows Kubernetes annotations&#39; namespacing, limits, and rules.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>confidential=true</code><ul>
-<li>Enables Confidential Cloud Run in Revisions created using this template.</li>
-</ul>
-</li>
-<li><code>container-concurrency=8</code><ul>
-<li>Sets the maximum number of requests that each serving instance can receive.</li>
-</ul>
-</li>
-<li><code>encryption-key=ut</code><ul>
+<li><code>encryption-key=sea</code><ul>
 <li>A reference to a customer managed encryption key (CMEK) to use to encrypt this container image. For more information, go to https://cloud.google.com/run/docs/securing/using-cmek</li>
 </ul>
 </li>
-<li><code>execution-environment=gubergren</code><ul>
+<li><code>execution-environment=consetetur</code><ul>
 <li>The sandbox environment to host this Revision.</li>
 </ul>
 </li>
-<li><code>labels=key=rebum.</code><ul>
-<li>KRM-style labels for the resource.</li>
+<li><code>health-check-disabled=true</code><ul>
+<li>Optional. Disables health checking containers during deployment.</li>
+</ul>
+</li>
+<li><code>labels=key=stet</code><ul>
+<li>Unstructured key value map that can be used to organize and categorize objects. User-provided labels are shared with Google&#39;s billing system, so they can be used to filter, or break down billing charges by team, component, environment, state, etc. For more information, visit https://cloud.google.com/resource-manager/docs/creating-managing-labels or https://cloud.google.com/run/docs/configuring/labels. Cloud Run API v2 does not support labels with <code>run.googleapis.com</code>, <code>cloud.googleapis.com</code>, <code>serving.knative.dev</code>, or <code>autoscaling.knative.dev</code> namespaces, and they will be rejected. All system labels in v1 now have a corresponding field in v2 RevisionTemplate.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>revision=est</code><ul>
+<li><code>max-instance-request-concurrency=94</code><ul>
+<li>Sets the maximum number of requests that each serving instance can receive.</li>
+</ul>
+</li>
+<li><code>revision=aliquyam</code><ul>
 <li>The unique name for the revision. If this field is omitted, it will be automatically generated based on the Service name.</li>
 </ul>
 </li>
-<li><code>scaling    max-instance-count=51</code><ul>
+<li><code>scaling    max-instance-count=7</code><ul>
 <li>Maximum number of serving instances that this resource should have.</li>
 </ul>
 </li>
 <li>
-<p><code>min-instance-count=51</code></p>
+<p><code>min-instance-count=81</code></p>
 <ul>
 <li>Minimum number of serving instances that this resource should have.</li>
 </ul>
 </li>
 <li>
-<p><code>..    service-account=est</code></p>
+<p><code>..    service-account=diam</code></p>
 <ul>
 <li>Email address of the IAM service account associated with the revision of the service. The service account represents the identity of the running revision, and determines what permissions the revision has. If not provided, the revision will use the project&#39;s default service account.</li>
 </ul>
 </li>
-<li><code>timeout=gubergren</code><ul>
+<li><code>session-affinity=true</code><ul>
+<li>Optional. Enable session affinity.</li>
+</ul>
+</li>
+<li><code>timeout=sit</code><ul>
 <li>Max allowed time for an instance to respond to a request.</li>
 </ul>
 </li>
-<li><code>vpc-access    connector=ea</code><ul>
-<li>VPC Access connector name. Format: projects/{project}/locations/{location}/connectors/{connector}</li>
+<li><code>vpc-access    connector=sed</code><ul>
+<li>VPC Access connector name. Format: projects/{project}/locations/{location}/connectors/{connector}, where {project} can be project id or number. For more information on sending traffic to a VPC network via a connector, visit https://cloud.google.com/run/docs/configuring/vpc-connectors.</li>
 </ul>
 </li>
 <li>
-<p><code>egress=dolor</code></p>
+<p><code>egress=eos</code></p>
 <ul>
-<li>Traffic VPC egress settings.</li>
+<li>Traffic VPC egress settings. If not provided, it defaults to PRIVATE_RANGES_ONLY.</li>
 </ul>
 </li>
 <li>
-<p><code>...terminal-condition    domain-mapping-reason=lorem</code></p>
+<p><code>...terminal-condition    execution-reason=lorem</code></p>
 <ul>
-<li>A reason for the domain mapping condition.</li>
-</ul>
-</li>
-<li><code>execution-reason=eos</code><ul>
 <li>A reason for the execution condition.</li>
 </ul>
 </li>
-<li><code>internal-reason=labore</code><ul>
-<li>A reason for the internal condition.</li>
-</ul>
-</li>
-<li><code>last-transition-time=sed</code><ul>
+<li><code>last-transition-time=ea</code><ul>
 <li>Last time the condition transitioned from one status to another.</li>
 </ul>
 </li>
-<li><code>message=duo</code><ul>
+<li><code>message=stet</code><ul>
 <li>Human readable message indicating details about the current status.</li>
 </ul>
 </li>
-<li><code>reason=sed</code><ul>
+<li><code>reason=dolores</code><ul>
 <li>A common (service-level) reason for this condition.</li>
 </ul>
 </li>
-<li><code>revision-reason=no</code><ul>
+<li><code>revision-reason=eos</code><ul>
 <li>A reason for the revision condition.</li>
 </ul>
 </li>
-<li><code>severity=stet</code><ul>
+<li><code>severity=et</code><ul>
 <li>How to interpret failures of this condition, one of Error, Warning, Info</li>
 </ul>
 </li>
-<li><code>state=kasd</code><ul>
+<li><code>state=sea</code><ul>
 <li>State of the condition.</li>
 </ul>
 </li>
@@ -443,16 +424,16 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    uid=sed</code></p>
+<p><code>..    uid=at</code></p>
 <ul>
 <li>Output only. Server assigned unique identifier for the trigger. The value is a UUID4 string and guaranteed to remain unchanged until the resource is deleted.</li>
 </ul>
 </li>
-<li><code>update-time=et</code><ul>
+<li><code>update-time=dolore</code><ul>
 <li>Output only. The last-modified time.</li>
 </ul>
 </li>
-<li><code>uri=et</code><ul>
+<li><code>uri=eirmod</code><ul>
 <li>Output only. The main URI in which this Service is serving traffic.</li>
 </ul>
 </li>
@@ -484,7 +465,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p service-id=string</strong></p>
 <ul>
-<li>Required. The unique identifier for the Service. The name of the service becomes {parent}/services/{service_id}.</li>
+<li>Required. The unique identifier for the Service. It must begin with letter, and cannot end with hyphen; must contain fewer than 50 characters. The name of the service becomes {parent}/services/{service_id}.</li>
 </ul>
 </li>
 <li>
@@ -564,32 +545,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_locations-services-delete" class="btn btn-neutral float-right" title="Locations Services Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_locations-operations-list" class="btn btn-neutral" title="Locations Operations List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_locations-operations-wait/" class="btn btn-neutral float-left" title="Locations Operations Wait"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-services-delete/" class="btn btn-neutral float-right" title="Locations Services Delete">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -597,14 +570,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_locations-operations-list" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-services-delete" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/run2-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_locations-operations-wait/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_locations-services-delete/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

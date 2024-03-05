@@ -1,317 +1,173 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Subscriptions Patch - Pubsub v3.0.0+20220221</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-pubsub1-cli/projects_subscriptions-patch/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Subscriptions Patch - Pubsub v5.0.4+20240227</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Subscriptions Patch";
+        var mkdocs_page_input_path = "projects_subscriptions-patch.md";
+        var mkdocs_page_url = "/google-apis-rs/google-pubsub1-cli/projects_subscriptions-patch/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Pubsub v3.0.0+20220221</a>
-        
+          <a href=".." class="icon icon-home"> Pubsub v5.0.4+20240227
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-create">Schemas Create</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-delete">Schemas Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-get">Schemas Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-get-iam-policy">Schemas Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-list">Schemas List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-set-iam-policy">Schemas Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-test-iam-permissions">Schemas Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-validate">Schemas Validate</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_schemas-validate-message">Schemas Validate Message</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-create">Snapshots Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-delete">Snapshots Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-get">Snapshots Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-get-iam-policy">Snapshots Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-list">Snapshots List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-patch">Snapshots Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-set-iam-policy">Snapshots Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_snapshots-test-iam-permissions">Snapshots Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-acknowledge">Subscriptions Acknowledge</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-create">Subscriptions Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-delete">Subscriptions Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-detach">Subscriptions Detach</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-get">Subscriptions Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-get-iam-policy">Subscriptions Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-list">Subscriptions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-modify-ack-deadline">Subscriptions Modify Ack Deadline</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-modify-push-config">Subscriptions Modify Push Config</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Subscriptions Patch</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-pull">Subscriptions Pull</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-seek">Subscriptions Seek</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-set-iam-policy">Subscriptions Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_subscriptions-test-iam-permissions">Subscriptions Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-create">Topics Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-delete">Topics Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-get">Topics Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-get-iam-policy">Topics Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-list">Topics List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-patch">Topics Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-publish">Topics Publish</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-set-iam-policy">Topics Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-snapshots-list">Topics Snapshots List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-subscriptions-list">Topics Subscriptions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_topics-test-iam-permissions">Topics Test Iam Permissions</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-commit/">Schemas Commit</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-create/">Schemas Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-delete/">Schemas Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-delete-revision/">Schemas Delete Revision</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-get/">Schemas Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-get-iam-policy/">Schemas Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-list/">Schemas List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-list-revisions/">Schemas List Revisions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-rollback/">Schemas Rollback</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-set-iam-policy/">Schemas Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-test-iam-permissions/">Schemas Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-validate/">Schemas Validate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_schemas-validate-message/">Schemas Validate Message</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-create/">Snapshots Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-delete/">Snapshots Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-get/">Snapshots Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-get-iam-policy/">Snapshots Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-list/">Snapshots List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-patch/">Snapshots Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-set-iam-policy/">Snapshots Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_snapshots-test-iam-permissions/">Snapshots Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-acknowledge/">Subscriptions Acknowledge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-create/">Subscriptions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-delete/">Subscriptions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-detach/">Subscriptions Detach</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-get/">Subscriptions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-get-iam-policy/">Subscriptions Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-list/">Subscriptions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-modify-ack-deadline/">Subscriptions Modify Ack Deadline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-modify-push-config/">Subscriptions Modify Push Config</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Subscriptions Patch</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-pull/">Subscriptions Pull</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-seek/">Subscriptions Seek</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-set-iam-policy/">Subscriptions Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_subscriptions-test-iam-permissions/">Subscriptions Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-create/">Topics Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-delete/">Topics Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-get/">Topics Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-get-iam-policy/">Topics Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-list/">Topics List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-patch/">Topics Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-publish/">Topics Publish</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-set-iam-policy/">Topics Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-snapshots-list/">Topics Snapshots List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-subscriptions-list/">Topics Subscriptions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_topics-test-iam-permissions/">Topics Test Iam Permissions</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Pubsub v5.0.4+20240227</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Subscriptions Patch</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/pubsub1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Subscriptions Patch</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/pubsub1-cli/edit/master/docs/projects_subscriptions-patch.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates an existing subscription. Note that certain properties of a subscription, such as its topic, are not modifiable.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates an existing subscription by updating the fields specified in the update mask. Note that certain properties of a subscription, such as its topic, are not modifiable.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -334,6 +190,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <pre><code>UpdateSubscriptionRequest:
   subscription:
     ack-deadline-seconds: integer
+    bigquery-config:
+      drop-unknown-fields: boolean
+      service-account-email: string
+      state: string
+      table: string
+      use-table-schema: boolean
+      use-topic-schema: boolean
+      write-metadata: boolean
+    cloud-storage-config:
+      avro-config:
+        write-metadata: boolean
+      bucket: string
+      filename-prefix: string
+      filename-suffix: string
+      max-bytes: string
+      max-duration: string
+      service-account-email: string
+      state: string
     dead-letter-policy:
       dead-letter-topic: string
       max-delivery-attempts: integer
@@ -348,6 +222,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     name: string
     push-config:
       attributes: { string: string }
+      no-wrapper:
+        write-metadata: boolean
       oidc-token:
         audience: string
         service-account-email: string
@@ -362,117 +238,194 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   update-mask: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .subscription    ack-deadline-seconds=9</code><ul>
-<li>The approximate amount of time (on a best-effort basis) Pub/Sub waits for the subscriber to acknowledge receipt before resending the message. In the interval after the message is delivered and before it is acknowledged, it is considered to be <em>outstanding</em>. During that time period, the message will not be redelivered (on a best-effort basis). For pull subscriptions, this value is used as the initial value for the ack deadline. To override this value for a given message, call <code>ModifyAckDeadline</code> with the corresponding <code>ack_id</code> if using non-streaming pull or send the <code>ack_id</code> in a <code>StreamingModifyAckDeadlineRequest</code> if using streaming pull. The minimum custom deadline you can specify is 10 seconds. The maximum custom deadline you can specify is 600 seconds (10 minutes). If this parameter is 0, a default value of 10 seconds is used. For push delivery, this value is also used to set the request timeout for the call to the push endpoint. If the subscriber never acknowledges the message, the Pub/Sub system will eventually redeliver the message.</li>
+<li><code>-r .subscription    ack-deadline-seconds=67</code><ul>
+<li>Optional. The approximate amount of time (on a best-effort basis) Pub/Sub waits for the subscriber to acknowledge receipt before resending the message. In the interval after the message is delivered and before it is acknowledged, it is considered to be <em>outstanding</em>. During that time period, the message will not be redelivered (on a best-effort basis). For pull subscriptions, this value is used as the initial value for the ack deadline. To override this value for a given message, call <code>ModifyAckDeadline</code> with the corresponding <code>ack_id</code> if using non-streaming pull or send the <code>ack_id</code> in a <code>StreamingModifyAckDeadlineRequest</code> if using streaming pull. The minimum custom deadline you can specify is 10 seconds. The maximum custom deadline you can specify is 600 seconds (10 minutes). If this parameter is 0, a default value of 10 seconds is used. For push delivery, this value is also used to set the request timeout for the call to the push endpoint. If the subscriber never acknowledges the message, the Pub/Sub system will eventually redeliver the message.</li>
 </ul>
 </li>
-<li><code>dead-letter-policy    dead-letter-topic=dolor</code><ul>
-<li>The name of the topic to which dead letter messages should be published. Format is <code>projects/{project}/topics/{topic}</code>.The Cloud Pub/Sub service account associated with the enclosing subscription&#39;s parent project (i.e., service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com) must have permission to Publish() to this topic. The operation will fail if the topic does not exist. Users should ensure that there is a subscription attached to this topic since messages published to a topic with no subscriptions are lost.</li>
+<li><code>bigquery-config    drop-unknown-fields=false</code><ul>
+<li>Optional. When true and use_topic_schema is true, any fields that are a part of the topic schema that are not part of the BigQuery table schema are dropped when writing to BigQuery. Otherwise, the schemas must be kept in sync and any messages with extra fields are not written and remain in the subscription&#39;s backlog.</li>
+</ul>
+</li>
+<li><code>service-account-email=amet.</code><ul>
+<li>Optional. The service account to use to write to BigQuery. The subscription creator or updater that specifies this field must have <code>iam.serviceAccounts.actAs</code> permission on the service account. If not specified, the Pub/Sub <a href="https://cloud.google.com/iam/docs/service-agents">service agent</a>, service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com, is used.</li>
+</ul>
+</li>
+<li><code>state=ea</code><ul>
+<li>Output only. An output-only field that indicates whether or not the subscription can receive messages.</li>
+</ul>
+</li>
+<li><code>table=sadipscing</code><ul>
+<li>Optional. The name of the table to which to write data, of the form {projectId}.{datasetId}.{tableId}</li>
+</ul>
+</li>
+<li><code>use-table-schema=true</code><ul>
+<li>Optional. When true, use the BigQuery table&#39;s schema as the columns to write to in BigQuery. <code>use_table_schema</code> and <code>use_topic_schema</code> cannot be enabled at the same time.</li>
+</ul>
+</li>
+<li><code>use-topic-schema=true</code><ul>
+<li>Optional. When true, use the topic&#39;s schema as the columns to write to in BigQuery, if it exists. <code>use_topic_schema</code> and <code>use_table_schema</code> cannot be enabled at the same time.</li>
 </ul>
 </li>
 <li>
-<p><code>max-delivery-attempts=83</code></p>
+<p><code>write-metadata=false</code></p>
 <ul>
-<li>The maximum number of delivery attempts for any message. The value must be between 5 and 100. The number of delivery attempts is defined as 1 + (the sum of number of NACKs and number of times the acknowledgement deadline has been exceeded for the message). A NACK is any call to ModifyAckDeadline with a 0 deadline. Note that client libraries may automatically extend ack_deadlines. This field will be honored on a best effort basis. If this parameter is 0, a default value of 5 is used.</li>
+<li>Optional. When true, write the subscription name, message_id, publish_time, attributes, and ordering_key to additional columns in the table. The subscription name, message_id, and publish_time fields are put in their own columns while all other message properties (other than data) are written to a JSON object in the attributes column.</li>
 </ul>
 </li>
 <li>
-<p><code>..    detached=false</code></p>
+<p><code>..cloud-storage-config.avro-config    write-metadata=true</code></p>
 <ul>
-<li>Indicates whether the subscription is detached from its topic. Detached subscriptions don&#39;t receive messages from their topic and don&#39;t retain any backlog. <code>Pull</code> and <code>StreamingPull</code> requests will return FAILED_PRECONDITION. If the subscription is a push subscription, pushes to the endpoint will not be made.</li>
+<li>Optional. When true, write the subscription name, message_id, publish_time, attributes, and ordering_key as additional fields in the output. The subscription name, message_id, and publish_time fields are put in their own fields while all other message properties other than data (for example, an ordering_key, if present) are added as entries in the attributes map.</li>
 </ul>
 </li>
-<li><code>enable-exactly-once-delivery=false</code><ul>
-<li>If true, Pub/Sub provides the following guarantees for the delivery of a message with a given value of <code>message_id</code> on this subscription: * The message sent to a subscriber is guaranteed not to be resent before the message&#39;s acknowledgement deadline expires. * An acknowledged message will not be resent to a subscriber. Note that subscribers may still receive multiple copies of a message when <code>enable_exactly_once_delivery</code> is true if the message was published multiple times by a publisher client. These copies are considered distinct by Pub/Sub and have distinct <code>message_id</code> values.</li>
+<li>
+<p><code>..    bucket=aliquyam</code></p>
+<ul>
+<li>Required. User-provided name for the Cloud Storage bucket. The bucket must be created by the user. The bucket name must be without any prefix like &#34;gs://&#34;. See the [bucket naming requirements] (https://cloud.google.com/storage/docs/buckets#naming).</li>
+</ul>
+</li>
+<li><code>filename-prefix=ipsum</code><ul>
+<li>Optional. User-provided prefix for Cloud Storage filename. See the <a href="https://cloud.google.com/storage/docs/objects#naming">object naming requirements</a>.</li>
+</ul>
+</li>
+<li><code>filename-suffix=et</code><ul>
+<li>Optional. User-provided suffix for Cloud Storage filename. See the <a href="https://cloud.google.com/storage/docs/objects#naming">object naming requirements</a>. Must not end in &#34;/&#34;.</li>
+</ul>
+</li>
+<li><code>max-bytes=sanctus</code><ul>
+<li>Optional. The maximum bytes that can be written to a Cloud Storage file before a new file is created. Min 1 KB, max 10 GiB. The max_bytes limit may be exceeded in cases where messages are larger than the limit.</li>
+</ul>
+</li>
+<li><code>max-duration=lorem</code><ul>
+<li>Optional. The maximum duration that can elapse before a new Cloud Storage file is created. Min 1 minute, max 10 minutes, default 5 minutes. May not exceed the subscription&#39;s acknowledgement deadline.</li>
+</ul>
+</li>
+<li><code>service-account-email=est</code><ul>
+<li>Optional. The service account to use to write to Cloud Storage. The subscription creator or updater that specifies this field must have <code>iam.serviceAccounts.actAs</code> permission on the service account. If not specified, the Pub/Sub <a href="https://cloud.google.com/iam/docs/service-agents">service agent</a>, service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com, is used.</li>
+</ul>
+</li>
+<li>
+<p><code>state=sed</code></p>
+<ul>
+<li>Output only. An output-only field that indicates whether or not the subscription can receive messages.</li>
+</ul>
+</li>
+<li>
+<p><code>..dead-letter-policy    dead-letter-topic=diam</code></p>
+<ul>
+<li>Optional. The name of the topic to which dead letter messages should be published. Format is <code>projects/{project}/topics/{topic}</code>.The Pub/Sub service account associated with the enclosing subscription&#39;s parent project (i.e., service-{project_number}@gcp-sa-pubsub.iam.gserviceaccount.com) must have permission to Publish() to this topic. The operation will fail if the topic does not exist. Users should ensure that there is a subscription attached to this topic since messages published to a topic with no subscriptions are lost.</li>
+</ul>
+</li>
+<li>
+<p><code>max-delivery-attempts=82</code></p>
+<ul>
+<li>Optional. The maximum number of delivery attempts for any message. The value must be between 5 and 100. The number of delivery attempts is defined as 1 + (the sum of number of NACKs and number of times the acknowledgement deadline has been exceeded for the message). A NACK is any call to ModifyAckDeadline with a 0 deadline. Note that client libraries may automatically extend ack_deadlines. This field will be honored on a best effort basis. If this parameter is 0, a default value of 5 is used.</li>
+</ul>
+</li>
+<li>
+<p><code>..    detached=true</code></p>
+<ul>
+<li>Optional. Indicates whether the subscription is detached from its topic. Detached subscriptions don&#39;t receive messages from their topic and don&#39;t retain any backlog. <code>Pull</code> and <code>StreamingPull</code> requests will return FAILED_PRECONDITION. If the subscription is a push subscription, pushes to the endpoint will not be made.</li>
+</ul>
+</li>
+<li><code>enable-exactly-once-delivery=true</code><ul>
+<li>Optional. If true, Pub/Sub provides the following guarantees for the delivery of a message with a given value of <code>message_id</code> on this subscription: * The message sent to a subscriber is guaranteed not to be resent before the message&#39;s acknowledgement deadline expires. * An acknowledged message will not be resent to a subscriber. Note that subscribers may still receive multiple copies of a message when <code>enable_exactly_once_delivery</code> is true if the message was published multiple times by a publisher client. These copies are considered distinct by Pub/Sub and have distinct <code>message_id</code> values.</li>
 </ul>
 </li>
 <li><code>enable-message-ordering=false</code><ul>
-<li>If true, messages published with the same <code>ordering_key</code> in <code>PubsubMessage</code> will be delivered to the subscribers in the order in which they are received by the Pub/Sub system. Otherwise, they may be delivered in any order.</li>
+<li>Optional. If true, messages published with the same <code>ordering_key</code> in <code>PubsubMessage</code> will be delivered to the subscribers in the order in which they are received by the Pub/Sub system. Otherwise, they may be delivered in any order.</li>
 </ul>
 </li>
 <li>
-<p><code>expiration-policy    ttl=vero</code></p>
+<p><code>expiration-policy    ttl=no</code></p>
 <ul>
-<li>Specifies the &#34;time-to-live&#34; duration for an associated resource. The resource expires if it is not active for a period of <code>ttl</code>. The definition of &#34;activity&#34; depends on the type of the associated resource. The minimum and maximum allowed values for <code>ttl</code> depend on the type of the associated resource, as well. If <code>ttl</code> is not set, the associated resource never expires.</li>
+<li>Optional. Specifies the &#34;time-to-live&#34; duration for an associated resource. The resource expires if it is not active for a period of <code>ttl</code>. The definition of &#34;activity&#34; depends on the type of the associated resource. The minimum and maximum allowed values for <code>ttl</code> depend on the type of the associated resource, as well. If <code>ttl</code> is not set, the associated resource never expires.</li>
 </ul>
 </li>
 <li>
-<p><code>..    filter=invidunt</code></p>
+<p><code>..    filter=et</code></p>
 <ul>
-<li>An expression written in the Pub/Sub <a href="https://cloud.google.com/pubsub/docs/filtering">filter language</a>. If non-empty, then only <code>PubsubMessage</code>s whose <code>attributes</code> field matches the filter are delivered on this subscription. If empty, then no messages are filtered out.</li>
+<li>Optional. An expression written in the Pub/Sub <a href="https://cloud.google.com/pubsub/docs/filtering">filter language</a>. If non-empty, then only <code>PubsubMessage</code>s whose <code>attributes</code> field matches the filter are delivered on this subscription. If empty, then no messages are filtered out.</li>
 </ul>
 </li>
-<li><code>labels=key=stet</code><ul>
-<li>See Creating and managing labels.</li>
+<li><code>labels=key=elitr</code><ul>
+<li>Optional. See <a href="https://cloud.google.com/pubsub/docs/labels">Creating and managing labels</a>.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>message-retention-duration=vero</code><ul>
-<li>How long to retain unacknowledged messages in the subscription&#39;s backlog, from the moment a message is published. If <code>retain_acked_messages</code> is true, then this also configures the retention of acknowledged messages, and thus configures how far back in time a <code>Seek</code> can be done. Defaults to 7 days. Cannot be more than 7 days or less than 10 minutes.</li>
+<li><code>message-retention-duration=sed</code><ul>
+<li>Optional. How long to retain unacknowledged messages in the subscription&#39;s backlog, from the moment a message is published. If <code>retain_acked_messages</code> is true, then this also configures the retention of acknowledged messages, and thus configures how far back in time a <code>Seek</code> can be done. Defaults to 7 days. Cannot be more than 7 days or less than 10 minutes.</li>
 </ul>
 </li>
-<li><code>name=elitr</code><ul>
+<li><code>name=no</code><ul>
 <li>Required. The name of the subscription. It must have the format <code>&amp;#34;projects/{project}/subscriptions/{subscription}&amp;#34;</code>. <code>{subscription}</code> must start with a letter, and contain only letters (<code>[A-Za-z]</code>), numbers (<code>[0-9]</code>), dashes (<code>-</code>), underscores (<code>_</code>), periods (<code>.</code>), tildes (<code>~</code>), plus (<code>+</code>) or percent signs (<code>%</code>). It must be between 3 and 255 characters in length, and it must not start with <code>&amp;#34;goog&amp;#34;</code>.</li>
 </ul>
 </li>
-<li><code>push-config    attributes=key=lorem</code><ul>
-<li>Endpoint configuration attributes that can be used to control different aspects of the message delivery. The only currently supported attribute is <code>x-goog-version</code>, which you can use to change the format of the pushed message. This attribute indicates the version of the data expected by the endpoint. This controls the shape of the pushed message (i.e., its fields and metadata). If not present during the <code>CreateSubscription</code> call, it will default to the version of the Pub/Sub API used to make such call. If not present in a <code>ModifyPushConfig</code> call, its value will not be changed. <code>GetSubscription</code> calls will always return a valid version, even if the subscription was created without this attribute. The only supported values for the <code>x-goog-version</code> attribute are: * <code>v1beta1</code>: uses the push format defined in the v1beta1 Pub/Sub API. * <code>v1</code> or <code>v1beta2</code>: uses the push format defined in the v1 Pub/Sub API. For example: attributes { &#34;x-goog-version&#34;: &#34;v1&#34; } </li>
+<li><code>push-config    attributes=key=nonumy</code><ul>
+<li>Optional. Endpoint configuration attributes that can be used to control different aspects of the message delivery. The only currently supported attribute is <code>x-goog-version</code>, which you can use to change the format of the pushed message. This attribute indicates the version of the data expected by the endpoint. This controls the shape of the pushed message (i.e., its fields and metadata). If not present during the <code>CreateSubscription</code> call, it will default to the version of the Pub/Sub API used to make such call. If not present in a <code>ModifyPushConfig</code> call, its value will not be changed. <code>GetSubscription</code> calls will always return a valid version, even if the subscription was created without this attribute. The only supported values for the <code>x-goog-version</code> attribute are: * <code>v1beta1</code>: uses the push format defined in the v1beta1 Pub/Sub API. * <code>v1</code> or <code>v1beta2</code>: uses the push format defined in the v1 Pub/Sub API. For example: <code>attributes { &amp;#34;x-goog-version&amp;#34;: &amp;#34;v1&amp;#34; }</code></li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>oidc-token    audience=diam</code><ul>
-<li>Audience to be used when generating OIDC token. The audience claim identifies the recipients that the JWT is intended for. The audience value is a single case-sensitive string. Having multiple values (array) for the audience field is not supported. More info about the OIDC JWT token audience here: https://tools.ietf.org/html/rfc7519#section-4.1.3 Note: if not specified, the Push endpoint URL will be used.</li>
-</ul>
-</li>
 <li>
-<p><code>service-account-email=no</code></p>
+<p><code>no-wrapper    write-metadata=false</code></p>
 <ul>
-<li><a href="https://cloud.google.com/iam/docs/service-accounts">Service account email</a> to be used for generating the OIDC token. The caller (for CreateSubscription, UpdateSubscription, and ModifyPushConfig RPCs) must have the iam.serviceAccounts.actAs permission for the service account.</li>
+<li>Optional. When true, writes the Pub/Sub message metadata to <code>x-goog-pubsub-:</code> headers of the HTTP request. Writes the Pub/Sub message attributes to <code>:</code> headers of the HTTP request.</li>
 </ul>
 </li>
 <li>
-<p><code>..    push-endpoint=ipsum</code></p>
+<p><code>..oidc-token    audience=sadipscing</code></p>
 <ul>
-<li>A URL locating the endpoint to which messages should be pushed. For example, a Webhook endpoint might use <code>https://example.com/push</code>.</li>
+<li>Optional. Audience to be used when generating OIDC token. The audience claim identifies the recipients that the JWT is intended for. The audience value is a single case-sensitive string. Having multiple values (array) for the audience field is not supported. More info about the OIDC JWT token audience here: https://tools.ietf.org/html/rfc7519#section-4.1.3 Note: if not specified, the Push endpoint URL will be used.</li>
 </ul>
 </li>
 <li>
-<p><code>..    retain-acked-messages=true</code></p>
+<p><code>service-account-email=aliquyam</code></p>
 <ul>
-<li>Indicates whether to retain acknowledged messages. If true, then messages are not expunged from the subscription&#39;s backlog, even if they are acknowledged, until they fall out of the <code>message_retention_duration</code> window. This must be true if you would like to [<code>Seek</code> to a timestamp] (https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time) in the past to replay previously-acknowledged messages.</li>
-</ul>
-</li>
-<li><code>retry-policy    maximum-backoff=consetetur</code><ul>
-<li>The maximum delay between consecutive deliveries of a given message. Value should be between 0 and 600 seconds. Defaults to 600 seconds.</li>
+<li>Optional. <a href="https://cloud.google.com/iam/docs/service-accounts">Service account email</a> used for generating the OIDC token. For more information on setting up authentication, see <a href="https://cloud.google.com/pubsub/docs/push">Push subscriptions</a>.</li>
 </ul>
 </li>
 <li>
-<p><code>minimum-backoff=voluptua.</code></p>
+<p><code>..    push-endpoint=dolores</code></p>
 <ul>
-<li>The minimum delay between consecutive deliveries of a given message. Value should be between 0 and 600 seconds. Defaults to 10 seconds.</li>
+<li>Optional. A URL locating the endpoint to which messages should be pushed. For example, a Webhook endpoint might use <code>https://example.com/push</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..    state=et</code></p>
+<p><code>..    retain-acked-messages=false</code></p>
+<ul>
+<li>Optional. Indicates whether to retain acknowledged messages. If true, then messages are not expunged from the subscription&#39;s backlog, even if they are acknowledged, until they fall out of the <code>message_retention_duration</code> window. This must be true if you would like to [<code>Seek</code> to a timestamp] (https://cloud.google.com/pubsub/docs/replay-overview#seek_to_a_time) in the past to replay previously-acknowledged messages.</li>
+</ul>
+</li>
+<li><code>retry-policy    maximum-backoff=erat</code><ul>
+<li>Optional. The maximum delay between consecutive deliveries of a given message. Value should be between 0 and 600 seconds. Defaults to 600 seconds.</li>
+</ul>
+</li>
+<li>
+<p><code>minimum-backoff=aliquyam</code></p>
+<ul>
+<li>Optional. The minimum delay between consecutive deliveries of a given message. Value should be between 0 and 600 seconds. Defaults to 10 seconds.</li>
+</ul>
+</li>
+<li>
+<p><code>..    state=amet</code></p>
 <ul>
 <li>Output only. An output-only field indicating whether or not the subscription can receive messages.</li>
 </ul>
 </li>
-<li><code>topic=erat</code><ul>
+<li><code>topic=est</code><ul>
 <li>Required. The name of the topic from which this subscription is receiving messages. Format is <code>projects/{project}/topics/{topic}</code>. The value of this field will be <code>_deleted-topic_</code> if the topic has been deleted.</li>
 </ul>
 </li>
 <li>
-<p><code>topic-message-retention-duration=consetetur</code></p>
+<p><code>topic-message-retention-duration=et</code></p>
 <ul>
 <li>Output only. Indicates the minimum duration for which a message is retained after it is published to the subscription&#39;s topic. If this field is set, messages published to the subscription&#39;s topic in the last <code>topic_message_retention_duration</code> are always available to subscribers. See the <code>message_retention_duration</code> field in <code>Topic</code>. This field is set only in responses from the server; it is ignored if it is set in any requests.</li>
 </ul>
 </li>
 <li>
-<p><code>..    update-mask=amet.</code></p>
+<p><code>..    update-mask=sea</code></p>
 <ul>
 <li>Required. Indicates which fields in the provided subscription to update. Must be specified and non-empty.</li>
 </ul>
@@ -567,32 +520,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_subscriptions-pull" class="btn btn-neutral float-right" title="Subscriptions Pull"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_subscriptions-modify-push-config" class="btn btn-neutral" title="Subscriptions Modify Push Config"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_subscriptions-modify-push-config/" class="btn btn-neutral float-left" title="Subscriptions Modify Push Config"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_subscriptions-pull/" class="btn btn-neutral float-right" title="Subscriptions Pull">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -600,14 +545,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_subscriptions-modify-push-config" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_subscriptions-pull" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/pubsub1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_subscriptions-modify-push-config/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_subscriptions-pull/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="This documentation was generated from YouTube crate version 5.0.3+20240303, where 20240303 is the exact revision of the youtube:v3 schema built by the mako code generator v5.0.3."><title>google_youtube3 - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-ac92e1bbe349e143.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="google_youtube3" data-themes="" data-resource-suffix="" data-rustdoc-version="1.76.0 (07dca489a 2024-02-04)" data-channel="1.76.0" data-search-js="search-2b6ce74ff89ae146.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-f2adc0d6ca4d09fb.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-305769736d49e732.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-feafe1bb7466e4bd.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../google_youtube3/index.html">google_youtube3</a><span class="version">5.0.3+20240303</span></h2></div><div class="sidebar-elems"><ul class="block">
+            <li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#reexports">Re-exports</a></li><li><a href="#modules">Modules</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Aliases</a></li></ul></section></div></nav><div class="sidebar-resizer"></div>
+    <main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../google_youtube3/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">google_youtube3</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="src" href="../src/google_youtube3/lib.rs.html#5-290">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>This documentation was generated from <em>YouTube</em> crate version <em>5.0.3+20240303</em>, where <em>20240303</em> is the exact revision of the <em>youtube:v3</em> schema built by the <a href="http://www.makotemplates.org/">mako</a> code generator <em>v5.0.3</em>.</p>
+<p>Everything else about the <em>YouTube</em> <em>v3</em> API can be found at the
+<a href="https://developers.google.com/youtube/">official documentation site</a>.
+The original source code is <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/youtube3">on github</a>.</p>
+<h2 id="features"><a href="#features">Features</a></h2>
+<p>Handle the following <em>Resources</em> with ease from the central <a href="api/struct.YouTube.html" title="struct google_youtube3::api::YouTube">hub</a> … </p>
+<ul>
+<li><a href="api/struct.AbuseReport.html" title="struct google_youtube3::api::AbuseReport">abuse reports</a></li>
+<li><a href="api/struct.AbuseReportInsertCall.html" title="struct google_youtube3::api::AbuseReportInsertCall"><em>insert</em></a></li>
+<li><a href="api/struct.Activity.html" title="struct google_youtube3::api::Activity">activities</a></li>
+<li><a href="api/struct.ActivityListCall.html" title="struct google_youtube3::api::ActivityListCall"><em>list</em></a></li>
+<li><a href="api/struct.Caption.html" title="struct google_youtube3::api::Caption">captions</a></li>
+<li><a href="api/struct.CaptionDeleteCall.html" title="struct google_youtube3::api::CaptionDeleteCall"><em>delete</em></a>, <a href="api/struct.CaptionDownloadCall.html" title="struct google_youtube3::api::CaptionDownloadCall"><em>download</em></a>, <a href="api/struct.CaptionInsertCall.html" title="struct google_youtube3::api::CaptionInsertCall"><em>insert</em></a>, <a href="api/struct.CaptionListCall.html" title="struct google_youtube3::api::CaptionListCall"><em>list</em></a> and <a href="api/struct.CaptionUpdateCall.html" title="struct google_youtube3::api::CaptionUpdateCall"><em>update</em></a></li>
+<li>channel banners</li>
+<li><a href="api/struct.ChannelBannerInsertCall.html" title="struct google_youtube3::api::ChannelBannerInsertCall"><em>insert</em></a></li>
+<li><a href="api/struct.ChannelSection.html" title="struct google_youtube3::api::ChannelSection">channel sections</a></li>
+<li><a href="api/struct.ChannelSectionDeleteCall.html" title="struct google_youtube3::api::ChannelSectionDeleteCall"><em>delete</em></a>, <a href="api/struct.ChannelSectionInsertCall.html" title="struct google_youtube3::api::ChannelSectionInsertCall"><em>insert</em></a>, <a href="api/struct.ChannelSectionListCall.html" title="struct google_youtube3::api::ChannelSectionListCall"><em>list</em></a> and <a href="api/struct.ChannelSectionUpdateCall.html" title="struct google_youtube3::api::ChannelSectionUpdateCall"><em>update</em></a></li>
+<li><a href="api/struct.Channel.html" title="struct google_youtube3::api::Channel">channels</a></li>
+<li><a href="api/struct.ChannelListCall.html" title="struct google_youtube3::api::ChannelListCall"><em>list</em></a> and <a href="api/struct.ChannelUpdateCall.html" title="struct google_youtube3::api::ChannelUpdateCall"><em>update</em></a></li>
+<li><a href="api/struct.CommentThread.html" title="struct google_youtube3::api::CommentThread">comment threads</a></li>
+<li><a href="api/struct.CommentThreadInsertCall.html" title="struct google_youtube3::api::CommentThreadInsertCall"><em>insert</em></a> and <a href="api/struct.CommentThreadListCall.html" title="struct google_youtube3::api::CommentThreadListCall"><em>list</em></a></li>
+<li><a href="api/struct.Comment.html" title="struct google_youtube3::api::Comment">comments</a></li>
+<li><a href="api/struct.CommentDeleteCall.html" title="struct google_youtube3::api::CommentDeleteCall"><em>delete</em></a>, <a href="api/struct.CommentInsertCall.html" title="struct google_youtube3::api::CommentInsertCall"><em>insert</em></a>, <a href="api/struct.CommentListCall.html" title="struct google_youtube3::api::CommentListCall"><em>list</em></a>, <a href="api/struct.CommentMarkAsSpamCall.html" title="struct google_youtube3::api::CommentMarkAsSpamCall"><em>mark as spam</em></a>, <a href="api/struct.CommentSetModerationStatuCall.html" title="struct google_youtube3::api::CommentSetModerationStatuCall"><em>set moderation status</em></a> and <a href="api/struct.CommentUpdateCall.html" title="struct google_youtube3::api::CommentUpdateCall"><em>update</em></a></li>
+<li><a href="api/struct.I18nLanguage.html" title="struct google_youtube3::api::I18nLanguage">i18n languages</a></li>
+<li><a href="api/struct.I18nLanguageListCall.html" title="struct google_youtube3::api::I18nLanguageListCall"><em>list</em></a></li>
+<li><a href="api/struct.I18nRegion.html" title="struct google_youtube3::api::I18nRegion">i18n regions</a></li>
+<li><a href="api/struct.I18nRegionListCall.html" title="struct google_youtube3::api::I18nRegionListCall"><em>list</em></a></li>
+<li><a href="api/struct.LiveBroadcast.html" title="struct google_youtube3::api::LiveBroadcast">live broadcasts</a></li>
+<li><a href="api/struct.LiveBroadcastBindCall.html" title="struct google_youtube3::api::LiveBroadcastBindCall"><em>bind</em></a>, <a href="api/struct.LiveBroadcastDeleteCall.html" title="struct google_youtube3::api::LiveBroadcastDeleteCall"><em>delete</em></a>, <a href="api/struct.LiveBroadcastInsertCall.html" title="struct google_youtube3::api::LiveBroadcastInsertCall"><em>insert</em></a>, <a href="api/struct.LiveBroadcastInsertCuepointCall.html" title="struct google_youtube3::api::LiveBroadcastInsertCuepointCall"><em>insert cuepoint</em></a>, <a href="api/struct.LiveBroadcastListCall.html" title="struct google_youtube3::api::LiveBroadcastListCall"><em>list</em></a>, <a href="api/struct.LiveBroadcastTransitionCall.html" title="struct google_youtube3::api::LiveBroadcastTransitionCall"><em>transition</em></a> and <a href="api/struct.LiveBroadcastUpdateCall.html" title="struct google_youtube3::api::LiveBroadcastUpdateCall"><em>update</em></a></li>
+<li><a href="api/struct.LiveChatBan.html" title="struct google_youtube3::api::LiveChatBan">live chat bans</a></li>
+<li><a href="api/struct.LiveChatBanDeleteCall.html" title="struct google_youtube3::api::LiveChatBanDeleteCall"><em>delete</em></a> and <a href="api/struct.LiveChatBanInsertCall.html" title="struct google_youtube3::api::LiveChatBanInsertCall"><em>insert</em></a></li>
+<li><a href="api/struct.LiveChatMessage.html" title="struct google_youtube3::api::LiveChatMessage">live chat messages</a></li>
+<li><a href="api/struct.LiveChatMessageDeleteCall.html" title="struct google_youtube3::api::LiveChatMessageDeleteCall"><em>delete</em></a>, <a href="api/struct.LiveChatMessageInsertCall.html" title="struct google_youtube3::api::LiveChatMessageInsertCall"><em>insert</em></a> and <a href="api/struct.LiveChatMessageListCall.html" title="struct google_youtube3::api::LiveChatMessageListCall"><em>list</em></a></li>
+<li><a href="api/struct.LiveChatModerator.html" title="struct google_youtube3::api::LiveChatModerator">live chat moderators</a></li>
+<li><a href="api/struct.LiveChatModeratorDeleteCall.html" title="struct google_youtube3::api::LiveChatModeratorDeleteCall"><em>delete</em></a>, <a href="api/struct.LiveChatModeratorInsertCall.html" title="struct google_youtube3::api::LiveChatModeratorInsertCall"><em>insert</em></a> and <a href="api/struct.LiveChatModeratorListCall.html" title="struct google_youtube3::api::LiveChatModeratorListCall"><em>list</em></a></li>
+<li><a href="api/struct.LiveStream.html" title="struct google_youtube3::api::LiveStream">live streams</a></li>
+<li><a href="api/struct.LiveStreamDeleteCall.html" title="struct google_youtube3::api::LiveStreamDeleteCall"><em>delete</em></a>, <a href="api/struct.LiveStreamInsertCall.html" title="struct google_youtube3::api::LiveStreamInsertCall"><em>insert</em></a>, <a href="api/struct.LiveStreamListCall.html" title="struct google_youtube3::api::LiveStreamListCall"><em>list</em></a> and <a href="api/struct.LiveStreamUpdateCall.html" title="struct google_youtube3::api::LiveStreamUpdateCall"><em>update</em></a></li>
+<li><a href="api/struct.Member.html" title="struct google_youtube3::api::Member">members</a></li>
+<li><a href="api/struct.MemberListCall.html" title="struct google_youtube3::api::MemberListCall"><em>list</em></a></li>
+<li><a href="api/struct.MembershipsLevel.html" title="struct google_youtube3::api::MembershipsLevel">memberships levels</a></li>
+<li><a href="api/struct.MembershipsLevelListCall.html" title="struct google_youtube3::api::MembershipsLevelListCall"><em>list</em></a></li>
+<li><a href="api/struct.PlaylistImage.html" title="struct google_youtube3::api::PlaylistImage">playlist images</a></li>
+<li><a href="api/struct.PlaylistImageDeleteCall.html" title="struct google_youtube3::api::PlaylistImageDeleteCall"><em>delete</em></a>, <a href="api/struct.PlaylistImageInsertCall.html" title="struct google_youtube3::api::PlaylistImageInsertCall"><em>insert</em></a>, <a href="api/struct.PlaylistImageListCall.html" title="struct google_youtube3::api::PlaylistImageListCall"><em>list</em></a> and <a href="api/struct.PlaylistImageUpdateCall.html" title="struct google_youtube3::api::PlaylistImageUpdateCall"><em>update</em></a></li>
+<li><a href="api/struct.PlaylistItem.html" title="struct google_youtube3::api::PlaylistItem">playlist items</a></li>
+<li><a href="api/struct.PlaylistItemDeleteCall.html" title="struct google_youtube3::api::PlaylistItemDeleteCall"><em>delete</em></a>, <a href="api/struct.PlaylistItemInsertCall.html" title="struct google_youtube3::api::PlaylistItemInsertCall"><em>insert</em></a>, <a href="api/struct.PlaylistItemListCall.html" title="struct google_youtube3::api::PlaylistItemListCall"><em>list</em></a> and <a href="api/struct.PlaylistItemUpdateCall.html" title="struct google_youtube3::api::PlaylistItemUpdateCall"><em>update</em></a></li>
+<li><a href="api/struct.Playlist.html" title="struct google_youtube3::api::Playlist">playlists</a></li>
+<li><a href="api/struct.PlaylistDeleteCall.html" title="struct google_youtube3::api::PlaylistDeleteCall"><em>delete</em></a>, <a href="api/struct.PlaylistInsertCall.html" title="struct google_youtube3::api::PlaylistInsertCall"><em>insert</em></a>, <a href="api/struct.PlaylistListCall.html" title="struct google_youtube3::api::PlaylistListCall"><em>list</em></a> and <a href="api/struct.PlaylistUpdateCall.html" title="struct google_youtube3::api::PlaylistUpdateCall"><em>update</em></a></li>
+<li>search</li>
+<li><a href="api/struct.SearchListCall.html" title="struct google_youtube3::api::SearchListCall"><em>list</em></a></li>
+<li><a href="api/struct.Subscription.html" title="struct google_youtube3::api::Subscription">subscriptions</a></li>
+<li><a href="api/struct.SubscriptionDeleteCall.html" title="struct google_youtube3::api::SubscriptionDeleteCall"><em>delete</em></a>, <a href="api/struct.SubscriptionInsertCall.html" title="struct google_youtube3::api::SubscriptionInsertCall"><em>insert</em></a> and <a href="api/struct.SubscriptionListCall.html" title="struct google_youtube3::api::SubscriptionListCall"><em>list</em></a></li>
+<li><a href="api/struct.SuperChatEvent.html" title="struct google_youtube3::api::SuperChatEvent">super chat events</a></li>
+<li><a href="api/struct.SuperChatEventListCall.html" title="struct google_youtube3::api::SuperChatEventListCall"><em>list</em></a></li>
+<li>tests</li>
+<li><a href="api/struct.TestInsertCall.html" title="struct google_youtube3::api::TestInsertCall"><em>insert</em></a></li>
+<li><a href="api/struct.ThirdPartyLink.html" title="struct google_youtube3::api::ThirdPartyLink">third party links</a></li>
+<li><a href="api/struct.ThirdPartyLinkDeleteCall.html" title="struct google_youtube3::api::ThirdPartyLinkDeleteCall"><em>delete</em></a>, <a href="api/struct.ThirdPartyLinkInsertCall.html" title="struct google_youtube3::api::ThirdPartyLinkInsertCall"><em>insert</em></a>, <a href="api/struct.ThirdPartyLinkListCall.html" title="struct google_youtube3::api::ThirdPartyLinkListCall"><em>list</em></a> and <a href="api/struct.ThirdPartyLinkUpdateCall.html" title="struct google_youtube3::api::ThirdPartyLinkUpdateCall"><em>update</em></a></li>
+<li><a href="api/struct.Thumbnail.html" title="struct google_youtube3::api::Thumbnail">thumbnails</a></li>
+<li><a href="api/struct.ThumbnailSetCall.html" title="struct google_youtube3::api::ThumbnailSetCall"><em>set</em></a></li>
+<li><a href="api/struct.VideoAbuseReportReason.html" title="struct google_youtube3::api::VideoAbuseReportReason">video abuse report reasons</a></li>
+<li><a href="api/struct.VideoAbuseReportReasonListCall.html" title="struct google_youtube3::api::VideoAbuseReportReasonListCall"><em>list</em></a></li>
+<li><a href="api/struct.VideoCategory.html" title="struct google_youtube3::api::VideoCategory">video categories</a></li>
+<li><a href="api/struct.VideoCategoryListCall.html" title="struct google_youtube3::api::VideoCategoryListCall"><em>list</em></a></li>
+<li><a href="api/struct.Video.html" title="struct google_youtube3::api::Video">videos</a></li>
+<li><a href="api/struct.VideoDeleteCall.html" title="struct google_youtube3::api::VideoDeleteCall"><em>delete</em></a>, <a href="api/struct.VideoGetRatingCall.html" title="struct google_youtube3::api::VideoGetRatingCall"><em>get rating</em></a>, <a href="api/struct.VideoInsertCall.html" title="struct google_youtube3::api::VideoInsertCall"><em>insert</em></a>, <a href="api/struct.VideoListCall.html" title="struct google_youtube3::api::VideoListCall"><em>list</em></a>, <a href="api/struct.VideoRateCall.html" title="struct google_youtube3::api::VideoRateCall"><em>rate</em></a>, <a href="api/struct.VideoReportAbuseCall.html" title="struct google_youtube3::api::VideoReportAbuseCall"><em>report abuse</em></a> and <a href="api/struct.VideoUpdateCall.html" title="struct google_youtube3::api::VideoUpdateCall"><em>update</em></a></li>
+<li>watermarks</li>
+<li><a href="api/struct.WatermarkSetCall.html" title="struct google_youtube3::api::WatermarkSetCall"><em>set</em></a> and <a href="api/struct.WatermarkUnsetCall.html" title="struct google_youtube3::api::WatermarkUnsetCall"><em>unset</em></a></li>
+<li>youtube</li>
+<li><a href="api/struct.YoutubeV3UpdateCommentThreadCall.html" title="struct google_youtube3::api::YoutubeV3UpdateCommentThreadCall"><em>v3 update comment threads</em></a></li>
+</ul>
+<p>Upload supported by …</p>
+<ul>
+<li><a href="api/struct.CaptionInsertCall.html" title="struct google_youtube3::api::CaptionInsertCall"><em>insert captions</em></a></li>
+<li><a href="api/struct.CaptionUpdateCall.html" title="struct google_youtube3::api::CaptionUpdateCall"><em>update captions</em></a></li>
+<li><a href="api/struct.ChannelBannerInsertCall.html" title="struct google_youtube3::api::ChannelBannerInsertCall"><em>insert channel banners</em></a></li>
+<li><a href="api/struct.PlaylistImageInsertCall.html" title="struct google_youtube3::api::PlaylistImageInsertCall"><em>insert playlist images</em></a></li>
+<li><a href="api/struct.PlaylistImageUpdateCall.html" title="struct google_youtube3::api::PlaylistImageUpdateCall"><em>update playlist images</em></a></li>
+<li><a href="api/struct.ThumbnailSetCall.html" title="struct google_youtube3::api::ThumbnailSetCall"><em>set thumbnails</em></a></li>
+<li><a href="api/struct.VideoInsertCall.html" title="struct google_youtube3::api::VideoInsertCall"><em>insert videos</em></a></li>
+<li><a href="api/struct.WatermarkSetCall.html" title="struct google_youtube3::api::WatermarkSetCall"><em>set watermarks</em></a></li>
+</ul>
+<p>Download supported by …</p>
+<ul>
+<li><a href="api/struct.CaptionDownloadCall.html" title="struct google_youtube3::api::CaptionDownloadCall"><em>download captions</em></a></li>
+</ul>
+<p>Not what you are looking for ? Find all other Google APIs in their Rust <a href="http://byron.github.io/google-apis-rs">documentation index</a>.</p>
+<h2 id="structure-of-this-library"><a href="#structure-of-this-library">Structure of this Library</a></h2>
+<p>The API is structured into the following primary items:</p>
+<ul>
+<li><strong><a href="api/struct.YouTube.html" title="struct google_youtube3::api::YouTube">Hub</a></strong>
+<ul>
+<li>a central object to maintain state and allow accessing all <em>Activities</em></li>
+<li>creates <a href="../google_apis_common/trait.MethodsBuilder.html" title="trait google_apis_common::MethodsBuilder"><em>Method Builders</em></a> which in turn
+allow access to individual <a href="../google_apis_common/trait.CallBuilder.html" title="trait google_apis_common::CallBuilder"><em>Call Builders</em></a></li>
+</ul>
+</li>
+<li><strong><a href="../google_apis_common/trait.Resource.html" title="trait google_apis_common::Resource">Resources</a></strong>
+<ul>
+<li>primary types that you can apply <em>Activities</em> to</li>
+<li>a collection of properties and <em>Parts</em></li>
+<li><strong><a href="../google_apis_common/trait.Part.html" title="trait google_apis_common::Part">Parts</a></strong>
+<ul>
+<li>a collection of properties</li>
+<li>never directly used in <em>Activities</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong><a href="../google_apis_common/trait.CallBuilder.html" title="trait google_apis_common::CallBuilder">Activities</a></strong>
+<ul>
+<li>operations to apply to <em>Resources</em></li>
+</ul>
+</li>
+</ul>
+<p>All <em>structures</em> are marked with applicable traits to further categorize them and ease browsing.</p>
+<p>Generally speaking, you can invoke <em>Activities</em> like this:</p>
+<div class="example-wrap"><pre class="language-Rust"><code>let r = hub.resource().activity(...).doit().await
+</code></pre></div>
+<p>Or specifically …</p>
+
+<div class="example-wrap ignore"><a href="#" class="tooltip" title="This example is not tested">ⓘ</a><pre class="rust rust-example-rendered"><code><span class="kw">let </span>r = hub.videos().delete(...).doit().<span class="kw">await
+let </span>r = hub.videos().get_rating(...).doit().<span class="kw">await
+let </span>r = hub.videos().insert(...).doit().<span class="kw">await
+let </span>r = hub.videos().list(...).doit().<span class="kw">await
+let </span>r = hub.videos().rate(...).doit().<span class="kw">await
+let </span>r = hub.videos().report_abuse(...).doit().<span class="kw">await
+let </span>r = hub.videos().update(...).doit().<span class="kw">await</span></code></pre></div>
+<p>The <code>resource()</code> and <code>activity(...)</code> calls create <a href="http://en.wikipedia.org/wiki/Builder_pattern">builders</a>. The second one dealing with <code>Activities</code> 
+supports various methods to configure the impending operation (not shown here). It is made such that all required arguments have to be 
+specified right away (i.e. <code>(...)</code>), whereas all optional ones can be <a href="http://en.wikipedia.org/wiki/Builder_pattern">build up</a> as desired.
+The <code>doit()</code> method performs the actual communication with the server and returns the respective result.</p>
+<h2 id="usage"><a href="#usage">Usage</a></h2><h3 id="setting-up-your-project"><a href="#setting-up-your-project">Setting up your Project</a></h3>
+<p>To use this library, you would put the following lines into your <code>Cargo.toml</code> file:</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+google-youtube3 = &quot;*&quot;
+serde = &quot;^1.0&quot;
+serde_json = &quot;^1.0&quot;
+</code></pre></div><h3 id="a-complete-example"><a href="#a-complete-example">A complete example</a></h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">extern crate </span>hyper;
+<span class="kw">extern crate </span>hyper_rustls;
+<span class="kw">extern crate </span>google_youtube3 <span class="kw">as </span>youtube3;
+<span class="kw">use </span>youtube3::{<span class="prelude-ty">Result</span>, Error};
+<span class="kw">use </span>std::default::Default;
+<span class="kw">use </span>youtube3::{YouTube, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+ 
+<span class="comment">// Get an ApplicationSecret instance by some means. It contains the `client_id` and 
+// `client_secret`, among other things.
+</span><span class="kw">let </span>secret: oauth2::ApplicationSecret = Default::default();
+<span class="comment">// Instantiate the authenticator. It will choose a suitable authentication flow for you, 
+// unless you replace  `None` with the desired Flow.
+// Provide your own `AuthenticatorDelegate` to adjust the way it operates and get feedback about 
+// what's going on. You probably want to bring in your own `TokenStorage` to persist tokens and
+// retrieve them from storage.
+</span><span class="kw">let </span>auth = oauth2::InstalledFlowAuthenticator::builder(
+        secret,
+        oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+    ).build().<span class="kw">await</span>.unwrap();
+<span class="kw">let </span><span class="kw-2">mut </span>hub = YouTube::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+<span class="comment">// You can configure optional parameters by calling the respective setters at will, and
+// execute the final call using `doit()`.
+// Values shown here are possibly random and not representative !
+</span><span class="kw">let </span>result = hub.videos().list(<span class="kw-2">&amp;</span><span class="macro">vec!</span>[<span class="string">"gubergren"</span>.into()])
+             .video_category_id(<span class="string">"Lorem"</span>)
+             .region_code(<span class="string">"gubergren"</span>)
+             .page_token(<span class="string">"eos"</span>)
+             .on_behalf_of_content_owner(<span class="string">"dolor"</span>)
+             .my_rating(<span class="string">"ea"</span>)
+             .max_width(-<span class="number">55</span>)
+             .max_results(<span class="number">13</span>)
+             .max_height(-<span class="number">47</span>)
+             .locale(<span class="string">"duo"</span>)
+             .add_id(<span class="string">"ipsum"</span>)
+             .hl(<span class="string">"sed"</span>)
+             .chart(<span class="string">"ut"</span>)
+             .doit().<span class="kw">await</span>;
+ 
+<span class="kw">match </span>result {
+    <span class="prelude-val">Err</span>(e) =&gt; <span class="kw">match </span>e {
+        <span class="comment">// The Error enum provides details about what exactly happened.
+        // You can also just use its `Debug`, `Display` or `Error` traits
+         </span>Error::HttpError(<span class="kw">_</span>)
+        |Error::Io(<span class="kw">_</span>)
+        |Error::MissingAPIKey
+        |Error::MissingToken(<span class="kw">_</span>)
+        |Error::Cancelled
+        |Error::UploadSizeLimitExceeded(<span class="kw">_</span>, <span class="kw">_</span>)
+        |Error::Failure(<span class="kw">_</span>)
+        |Error::BadRequest(<span class="kw">_</span>)
+        |Error::FieldClash(<span class="kw">_</span>)
+        |Error::JsonDecodeError(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; <span class="macro">println!</span>(<span class="string">"{}"</span>, e),
+    },
+    <span class="prelude-val">Ok</span>(res) =&gt; <span class="macro">println!</span>(<span class="string">"Success: {:?}"</span>, res),
+}</code></pre></div>
+<h3 id="handling-errors"><a href="#handling-errors">Handling Errors</a></h3>
+<p>All errors produced by the system are provided either as <a href="type.Result.html" title="type google_youtube3::Result">Result</a> enumeration as return value of
+the doit() methods, or handed as possibly intermediate results to either the 
+<a href="trait.Delegate.html" title="trait google_youtube3::Delegate">Hub Delegate</a>, or the <a href="https://docs.rs/yup-oauth2/*/yup_oauth2/trait.AuthenticatorDelegate.html">Authenticator Delegate</a>.</p>
+<p>When delegates handle errors or intermediate values, they may have a chance to instruct the system to retry. This 
+makes the system potentially resilient to all kinds of errors.</p>
+<h3 id="uploads-and-downloads"><a href="#uploads-and-downloads">Uploads and Downloads</a></h3>
+<p>If a method supports downloads, the response body, which is part of the <a href="type.Result.html" title="type google_youtube3::Result">Result</a>, should be
+read by you to obtain the media.
+If such a method also supports a <a href="../google_apis_common/trait.ResponseResult.html" title="trait google_apis_common::ResponseResult">Response Result</a>, it will return that by default.
+You can see it as meta-data for the actual media. To trigger a media download, you will have to set up the builder by making
+this call: <code>.param(&quot;alt&quot;, &quot;media&quot;)</code>.</p>
+<p>Methods supporting uploads can do so using up to 2 different protocols: 
+<em>simple</em> and <em>resumable</em>. The distinctiveness of each is represented by customized 
+<code>doit(...)</code> methods, which are then named <code>upload(...)</code> and <code>upload_resumable(...)</code> respectively.</p>
+<h3 id="customization-and-callbacks"><a href="#customization-and-callbacks">Customization and Callbacks</a></h3>
+<p>You may alter the way an <code>doit()</code> method is called by providing a <a href="trait.Delegate.html" title="trait google_youtube3::Delegate">delegate</a> to the 
+<a href="../google_apis_common/trait.CallBuilder.html" title="trait google_apis_common::CallBuilder">Method Builder</a> before making the final <code>doit()</code> call. 
+Respective methods will be called to provide progress information, as well as determine whether the system should 
+retry on failure.</p>
+<p>The <a href="trait.Delegate.html" title="trait google_youtube3::Delegate">delegate trait</a> is default-implemented, allowing you to customize it with minimal effort.</p>
+<h3 id="optional-parts-in-server-requests"><a href="#optional-parts-in-server-requests">Optional Parts in Server-Requests</a></h3>
+<p>All structures provided by this library are made to be <a href="../google_apis_common/trait.RequestValue.html" title="trait google_apis_common::RequestValue">encodable</a> and 
+<a href="../google_apis_common/trait.ResponseResult.html" title="trait google_apis_common::ResponseResult">decodable</a> via <em>json</em>. Optionals are used to indicate that partial requests are responses 
+are valid.
+Most optionals are are considered <a href="../google_apis_common/trait.Part.html" title="trait google_apis_common::Part">Parts</a> which are identifiable by name, which will be sent to 
+the server to indicate either the set parts of the request or the desired parts in the response.</p>
+<h3 id="builder-arguments"><a href="#builder-arguments">Builder Arguments</a></h3>
+<p>Using <a href="../google_apis_common/trait.CallBuilder.html" title="trait google_apis_common::CallBuilder">method builders</a>, you are able to prepare an action call by repeatedly calling it’s methods.
+These will always take a single argument, for which the following statements are true.</p>
+<ul>
+<li><a href="http://en.wikipedia.org/wiki/Plain_old_data_structure">PODs</a> are handed by copy</li>
+<li>strings are passed as <code>&amp;str</code></li>
+<li><a href="../google_apis_common/trait.RequestValue.html" title="trait google_apis_common::RequestValue">request values</a> are moved</li>
+</ul>
+<p>Arguments will always be copied or cloned into the builder, to make them independent of their original life times.</p>
+</div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2><ul class="item-table"><li><div class="item-name"><code>pub extern crate <a class="mod" href="../google_apis_common/index.html" title="mod google_apis_common">google_apis_common</a> as client;</code></div></li><li><div class="item-name" id="reexport.YouTube"><code>pub use api::<a class="struct" href="api/struct.YouTube.html" title="struct google_youtube3::api::YouTube">YouTube</a>;</code></div></li><li><div class="item-name" id="reexport.hyper"><code>pub use <a class="mod" href="../hyper/index.html" title="mod hyper">hyper</a>;</code></div></li><li><div class="item-name" id="reexport.hyper_rustls"><code>pub use <a class="mod" href="../hyper_rustls/index.html" title="mod hyper_rustls">hyper_rustls</a>;</code></div></li><li><div class="item-name" id="reexport.chrono"><code>pub use client::<a class="mod" href="../chrono/index.html" title="mod chrono">chrono</a>;</code></div></li><li><div class="item-name" id="reexport.oauth2"><code>pub use client::<a class="mod" href="../yup_oauth2/index.html" title="mod yup_oauth2">oauth2</a>;</code></div></li></ul><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="api/index.html" title="mod google_youtube3::api">api</a></div></li></ul><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2><ul class="item-table"><li><div class="item-name"><a class="struct" href="struct.FieldMask.html" title="struct google_youtube3::FieldMask">FieldMask</a></div><div class="desc docblock-short">A <code>FieldMask</code> as defined in <code>https://github.com/protocolbuffers/protobuf/blob/ec1a70913e5793a7d0a7b5fbf7e0e4f75409dd41/src/google/protobuf/field_mask.proto#L180</code></div></li></ul><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2><ul class="item-table"><li><div class="item-name"><a class="enum" href="enum.Error.html" title="enum google_youtube3::Error">Error</a></div></li></ul><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2><ul class="item-table"><li><div class="item-name"><a class="trait" href="trait.Delegate.html" title="trait google_youtube3::Delegate">Delegate</a></div><div class="desc docblock-short">A trait specifying functionality to help controlling any request performed by the API.
+The trait has a conservative default implementation.</div></li></ul><h2 id="types" class="section-header"><a href="#types">Type Aliases</a></h2><ul class="item-table"><li><div class="item-name"><a class="type" href="type.Result.html" title="type google_youtube3::Result">Result</a></div><div class="desc docblock-short">A universal result type used as return for all calls.</div></li></ul></section></div></main></body></html>

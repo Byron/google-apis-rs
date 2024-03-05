@@ -1,487 +1,236 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Locations Patch - My Business v3.0.0+0</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-mybusiness4-cli/accounts_locations-patch/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Locations Patch - My Business v5.0.4+0</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Locations Patch";
+        var mkdocs_page_input_path = "accounts_locations-patch.md";
+        var mkdocs_page_url = "/google-apis-rs/google-mybusiness4-cli/accounts_locations-patch/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> My Business v3.0.0+0</a>
-        
+          <a href=".." class="icon icon-home"> My Business v5.0.4+0
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Accounts</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_admins-create">Admins Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_admins-delete">Admins Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_admins-list">Admins List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_admins-patch">Admins Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_create">Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_delete-notifications">Delete Notifications</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_generate-account-number">Generate Account Number</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_get-notifications">Get Notifications</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_invitations-accept">Invitations Accept</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_invitations-decline">Invitations Decline</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_invitations-list">Invitations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_list-recommend-google-locations">List Recommend Google Locations</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-admins-create">Locations Admins Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-admins-delete">Locations Admins Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-admins-list">Locations Admins List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-admins-patch">Locations Admins Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-associate">Locations Associate</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-batch-get">Locations Batch Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-batch-get-reviews">Locations Batch Get Reviews</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-clear-association">Locations Clear Association</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-create">Locations Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-delete">Locations Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-fetch-verification-options">Locations Fetch Verification Options</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-find-matches">Locations Find Matches</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-followers-get-metadata">Locations Followers Get Metadata</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-get">Locations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-get-google-updated">Locations Get Google Updated</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-list">Locations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-local-posts-create">Locations Local Posts Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-local-posts-delete">Locations Local Posts Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-local-posts-get">Locations Local Posts Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-local-posts-list">Locations Local Posts List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-local-posts-patch">Locations Local Posts Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-local-posts-report-insights">Locations Local Posts Report Insights</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-media-create">Locations Media Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-media-customers-get">Locations Media Customers Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-media-customers-list">Locations Media Customers List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-media-delete">Locations Media Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-media-get">Locations Media Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-media-list">Locations Media List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-media-patch">Locations Media Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-media-start-upload">Locations Media Start Upload</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Locations Patch</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-questions-answers-delete">Locations Questions Answers Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-questions-answers-list">Locations Questions Answers List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-questions-answers-upsert">Locations Questions Answers Upsert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-questions-create">Locations Questions Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-questions-delete">Locations Questions Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-questions-list">Locations Questions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-questions-patch">Locations Questions Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-report-insights">Locations Report Insights</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-reviews-delete-reply">Locations Reviews Delete Reply</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-reviews-get">Locations Reviews Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-reviews-list">Locations Reviews List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-reviews-update-reply">Locations Reviews Update Reply</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-transfer">Locations Transfer</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-verifications-complete">Locations Verifications Complete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-verifications-list">Locations Verifications List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_locations-verify">Locations Verify</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_update">Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_update-notifications">Update Notifications</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Attributes</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../attributes_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Categories</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../categories_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Chains</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../chains_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../chains_search">Search</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Google Locations</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../google-locations_report">Report</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../google-locations_search">Search</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Verification Tokens</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../verification-tokens_generate">Generate</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Accounts</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_admins-create/">Admins Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_admins-delete/">Admins Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_admins-list/">Admins List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_admins-patch/">Admins Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_delete-notifications/">Delete Notifications</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_generate-account-number/">Generate Account Number</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_get-notifications/">Get Notifications</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_invitations-accept/">Invitations Accept</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_invitations-decline/">Invitations Decline</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_invitations-list/">Invitations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_list-recommend-google-locations/">List Recommend Google Locations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-admins-create/">Locations Admins Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-admins-delete/">Locations Admins Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-admins-list/">Locations Admins List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-admins-patch/">Locations Admins Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-associate/">Locations Associate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-batch-get/">Locations Batch Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-batch-get-reviews/">Locations Batch Get Reviews</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-clear-association/">Locations Clear Association</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-create/">Locations Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-delete/">Locations Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-fetch-verification-options/">Locations Fetch Verification Options</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-find-matches/">Locations Find Matches</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-followers-get-metadata/">Locations Followers Get Metadata</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-get-google-updated/">Locations Get Google Updated</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-list/">Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-local-posts-create/">Locations Local Posts Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-local-posts-delete/">Locations Local Posts Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-local-posts-get/">Locations Local Posts Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-local-posts-list/">Locations Local Posts List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-local-posts-patch/">Locations Local Posts Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-local-posts-report-insights/">Locations Local Posts Report Insights</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-media-create/">Locations Media Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-media-customers-get/">Locations Media Customers Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-media-customers-list/">Locations Media Customers List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-media-delete/">Locations Media Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-media-get/">Locations Media Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-media-list/">Locations Media List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-media-patch/">Locations Media Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-media-start-upload/">Locations Media Start Upload</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Locations Patch</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-questions-answers-delete/">Locations Questions Answers Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-questions-answers-list/">Locations Questions Answers List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-questions-answers-upsert/">Locations Questions Answers Upsert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-questions-create/">Locations Questions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-questions-delete/">Locations Questions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-questions-list/">Locations Questions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-questions-patch/">Locations Questions Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-report-insights/">Locations Report Insights</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-reviews-delete-reply/">Locations Reviews Delete Reply</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-reviews-get/">Locations Reviews Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-reviews-list/">Locations Reviews List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-reviews-update-reply/">Locations Reviews Update Reply</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-transfer/">Locations Transfer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-verifications-complete/">Locations Verifications Complete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-verifications-list/">Locations Verifications List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_locations-verify/">Locations Verify</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_update/">Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_update-notifications/">Update Notifications</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Attributes</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../attributes_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Categories</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../categories_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Chains</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../chains_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../chains_search/">Search</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Google Locations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../google-locations_report/">Report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../google-locations_search/">Search</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Verification Tokens</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../verification-tokens_generate/">Generate</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">My Business v5.0.4+0</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Locations Patch</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/mybusiness4-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Accounts &raquo;</li>
+      <li>Locations Patch</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/mybusiness4-cli/edit/master/docs/accounts_locations-patch.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates the specified location.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates the specified location.</p>
 <p>Photos are only allowed on a location that has a Google+ page.</p>
 <p>Returns <code>NOT_FOUND</code> if the location does not exist.</p>
 <h1 id="required-scalar-argument">Required Scalar Argument</h1>
@@ -571,7 +320,6 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   website-url: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li>
@@ -613,7 +361,7 @@ then geocoding is the recommended way to handle completely unstructured
 addresses (as opposed to guessing which parts of the address should be
 localities or administrative areas).
     - Each invocation of this argument appends the given value to the array.
-<em> <code>administrative-area=at</code>
+* <code>administrative-area=at</code>
     - Optional. Highest administrative subdivision which is used for postal
 addresses of a country or region.
 For example, this can be a state, a province, an oblast, or a prefecture.
@@ -621,7 +369,7 @@ Specifically, for Spain this is the province and not the autonomous
 community (e.g. &#34;Barcelona&#34; and not &#34;Catalonia&#34;).
 Many countries don&#39;t use an administrative area in postal addresses. E.g.
 in Switzerland this should be left unpopulated.
-</em> <code>language-code=invidunt</code>
+* <code>language-code=invidunt</code>
     - Optional. BCP-47 language code of the contents of this address (if
 known). This is often the UI language of the input form or is expected
 to match one of the languages used in the address&#39; country/region, or their
@@ -632,40 +380,40 @@ other non-formatting related operations.</p>
 <p>If this value is not known, it should be omitted (rather than specifying a
 possibly incorrect default).</p>
 <p>Examples: &#34;zh-Hant&#34;, &#34;ja&#34;, &#34;ja-Latn&#34;, &#34;en&#34;.
-<em> <code>locality=clita</code>
+* <code>locality=clita</code>
     - Optional. Generally refers to the city/town portion of the address.
 Examples: US city, IT comune, UK post town.
 In regions of the world where localities are not well defined or do not fit
 into this structure well, leave locality empty and use address_lines.
-</em> <code>organization=stet</code>
+* <code>organization=stet</code>
     - Optional. The name of the organization at the address.
-<em> <code>postal-code=aliquyam</code>
+* <code>postal-code=aliquyam</code>
     - Optional. Postal code of the address. Not all countries use or require
 postal codes to be present, but where they are used, they may trigger
 additional validation with other parts of the address (e.g. state/zip
 validation in the U.S.A.).
-</em> <code>recipients=ut</code>
+* <code>recipients=ut</code>
     - Optional. The recipient at the address.
 This field may, under certain circumstances, contain multiline information.
 For example, it might contain &#34;care of&#34; information.
     - Each invocation of this argument appends the given value to the array.
-<em> <code>region-code=sit</code>
+* <code>region-code=sit</code>
     - Required. CLDR region code of the country/region of the address. This
 is never inferred and it is up to the user to ensure the value is
 correct. See http://cldr.unicode.org/ and
 http://www.unicode.org/cldr/charts/30/supplemental/territory_information.html
 for details. Example: &#34;CH&#34; for Switzerland.
-</em> <code>revision=75</code>
+* <code>revision=75</code>
     - The schema revision of the <code>PostalAddress</code>. This must be set to 0, which is
 the latest revision.</p>
 <p>All new revisions <strong>must</strong> be backward compatible with old revisions.
-<em> <code>sorting-code=rebum.</code>
+* <code>sorting-code=rebum.</code>
     - Optional. Additional, country-specific, sorting code. This is not used
 in most regions. Where it is used, the value is either a string like
 &#34;CEDEX&#34;, optionally followed by a number (e.g. &#34;CEDEX 7&#34;), or just a number
 alone, representing the &#34;sector code&#34; (Jamaica), &#34;delivery area indicator&#34;
 (Malawi) or &#34;post office indicator&#34; (e.g. Côte d&#39;Ivoire).
-</em> <code>sublocality=dolores</code>
+* <code>sublocality=dolores</code>
     - Optional. Sublocality of the address.
 For example, this can be neighborhoods, boroughs, districts.</p>
 </li>
@@ -713,10 +461,10 @@ has been associated with a place that appears on Google Maps.</p>
 <p>This field can be set during Create calls, but not for Update.</p>
 <p>The additional <code>explicit_no_place_id</code> bool qualifies whether an unset
 place ID is deliberate or not.
-<em> <code>plus-page-id=diam</code>
+* <code>plus-page-id=diam</code>
     - Output only. If this location has a Google+ page associated with it, this
 is populated with the Google+ page ID for this location.
-</em> <code>request-id=nonumy</code>
+* <code>request-id=nonumy</code>
     - Output only. The <code>request_id</code> used to create this location. May be empty if
 this location was created outside of the GMB API or Google My Business
 Locations.</p>
@@ -770,7 +518,7 @@ Locations.</p>
 <li><code>is-duplicate=false</code><ul>
 <li>Output only. Indicates whether the location is a duplicate of another
     location. For more information, see
-    <a href="..//my-business/reference/rest/v4/accounts.locations#Duplicate">metadata.duplicate</a>.</li>
+    <a href="/my-business/reference/rest/v4/accounts.locations#Duplicate">metadata.duplicate</a>.</li>
 </ul>
 </li>
 <li><code>is-google-updated=false</code><ul>
@@ -780,7 +528,7 @@ Locations.</p>
 </li>
 <li><code>is-local-post-api-disabled=false</code><ul>
 <li>Output only. Indicates whether
-    <a href="..//my-business/reference/rest/v4/accounts.locations.localPosts">accounts.locations.localPosts</a>
+    <a href="/my-business/reference/rest/v4/accounts.locations.localPosts">accounts.locations.localPosts</a>
     is disabled for this location.</li>
 </ul>
 </li>
@@ -847,16 +595,16 @@ Locations.</p>
 <p>Google identifier for this location in the form:
       <code>accounts/{account_id}/locations/{location_id}</code></p>
 <p>In the context of matches, this field will not be populated.
-<em> <code>open-info    can-reopen=false</code>
+* <code>open-info    can-reopen=false</code>
     - Output only. Indicates whether this business is eligible for re-open.
-</em> <code>opening-date    day=10</code>
+* <code>opening-date    day=10</code>
     - Day of month. Must be from 1 to 31 and valid for the year and month, or 0
 if specifying a year by itself or a year and month where the day is not
 significant.
-<em> <code>month=91</code>
+* <code>month=91</code>
     - Month of year. Must be from 1 to 12, or 0 if specifying a year without a
 month and day.
-</em> <code>year=1</code>
+* <code>year=1</code>
     - Year of date. Must be from 1 to 9999, or 0 if specifying a date without
 a year.</p>
 </li>
@@ -1066,32 +814,24 @@ one of the fields to update.</p>
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../accounts_locations-questions-answers-delete" class="btn btn-neutral float-right" title="Locations Questions Answers Delete"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../accounts_locations-media-start-upload" class="btn btn-neutral" title="Locations Media Start Upload"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../accounts_locations-media-start-upload/" class="btn btn-neutral float-left" title="Locations Media Start Upload"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../accounts_locations-questions-answers-delete/" class="btn btn-neutral float-right" title="Locations Questions Answers Delete">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -1099,14 +839,30 @@ one of the fields to update.</p>
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../accounts_locations-media-start-upload" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../accounts_locations-questions-answers-delete" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/mybusiness4-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../accounts_locations-media-start-upload/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../accounts_locations-questions-answers-delete/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

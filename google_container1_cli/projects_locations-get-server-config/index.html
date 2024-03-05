@@ -1,420 +1,211 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Locations Get Server Config - Container v3.0.0+20220215</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-container1-cli/projects_locations-get-server-config/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Locations Get Server Config - Container v5.0.4+20240214</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Locations Get Server Config";
+        var mkdocs_page_input_path = "projects_locations-get-server-config.md";
+        var mkdocs_page_url = "/google-apis-rs/google-container1-cli/projects_locations-get-server-config/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Container v3.0.0+20220215</a>
-        
+          <a href=".." class="icon icon-home"> Container v5.0.4+20240214
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_aggregated-usable-subnetworks-list">Aggregated Usable Subnetworks List</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-complete-ip-rotation">Locations Clusters Complete Ip Rotation</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-create">Locations Clusters Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-delete">Locations Clusters Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-get">Locations Clusters Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-get-jwks">Locations Clusters Get Jwks</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-list">Locations Clusters List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-node-pools-create">Locations Clusters Node Pools Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-node-pools-delete">Locations Clusters Node Pools Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-node-pools-get">Locations Clusters Node Pools Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-node-pools-list">Locations Clusters Node Pools List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-node-pools-rollback">Locations Clusters Node Pools Rollback</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-node-pools-set-autoscaling">Locations Clusters Node Pools Set Autoscaling</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-node-pools-set-management">Locations Clusters Node Pools Set Management</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-node-pools-set-size">Locations Clusters Node Pools Set Size</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-node-pools-update">Locations Clusters Node Pools Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-set-addons">Locations Clusters Set Addons</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-set-legacy-abac">Locations Clusters Set Legacy Abac</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-set-locations">Locations Clusters Set Locations</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-set-logging">Locations Clusters Set Logging</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-set-maintenance-policy">Locations Clusters Set Maintenance Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-set-master-auth">Locations Clusters Set Master Auth</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-set-monitoring">Locations Clusters Set Monitoring</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-set-network-policy">Locations Clusters Set Network Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-set-resource-labels">Locations Clusters Set Resource Labels</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-start-ip-rotation">Locations Clusters Start Ip Rotation</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-update">Locations Clusters Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-update-master">Locations Clusters Update Master</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-clusters-well-known-get-openid-configuration">Locations Clusters Well Known Get Openid Configuration</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Locations Get Server Config</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-addons">Zones Clusters Addons</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-complete-ip-rotation">Zones Clusters Complete Ip Rotation</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-create">Zones Clusters Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-delete">Zones Clusters Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-get">Zones Clusters Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-legacy-abac">Zones Clusters Legacy Abac</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-list">Zones Clusters List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-locations">Zones Clusters Locations</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-logging">Zones Clusters Logging</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-master">Zones Clusters Master</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-monitoring">Zones Clusters Monitoring</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-node-pools-autoscaling">Zones Clusters Node Pools Autoscaling</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-node-pools-create">Zones Clusters Node Pools Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-node-pools-delete">Zones Clusters Node Pools Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-node-pools-get">Zones Clusters Node Pools Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-node-pools-list">Zones Clusters Node Pools List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-node-pools-rollback">Zones Clusters Node Pools Rollback</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-node-pools-set-management">Zones Clusters Node Pools Set Management</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-node-pools-set-size">Zones Clusters Node Pools Set Size</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-node-pools-update">Zones Clusters Node Pools Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-resource-labels">Zones Clusters Resource Labels</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-set-maintenance-policy">Zones Clusters Set Maintenance Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-set-master-auth">Zones Clusters Set Master Auth</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-set-network-policy">Zones Clusters Set Network Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-start-ip-rotation">Zones Clusters Start Ip Rotation</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-clusters-update">Zones Clusters Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-get-serverconfig">Zones Get Serverconfig</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-operations-cancel">Zones Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-operations-get">Zones Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_zones-operations-list">Zones Operations List</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_aggregated-usable-subnetworks-list/">Aggregated Usable Subnetworks List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-check-autopilot-compatibility/">Locations Clusters Check Autopilot Compatibility</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-complete-ip-rotation/">Locations Clusters Complete Ip Rotation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-create/">Locations Clusters Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-delete/">Locations Clusters Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-get/">Locations Clusters Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-get-jwks/">Locations Clusters Get Jwks</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-list/">Locations Clusters List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-node-pools-complete-upgrade/">Locations Clusters Node Pools Complete Upgrade</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-node-pools-create/">Locations Clusters Node Pools Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-node-pools-delete/">Locations Clusters Node Pools Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-node-pools-get/">Locations Clusters Node Pools Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-node-pools-list/">Locations Clusters Node Pools List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-node-pools-rollback/">Locations Clusters Node Pools Rollback</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-node-pools-set-autoscaling/">Locations Clusters Node Pools Set Autoscaling</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-node-pools-set-management/">Locations Clusters Node Pools Set Management</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-node-pools-set-size/">Locations Clusters Node Pools Set Size</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-node-pools-update/">Locations Clusters Node Pools Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-set-addons/">Locations Clusters Set Addons</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-set-legacy-abac/">Locations Clusters Set Legacy Abac</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-set-locations/">Locations Clusters Set Locations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-set-logging/">Locations Clusters Set Logging</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-set-maintenance-policy/">Locations Clusters Set Maintenance Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-set-master-auth/">Locations Clusters Set Master Auth</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-set-monitoring/">Locations Clusters Set Monitoring</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-set-network-policy/">Locations Clusters Set Network Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-set-resource-labels/">Locations Clusters Set Resource Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-start-ip-rotation/">Locations Clusters Start Ip Rotation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-update/">Locations Clusters Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-update-master/">Locations Clusters Update Master</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-clusters-well-known-get-openid-configuration/">Locations Clusters Well Known Get Openid Configuration</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Locations Get Server Config</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-addons/">Zones Clusters Addons</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-complete-ip-rotation/">Zones Clusters Complete Ip Rotation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-create/">Zones Clusters Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-delete/">Zones Clusters Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-get/">Zones Clusters Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-legacy-abac/">Zones Clusters Legacy Abac</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-list/">Zones Clusters List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-locations/">Zones Clusters Locations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-logging/">Zones Clusters Logging</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-master/">Zones Clusters Master</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-monitoring/">Zones Clusters Monitoring</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-node-pools-autoscaling/">Zones Clusters Node Pools Autoscaling</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-node-pools-create/">Zones Clusters Node Pools Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-node-pools-delete/">Zones Clusters Node Pools Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-node-pools-get/">Zones Clusters Node Pools Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-node-pools-list/">Zones Clusters Node Pools List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-node-pools-rollback/">Zones Clusters Node Pools Rollback</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-node-pools-set-management/">Zones Clusters Node Pools Set Management</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-node-pools-set-size/">Zones Clusters Node Pools Set Size</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-node-pools-update/">Zones Clusters Node Pools Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-resource-labels/">Zones Clusters Resource Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-set-maintenance-policy/">Zones Clusters Set Maintenance Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-set-master-auth/">Zones Clusters Set Master Auth</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-set-network-policy/">Zones Clusters Set Network Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-start-ip-rotation/">Zones Clusters Start Ip Rotation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-clusters-update/">Zones Clusters Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-get-serverconfig/">Zones Get Serverconfig</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-operations-cancel/">Zones Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-operations-get/">Zones Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_zones-operations-list/">Zones Operations List</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Container v5.0.4+20240214</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Locations Get Server Config</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/container1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Locations Get Server Config</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/container1-cli/edit/master/docs/projects_locations-get-server-config.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Returns configuration info about the Google Kubernetes Engine service.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Returns configuration info about the Google Kubernetes Engine service.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -445,7 +236,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p project-id=string</strong></p>
 <ul>
-<li>Deprecated. The Google Developers Console <a href="https://support.google.com/cloud/answer/6158840">project ID or project number</a>. This field has been deprecated and replaced by the name field.</li>
+<li>Deprecated. The Google Developers Console <a href="https://cloud.google.com/resource-manager/docs/creating-managing-projects">project ID or project number</a>. This field has been deprecated and replaced by the name field.</li>
 </ul>
 </li>
 <li>
@@ -525,32 +316,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_locations-operations-cancel" class="btn btn-neutral float-right" title="Locations Operations Cancel"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_locations-clusters-well-known-get-openid-configuration" class="btn btn-neutral" title="Locations Clusters Well Known Get Openid Configuration"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_locations-clusters-well-known-get-openid-configuration/" class="btn btn-neutral float-left" title="Locations Clusters Well Known Get Openid Configuration"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-operations-cancel/" class="btn btn-neutral float-right" title="Locations Operations Cancel">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -558,14 +341,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_locations-clusters-well-known-get-openid-configuration" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_locations-operations-cancel" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/container1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_locations-clusters-well-known-get-openid-configuration/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_locations-operations-cancel/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

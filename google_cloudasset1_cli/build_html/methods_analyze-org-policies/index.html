@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-cloudasset1-cli/methods_analyze-org-policies/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Analyze Org Policies - Cloud Asset v5.0.4+20240302</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Analyze Org Policies";
+        var mkdocs_page_input_path = "methods_analyze-org-policies.md";
+        var mkdocs_page_url = "/google-apis-rs/google-cloudasset1-cli/methods_analyze-org-policies/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Cloud Asset v5.0.4+20240302
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Assets</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../assets_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Effective Iam Policies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../effective-iam-policies_batch-get/">Batch Get</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Feeds</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../feeds_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../feeds_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../feeds_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../feeds_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../feeds_patch/">Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Methods</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_analyze-iam-policy/">Analyze Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_analyze-iam-policy-longrunning/">Analyze Iam Policy Longrunning</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_analyze-move/">Analyze Move</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Analyze Org Policies</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_analyze-org-policy-governed-assets/">Analyze Org Policy Governed Assets</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_analyze-org-policy-governed-containers/">Analyze Org Policy Governed Containers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_batch-get-assets-history/">Batch Get Assets History</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_export-assets/">Export Assets</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_query-assets/">Query Assets</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_search-all-iam-policies/">Search All Iam Policies</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_search-all-resources/">Search All Resources</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Operations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operations_get/">Get</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Saved Queries</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../saved-queries_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../saved-queries_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../saved-queries_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../saved-queries_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../saved-queries_patch/">Patch</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Cloud Asset v5.0.4+20240302</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Methods &raquo;</li>
+      <li>Analyze Org Policies</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/cloudasset1-cli/edit/master/docs/methods_analyze-org-policies.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Analyzes organization policies under a scope.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>cloudasset1 --scope &lt;scope&gt; methods analyze-org-policies ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;scope&gt;</strong> <em>(string)</em><ul>
+<li>Required. The organization to scope the request. Only organization policies within the scope will be analyzed. * organizations/{ORGANIZATION_NUMBER} (e.g., &#34;organizations/123456&#34;)</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-method-properties">Optional Method Properties</h1>
+<p>You may set the following properties to further configure the call. Please note that <code>-p</code> is followed by one 
+or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> even though the listing below repeats the
+<code>-p</code> for completeness.</p>
+<ul>
+<li>
+<p><strong>-p constraint=string</strong></p>
+<ul>
+<li>Required. The name of the constraint to analyze organization policies for. The response only contains analyzed organization policies for the provided constraint.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p filter=string</strong></p>
+<ul>
+<li>The expression to filter AnalyzeOrgPoliciesResponse.org_policy_results. Filtering is currently available for bare literal values and the following fields: * consolidated_policy.attached_resource * consolidated_policy.rules.enforce When filtering by a specific field, the only supported operator is <code>=</code>. For example, filtering by consolidated_policy.attached_resource=&#34;//cloudresourcemanager.googleapis.com/folders/001&#34; will return all the Organization Policy results attached to &#34;folders/001&#34;.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p page-size=integer</strong></p>
+<ul>
+<li>The maximum number of items to return per page. If unspecified, AnalyzeOrgPoliciesResponse.org_policy_results will contain 20 items with a maximum of 200.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p page-token=string</strong></p>
+<ul>
+<li>The pagination token to retrieve the next page.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../methods_analyze-move/" class="btn btn-neutral float-left" title="Analyze Move"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../methods_analyze-org-policy-governed-assets/" class="btn btn-neutral float-right" title="Analyze Org Policy Governed Assets">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/cloudasset1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../methods_analyze-move/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../methods_analyze-org-policy-governed-assets/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

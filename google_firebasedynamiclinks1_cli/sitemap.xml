@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-firebasedynamiclinks1-cli/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-firebasedynamiclinks1-cli/managed-short-links_create/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-firebasedynamiclinks1-cli/methods_get-link-stats/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-firebasedynamiclinks1-cli/methods_install-attribution/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-firebasedynamiclinks1-cli/methods_reopen-attribution/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-firebasedynamiclinks1-cli/short-links_create/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+</urlset>

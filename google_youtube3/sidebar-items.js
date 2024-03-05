@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Error"],"externcrate":["client"],"mod":["api"],"struct":["FieldMask"],"trait":["Delegate"],"type":["Result"]};

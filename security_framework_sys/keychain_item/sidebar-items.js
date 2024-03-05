@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["SecItemAdd","SecItemCopyMatching","SecItemDelete","SecItemUpdate","SecKeychainItemDelete","SecKeychainItemFreeContent","SecKeychainItemGetTypeID","SecKeychainItemModifyAttributesAndData"]};

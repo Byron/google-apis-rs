@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="A complete library to interact with Android Publisher (protocol v3)" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-androidpublisher3-cli/" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>Android Publisher v5.0.4+20240229</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Home";
+        var mkdocs_page_input_path = "index.md";
+        var mkdocs_page_url = "/google-apis-rs/google-androidpublisher3-cli/";
+      </script>
+    
+    <script src="js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> Android Publisher v5.0.4+20240229
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Applications</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="applications_data-safety/">Data Safety</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="applications_device-tier-configs-create/">Device Tier Configs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="applications_device-tier-configs-get/">Device Tier Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="applications_device-tier-configs-list/">Device Tier Configs List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Apprecovery</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="apprecovery_add-targeting/">Add Targeting</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="apprecovery_app-recoveries/">App Recoveries</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="apprecovery_cancel/">Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="apprecovery_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="apprecovery_deploy/">Deploy</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Edits</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_apks-addexternallyhosted/">Apks Addexternallyhosted</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_apks-list/">Apks List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_apks-upload/">Apks Upload</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_bundles-list/">Bundles List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_bundles-upload/">Bundles Upload</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_commit/">Commit</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_countryavailability-get/">Countryavailability Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_deobfuscationfiles-upload/">Deobfuscationfiles Upload</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_details-get/">Details Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_details-patch/">Details Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_details-update/">Details Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_expansionfiles-get/">Expansionfiles Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_expansionfiles-patch/">Expansionfiles Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_expansionfiles-update/">Expansionfiles Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_expansionfiles-upload/">Expansionfiles Upload</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_images-delete/">Images Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_images-deleteall/">Images Deleteall</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_images-list/">Images List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_images-upload/">Images Upload</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_listings-delete/">Listings Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_listings-deleteall/">Listings Deleteall</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_listings-get/">Listings Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_listings-list/">Listings List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_listings-patch/">Listings Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_listings-update/">Listings Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_testers-get/">Testers Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_testers-patch/">Testers Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_testers-update/">Testers Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_tracks-create/">Tracks Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_tracks-get/">Tracks Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_tracks-list/">Tracks List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_tracks-patch/">Tracks Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_tracks-update/">Tracks Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="edits_validate/">Validate</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Externaltransactions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="externaltransactions_createexternaltransaction/">Createexternaltransaction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="externaltransactions_getexternaltransaction/">Getexternaltransaction</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="externaltransactions_refundexternaltransaction/">Refundexternaltransaction</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Generatedapks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="generatedapks_download/">Download</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="generatedapks_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Grants</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="grants_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="grants_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="grants_patch/">Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Inappproducts</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="inappproducts_batch-delete/">Batch Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="inappproducts_batch-get/">Batch Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="inappproducts_batch-update/">Batch Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="inappproducts_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="inappproducts_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="inappproducts_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="inappproducts_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="inappproducts_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="inappproducts_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Internalappsharingartifacts</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="internalappsharingartifacts_uploadapk/">Uploadapk</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="internalappsharingartifacts_uploadbundle/">Uploadbundle</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Monetization</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_convert-region-prices/">Convert Region Prices</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-archive/">Subscriptions Archive</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-activate/">Subscriptions Base Plans Activate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-batch-migrate-prices/">Subscriptions Base Plans Batch Migrate Prices</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-batch-update-states/">Subscriptions Base Plans Batch Update States</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-deactivate/">Subscriptions Base Plans Deactivate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-delete/">Subscriptions Base Plans Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-migrate-prices/">Subscriptions Base Plans Migrate Prices</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-offers-activate/">Subscriptions Base Plans Offers Activate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-offers-batch-get/">Subscriptions Base Plans Offers Batch Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-offers-batch-update/">Subscriptions Base Plans Offers Batch Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-offers-batch-update-states/">Subscriptions Base Plans Offers Batch Update States</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-offers-create/">Subscriptions Base Plans Offers Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-offers-deactivate/">Subscriptions Base Plans Offers Deactivate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-offers-delete/">Subscriptions Base Plans Offers Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-offers-get/">Subscriptions Base Plans Offers Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-offers-list/">Subscriptions Base Plans Offers List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-base-plans-offers-patch/">Subscriptions Base Plans Offers Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-batch-get/">Subscriptions Batch Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-batch-update/">Subscriptions Batch Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-create/">Subscriptions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-delete/">Subscriptions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-get/">Subscriptions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-list/">Subscriptions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="monetization_subscriptions-patch/">Subscriptions Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Orders</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="orders_refund/">Refund</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Purchases</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="purchases_products-acknowledge/">Products Acknowledge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="purchases_products-consume/">Products Consume</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="purchases_products-get/">Products Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="purchases_subscriptions-acknowledge/">Subscriptions Acknowledge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="purchases_subscriptions-cancel/">Subscriptions Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="purchases_subscriptions-defer/">Subscriptions Defer</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="purchases_subscriptions-get/">Subscriptions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="purchases_subscriptions-refund/">Subscriptions Refund</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="purchases_subscriptions-revoke/">Subscriptions Revoke</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="purchases_subscriptionsv2-get/">Subscriptionsv2 Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="purchases_subscriptionsv2-revoke/">Subscriptionsv2 Revoke</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="purchases_voidedpurchases-list/">Voidedpurchases List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reviews</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="reviews_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="reviews_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="reviews_reply/">Reply</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Systemapks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="systemapks_variants-create/">Variants Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="systemapks_variants-download/">Variants Download</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="systemapks_variants-get/">Variants Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="systemapks_variants-list/">Variants List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Users</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="users_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="users_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="users_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="users_patch/">Patch</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">Android Publisher v5.0.4+20240229</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+      <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/androidpublisher3-cli/edit/master/docs/index.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <!---
+DO NOT EDIT !
+This file was generated automatically from 'src/generator/templates/cli/README.md.mako'
+DO NOT EDIT !
+-->
+<p>The <code>androidpublisher3</code> command-line interface <em>(CLI)</em> allows to use most features of the <em>Google Android Publisher</em> service from the comfort of your terminal.</p>
+<p>By default all output is printed to standard out, but flags can be set to direct it into a file independent of your shell's
+capabilities. Errors will be printed to standard error, and cause the program's exit code to be non-zero.</p>
+<p>If data-structures are requested, these will be returned as pretty-printed JSON, to be useful as input to other tools.</p>
+<p>Everything else about the <em>Android Publisher</em> API can be found at the
+<a href="https://developers.google.com/android-publisher">official documentation site</a>.</p>
+<h1 id="installation-and-source-code">Installation and Source Code</h1>
+<p>Install the command-line interface with cargo using:</p>
+<pre><code class="language-bash">cargo install google-androidpublisher3-cli
+</code></pre>
+<p>Find the source code <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/androidpublisher3-cli">on github</a>.</p>
+<h1 id="usage">Usage</h1>
+<p>This documentation was generated from the <em>Android Publisher</em> API at revision <em>20240229</em>. The CLI is at version <em>5.0.4</em>.</p>
+<pre><code class="language-bash">androidpublisher3 [options]
+        applications
+                data-safety &lt;package-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                device-tier-configs-create &lt;package-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                device-tier-configs-get &lt;package-name&gt; &lt;device-tier-config-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                device-tier-configs-list &lt;package-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        apprecovery
+                add-targeting &lt;package-name&gt; &lt;app-recovery-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                app-recoveries &lt;package-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                cancel &lt;package-name&gt; &lt;app-recovery-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                create &lt;package-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                deploy &lt;package-name&gt; &lt;app-recovery-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        edits
+                apks-addexternallyhosted &lt;package-name&gt; &lt;edit-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                apks-list &lt;package-name&gt; &lt;edit-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                apks-upload &lt;package-name&gt; &lt;edit-id&gt; (-u simple -f &lt;file&gt; [-m &lt;mime&gt;]) [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                bundles-list &lt;package-name&gt; &lt;edit-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                bundles-upload &lt;package-name&gt; &lt;edit-id&gt; (-u simple -f &lt;file&gt; [-m &lt;mime&gt;]) [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                commit &lt;package-name&gt; &lt;edit-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                countryavailability-get &lt;package-name&gt; &lt;edit-id&gt; &lt;track&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;package-name&gt; &lt;edit-id&gt; [-p &lt;v&gt;]...
+                deobfuscationfiles-upload &lt;package-name&gt; &lt;edit-id&gt; &lt;apk-version-code&gt; &lt;deobfuscation-file-type&gt; (-u simple -f &lt;file&gt; [-m &lt;mime&gt;]) [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                details-get &lt;package-name&gt; &lt;edit-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                details-patch &lt;package-name&gt; &lt;edit-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                details-update &lt;package-name&gt; &lt;edit-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                expansionfiles-get &lt;package-name&gt; &lt;edit-id&gt; &lt;apk-version-code&gt; &lt;expansion-file-type&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                expansionfiles-patch &lt;package-name&gt; &lt;edit-id&gt; &lt;apk-version-code&gt; &lt;expansion-file-type&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                expansionfiles-update &lt;package-name&gt; &lt;edit-id&gt; &lt;apk-version-code&gt; &lt;expansion-file-type&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                expansionfiles-upload &lt;package-name&gt; &lt;edit-id&gt; &lt;apk-version-code&gt; &lt;expansion-file-type&gt; (-u simple -f &lt;file&gt; [-m &lt;mime&gt;]) [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                get &lt;package-name&gt; &lt;edit-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                images-delete &lt;package-name&gt; &lt;edit-id&gt; &lt;language&gt; &lt;image-type&gt; &lt;image-id&gt; [-p &lt;v&gt;]...
+                images-deleteall &lt;package-name&gt; &lt;edit-id&gt; &lt;language&gt; &lt;image-type&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                images-list &lt;package-name&gt; &lt;edit-id&gt; &lt;language&gt; &lt;image-type&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                images-upload &lt;package-name&gt; &lt;edit-id&gt; &lt;language&gt; &lt;image-type&gt; (-u simple -f &lt;file&gt; [-m &lt;mime&gt;]) [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;package-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                listings-delete &lt;package-name&gt; &lt;edit-id&gt; &lt;language&gt; [-p &lt;v&gt;]...
+                listings-deleteall &lt;package-name&gt; &lt;edit-id&gt; [-p &lt;v&gt;]...
+                listings-get &lt;package-name&gt; &lt;edit-id&gt; &lt;language&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                listings-list &lt;package-name&gt; &lt;edit-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                listings-patch &lt;package-name&gt; &lt;edit-id&gt; &lt;language&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                listings-update &lt;package-name&gt; &lt;edit-id&gt; &lt;language&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                testers-get &lt;package-name&gt; &lt;edit-id&gt; &lt;track&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                testers-patch &lt;package-name&gt; &lt;edit-id&gt; &lt;track&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                testers-update &lt;package-name&gt; &lt;edit-id&gt; &lt;track&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                tracks-create &lt;package-name&gt; &lt;edit-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                tracks-get &lt;package-name&gt; &lt;edit-id&gt; &lt;track&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                tracks-list &lt;package-name&gt; &lt;edit-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                tracks-patch &lt;package-name&gt; &lt;edit-id&gt; &lt;track&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                tracks-update &lt;package-name&gt; &lt;edit-id&gt; &lt;track&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                validate &lt;package-name&gt; &lt;edit-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        externaltransactions
+                createexternaltransaction &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                getexternaltransaction &lt;name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                refundexternaltransaction &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        generatedapks
+                download &lt;package-name&gt; &lt;version-code&gt; &lt;download-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;package-name&gt; &lt;version-code&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        grants
+                create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;name&gt; [-p &lt;v&gt;]...
+                patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        inappproducts
+                batch-delete &lt;package-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]...
+                batch-get &lt;package-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                batch-update &lt;package-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;package-name&gt; &lt;sku&gt; [-p &lt;v&gt;]...
+                get &lt;package-name&gt; &lt;sku&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                insert &lt;package-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;package-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;package-name&gt; &lt;sku&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                update &lt;package-name&gt; &lt;sku&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        internalappsharingartifacts
+                uploadapk &lt;package-name&gt; (-u simple -f &lt;file&gt; [-m &lt;mime&gt;]) [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                uploadbundle &lt;package-name&gt; (-u simple -f &lt;file&gt; [-m &lt;mime&gt;]) [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        monetization
+                convert-region-prices &lt;package-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-archive &lt;package-name&gt; &lt;product-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-base-plans-activate &lt;package-name&gt; &lt;product-id&gt; &lt;base-plan-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-base-plans-batch-migrate-prices &lt;package-name&gt; &lt;product-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-base-plans-batch-update-states &lt;package-name&gt; &lt;product-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-base-plans-deactivate &lt;package-name&gt; &lt;product-id&gt; &lt;base-plan-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-base-plans-delete &lt;package-name&gt; &lt;product-id&gt; &lt;base-plan-id&gt; [-p &lt;v&gt;]...
+                subscriptions-base-plans-migrate-prices &lt;package-name&gt; &lt;product-id&gt; &lt;base-plan-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-base-plans-offers-activate &lt;package-name&gt; &lt;product-id&gt; &lt;base-plan-id&gt; &lt;offer-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-base-plans-offers-batch-get &lt;package-name&gt; &lt;product-id&gt; &lt;base-plan-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-base-plans-offers-batch-update &lt;package-name&gt; &lt;product-id&gt; &lt;base-plan-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-base-plans-offers-batch-update-states &lt;package-name&gt; &lt;product-id&gt; &lt;base-plan-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-base-plans-offers-create &lt;package-name&gt; &lt;product-id&gt; &lt;base-plan-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-base-plans-offers-deactivate &lt;package-name&gt; &lt;product-id&gt; &lt;base-plan-id&gt; &lt;offer-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-base-plans-offers-delete &lt;package-name&gt; &lt;product-id&gt; &lt;base-plan-id&gt; &lt;offer-id&gt; [-p &lt;v&gt;]...
+                subscriptions-base-plans-offers-get &lt;package-name&gt; &lt;product-id&gt; &lt;base-plan-id&gt; &lt;offer-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-base-plans-offers-list &lt;package-name&gt; &lt;product-id&gt; &lt;base-plan-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-base-plans-offers-patch &lt;package-name&gt; &lt;product-id&gt; &lt;base-plan-id&gt; &lt;offer-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-batch-get &lt;package-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-batch-update &lt;package-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-create &lt;package-name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-delete &lt;package-name&gt; &lt;product-id&gt; [-p &lt;v&gt;]...
+                subscriptions-get &lt;package-name&gt; &lt;product-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-list &lt;package-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-patch &lt;package-name&gt; &lt;product-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        orders
+                refund &lt;package-name&gt; &lt;order-id&gt; [-p &lt;v&gt;]...
+        purchases
+                products-acknowledge &lt;package-name&gt; &lt;product-id&gt; &lt;token&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]...
+                products-consume &lt;package-name&gt; &lt;product-id&gt; &lt;token&gt; [-p &lt;v&gt;]...
+                products-get &lt;package-name&gt; &lt;product-id&gt; &lt;token&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-acknowledge &lt;package-name&gt; &lt;subscription-id&gt; &lt;token&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]...
+                subscriptions-cancel &lt;package-name&gt; &lt;subscription-id&gt; &lt;token&gt; [-p &lt;v&gt;]...
+                subscriptions-defer &lt;package-name&gt; &lt;subscription-id&gt; &lt;token&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-get &lt;package-name&gt; &lt;subscription-id&gt; &lt;token&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptions-refund &lt;package-name&gt; &lt;subscription-id&gt; &lt;token&gt; [-p &lt;v&gt;]...
+                subscriptions-revoke &lt;package-name&gt; &lt;subscription-id&gt; &lt;token&gt; [-p &lt;v&gt;]...
+                subscriptionsv2-get &lt;package-name&gt; &lt;token&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                subscriptionsv2-revoke &lt;package-name&gt; &lt;token&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                voidedpurchases-list &lt;package-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        reviews
+                get &lt;package-name&gt; &lt;review-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                list &lt;package-name&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                reply &lt;package-name&gt; &lt;review-id&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        systemapks
+                variants-create &lt;package-name&gt; &lt;version-code&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                variants-download &lt;package-name&gt; &lt;version-code&gt; &lt;variant-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                variants-get &lt;package-name&gt; &lt;version-code&gt; &lt;variant-id&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                variants-list &lt;package-name&gt; &lt;version-code&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+        users
+                create &lt;parent&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                delete &lt;name&gt; [-p &lt;v&gt;]...
+                list &lt;parent&gt; [-p &lt;v&gt;]... [-o &lt;out&gt;]
+                patch &lt;name&gt; (-r &lt;kv&gt;)... [-p &lt;v&gt;]... [-o &lt;out&gt;]
+  androidpublisher3 --help
+
+Configuration:
+  [--scope &lt;url&gt;]...
+            Specify the authentication a method should be executed in. Each scope
+            requires the user to grant this application permission to use it.
+            If unset, it defaults to the shortest scope url for a particular method.
+  --config-dir &lt;folder&gt;
+            A directory into which we will store our persistent data. Defaults to
+            a user-writable directory that we will create during the first invocation.
+            [default: ~/.google-service-cli]
+
+</code></pre>
+<h1 id="configuration">Configuration</h1>
+<p>The program will store all persistent data in the <code>~/.google-service-cli</code> directory in <em>JSON</em> files prefixed with <code>androidpublisher3-</code>.  You can change the directory used to store configuration with the <code>--config-dir</code> flag on a per-invocation basis.</p>
+<p>More information about the various kinds of persistent data are given in the following paragraphs.</p>
+<h1 id="authentication">Authentication</h1>
+<p>Most APIs require a user to authenticate any request. If this is the case, the <a href="https://developers.google.com/+/api/oauth#scopes">scope</a> determines the 
+set of permissions granted. The granularity of these is usually no more than <em>read-only</em> or <em>full-access</em>.</p>
+<p>If not set, the system will automatically select the smallest feasible scope, e.g. when invoking a
+method that is read-only, it will ask only for a read-only scope. 
+You may use the <code>--scope</code> flag to specify a scope directly. 
+All applicable scopes are documented in the respective method's CLI documentation.</p>
+<p>The first time a scope is used, the user is asked for permission. Follow the instructions given 
+by the CLI to grant permissions, or to decline.</p>
+<p>If a scope was authenticated by the user, the respective information will be stored as <em>JSON</em> in the configuration
+directory, e.g. <code>~/.google-service-cli/androidpublisher3-token-&lt;scope-hash&gt;.json</code>. No manual management of these tokens
+is necessary.</p>
+<p>To revoke granted authentication, please refer to the <a href="http://webapps.stackexchange.com/a/30849">official documentation</a>.</p>
+<h1 id="application-secrets">Application Secrets</h1>
+<p>In order to allow any application to use Google services, it will need to be registered using the 
+<a href="https://console.developers.google.com/">Google Developer Console</a>. APIs the application may use are then enabled for it
+one by one. Most APIs can be used for free and have a daily quota.</p>
+<p>To allow more comfortable usage of the CLI without forcing anyone to register an own application, the CLI
+comes with a default application secret that is configured accordingly. This also means that heavy usage
+all around the world may deplete the daily quota.</p>
+<p>You can workaround this limitation by putting your own secrets file at this location: 
+<code>~/.google-service-cli/androidpublisher3-secret.json</code>, assuming that the required <em>androidpublisher</em> API 
+was enabled for it. Such a secret file can be downloaded in the <em>Google Developer Console</em> at 
+<em>APIs &amp; auth -&gt; Credentials -&gt; Download JSON</em> and used as is.</p>
+<p>Learn more about how to setup Google projects and enable APIs using the <a href="https://developers.google.com/console/help/new/">official documentation</a>.</p>
+<h1 id="debugging">Debugging</h1>
+<p>Even though the CLI does its best to provide usable error messages, sometimes it might be desirable to know
+what exactly led to a particular issue. This is done by allowing all client-server communication to be 
+output to standard error <em>as-is</em>.</p>
+<p>The <code>--debug</code> flag will print errors using the <code>Debug</code> representation to standard error.</p>
+<p>You may consider redirecting standard error into a file for ease of use, e.g. <code>androidpublisher3 --debug &lt;resource&gt; &lt;method&gt; [options] 2&gt;debug.txt</code>.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="applications_data-safety/" class="btn btn-neutral float-right" title="Data Safety">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/androidpublisher3-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+      <span><a href="applications_data-safety/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.3.1
+Build Date UTC : 2024-03-05 20:04:07.039915+00:00
+-->

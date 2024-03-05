@@ -1,283 +1,160 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Creatives Create - Real-time Bidding v3.0.0+20220307</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-realtimebidding1-cli/buyers_creatives-create/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Creatives Create - Real-time Bidding v5.0.4+20240305</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Creatives Create";
+        var mkdocs_page_input_path = "buyers_creatives-create.md";
+        var mkdocs_page_url = "/google-apis-rs/google-realtimebidding1-cli/buyers_creatives-create/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Real-time Bidding v3.0.0+20220307</a>
-        
+          <a href=".." class="icon icon-home"> Real-time Bidding v5.0.4+20240305
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Bidders</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_creatives-list">Creatives List</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_creatives-watch">Creatives Watch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_endpoints-get">Endpoints Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_endpoints-list">Endpoints List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_endpoints-patch">Endpoints Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_pretargeting-configs-activate">Pretargeting Configs Activate</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_pretargeting-configs-add-targeted-apps">Pretargeting Configs Add Targeted Apps</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_pretargeting-configs-add-targeted-publishers">Pretargeting Configs Add Targeted Publishers</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_pretargeting-configs-add-targeted-sites">Pretargeting Configs Add Targeted Sites</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_pretargeting-configs-create">Pretargeting Configs Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_pretargeting-configs-delete">Pretargeting Configs Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_pretargeting-configs-get">Pretargeting Configs Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_pretargeting-configs-list">Pretargeting Configs List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_pretargeting-configs-patch">Pretargeting Configs Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_pretargeting-configs-remove-targeted-apps">Pretargeting Configs Remove Targeted Apps</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_pretargeting-configs-remove-targeted-publishers">Pretargeting Configs Remove Targeted Publishers</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_pretargeting-configs-remove-targeted-sites">Pretargeting Configs Remove Targeted Sites</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bidders_pretargeting-configs-suspend">Pretargeting Configs Suspend</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Buyers</span>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Creatives Create</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buyers_creatives-get">Creatives Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buyers_creatives-list">Creatives List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buyers_creatives-patch">Creatives Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buyers_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buyers_get-remarketing-tag">Get Remarketing Tag</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buyers_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buyers_user-lists-close">User Lists Close</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buyers_user-lists-create">User Lists Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buyers_user-lists-get">User Lists Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buyers_user-lists-get-remarketing-tag">User Lists Get Remarketing Tag</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buyers_user-lists-list">User Lists List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buyers_user-lists-open">User Lists Open</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buyers_user-lists-update">User Lists Update</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Bidders</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_creatives-list/">Creatives List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_creatives-watch/">Creatives Watch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_endpoints-get/">Endpoints Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_endpoints-list/">Endpoints List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_endpoints-patch/">Endpoints Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-activate/">Pretargeting Configs Activate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-add-targeted-apps/">Pretargeting Configs Add Targeted Apps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-add-targeted-publishers/">Pretargeting Configs Add Targeted Publishers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-add-targeted-sites/">Pretargeting Configs Add Targeted Sites</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-create/">Pretargeting Configs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-delete/">Pretargeting Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-get/">Pretargeting Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-list/">Pretargeting Configs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-patch/">Pretargeting Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-remove-targeted-apps/">Pretargeting Configs Remove Targeted Apps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-remove-targeted-publishers/">Pretargeting Configs Remove Targeted Publishers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-remove-targeted-sites/">Pretargeting Configs Remove Targeted Sites</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_pretargeting-configs-suspend/">Pretargeting Configs Suspend</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_publisher-connections-batch-approve/">Publisher Connections Batch Approve</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_publisher-connections-batch-reject/">Publisher Connections Batch Reject</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_publisher-connections-get/">Publisher Connections Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bidders_publisher-connections-list/">Publisher Connections List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Buyers</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Creatives Create</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_creatives-get/">Creatives Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_creatives-list/">Creatives List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_creatives-patch/">Creatives Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_get-remarketing-tag/">Get Remarketing Tag</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_user-lists-close/">User Lists Close</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_user-lists-create/">User Lists Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_user-lists-get/">User Lists Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_user-lists-get-remarketing-tag/">User Lists Get Remarketing Tag</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_user-lists-list/">User Lists List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_user-lists-open/">User Lists Open</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buyers_user-lists-update/">User Lists Update</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Real-time Bidding v5.0.4+20240305</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Creatives Create</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/realtimebidding1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Buyers &raquo;</li>
+      <li>Creatives Create</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/realtimebidding1-cli/edit/master/docs/buyers_creatives-create.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Creates a creative.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Creates a creative.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/realtime-bidding</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/realtime-bidding</em>.
@@ -358,6 +235,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     star-rating: number
     video-url: string
     video-vast-xml: string
+  render-url: string
   restricted-categories: [string]
   version: integer
   video:
@@ -371,84 +249,83 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     video-vast-xml: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    account-id=ipsum</code><ul>
+<li><code>-r .    account-id=takimata</code><ul>
 <li>Output only. ID of the buyer account that this creative is owned by. Can be used to filter the response of the creatives.list method with equality and inequality check.</li>
 </ul>
 </li>
-<li><code>ad-choices-destination-url=accusam</code><ul>
+<li><code>ad-choices-destination-url=consetetur</code><ul>
 <li>The link to AdChoices destination page. This is only supported for native ads.</li>
 </ul>
 </li>
-<li><code>advertiser-name=takimata</code><ul>
+<li><code>advertiser-name=voluptua.</code><ul>
 <li>The name of the company being advertised in the creative. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
-<li><code>agency-id=consetetur</code><ul>
+<li><code>agency-id=et</code><ul>
 <li>The agency ID for this creative.</li>
 </ul>
 </li>
-<li><code>api-update-time=voluptua.</code><ul>
-<li>Output only. The last update timestamp of the creative via API.</li>
+<li><code>api-update-time=erat</code><ul>
+<li>Output only. The last update timestamp of the creative through the API.</li>
 </ul>
 </li>
-<li><code>creative-format=et</code><ul>
+<li><code>creative-format=consetetur</code><ul>
 <li>Output only. The format of this creative. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
-<li><code>creative-id=erat</code><ul>
+<li><code>creative-id=amet.</code><ul>
 <li>Buyer-specific creative ID that references this creative in bid responses. This field is Ignored in update operations. Can be used to filter the response of the creatives.list method. The maximum length of the creative ID is 128 bytes.</li>
 </ul>
 </li>
-<li><code>creative-serving-decision.ad-technology-providers    detected-gvl-ids=consetetur</code><ul>
-<li>The detected IAB Global Vendor List (GVL) IDs for this creative. See the IAB Global Vendor List at https://vendorlist.consensu.org/v2/vendor-list.json for details about the vendors.</li>
+<li><code>creative-serving-decision.ad-technology-providers    detected-gvl-ids=sed</code><ul>
+<li>The detected IAB Global Vendor List (GVL) IDs for this creative. See the IAB Global Vendor List at https://vendor-list.consensu.org/v2/vendor-list.json for details about the vendors.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>detected-provider-ids=amet.</code><ul>
+<li><code>detected-provider-ids=takimata</code><ul>
 <li>The detected <a href="https://support.google.com/admanager/answer/9012903">Google Ad Tech Providers (ATP)</a> for this creative. See https://storage.googleapis.com/adx-rtb-dictionaries/providers.csv for mapping of provider ID to provided name, a privacy policy URL, and a list of domains which can be attributed to the provider.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>unidentified-provider-domains=sed</code></p>
+<p><code>unidentified-provider-domains=dolores</code></p>
 <ul>
 <li>Domains of detected unidentified ad technology providers (if any). You must ensure that the creatives used in bids placed for inventory that will serve to EEA or UK users does not contain unidentified ad technology providers. Google reserves the right to filter non-compliant bids.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..china-policy-compliance    status=takimata</code></p>
+<p><code>..china-policy-compliance    status=gubergren</code></p>
 <ul>
-<li>Serving status for the given transaction type (e.g., open auction, deals) or region (e.g., China, Russia). Can be used to filter the response of the creatives.list method.</li>
+<li>Serving status for the given transaction type (for example, open auction, deals) or region (for example, China, Russia). Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>..deals-policy-compliance    status=dolores</code></p>
+<p><code>..deals-policy-compliance    status=et</code></p>
 <ul>
-<li>Serving status for the given transaction type (e.g., open auction, deals) or region (e.g., China, Russia). Can be used to filter the response of the creatives.list method.</li>
+<li>Serving status for the given transaction type (for example, open auction, deals) or region (for example, China, Russia). Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>..    detected-attributes=gubergren</code></p>
+<p><code>..    detected-attributes=accusam</code></p>
 <ul>
 <li>Publisher-excludable attributes that were detected for this creative. Can be used to filter the response of the creatives.list method. If the <code>excluded_attribute</code> field of a <a href="https://developers.google.com/authorized-buyers/rtb/downloads/realtime-bidding-proto">bid request</a> contains one of the attributes that were declared or detected for a given creative, and a bid is submitted with that creative, the bid will be filtered before the auction.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>detected-click-through-urls=et</code><ul>
+<li><code>detected-click-through-urls=voluptua.</code><ul>
 <li>The set of detected destination URLs for the creative. Can be used to filter the response of the creatives.list method.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>detected-domains=accusam</code><ul>
+<li><code>detected-domains=dolore</code><ul>
 <li>The detected domains for this creative.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>detected-languages=voluptua.</code><ul>
+<li><code>detected-languages=dolore</code><ul>
 <li>The detected languages for this creative. The order is arbitrary. The codes are 2 or 5 characters and are documented at https://developers.google.com/adwords/api/docs/appendix/languagecodes. Can be used to filter the response of the creatives.list method.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
@@ -458,220 +335,224 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>detected-sensitive-categories=67</code><ul>
+<li><code>detected-sensitive-categories=23</code><ul>
 <li>Detected sensitive categories, if any. Can be used to filter the response of the creatives.list method. See the ad-sensitive-categories.txt file in the technical documentation for a list of IDs. You should use these IDs along with the excluded-sensitive-category field in the bid request to filter your bids.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>detected-vendor-ids=67</code><ul>
+<li><code>detected-vendor-ids=99</code><ul>
 <li>IDs of the ad technology vendors that were detected to be used by this creative. See https://storage.googleapis.com/adx-rtb-dictionaries/vendors.txt for possible values. Can be used to filter the response of the creatives.list method. If the <code>allowed_vendor_type</code> field of a <a href="https://developers.google.com/authorized-buyers/rtb/downloads/realtime-bidding-proto">bid request</a> does not contain one of the vendor type IDs that were declared or detected for a given creative, and a bid is submitted with that creative, the bid will be filtered before the auction.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>last-status-update=voluptua.</code><ul>
+<li><code>last-status-update=ea</code><ul>
 <li>The last time the creative status was updated. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>network-policy-compliance    status=amet.</code></p>
+<p><code>network-policy-compliance    status=sadipscing</code></p>
 <ul>
-<li>Serving status for the given transaction type (e.g., open auction, deals) or region (e.g., China, Russia). Can be used to filter the response of the creatives.list method.</li>
+<li>Serving status for the given transaction type (for example, open auction, deals) or region (for example, China, Russia). Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>..platform-policy-compliance    status=ea</code></p>
+<p><code>..platform-policy-compliance    status=lorem</code></p>
 <ul>
-<li>Serving status for the given transaction type (e.g., open auction, deals) or region (e.g., China, Russia). Can be used to filter the response of the creatives.list method.</li>
+<li>Serving status for the given transaction type (for example, open auction, deals) or region (for example, China, Russia). Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>..russia-policy-compliance    status=sadipscing</code></p>
+<p><code>..russia-policy-compliance    status=invidunt</code></p>
 <ul>
-<li>Serving status for the given transaction type (e.g., open auction, deals) or region (e.g., China, Russia). Can be used to filter the response of the creatives.list method.</li>
+<li>Serving status for the given transaction type (for example, open auction, deals) or region (for example, China, Russia). Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>...    deal-ids=lorem</code></p>
+<p><code>...    deal-ids=no</code></p>
 <ul>
 <li>Output only. IDs of all of the deals with which this creative has been used in bidding. Can be used to filter the response of the creatives.list method.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>declared-attributes=invidunt</code><ul>
-<li>All declared attributes for the ads that may be shown from this creative. Can be used to filter the response of the creatives.list method. If the <code>excluded_attribute</code> field of a <a href="https://developers.google.com/authorized-buyers/rtb/downloads/realtime-bidding-proto&amp;#34;">bid request</a> contains one of the attributes that were declared or detected for a given creative, and a bid is submitted with that creative, the bid will be filtered before the auction.</li>
+<li><code>declared-attributes=est</code><ul>
+<li>All declared attributes for the ads that may be shown from this creative. Can be used to filter the response of the creatives.list method. If the <code>excluded_attribute</code> field of a <a href="https://developers.google.com/authorized-buyers/rtb/downloads/realtime-bidding-proto&#34;">bid request</a> contains one of the attributes that were declared or detected for a given creative, and a bid is submitted with that creative, the bid will be filtered before the auction.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>declared-click-through-urls=no</code><ul>
+<li><code>declared-click-through-urls=at</code><ul>
 <li>The set of declared destination URLs for the creative. Can be used to filter the response of the creatives.list method.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>declared-restricted-categories=est</code><ul>
+<li><code>declared-restricted-categories=sed</code><ul>
 <li>All declared restricted categories for the ads that may be shown from this creative. Can be used to filter the response of the creatives.list method.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>declared-vendor-ids=74</code><ul>
+<li><code>declared-vendor-ids=3</code><ul>
 <li>IDs for the declared ad technology vendors that may be used by this creative. See https://storage.googleapis.com/adx-rtb-dictionaries/vendors.txt for possible values. Can be used to filter the response of the creatives.list method.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>html    height=58</code><ul>
+<li><code>html    height=66</code><ul>
 <li>The height of the HTML snippet in pixels. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
-<li><code>snippet=sit</code><ul>
+<li><code>snippet=tempor</code><ul>
 <li>The HTML snippet that displays the ad when inserted in the web page.</li>
 </ul>
 </li>
 <li>
-<p><code>width=66</code></p>
+<p><code>width=69</code></p>
 <ul>
 <li>The width of the HTML snippet in pixels. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>..    impression-tracking-urls=tempor</code></p>
+<p><code>..    impression-tracking-urls=ipsum</code></p>
 <ul>
 <li>The set of URLs to be called to record an impression.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>name=aliquyam</code><ul>
+<li><code>name=et</code><ul>
 <li>Output only. Name of the creative. Follows the pattern <code>buyers/{buyer}/creatives/{creative}</code>, where <code>{buyer}</code> represents the account ID of the buyer who owns the creative, and <code>{creative}</code> is the buyer-specific creative ID that references this creative in the bid response.</li>
 </ul>
 </li>
-<li><code>native    advertiser-name=ipsum</code><ul>
+<li><code>native    advertiser-name=sanctus</code><ul>
 <li>The name of the advertiser or sponsor, to be displayed in the ad creative.</li>
 </ul>
 </li>
-<li><code>app-icon    height=83</code><ul>
+<li><code>app-icon    height=45</code><ul>
 <li>Image height in pixels.</li>
 </ul>
 </li>
-<li><code>url=sanctus</code><ul>
+<li><code>url=est</code><ul>
 <li>The URL of the image.</li>
 </ul>
 </li>
 <li>
-<p><code>width=45</code></p>
+<p><code>width=71</code></p>
 <ul>
 <li>Image width in pixels.</li>
 </ul>
 </li>
 <li>
-<p><code>..    body=est</code></p>
+<p><code>..    body=diam</code></p>
 <ul>
 <li>A long description of the ad.</li>
 </ul>
 </li>
-<li><code>call-to-action=sed</code><ul>
+<li><code>call-to-action=dolores</code><ul>
 <li>A label for the button that the user is supposed to click.</li>
 </ul>
 </li>
-<li><code>click-link-url=diam</code><ul>
+<li><code>click-link-url=dolores</code><ul>
 <li>The URL that the browser/SDK will load when the user clicks the ad.</li>
 </ul>
 </li>
-<li><code>click-tracking-url=dolores</code><ul>
+<li><code>click-tracking-url=et</code><ul>
 <li>The URL to use for click tracking.</li>
 </ul>
 </li>
-<li><code>headline=dolores</code><ul>
+<li><code>headline=sed</code><ul>
 <li>A short title for the ad.</li>
 </ul>
 </li>
-<li><code>image    height=33</code><ul>
+<li><code>image    height=90</code><ul>
 <li>Image height in pixels.</li>
 </ul>
 </li>
-<li><code>url=sed</code><ul>
+<li><code>url=et</code><ul>
 <li>The URL of the image.</li>
 </ul>
 </li>
 <li>
-<p><code>width=90</code></p>
+<p><code>width=7</code></p>
 <ul>
 <li>Image width in pixels.</li>
 </ul>
 </li>
 <li>
-<p><code>..logo    height=16</code></p>
+<p><code>..logo    height=21</code></p>
 <ul>
 <li>Image height in pixels.</li>
 </ul>
 </li>
-<li><code>url=elitr</code><ul>
+<li><code>url=no</code><ul>
 <li>The URL of the image.</li>
 </ul>
 </li>
 <li>
-<p><code>width=21</code></p>
+<p><code>width=10</code></p>
 <ul>
 <li>Image width in pixels.</li>
 </ul>
 </li>
 <li>
-<p><code>..    price-display-text=no</code></p>
+<p><code>..    price-display-text=at</code></p>
 <ul>
 <li>The price of the promoted app including currency info.</li>
 </ul>
 </li>
-<li><code>star-rating=0.8199801376344691</code><ul>
+<li><code>star-rating=0.439459047858913</code><ul>
 <li>The app rating in the app store. Must be in the range [0-5].</li>
 </ul>
 </li>
-<li><code>video-url=at</code><ul>
+<li><code>video-url=aliquyam</code><ul>
 <li>The URL to fetch a native video ad.</li>
 </ul>
 </li>
 <li>
-<p><code>video-vast-xml=sadipscing</code></p>
+<p><code>video-vast-xml=dolores</code></p>
 <ul>
 <li>The contents of a VAST document for a native video ad.</li>
 </ul>
 </li>
 <li>
-<p><code>..    restricted-categories=aliquyam</code></p>
+<p><code>..    render-url=sadipscing</code></p>
 <ul>
+<li>Experimental field that can be used during the <a href="/authorized-buyers/rtb/fledge-origin-trial">FLEDGE Origin Trial</a>. The URL to fetch an interest group ad used in <a href="https://github.com/WICG/turtledove/blob/main/FLEDGE.md#1-browsers-record-interest-groups&#34;">TURTLEDOVE on-device auction</a>. This should be unique among all creatives for a given <code>accountId</code>. This URL should be the same as the URL returned by <a href="https://github.com/WICG/turtledove/blob/main/FLEDGE.md#32-on-device-bidding">generateBid()</a>.</li>
+</ul>
+</li>
+<li><code>restricted-categories=erat</code><ul>
 <li>All restricted categories for the ads that may be shown from this creative.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>version=32</code><ul>
-<li>Output only. The version of this creative. Version for a new creative is 1 and it increments during subsequent creative updates.</li>
+<li><code>version=19</code><ul>
+<li>Output only. The version of the creative. Version for a new creative is 1 and it increments during subsequent creative updates.</li>
 </ul>
 </li>
-<li><code>video.video-metadata    duration=sadipscing</code><ul>
+<li><code>video.video-metadata    duration=amet</code><ul>
 <li>The duration of the ad. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
-<li><code>is-valid-vast=false</code><ul>
+<li><code>is-valid-vast=true</code><ul>
 <li>Is this a valid VAST ad? Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
-<li><code>is-vpaid=true</code><ul>
+<li><code>is-vpaid=false</code><ul>
 <li>Is this a VPAID ad? Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
-<li><code>skip-offset=est</code><ul>
+<li><code>skip-offset=consetetur</code><ul>
 <li>The minimum duration that the user has to watch before being able to skip this ad. If the field is not set, the ad is not skippable. If the field is set, the ad is skippable. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>vast-version=et</code></p>
+<p><code>vast-version=stet</code></p>
 <ul>
 <li>The maximum VAST version across all wrapped VAST documents. Can be used to filter the response of the creatives.list method.</li>
 </ul>
 </li>
 <li>
-<p><code>..    video-url=sea</code></p>
+<p><code>..    video-url=est</code></p>
 <ul>
 <li>The URL to fetch a video ad.</li>
 </ul>
 </li>
-<li><code>video-vast-xml=consetetur</code><ul>
+<li><code>video-vast-xml=aliquyam</code><ul>
 <li>The contents of a VAST document for a video ad. This document should conform to the VAST 2.0 or 3.0 standard.</li>
 </ul>
 </li>
@@ -765,32 +646,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../buyers_creatives-get" class="btn btn-neutral float-right" title="Creatives Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../bidders_pretargeting-configs-suspend" class="btn btn-neutral" title="Pretargeting Configs Suspend"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../bidders_publisher-connections-list/" class="btn btn-neutral float-left" title="Publisher Connections List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../buyers_creatives-get/" class="btn btn-neutral float-right" title="Creatives Get">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -798,14 +671,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../bidders_pretargeting-configs-suspend" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../buyers_creatives-get" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/realtimebidding1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../bidders_publisher-connections-list/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../buyers_creatives-get/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

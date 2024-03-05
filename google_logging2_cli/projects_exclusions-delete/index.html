@@ -1,1007 +1,549 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Exclusions Delete - Logging v3.0.0+20220225</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-logging2-cli/projects_exclusions-delete/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Exclusions Delete - Logging v5.0.4+20240223</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Exclusions Delete";
+        var mkdocs_page_input_path = "projects_exclusions-delete.md";
+        var mkdocs_page_url = "/google-apis-rs/google-logging2-cli/projects_exclusions-delete/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Logging v3.0.0+20220225</a>
-        
+          <a href=".." class="icon icon-home"> Logging v5.0.4+20240223
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Billing Accounts</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_buckets-get">Buckets Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_buckets-views-get">Buckets Views Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_exclusions-create">Exclusions Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_exclusions-delete">Exclusions Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_exclusions-get">Exclusions Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_exclusions-list">Exclusions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_exclusions-patch">Exclusions Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_get-cmek-settings">Get Cmek Settings</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_get-settings">Get Settings</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_locations-buckets-create">Locations Buckets Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_locations-buckets-delete">Locations Buckets Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_locations-buckets-list">Locations Buckets List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_locations-buckets-patch">Locations Buckets Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_locations-buckets-undelete">Locations Buckets Undelete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_locations-buckets-views-create">Locations Buckets Views Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_locations-buckets-views-delete">Locations Buckets Views Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_locations-buckets-views-list">Locations Buckets Views List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_locations-buckets-views-patch">Locations Buckets Views Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_locations-get">Locations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_locations-list">Locations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_locations-operations-cancel">Locations Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_locations-operations-list">Locations Operations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_logs-delete">Logs Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_logs-list">Logs List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_operations-get">Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_sinks-create">Sinks Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_sinks-delete">Sinks Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_sinks-get">Sinks Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_sinks-list">Sinks List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_sinks-patch">Sinks Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../billing-accounts_sinks-update">Sinks Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Entries</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../entries_copy">Copy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../entries_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../entries_tail">Tail</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../entries_write">Write</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Exclusions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../exclusions_create">Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../exclusions_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../exclusions_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../exclusions_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../exclusions_patch">Patch</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Folders</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_exclusions-create">Exclusions Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_exclusions-delete">Exclusions Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_exclusions-get">Exclusions Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_exclusions-list">Exclusions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_exclusions-patch">Exclusions Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_get-cmek-settings">Get Cmek Settings</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_get-settings">Get Settings</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-buckets-create">Locations Buckets Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-buckets-delete">Locations Buckets Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-buckets-get">Locations Buckets Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-buckets-list">Locations Buckets List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-buckets-patch">Locations Buckets Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-buckets-undelete">Locations Buckets Undelete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-buckets-views-create">Locations Buckets Views Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-buckets-views-delete">Locations Buckets Views Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-buckets-views-get">Locations Buckets Views Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-buckets-views-list">Locations Buckets Views List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-buckets-views-patch">Locations Buckets Views Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-get">Locations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-list">Locations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-operations-cancel">Locations Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-operations-get">Locations Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_locations-operations-list">Locations Operations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_logs-delete">Logs Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_logs-list">Logs List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_sinks-create">Sinks Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_sinks-delete">Sinks Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_sinks-get">Sinks Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_sinks-list">Sinks List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_sinks-patch">Sinks Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_sinks-update">Sinks Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../folders_update-settings">Update Settings</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Locations</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_buckets-create">Buckets Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_buckets-delete">Buckets Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_buckets-get">Buckets Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_buckets-list">Buckets List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_buckets-patch">Buckets Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_buckets-undelete">Buckets Undelete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_buckets-views-create">Buckets Views Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_buckets-views-delete">Buckets Views Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_buckets-views-get">Buckets Views Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_buckets-views-list">Buckets Views List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_buckets-views-patch">Buckets Views Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_operations-cancel">Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_operations-get">Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../locations_operations-list">Operations List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Logs</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../logs_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../logs_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Methods</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../methods_get-cmek-settings">Get Cmek Settings</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../methods_get-settings">Get Settings</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../methods_update-cmek-settings">Update Cmek Settings</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../methods_update-settings">Update Settings</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Monitored Resource Descriptors</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../monitored-resource-descriptors_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Organizations</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_exclusions-create">Exclusions Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_exclusions-delete">Exclusions Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_exclusions-get">Exclusions Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_exclusions-list">Exclusions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_exclusions-patch">Exclusions Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_get-cmek-settings">Get Cmek Settings</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_get-settings">Get Settings</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-buckets-create">Locations Buckets Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-buckets-delete">Locations Buckets Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-buckets-get">Locations Buckets Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-buckets-list">Locations Buckets List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-buckets-patch">Locations Buckets Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-buckets-undelete">Locations Buckets Undelete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-buckets-views-create">Locations Buckets Views Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-buckets-views-delete">Locations Buckets Views Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-buckets-views-get">Locations Buckets Views Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-buckets-views-list">Locations Buckets Views List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-buckets-views-patch">Locations Buckets Views Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-get">Locations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-list">Locations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-operations-cancel">Locations Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-operations-get">Locations Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_locations-operations-list">Locations Operations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_logs-delete">Logs Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_logs-list">Logs List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sinks-create">Sinks Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sinks-delete">Sinks Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sinks-get">Sinks Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sinks-list">Sinks List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sinks-patch">Sinks Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_sinks-update">Sinks Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_update-cmek-settings">Update Cmek Settings</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../organizations_update-settings">Update Settings</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_exclusions-create">Exclusions Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Exclusions Delete</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_exclusions-get">Exclusions Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_exclusions-list">Exclusions List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_exclusions-patch">Exclusions Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_get-cmek-settings">Get Cmek Settings</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_get-settings">Get Settings</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-buckets-create">Locations Buckets Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-buckets-delete">Locations Buckets Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-buckets-get">Locations Buckets Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-buckets-list">Locations Buckets List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-buckets-patch">Locations Buckets Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-buckets-undelete">Locations Buckets Undelete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-buckets-views-create">Locations Buckets Views Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-buckets-views-delete">Locations Buckets Views Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-buckets-views-get">Locations Buckets Views Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-buckets-views-list">Locations Buckets Views List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-buckets-views-patch">Locations Buckets Views Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-get">Locations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-list">Locations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-cancel">Locations Operations Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-get">Locations Operations Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_locations-operations-list">Locations Operations List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_logs-delete">Logs Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_logs-list">Logs List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_metrics-create">Metrics Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_metrics-delete">Metrics Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_metrics-get">Metrics Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_metrics-list">Metrics List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_metrics-update">Metrics Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_sinks-create">Sinks Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_sinks-delete">Sinks Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_sinks-get">Sinks Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_sinks-list">Sinks List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_sinks-patch">Sinks Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_sinks-update">Sinks Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Sinks</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../sinks_create">Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../sinks_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../sinks_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../sinks_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../sinks_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Billing Accounts</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_exclusions-create/">Exclusions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_exclusions-delete/">Exclusions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_exclusions-get/">Exclusions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_exclusions-list/">Exclusions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_exclusions-patch/">Exclusions Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_get-cmek-settings/">Get Cmek Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_get-settings/">Get Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-create/">Locations Buckets Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-create-async/">Locations Buckets Create Async</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-delete/">Locations Buckets Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-get/">Locations Buckets Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-links-create/">Locations Buckets Links Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-links-delete/">Locations Buckets Links Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-links-get/">Locations Buckets Links Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-links-list/">Locations Buckets Links List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-list/">Locations Buckets List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-patch/">Locations Buckets Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-undelete/">Locations Buckets Undelete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-update-async/">Locations Buckets Update Async</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-views-create/">Locations Buckets Views Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-views-delete/">Locations Buckets Views Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-views-get/">Locations Buckets Views Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-views-list/">Locations Buckets Views List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-views-logs-list/">Locations Buckets Views Logs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-buckets-views-patch/">Locations Buckets Views Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-list/">Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-recent-queries-list/">Locations Recent Queries List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-saved-queries-create/">Locations Saved Queries Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-saved-queries-delete/">Locations Saved Queries Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_locations-saved-queries-list/">Locations Saved Queries List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_logs-delete/">Logs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_logs-list/">Logs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_sinks-create/">Sinks Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_sinks-delete/">Sinks Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_sinks-get/">Sinks Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_sinks-list/">Sinks List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_sinks-patch/">Sinks Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../billing-accounts_sinks-update/">Sinks Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Entries</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../entries_copy/">Copy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../entries_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../entries_tail/">Tail</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../entries_write/">Write</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Exclusions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../exclusions_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../exclusions_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../exclusions_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../exclusions_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../exclusions_patch/">Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Folders</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_exclusions-create/">Exclusions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_exclusions-delete/">Exclusions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_exclusions-get/">Exclusions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_exclusions-list/">Exclusions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_exclusions-patch/">Exclusions Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_get-cmek-settings/">Get Cmek Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_get-settings/">Get Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-create/">Locations Buckets Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-create-async/">Locations Buckets Create Async</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-delete/">Locations Buckets Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-get/">Locations Buckets Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-links-create/">Locations Buckets Links Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-links-delete/">Locations Buckets Links Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-links-get/">Locations Buckets Links Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-links-list/">Locations Buckets Links List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-list/">Locations Buckets List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-patch/">Locations Buckets Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-undelete/">Locations Buckets Undelete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-update-async/">Locations Buckets Update Async</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-views-create/">Locations Buckets Views Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-views-delete/">Locations Buckets Views Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-views-get/">Locations Buckets Views Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-views-list/">Locations Buckets Views List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-views-logs-list/">Locations Buckets Views Logs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-buckets-views-patch/">Locations Buckets Views Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-list/">Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-recent-queries-list/">Locations Recent Queries List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-saved-queries-create/">Locations Saved Queries Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-saved-queries-delete/">Locations Saved Queries Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_locations-saved-queries-list/">Locations Saved Queries List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_logs-delete/">Logs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_logs-list/">Logs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_sinks-create/">Sinks Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_sinks-delete/">Sinks Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_sinks-get/">Sinks Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_sinks-list/">Sinks List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_sinks-patch/">Sinks Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_sinks-update/">Sinks Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_update-settings/">Update Settings</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Locations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-create/">Buckets Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-create-async/">Buckets Create Async</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-delete/">Buckets Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-get/">Buckets Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-links-create/">Buckets Links Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-links-delete/">Buckets Links Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-links-get/">Buckets Links Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-links-list/">Buckets Links List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-list/">Buckets List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-patch/">Buckets Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-undelete/">Buckets Undelete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-update-async/">Buckets Update Async</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-views-create/">Buckets Views Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-views-delete/">Buckets Views Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-views-get/">Buckets Views Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-views-list/">Buckets Views List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_buckets-views-patch/">Buckets Views Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_operations-cancel/">Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_operations-get/">Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../locations_operations-list/">Operations List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Logs</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../logs_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../logs_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Methods</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_get-cmek-settings/">Get Cmek Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_get-settings/">Get Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_update-cmek-settings/">Update Cmek Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../methods_update-settings/">Update Settings</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Monitored Resource Descriptors</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../monitored-resource-descriptors_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Organizations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_exclusions-create/">Exclusions Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_exclusions-delete/">Exclusions Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_exclusions-get/">Exclusions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_exclusions-list/">Exclusions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_exclusions-patch/">Exclusions Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_get-cmek-settings/">Get Cmek Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_get-settings/">Get Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-create/">Locations Buckets Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-create-async/">Locations Buckets Create Async</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-delete/">Locations Buckets Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-get/">Locations Buckets Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-links-create/">Locations Buckets Links Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-links-delete/">Locations Buckets Links Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-links-get/">Locations Buckets Links Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-links-list/">Locations Buckets Links List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-list/">Locations Buckets List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-patch/">Locations Buckets Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-undelete/">Locations Buckets Undelete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-update-async/">Locations Buckets Update Async</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-views-create/">Locations Buckets Views Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-views-delete/">Locations Buckets Views Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-views-get/">Locations Buckets Views Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-views-list/">Locations Buckets Views List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-views-logs-list/">Locations Buckets Views Logs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-buckets-views-patch/">Locations Buckets Views Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-list/">Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-recent-queries-list/">Locations Recent Queries List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-saved-queries-create/">Locations Saved Queries Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-saved-queries-delete/">Locations Saved Queries Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_locations-saved-queries-list/">Locations Saved Queries List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_logs-delete/">Logs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_logs-list/">Logs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sinks-create/">Sinks Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sinks-delete/">Sinks Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sinks-get/">Sinks Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sinks-list/">Sinks List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sinks-patch/">Sinks Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_sinks-update/">Sinks Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_update-cmek-settings/">Update Cmek Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../organizations_update-settings/">Update Settings</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_exclusions-create/">Exclusions Create</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Exclusions Delete</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_exclusions-get/">Exclusions Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_exclusions-list/">Exclusions List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_exclusions-patch/">Exclusions Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_get-cmek-settings/">Get Cmek Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_get-settings/">Get Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-create/">Locations Buckets Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-create-async/">Locations Buckets Create Async</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-delete/">Locations Buckets Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-get/">Locations Buckets Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-links-create/">Locations Buckets Links Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-links-delete/">Locations Buckets Links Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-links-get/">Locations Buckets Links Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-links-list/">Locations Buckets Links List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-list/">Locations Buckets List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-patch/">Locations Buckets Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-undelete/">Locations Buckets Undelete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-update-async/">Locations Buckets Update Async</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-views-create/">Locations Buckets Views Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-views-delete/">Locations Buckets Views Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-views-get/">Locations Buckets Views Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-views-list/">Locations Buckets Views List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-views-logs-list/">Locations Buckets Views Logs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-buckets-views-patch/">Locations Buckets Views Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-get/">Locations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-list/">Locations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-cancel/">Locations Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-recent-queries-list/">Locations Recent Queries List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-saved-queries-create/">Locations Saved Queries Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-saved-queries-delete/">Locations Saved Queries Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-saved-queries-list/">Locations Saved Queries List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_logs-delete/">Logs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_logs-list/">Logs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_metrics-create/">Metrics Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_metrics-delete/">Metrics Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_metrics-get/">Metrics Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_metrics-list/">Metrics List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_metrics-update/">Metrics Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_sinks-create/">Sinks Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_sinks-delete/">Sinks Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_sinks-get/">Sinks Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_sinks-list/">Sinks List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_sinks-patch/">Sinks Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_sinks-update/">Sinks Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Sinks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../sinks_create/">Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../sinks_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../sinks_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../sinks_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../sinks_update/">Update</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Logging v5.0.4+20240223</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Exclusions Delete</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/logging2-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Exclusions Delete</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/logging2-cli/edit/master/docs/projects_exclusions-delete.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Deletes an exclusion in the _Default sink.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Deletes an exclusion in the _Default sink.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -1098,32 +640,24 @@ You can set the scope for this method like this: <code>logging2 --scope &lt;scop
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../projects_exclusions-get" class="btn btn-neutral float-right" title="Exclusions Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_exclusions-create" class="btn btn-neutral" title="Exclusions Create"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_exclusions-create/" class="btn btn-neutral float-left" title="Exclusions Create"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_exclusions-get/" class="btn btn-neutral float-right" title="Exclusions Get">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -1131,14 +665,30 @@ You can set the scope for this method like this: <code>logging2 --scope &lt;scop
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_exclusions-create" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../projects_exclusions-get" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/logging2-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_exclusions-create/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_exclusions-get/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-ideahub1_beta-cli/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-ideahub1_beta-cli/platforms_properties-idea-activities-create/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-ideahub1_beta-cli/platforms_properties-idea-states-patch/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-ideahub1_beta-cli/platforms_properties-ideas-list/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-ideahub1_beta-cli/platforms_properties-locales-list/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-ideahub1_beta-cli/platforms_properties-topic-states-patch/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+</urlset>

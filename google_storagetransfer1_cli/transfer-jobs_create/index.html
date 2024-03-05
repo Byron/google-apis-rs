@@ -1,202 +1,124 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Create - storagetransfer v3.0.0+20220223</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-storagetransfer1-cli/transfer-jobs_create/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Create - storagetransfer v5.0.4+20240224</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Create";
+        var mkdocs_page_input_path = "transfer-jobs_create.md";
+        var mkdocs_page_url = "/google-apis-rs/google-storagetransfer1-cli/transfer-jobs_create/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> storagetransfer v3.0.0+20220223</a>
-        
+          <a href=".." class="icon icon-home"> storagetransfer v5.0.4+20240224
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Google Service Accounts</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../google-service-accounts_get">Get</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-        
-
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_agent-pools-create">Agent Pools Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_agent-pools-delete">Agent Pools Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_agent-pools-get">Agent Pools Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_agent-pools-list">Agent Pools List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_agent-pools-patch">Agent Pools Patch</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Transfer Jobs</span>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Create</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../transfer-jobs_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../transfer-jobs_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../transfer-jobs_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../transfer-jobs_run">Run</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Transfer Operations</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../transfer-operations_cancel">Cancel</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../transfer-operations_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../transfer-operations_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../transfer-operations_pause">Pause</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../transfer-operations_resume">Resume</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Google Service Accounts</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../google-service-accounts_get/">Get</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_agent-pools-create/">Agent Pools Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_agent-pools-delete/">Agent Pools Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_agent-pools-get/">Agent Pools Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_agent-pools-list/">Agent Pools List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_agent-pools-patch/">Agent Pools Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Transfer Jobs</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Create</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transfer-jobs_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transfer-jobs_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transfer-jobs_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transfer-jobs_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transfer-jobs_run/">Run</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Transfer Operations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../transfer-operations_cancel/">Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transfer-operations_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transfer-operations_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transfer-operations_pause/">Pause</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../transfer-operations_resume/">Resume</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">storagetransfer v5.0.4+20240224</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Create</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/storagetransfer1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Transfer Jobs &raquo;</li>
+      <li>Create</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/storagetransfer1-cli/edit/master/docs/transfer-jobs_create.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Creates a transfer job that runs periodically.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Creates a transfer job that runs periodically.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
@@ -209,6 +131,10 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   creation-time: string
   deletion-time: string
   description: string
+  event-stream:
+    event-stream-expiration-time: string
+    event-stream-start-time: string
+    name: string
   last-modification-time: string
   latest-operation-name: string
   logging-config:
@@ -243,27 +169,45 @@ In the latter case it is advised to set the field-cursor to the data-structure's
       seconds: integer
   status: string
   transfer-spec:
+    aws-s3-compatible-data-source:
+      bucket-name: string
+      endpoint: string
+      path: string
+      region: string
+      s3-metadata:
+        auth-method: string
+        list-api: string
+        protocol: string
+        request-model: string
     aws-s3-data-source:
       aws-access-key:
         access-key-id: string
         secret-access-key: string
       bucket-name: string
+      cloudfront-domain: string
+      credentials-secret: string
       path: string
       role-arn: string
     azure-blob-storage-data-source:
       azure-credentials:
         sas-token: string
       container: string
+      credentials-secret: string
       path: string
       storage-account: string
     gcs-data-sink:
       bucket-name: string
+      managed-folder-transfer-enabled: boolean
       path: string
     gcs-data-source:
       bucket-name: string
+      managed-folder-transfer-enabled: boolean
       path: string
     gcs-intermediate-data-location:
       bucket-name: string
+      managed-folder-transfer-enabled: boolean
+      path: string
+    hdfs-data-source:
       path: string
     http-data-source:
       list-url: string
@@ -296,9 +240,9 @@ In the latter case it is advised to set the field-cursor to the data-structure's
         time-created: string
         uid: string
       overwrite-objects-already-existing-in-sink: boolean
+      overwrite-when: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .    creation-time=amet.</code><ul>
@@ -313,98 +257,98 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>A description provided by the user for the job. Its max length is 1024 bytes when Unicode-encoded.</li>
 </ul>
 </li>
-<li><code>last-modification-time=duo</code><ul>
+<li><code>event-stream    event-stream-expiration-time=duo</code><ul>
+<li>Specifies the data and time at which Storage Transfer Service stops listening for events from this stream. After this time, any transfers in progress will complete, but no new transfers are initiated.</li>
+</ul>
+</li>
+<li><code>event-stream-start-time=ipsum</code><ul>
+<li>Specifies the date and time that Storage Transfer Service starts listening for events from this stream. If no start time is specified or start time is in the past, Storage Transfer Service starts listening immediately.</li>
+</ul>
+</li>
+<li>
+<p><code>name=gubergren</code></p>
+<ul>
+<li>Required. Specifies a unique name of the resource such as AWS SQS ARN in the form &#39;arn:aws:sqs:region:account_id:queue_name&#39;, or Pub/Sub subscription resource name in the form &#39;projects/{project}/subscriptions/{sub}&#39;.</li>
+</ul>
+</li>
+<li>
+<p><code>..    last-modification-time=lorem</code></p>
+<ul>
 <li>Output only. The time that the transfer job was last modified.</li>
 </ul>
 </li>
-<li><code>latest-operation-name=ipsum</code><ul>
+<li><code>latest-operation-name=gubergren</code><ul>
 <li>The name of the most recently started TransferOperation of this JobConfig. Present if a TransferOperation has been created for this JobConfig.</li>
 </ul>
 </li>
-<li><code>logging-config    enable-onprem-gcs-transfer-logs=true</code><ul>
+<li><code>logging-config    enable-onprem-gcs-transfer-logs=false</code><ul>
 <li>For transfers with a PosixFilesystem source, this option enables the Cloud Storage transfer logs for this transfer.</li>
 </ul>
 </li>
-<li><code>log-action-states=lorem</code><ul>
+<li><code>log-action-states=dolor</code><ul>
 <li>States in which <code>log_actions</code> are logged. If empty, no logs are generated. Not supported for transfers with PosixFilesystem data sources; use enable_onprem_gcs_transfer_logs instead.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>log-actions=gubergren</code></p>
+<p><code>log-actions=ea</code></p>
 <ul>
 <li>Specifies the actions to be logged. If empty, no logs are generated. Not supported for transfers with PosixFilesystem data sources; use enable_onprem_gcs_transfer_logs instead.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
 <li>
-<p><code>..    name=eos</code></p>
+<p><code>..    name=ipsum</code></p>
 <ul>
 <li>A unique name (within the transfer project) assigned when the job is created. If this field is empty in a CreateTransferJobRequest, Storage Transfer Service assigns a unique name. Otherwise, the specified name is used as the unique name for this job. If the specified name is in use by a job, the creation request fails with an ALREADY_EXISTS error. This name must start with <code>&amp;#34;transferJobs/&amp;#34;</code> prefix and end with a letter or a number, and should be no more than 128 characters. For transfers involving PosixFilesystem, this name must start with <code>transferJobs/OPI</code> specifically. For all other transfer types, this name must not start with <code>transferJobs/OPI</code>. Non-PosixFilesystem example: <code>&amp;#34;transferJobs/^(?!OPI)[A-Za-z0-9-._~]*[A-Za-z0-9]$&amp;#34;</code> PosixFilesystem example: <code>&amp;#34;transferJobs/OPI^[A-Za-z0-9-._~]*[A-Za-z0-9]$&amp;#34;</code> Applications must not rely on the enforcement of naming requirements involving OPI. Invalid job names fail with an INVALID_ARGUMENT error.</li>
 </ul>
 </li>
-<li><code>notification-config    event-types=dolor</code><ul>
+<li><code>notification-config    event-types=invidunt</code><ul>
 <li>Event types for which a notification is desired. If empty, send notifications for all event types.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>payload-format=ea</code><ul>
+<li><code>payload-format=amet</code><ul>
 <li>Required. The desired format of the notification message payloads.</li>
 </ul>
 </li>
 <li>
-<p><code>pubsub-topic=ipsum</code></p>
+<p><code>pubsub-topic=duo</code></p>
 <ul>
 <li>Required. The <code>Topic.name</code> of the Pub/Sub topic to which to publish notifications. Must be of the format: <code>projects/{project}/topics/{topic}</code>. Not matching this format results in an INVALID_ARGUMENT error.</li>
 </ul>
 </li>
 <li>
-<p><code>..    project-id=invidunt</code></p>
+<p><code>..    project-id=ipsum</code></p>
 <ul>
 <li>The ID of the Google Cloud project that owns the job.</li>
 </ul>
 </li>
-<li><code>schedule.end-time-of-day    hours=54</code><ul>
+<li><code>schedule.end-time-of-day    hours=8</code><ul>
 <li>Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value &#34;24:00:00&#34; for scenarios like business closing time.</li>
 </ul>
 </li>
-<li><code>minutes=81</code><ul>
+<li><code>minutes=64</code><ul>
 <li>Minutes of hour of day. Must be from 0 to 59.</li>
 </ul>
 </li>
-<li><code>nanos=51</code><ul>
+<li><code>nanos=89</code><ul>
 <li>Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.</li>
 </ul>
 </li>
 <li>
-<p><code>seconds=8</code></p>
+<p><code>seconds=85</code></p>
 <ul>
 <li>Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.</li>
 </ul>
 </li>
 <li>
-<p><code>..    repeat-interval=ut</code></p>
+<p><code>..    repeat-interval=est</code></p>
 <ul>
 <li>Interval between the start of each scheduled TransferOperation. If unspecified, the default value is 24 hours. This value may not be less than 1 hour.</li>
 </ul>
 </li>
-<li><code>schedule-end-date    day=89</code><ul>
-<li>Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn&#39;t significant.</li>
-</ul>
-</li>
-<li><code>month=85</code><ul>
-<li>Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.</li>
-</ul>
-</li>
-<li>
-<p><code>year=44</code></p>
-<ul>
-<li>Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.</li>
-</ul>
-</li>
-<li>
-<p><code>..schedule-start-date    day=51</code></p>
-<ul>
+<li><code>schedule-end-date    day=51</code><ul>
 <li>Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn&#39;t significant.</li>
 </ul>
 </li>
@@ -419,67 +363,105 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..start-time-of-day    hours=39</code></p>
+<p><code>..schedule-start-date    day=39</code></p>
+<ul>
+<li>Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn&#39;t significant.</li>
+</ul>
+</li>
+<li><code>month=84</code><ul>
+<li>Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.</li>
+</ul>
+</li>
+<li>
+<p><code>year=2</code></p>
+<ul>
+<li>Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.</li>
+</ul>
+</li>
+<li>
+<p><code>..start-time-of-day    hours=45</code></p>
 <ul>
 <li>Hours of day in 24 hour format. Should be from 0 to 23. An API may choose to allow the value &#34;24:00:00&#34; for scenarios like business closing time.</li>
 </ul>
 </li>
-<li><code>minutes=84</code><ul>
+<li><code>minutes=76</code><ul>
 <li>Minutes of hour of day. Must be from 0 to 59.</li>
 </ul>
 </li>
-<li><code>nanos=2</code><ul>
+<li><code>nanos=15</code><ul>
 <li>Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999.</li>
 </ul>
 </li>
 <li>
-<p><code>seconds=45</code></p>
+<p><code>seconds=58</code></p>
 <ul>
 <li>Seconds of minutes of the time. Must normally be from 0 to 59. An API may allow the value 60 if it allows leap-seconds.</li>
 </ul>
 </li>
 <li>
-<p><code>...    status=eos</code></p>
+<p><code>...    status=duo</code></p>
 <ul>
 <li>Status of the job. This value MUST be specified for <code>CreateTransferJobRequests</code>. <strong>Note:</strong> The effect of the new job status takes place during a subsequent job run. For example, if you change the job status from ENABLED to DISABLED, and an operation spawned by the transfer is running, the status change would not affect the current operation.</li>
 </ul>
 </li>
-<li><code>transfer-spec.aws-s3-data-source.aws-access-key    access-key-id=labore</code><ul>
+<li><code>transfer-spec.aws-s3-compatible-data-source    bucket-name=sed</code><ul>
+<li>Required. Specifies the name of the bucket.</li>
+</ul>
+</li>
+<li><code>endpoint=no</code><ul>
+<li>Required. Specifies the endpoint of the storage service.</li>
+</ul>
+</li>
+<li><code>path=stet</code><ul>
+<li>Specifies the root path to transfer objects. Must be an empty string or full path name that ends with a &#39;/&#39;. This field is treated as an object prefix. As such, it should generally not begin with a &#39;/&#39;.</li>
+</ul>
+</li>
+<li><code>region=kasd</code><ul>
+<li>Specifies the region to sign requests with. This can be left blank if requests should be signed with an empty region.</li>
+</ul>
+</li>
+<li><code>s3-metadata    auth-method=et</code><ul>
+<li>Specifies the authentication and authorization method used by the storage service. When not specified, Transfer Service will attempt to determine right auth method to use.</li>
+</ul>
+</li>
+<li><code>list-api=sed</code><ul>
+<li>The Listing API to use for discovering objects. When not specified, Transfer Service will attempt to determine the right API to use.</li>
+</ul>
+</li>
+<li><code>protocol=et</code><ul>
+<li>Specifies the network protocol of the agent. When not specified, the default value of NetworkProtocol NETWORK_PROTOCOL_HTTPS is used.</li>
+</ul>
+</li>
+<li>
+<p><code>request-model=et</code></p>
+<ul>
+<li>Specifies the API request model used to call the storage service. When not specified, the default value of RequestModel REQUEST_MODEL_VIRTUAL_HOSTED_STYLE is used.</li>
+</ul>
+</li>
+<li>
+<p><code>...aws-s3-data-source.aws-access-key    access-key-id=vero</code></p>
+<ul>
 <li>Required. AWS access key ID.</li>
 </ul>
 </li>
 <li>
-<p><code>secret-access-key=sed</code></p>
+<p><code>secret-access-key=erat</code></p>
 <ul>
 <li>Required. AWS secret access key. This field is not returned in RPC responses.</li>
 </ul>
 </li>
 <li>
-<p><code>..    bucket-name=duo</code></p>
+<p><code>..    bucket-name=sed</code></p>
 <ul>
 <li>Required. S3 Bucket name (see <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/create-bucket-get-location-example.html">Creating a bucket</a>).</li>
 </ul>
 </li>
-<li><code>path=sed</code><ul>
-<li>Root path to transfer objects. Must be an empty string or full path name that ends with a &#39;/&#39;. This field is treated as an object prefix. As such, it should generally not begin with a &#39;/&#39;.</li>
+<li><code>cloudfront-domain=duo</code><ul>
+<li>Optional. Cloudfront domain name pointing to this bucket (as origin), to use when fetching. Format: <code>https://{id}.cloudfront.net</code> or any valid custom domain <code>https://...</code></li>
 </ul>
 </li>
-<li>
-<p><code>role-arn=no</code></p>
-<ul>
-<li>The Amazon Resource Name (ARN) of the role to support temporary credentials via <code>AssumeRoleWithWebIdentity</code>. For more information about ARNs, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-arns">IAM ARNs</a>. When a role ARN is provided, Transfer Service fetches temporary credentials for the session using a <code>AssumeRoleWithWebIdentity</code> call for the provided role using the GoogleServiceAccount for this project.</li>
-</ul>
-</li>
-<li>
-<p><code>..azure-blob-storage-data-source.azure-credentials    sas-token=stet</code></p>
-<ul>
-<li>Required. Azure shared access signature (SAS). For more information about SAS, see <a href="https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview">Grant limited access to Azure Storage resources using shared access signatures (SAS)</a>.</li>
-</ul>
-</li>
-<li>
-<p><code>..    container=kasd</code></p>
-<ul>
-<li>Required. The container to transfer from the Azure Storage account.</li>
+<li><code>credentials-secret=dolore</code><ul>
+<li>Optional. The Resource name of a secret in Secret Manager. AWS credentials must be stored in Secret Manager in JSON format: { &#34;access_key_id&#34;: &#34;ACCESS_KEY_ID&#34;, &#34;secret_access_key&#34;: &#34;SECRET_ACCESS_KEY&#34; } GoogleServiceAccount must be granted <code>roles/secretmanager.secretAccessor</code> for the resource. See [Configure access to a source: Amazon S3] (https://cloud.google.com/storage-transfer/docs/source-amazon-s3#secret_manager) for more information. If <code>credentials_secret</code> is specified, do not specify role_arn or aws_access_key. This feature is in <a href="https://cloud.google.com/terms/service-terms#1">preview</a>. Format: <code>projects/{project_number}/secrets/{secret_name}</code></li>
 </ul>
 </li>
 <li><code>path=et</code><ul>
@@ -487,7 +469,33 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>storage-account=sed</code></p>
+<p><code>role-arn=voluptua.</code></p>
+<ul>
+<li>The Amazon Resource Name (ARN) of the role to support temporary credentials via <code>AssumeRoleWithWebIdentity</code>. For more information about ARNs, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_identifiers.html#identifiers-arns">IAM ARNs</a>. When a role ARN is provided, Transfer Service fetches temporary credentials for the session using a <code>AssumeRoleWithWebIdentity</code> call for the provided role using the GoogleServiceAccount for this project.</li>
+</ul>
+</li>
+<li>
+<p><code>..azure-blob-storage-data-source.azure-credentials    sas-token=amet.</code></p>
+<ul>
+<li>Required. Azure shared access signature (SAS). For more information about SAS, see <a href="https://docs.microsoft.com/en-us/azure/storage/common/storage-sas-overview">Grant limited access to Azure Storage resources using shared access signatures (SAS)</a>.</li>
+</ul>
+</li>
+<li>
+<p><code>..    container=consetetur</code></p>
+<ul>
+<li>Required. The container to transfer from the Azure Storage account.</li>
+</ul>
+</li>
+<li><code>credentials-secret=diam</code><ul>
+<li>Optional. The Resource name of a secret in Secret Manager. The Azure SAS token must be stored in Secret Manager in JSON format: { &#34;sas_token&#34; : &#34;SAS_TOKEN&#34; } GoogleServiceAccount must be granted <code>roles/secretmanager.secretAccessor</code> for the resource. See [Configure access to a source: Microsoft Azure Blob Storage] (https://cloud.google.com/storage-transfer/docs/source-microsoft-azure#secret_manager) for more information. If <code>credentials_secret</code> is specified, do not specify azure_credentials. This feature is in <a href="https://cloud.google.com/terms/service-terms#1">preview</a>. Format: <code>projects/{project_number}/secrets/{secret_name}</code></li>
+</ul>
+</li>
+<li><code>path=dolor</code><ul>
+<li>Root path to transfer objects. Must be an empty string or full path name that ends with a &#39;/&#39;. This field is treated as an object prefix. As such, it should generally not begin with a &#39;/&#39;.</li>
+</ul>
+</li>
+<li>
+<p><code>storage-account=et</code></p>
 <ul>
 <li>Required. The name of the Azure Storage account.</li>
 </ul>
@@ -495,77 +503,95 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..gcs-data-sink    bucket-name=et</code></p>
 <ul>
-<li>Required. Cloud Storage bucket name. Must meet <a href="..//storage/docs/naming#requirements">Bucket Name Requirements</a>.</li>
+<li>Required. Cloud Storage bucket name. Must meet <a href="/storage/docs/naming#requirements">Bucket Name Requirements</a>.</li>
+</ul>
+</li>
+<li><code>managed-folder-transfer-enabled=false</code><ul>
+<li>Transfer managed folders is in public preview. This option is only applicable to the Cloud Storage source bucket. If set to true: - The source managed folder will be transferred to the destination bucket - The destination managed folder will always be overwritten, other OVERWRITE options will not be supported</li>
 </ul>
 </li>
 <li>
-<p><code>path=et</code></p>
+<p><code>path=stet</code></p>
 <ul>
-<li>Root path to transfer objects. Must be an empty string or full path name that ends with a &#39;/&#39;. This field is treated as an object prefix. As such, it should generally not begin with a &#39;/&#39;. The root path value must meet <a href="..//storage/docs/naming#objectnames">Object Name Requirements</a>.</li>
+<li>Root path to transfer objects. Must be an empty string or full path name that ends with a &#39;/&#39;. This field is treated as an object prefix. As such, it should generally not begin with a &#39;/&#39;. The root path value must meet <a href="/storage/docs/naming#objectnames">Object Name Requirements</a>.</li>
 </ul>
 </li>
 <li>
-<p><code>..gcs-data-source    bucket-name=vero</code></p>
+<p><code>..gcs-data-source    bucket-name=dolor</code></p>
 <ul>
-<li>Required. Cloud Storage bucket name. Must meet <a href="..//storage/docs/naming#requirements">Bucket Name Requirements</a>.</li>
+<li>Required. Cloud Storage bucket name. Must meet <a href="/storage/docs/naming#requirements">Bucket Name Requirements</a>.</li>
+</ul>
+</li>
+<li><code>managed-folder-transfer-enabled=false</code><ul>
+<li>Transfer managed folders is in public preview. This option is only applicable to the Cloud Storage source bucket. If set to true: - The source managed folder will be transferred to the destination bucket - The destination managed folder will always be overwritten, other OVERWRITE options will not be supported</li>
 </ul>
 </li>
 <li>
-<p><code>path=erat</code></p>
+<p><code>path=vero</code></p>
 <ul>
-<li>Root path to transfer objects. Must be an empty string or full path name that ends with a &#39;/&#39;. This field is treated as an object prefix. As such, it should generally not begin with a &#39;/&#39;. The root path value must meet <a href="..//storage/docs/naming#objectnames">Object Name Requirements</a>.</li>
+<li>Root path to transfer objects. Must be an empty string or full path name that ends with a &#39;/&#39;. This field is treated as an object prefix. As such, it should generally not begin with a &#39;/&#39;. The root path value must meet <a href="/storage/docs/naming#objectnames">Object Name Requirements</a>.</li>
 </ul>
 </li>
 <li>
-<p><code>..gcs-intermediate-data-location    bucket-name=sed</code></p>
+<p><code>..gcs-intermediate-data-location    bucket-name=invidunt</code></p>
 <ul>
-<li>Required. Cloud Storage bucket name. Must meet <a href="..//storage/docs/naming#requirements">Bucket Name Requirements</a>.</li>
+<li>Required. Cloud Storage bucket name. Must meet <a href="/storage/docs/naming#requirements">Bucket Name Requirements</a>.</li>
+</ul>
+</li>
+<li><code>managed-folder-transfer-enabled=true</code><ul>
+<li>Transfer managed folders is in public preview. This option is only applicable to the Cloud Storage source bucket. If set to true: - The source managed folder will be transferred to the destination bucket - The destination managed folder will always be overwritten, other OVERWRITE options will not be supported</li>
 </ul>
 </li>
 <li>
-<p><code>path=duo</code></p>
+<p><code>path=vero</code></p>
 <ul>
-<li>Root path to transfer objects. Must be an empty string or full path name that ends with a &#39;/&#39;. This field is treated as an object prefix. As such, it should generally not begin with a &#39;/&#39;. The root path value must meet <a href="..//storage/docs/naming#objectnames">Object Name Requirements</a>.</li>
+<li>Root path to transfer objects. Must be an empty string or full path name that ends with a &#39;/&#39;. This field is treated as an object prefix. As such, it should generally not begin with a &#39;/&#39;. The root path value must meet <a href="/storage/docs/naming#objectnames">Object Name Requirements</a>.</li>
 </ul>
 </li>
 <li>
-<p><code>..http-data-source    list-url=dolore</code></p>
+<p><code>..hdfs-data-source    path=elitr</code></p>
+<ul>
+<li>Root path to transfer files.</li>
+</ul>
+</li>
+<li>
+<p><code>..http-data-source    list-url=lorem</code></p>
 <ul>
 <li>Required. The URL that points to the file that stores the object list entries. This file must allow public access. Currently, only URLs with HTTP and HTTPS schemes are supported.</li>
 </ul>
 </li>
 <li>
-<p><code>..object-conditions    exclude-prefixes=et</code></p>
+<p><code>..object-conditions    exclude-prefixes=diam</code></p>
 <ul>
-<li>If you specify <code>exclude_prefixes</code>, Storage Transfer Service uses the items in the <code>exclude_prefixes</code> array to determine which objects to exclude from a transfer. Objects must not start with one of the matching <code>exclude_prefixes</code> for inclusion in a transfer. The following are requirements of <code>exclude_prefixes</code>: * Each exclude-prefix can contain any sequence of Unicode characters, to a max length of 1024 bytes when UTF8-encoded, and must not contain Carriage Return or Line Feed characters. Wildcard matching and regular expression matching are not supported. * Each exclude-prefix must omit the leading slash. For example, to exclude the object <code>s3://my-aws-bucket/logs/y=2015/requests.gz</code>, specify the exclude-prefix as <code>logs/y=2015/requests.gz</code>. * None of the exclude-prefix values can be empty, if specified. * Each exclude-prefix must exclude a distinct portion of the object namespace. No exclude-prefix may be a prefix of another exclude-prefix. * If include_prefixes is specified, then each exclude-prefix must start with the value of a path explicitly included by <code>include_prefixes</code>. The max size of <code>exclude_prefixes</code> is 1000. For more information, see <a href="..//storage-transfer/docs/filtering-objects-from-transfers">Filtering objects from transfers</a>.</li>
+<li>If you specify <code>exclude_prefixes</code>, Storage Transfer Service uses the items in the <code>exclude_prefixes</code> array to determine which objects to exclude from a transfer. Objects must not start with one of the matching <code>exclude_prefixes</code> for inclusion in a transfer. The following are requirements of <code>exclude_prefixes</code>: * Each exclude-prefix can contain any sequence of Unicode characters, to a max length of 1024 bytes when UTF8-encoded, and must not contain Carriage Return or Line Feed characters. Wildcard matching and regular expression matching are not supported. * Each exclude-prefix must omit the leading slash. For example, to exclude the object <code>s3://my-aws-bucket/logs/y=2015/requests.gz</code>, specify the exclude-prefix as <code>logs/y=2015/requests.gz</code>. * None of the exclude-prefix values can be empty, if specified. * Each exclude-prefix must exclude a distinct portion of the object namespace. No exclude-prefix may be a prefix of another exclude-prefix. * If include_prefixes is specified, then each exclude-prefix must start with the value of a path explicitly included by <code>include_prefixes</code>. The max size of <code>exclude_prefixes</code> is 1000. For more information, see <a href="/storage-transfer/docs/filtering-objects-from-transfers">Filtering objects from transfers</a>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>include-prefixes=voluptua.</code><ul>
-<li>If you specify <code>include_prefixes</code>, Storage Transfer Service uses the items in the <code>include_prefixes</code> array to determine which objects to include in a transfer. Objects must start with one of the matching <code>include_prefixes</code> for inclusion in the transfer. If exclude_prefixes is specified, objects must not start with any of the <code>exclude_prefixes</code> specified for inclusion in the transfer. The following are requirements of <code>include_prefixes</code>: * Each include-prefix can contain any sequence of Unicode characters, to a max length of 1024 bytes when UTF8-encoded, and must not contain Carriage Return or Line Feed characters. Wildcard matching and regular expression matching are not supported. * Each include-prefix must omit the leading slash. For example, to include the object <code>s3://my-aws-bucket/logs/y=2015/requests.gz</code>, specify the include-prefix as <code>logs/y=2015/requests.gz</code>. * None of the include-prefix values can be empty, if specified. * Each include-prefix must include a distinct portion of the object namespace. No include-prefix may be a prefix of another include-prefix. The max size of <code>include_prefixes</code> is 1000. For more information, see <a href="..//storage-transfer/docs/filtering-objects-from-transfers">Filtering objects from transfers</a>.</li>
+<li><code>include-prefixes=no</code><ul>
+<li>If you specify <code>include_prefixes</code>, Storage Transfer Service uses the items in the <code>include_prefixes</code> array to determine which objects to include in a transfer. Objects must start with one of the matching <code>include_prefixes</code> for inclusion in the transfer. If exclude_prefixes is specified, objects must not start with any of the <code>exclude_prefixes</code> specified for inclusion in the transfer. The following are requirements of <code>include_prefixes</code>: * Each include-prefix can contain any sequence of Unicode characters, to a max length of 1024 bytes when UTF8-encoded, and must not contain Carriage Return or Line Feed characters. Wildcard matching and regular expression matching are not supported. * Each include-prefix must omit the leading slash. For example, to include the object <code>s3://my-aws-bucket/logs/y=2015/requests.gz</code>, specify the include-prefix as <code>logs/y=2015/requests.gz</code>. * None of the include-prefix values can be empty, if specified. * Each include-prefix must include a distinct portion of the object namespace. No include-prefix may be a prefix of another include-prefix. The max size of <code>include_prefixes</code> is 1000. For more information, see <a href="/storage-transfer/docs/filtering-objects-from-transfers">Filtering objects from transfers</a>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>last-modified-before=amet.</code><ul>
+<li><code>last-modified-before=ipsum</code><ul>
 <li>If specified, only objects with a &#34;last modification time&#34; before this timestamp and objects that don&#39;t have a &#34;last modification time&#34; are transferred.</li>
 </ul>
 </li>
-<li><code>last-modified-since=consetetur</code><ul>
+<li><code>last-modified-since=accusam</code><ul>
 <li>If specified, only objects with a &#34;last modification time&#34; on or after this timestamp and objects that don&#39;t have a &#34;last modification time&#34; are transferred. The <code>last_modified_since</code> and <code>last_modified_before</code> fields can be used together for chunked data processing. For example, consider a script that processes each day&#39;s worth of data at a time. For that you&#39;d set each of the fields as follows: * <code>last_modified_since</code> to the start of the day * <code>last_modified_before</code> to the end of the day</li>
 </ul>
 </li>
-<li><code>max-time-elapsed-since-last-modification=diam</code><ul>
+<li><code>max-time-elapsed-since-last-modification=takimata</code><ul>
 <li>Ensures that objects are not transferred if a specific maximum time has elapsed since the &#34;last modification time&#34;. When a TransferOperation begins, objects with a &#34;last modification time&#34; are transferred only if the elapsed time between the start_time of the <code>TransferOperation</code>and the &#34;last modification time&#34; of the object is less than the value of max_time_elapsed_since_last_modification`. Objects that do not have a &#34;last modification time&#34; are also transferred.</li>
 </ul>
 </li>
 <li>
-<p><code>min-time-elapsed-since-last-modification=dolor</code></p>
+<p><code>min-time-elapsed-since-last-modification=consetetur</code></p>
 <ul>
 <li>Ensures that objects are not transferred until a specific minimum time has elapsed after the &#34;last modification time&#34;. When a TransferOperation begins, objects with a &#34;last modification time&#34; are transferred only if the elapsed time between the start_time of the <code>TransferOperation</code> and the &#34;last modification time&#34; of the object is equal to or greater than the value of min_time_elapsed_since_last_modification`. Objects that do not have a &#34;last modification time&#34; are also transferred.</li>
 </ul>
 </li>
 <li>
-<p><code>..posix-data-sink    root-directory=et</code></p>
+<p><code>..posix-data-sink    root-directory=voluptua.</code></p>
 <ul>
 <li>Root directory path to the filesystem.</li>
 </ul>
@@ -577,23 +603,23 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    sink-agent-pool-name=sadipscing</code></p>
+<p><code>..    sink-agent-pool-name=erat</code></p>
 <ul>
 <li>Specifies the agent pool name associated with the posix data sink. When unspecified, the default name is used.</li>
 </ul>
 </li>
-<li><code>source-agent-pool-name=stet</code><ul>
+<li><code>source-agent-pool-name=consetetur</code><ul>
 <li>Specifies the agent pool name associated with the posix data source. When unspecified, the default name is used.</li>
 </ul>
 </li>
 <li>
-<p><code>transfer-manifest    location=dolor</code></p>
+<p><code>transfer-manifest    location=amet.</code></p>
 <ul>
 <li>Specifies the path to the manifest in Cloud Storage. The Google-managed service account for the transfer must have <code>storage.objects.get</code> permission for this object. An example path is <code>gs://bucket_name/path/manifest.csv</code>.</li>
 </ul>
 </li>
 <li>
-<p><code>..transfer-options    delete-objects-from-source-after-transfer=false</code></p>
+<p><code>..transfer-options    delete-objects-from-source-after-transfer=true</code></p>
 <ul>
 <li>Whether objects should be deleted from the source after they are transferred to the sink. <strong>Note:</strong> This option and delete_objects_unique_in_sink are mutually exclusive.</li>
 </ul>
@@ -602,48 +628,52 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Whether objects that exist only in the sink should be deleted. <strong>Note:</strong> This option and delete_objects_from_source_after_transfer are mutually exclusive.</li>
 </ul>
 </li>
-<li><code>metadata-options    acl=invidunt</code><ul>
+<li><code>metadata-options    acl=accusam</code><ul>
 <li>Specifies how each object&#39;s ACLs should be preserved for transfers between Google Cloud Storage buckets. If unspecified, the default behavior is the same as ACL_DESTINATION_BUCKET_DEFAULT.</li>
 </ul>
 </li>
-<li><code>gid=stet</code><ul>
-<li>Specifies how each file&#39;s POSIX group ID (GID) attribute should be handled by the transfer. By default, GID is not preserved.</li>
+<li><code>gid=voluptua.</code><ul>
+<li>Specifies how each file&#39;s POSIX group ID (GID) attribute should be handled by the transfer. By default, GID is not preserved. Only applicable to transfers involving POSIX file systems, and ignored for other transfers.</li>
 </ul>
 </li>
-<li><code>kms-key=vero</code><ul>
+<li><code>kms-key=dolore</code><ul>
 <li>Specifies how each object&#39;s Cloud KMS customer-managed encryption key (CMEK) is preserved for transfers between Google Cloud Storage buckets. If unspecified, the default behavior is the same as KMS_KEY_DESTINATION_BUCKET_DEFAULT.</li>
 </ul>
 </li>
-<li><code>mode=elitr</code><ul>
-<li>Specifies how each file&#39;s mode attribute should be handled by the transfer. By default, mode is not preserved.</li>
+<li><code>mode=dolore</code><ul>
+<li>Specifies how each file&#39;s mode attribute should be handled by the transfer. By default, mode is not preserved. Only applicable to transfers involving POSIX file systems, and ignored for other transfers.</li>
 </ul>
 </li>
-<li><code>storage-class=lorem</code><ul>
+<li><code>storage-class=dolore</code><ul>
 <li>Specifies the storage class to set on objects being transferred to Google Cloud Storage buckets. If unspecified, the default behavior is the same as STORAGE_CLASS_DESTINATION_BUCKET_DEFAULT.</li>
 </ul>
 </li>
-<li><code>symlink=diam</code><ul>
-<li>Specifies how symlinks should be handled by the transfer. By default, symlinks are not preserved.</li>
+<li><code>symlink=voluptua.</code><ul>
+<li>Specifies how symlinks should be handled by the transfer. By default, symlinks are not preserved. Only applicable to transfers involving POSIX file systems, and ignored for other transfers.</li>
 </ul>
 </li>
-<li><code>temporary-hold=no</code><ul>
+<li><code>temporary-hold=amet.</code><ul>
 <li>Specifies how each object&#39;s temporary hold status should be preserved for transfers between Google Cloud Storage buckets. If unspecified, the default behavior is the same as TEMPORARY_HOLD_PRESERVE.</li>
 </ul>
 </li>
-<li><code>time-created=ipsum</code><ul>
-<li>Specifies how each object&#39;s <code>timeCreated</code> metadata is preserved for transfers between Google Cloud Storage buckets. If unspecified, the default behavior is the same as TIME_CREATED_SKIP.</li>
+<li><code>time-created=ea</code><ul>
+<li>Specifies how each object&#39;s <code>timeCreated</code> metadata is preserved for transfers. If unspecified, the default behavior is the same as TIME_CREATED_SKIP.</li>
 </ul>
 </li>
 <li>
-<p><code>uid=accusam</code></p>
+<p><code>uid=sadipscing</code></p>
 <ul>
-<li>Specifies how each file&#39;s POSIX user ID (UID) attribute should be handled by the transfer. By default, UID is not preserved.</li>
+<li>Specifies how each file&#39;s POSIX user ID (UID) attribute should be handled by the transfer. By default, UID is not preserved. Only applicable to transfers involving POSIX file systems, and ignored for other transfers.</li>
 </ul>
 </li>
 <li>
 <p><code>..    overwrite-objects-already-existing-in-sink=true</code></p>
 <ul>
 <li>When to overwrite objects that already exist in the sink. The default is that only objects that are different from the source are ovewritten. If true, all objects in the sink whose name matches an object in the source are overwritten with the source object.</li>
+</ul>
+</li>
+<li><code>overwrite-when=no</code><ul>
+<li>When to overwrite objects that already exist in the sink. If not set, overwrite behavior is determined by overwrite_objects_already_existing_in_sink.</li>
 </ul>
 </li>
 </ul>
@@ -736,32 +766,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../transfer-jobs_get" class="btn btn-neutral float-right" title="Get"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../projects_agent-pools-patch" class="btn btn-neutral" title="Agent Pools Patch"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_agent-pools-patch/" class="btn btn-neutral float-left" title="Agent Pools Patch"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../transfer-jobs_delete/" class="btn btn-neutral float-right" title="Delete">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -769,14 +791,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../projects_agent-pools-patch" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../transfer-jobs_get" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/storagetransfer1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_agent-pools-patch/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../transfer-jobs_delete/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

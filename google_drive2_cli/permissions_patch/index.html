@@ -1,548 +1,268 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Patch - drive v3.0.0+20220225</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-drive2-cli/permissions_patch/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Patch - drive v5.0.4+20240227</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Patch";
+        var mkdocs_page_input_path = "permissions_patch.md";
+        var mkdocs_page_url = "/google-apis-rs/google-drive2-cli/permissions_patch/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> drive v3.0.0+20220225</a>
-        
+          <a href=".." class="icon icon-home"> drive v5.0.4+20240227
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>About</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../about_get">Get</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Apps</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../apps_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../apps_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Changes</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../changes_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../changes_get-start-page-token">Get Start Page Token</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../changes_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../changes_watch">Watch</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Channels</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channels_stop">Stop</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Children</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../children_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../children_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../children_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../children_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Comments</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Drives</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_hide">Hide</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_unhide">Unhide</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Files</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_copy">Copy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_empty-trash">Empty Trash</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_export">Export</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_generate-ids">Generate Ids</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_touch">Touch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_trash">Trash</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_untrash">Untrash</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_update">Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_watch">Watch</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Parents</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../parents_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../parents_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../parents_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../parents_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Permissions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_get-id-for-email">Get Id For Email</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Patch</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-arguments">Required Scalar Arguments</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Properties</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Replies</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Revisions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Teamdrives</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../teamdrives_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../teamdrives_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../teamdrives_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../teamdrives_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../teamdrives_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">About</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../about_get/">Get</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Apps</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../apps_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../apps_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Changes</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../changes_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../changes_get-start-page-token/">Get Start Page Token</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../changes_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../changes_watch/">Watch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Channels</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../channels_stop/">Stop</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Children</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../children_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../children_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../children_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../children_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Comments</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Drives</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_hide/">Hide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_unhide/">Unhide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Files</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_copy/">Copy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_empty-trash/">Empty Trash</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_export/">Export</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_generate-ids/">Generate Ids</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_list-labels/">List Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_modify-labels/">Modify Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_touch/">Touch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_trash/">Trash</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_untrash/">Untrash</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_update/">Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_watch/">Watch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Parents</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../parents_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../parents_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../parents_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../parents_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Permissions</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_get-id-for-email/">Get Id For Email</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_list/">List</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Patch</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Properties</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Replies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Revisions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Teamdrives</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../teamdrives_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../teamdrives_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../teamdrives_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../teamdrives_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../teamdrives_update/">Update</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">drive v5.0.4+20240227</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Patch</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/drive2-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Permissions &raquo;</li>
+      <li>Patch</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/drive2-cli/edit/master/docs/permissions_patch.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates a permission using patch semantics.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates a permission using patch semantics. <strong>Warning:</strong> Concurrent permissions operations on the same file are not supported; only the last update is applied.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -587,99 +307,78 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   with-link: boolean
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    additional-roles=eirmod</code><ul>
-<li>Additional roles for this user. Only commenter is currently allowed, though more may be supported in the future.</li>
+<li><code>-r .    additional-roles=sea</code><ul>
+<li>Additional roles for this user. Only <code>commenter</code> is currently allowed, though more may be supported in the future.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>auth-key=accusam</code><ul>
-<li>Deprecated.</li>
+<li><code>auth-key=aliquyam</code><ul>
+<li>Output only. Deprecated.</li>
 </ul>
 </li>
 <li><code>deleted=false</code><ul>
-<li>Whether the account associated with this permission has been deleted. This field only pertains to user and group permissions.</li>
+<li>Output only. Whether the account associated with this permission has been deleted. This field only pertains to user and group permissions.</li>
 </ul>
 </li>
-<li><code>domain=lorem</code><ul>
-<li>The domain name of the entity this permission refers to. This is an output-only field which is present when the permission type is user, group or domain.</li>
+<li><code>domain=magna</code><ul>
+<li>Output only. The domain name of the entity this permission refers to. This is an output-only field which is present when the permission type is <code>user</code>, <code>group</code> or <code>domain</code>.</li>
 </ul>
 </li>
-<li><code>email-address=et</code><ul>
-<li>The email address of the user or group this permission refers to. This is an output-only field which is present when the permission type is user or group.</li>
+<li><code>email-address=tempor</code><ul>
+<li>Output only. The email address of the user or group this permission refers to. This is an output-only field which is present when the permission type is <code>user</code> or <code>group</code>.</li>
 </ul>
 </li>
-<li><code>etag=tempor</code><ul>
-<li>The ETag of the permission.</li>
+<li><code>etag=dolor</code><ul>
+<li>Output only. The ETag of the permission.</li>
 </ul>
 </li>
-<li><code>expiration-date=lorem</code><ul>
-<li>The time at which this permission will expire (RFC 3339 date-time). Expiration dates have the following restrictions:  <ul>
-<li>They cannot be set on shared drive items </li>
-<li>They can only be set on user and group permissions </li>
-<li>The date must be in the future </li>
-<li>The date cannot be more than a year in the future </li>
-<li>The date can only be set on drive.permissions.update or drive.permissions.patch requests</li>
+<li><code>expiration-date=ea</code><ul>
+<li>The time at which this permission will expire (RFC 3339 date-time). Expiration dates have the following restrictions: - They can only be set on user and group permissions - The date must be in the future - The date cannot be more than a year in the future - The date can only be set on drive.permissions.update or drive.permissions.patch requests</li>
 </ul>
 </li>
+<li><code>id=eirmod</code><ul>
+<li>The ID of the user this permission refers to, and identical to the <code>permissionId</code> in the About and Files resources. When making a <code>drive.permissions.insert</code> request, exactly one of the <code>id</code> or <code>value</code> fields must be specified unless the permission type is <code>anyone</code>, in which case both <code>id</code> and <code>value</code> are ignored.</li>
 </ul>
 </li>
-<li><code>id=vero</code><ul>
-<li>The ID of the user this permission refers to, and identical to the permissionId in the About and Files resources. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type is anyone, in which case both id and value are ignored.</li>
+<li><code>kind=et</code><ul>
+<li>Output only. This is always <code>drive#permission</code>.</li>
 </ul>
 </li>
-<li><code>kind=at</code><ul>
-<li>This is always drive#permission.</li>
-</ul>
-</li>
-<li><code>name=duo</code><ul>
-<li>The name for this permission.</li>
+<li><code>name=erat</code><ul>
+<li>Output only. The name for this permission.</li>
 </ul>
 </li>
 <li><code>pending-owner=true</code><ul>
-<li>Whether the account associated with this permission is a pending owner. Only populated for user type permissions for files that are not in a shared drive.</li>
+<li>Whether the account associated with this permission is a pending owner. Only populated for <code>user</code> type permissions for files that are not in a shared drive.</li>
 </ul>
 </li>
-<li><code>photo-link=et</code><ul>
-<li>A link to the profile photo, if available.</li>
+<li><code>photo-link=amet</code><ul>
+<li>Output only. A link to the profile photo, if available.</li>
 </ul>
 </li>
-<li><code>role=lorem</code><ul>
-<li>The primary role for this user. While new values may be supported in the future, the following are currently allowed:  <ul>
-<li>owner </li>
-<li>organizer </li>
-<li>fileOrganizer </li>
-<li>writer </li>
-<li>reader</li>
+<li><code>role=vero</code><ul>
+<li>The primary role for this user. While new values may be supported in the future, the following are currently allowed: * <code>owner</code> * <code>organizer</code> * <code>fileOrganizer</code> * <code>writer</code> * <code>reader</code></li>
 </ul>
 </li>
+<li><code>self-link=duo</code><ul>
+<li>Output only. A link back to this permission.</li>
 </ul>
 </li>
-<li><code>self-link=justo</code><ul>
-<li>A link back to this permission.</li>
+<li><code>type=dolor</code><ul>
+<li>The account type. Allowed values are: * <code>user</code> * <code>group</code> * <code>domain</code> * <code>anyone</code></li>
 </ul>
 </li>
-<li><code>type=et</code><ul>
-<li>The account type. Allowed values are:  <ul>
-<li>user </li>
-<li>group </li>
-<li>domain </li>
-<li>anyone</li>
+<li><code>value=est</code><ul>
+<li>The email address or domain name for the entity. This is used during inserts and is not populated in responses. When making a <code>drive.permissions.insert</code> request, exactly one of the <code>id</code> or <code>value</code> fields must be specified unless the permission type is <code>anyone</code>, in which case both <code>id</code> and <code>value</code> are ignored.</li>
 </ul>
 </li>
+<li><code>view=et</code><ul>
+<li>Indicates the view for this permission. Only populated for permissions that belong to a view. <code>published</code> is the only supported value.</li>
 </ul>
 </li>
-<li><code>value=labore</code><ul>
-<li>The email address or domain name for the entity. This is used during inserts and is not populated in responses. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type is anyone, in which case both id and value are ignored.</li>
-</ul>
-</li>
-<li><code>view=ipsum</code><ul>
-<li>Indicates the view for this permission. Only populated for permissions that belong to a view. published is the only supported value.</li>
-</ul>
-</li>
-<li><code>with-link=false</code><ul>
+<li><code>with-link=true</code><ul>
 <li>Whether the link is required for this permission.</li>
 </ul>
 </li>
@@ -723,13 +422,13 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p supports-team-drives=boolean</strong></p>
 <ul>
-<li>Deprecated use supportsAllDrives instead.</li>
+<li>Deprecated: Use <code>supportsAllDrives</code> instead.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p transfer-ownership=boolean</strong></p>
 <ul>
-<li>Whether changing a role to &#39;owner&#39; downgrades the current owners to writers. Does nothing if the specified role is not &#39;owner&#39;.</li>
+<li>Whether changing a role to <code>owner</code> downgrades the current owners to writers. Does nothing if the specified role is not <code>owner</code>.</li>
 </ul>
 </li>
 <li>
@@ -743,9 +442,27 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <p>The following properties can configure any call, and are not specific to this method.</p>
 <ul>
 <li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
 <p><strong>-p alt=string</strong></p>
 <ul>
-<li>Data format for the response.</li>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
 </ul>
 </li>
 <li>
@@ -775,42 +492,40 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p quota-user=string</strong></p>
 <ul>
-<li>An opaque string that represents a user for quota purposes. Must not exceed 40 characters.</li>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
 </ul>
 </li>
 <li>
-<p><strong>-p user-ip=string</strong></p>
+<p><strong>-p upload-type=string</strong></p>
 <ul>
-<li>Deprecated. Please use quotaUser instead.</li>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../permissions_update" class="btn btn-neutral float-right" title="Update"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../permissions_list" class="btn btn-neutral" title="List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../permissions_list/" class="btn btn-neutral float-left" title="List"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../permissions_update/" class="btn btn-neutral float-right" title="Update">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -818,14 +533,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../permissions_list" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../permissions_update" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/drive2-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../permissions_list/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../permissions_update/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

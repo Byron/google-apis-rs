@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-retail2-cli/projects_locations-catalogs-controls-delete/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Locations Catalogs Controls Delete - Cloud Retail v5.0.4+20240222</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Locations Catalogs Controls Delete";
+        var mkdocs_page_input_path = "projects_locations-catalogs-controls-delete.md";
+        var mkdocs_page_url = "/google-apis-rs/google-retail2-cli/projects_locations-catalogs-controls-delete/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> Cloud Retail v5.0.4+20240222
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-attributes-config-add-catalog-attribute/">Locations Catalogs Attributes Config Add Catalog Attribute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-attributes-config-remove-catalog-attribute/">Locations Catalogs Attributes Config Remove Catalog Attribute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-attributes-config-replace-catalog-attribute/">Locations Catalogs Attributes Config Replace Catalog Attribute</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-operations-get/">Locations Catalogs Branches Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-add-fulfillment-places/">Locations Catalogs Branches Products Add Fulfillment Places</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-add-local-inventories/">Locations Catalogs Branches Products Add Local Inventories</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-create/">Locations Catalogs Branches Products Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-delete/">Locations Catalogs Branches Products Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-get/">Locations Catalogs Branches Products Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-import/">Locations Catalogs Branches Products Import</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-list/">Locations Catalogs Branches Products List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-patch/">Locations Catalogs Branches Products Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-purge/">Locations Catalogs Branches Products Purge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-remove-fulfillment-places/">Locations Catalogs Branches Products Remove Fulfillment Places</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-remove-local-inventories/">Locations Catalogs Branches Products Remove Local Inventories</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-branches-products-set-inventory/">Locations Catalogs Branches Products Set Inventory</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-complete-query/">Locations Catalogs Complete Query</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-completion-data-import/">Locations Catalogs Completion Data Import</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-controls-create/">Locations Catalogs Controls Create</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Locations Catalogs Controls Delete</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-controls-get/">Locations Catalogs Controls Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-controls-list/">Locations Catalogs Controls List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-controls-patch/">Locations Catalogs Controls Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-export-analytics-metrics/">Locations Catalogs Export Analytics Metrics</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-get-attributes-config/">Locations Catalogs Get Attributes Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-get-completion-config/">Locations Catalogs Get Completion Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-get-default-branch/">Locations Catalogs Get Default Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-list/">Locations Catalogs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-create/">Locations Catalogs Models Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-delete/">Locations Catalogs Models Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-get/">Locations Catalogs Models Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-list/">Locations Catalogs Models List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-patch/">Locations Catalogs Models Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-pause/">Locations Catalogs Models Pause</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-resume/">Locations Catalogs Models Resume</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-models-tune/">Locations Catalogs Models Tune</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-operations-get/">Locations Catalogs Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-operations-list/">Locations Catalogs Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-patch/">Locations Catalogs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-placements-predict/">Locations Catalogs Placements Predict</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-placements-search/">Locations Catalogs Placements Search</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-add-control/">Locations Catalogs Serving Configs Add Control</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-create/">Locations Catalogs Serving Configs Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-delete/">Locations Catalogs Serving Configs Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-get/">Locations Catalogs Serving Configs Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-list/">Locations Catalogs Serving Configs List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-patch/">Locations Catalogs Serving Configs Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-predict/">Locations Catalogs Serving Configs Predict</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-remove-control/">Locations Catalogs Serving Configs Remove Control</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-serving-configs-search/">Locations Catalogs Serving Configs Search</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-set-default-branch/">Locations Catalogs Set Default Branch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-update-attributes-config/">Locations Catalogs Update Attributes Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-update-completion-config/">Locations Catalogs Update Completion Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-user-events-collect/">Locations Catalogs User Events Collect</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-user-events-import/">Locations Catalogs User Events Import</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-user-events-purge/">Locations Catalogs User Events Purge</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-user-events-rejoin/">Locations Catalogs User Events Rejoin</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-catalogs-user-events-write/">Locations Catalogs User Events Write</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-get/">Locations Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_locations-operations-list/">Locations Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_operations-get/">Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_operations-list/">Operations List</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Cloud Retail v5.0.4+20240222</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Projects &raquo;</li>
+      <li>Locations Catalogs Controls Delete</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/retail2-cli/edit/master/docs/projects_locations-catalogs-controls-delete.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Deletes a Control. If the Control to delete does not exist, a NOT_FOUND error is returned.</p>
+<h1 id="scopes">Scopes</h1>
+<p>You will need authorization for the <em>https://www.googleapis.com/auth/cloud-platform</em> scope to make a valid call.</p>
+<p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/cloud-platform</em>.
+You can set the scope for this method like this: <code>retail2 --scope &lt;scope&gt; projects locations-catalogs-controls-delete ...</code></p>
+<h1 id="required-scalar-argument">Required Scalar Argument</h1>
+<ul>
+<li><strong>&lt;name&gt;</strong> <em>(string)</em><ul>
+<li>Required. The resource name of the Control to delete. Format: <code>projects/{project_number}/locations/{location_id}/catalogs/{catalog_id}/controls/{control_id}</code></li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-output-flags">Optional Output Flags</h1>
+<p>The method's return value a JSON encoded structure, which will be written to standard output by default.</p>
+<ul>
+<li><strong>-o out</strong><ul>
+<li><em>out</em> specifies the <em>destination</em> to which to write the server's result to.
+  It will be a JSON-encoded structure.
+  The <em>destination</em> may be <code>-</code> to indicate standard output, or a filepath that is to contain the received bytes.
+  If unset, it defaults to standard output.</li>
+</ul>
+</li>
+</ul>
+<h1 id="optional-general-properties">Optional General Properties</h1>
+<p>The following properties can configure any call, and are not specific to this method.</p>
+<ul>
+<li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p alt=string</strong></p>
+<ul>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
+</ul>
+</li>
+<li>
+<p><strong>-p fields=string</strong></p>
+<ul>
+<li>Selector specifying which fields to include in a partial response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p key=string</strong></p>
+<ul>
+<li>API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p oauth-token=string</strong></p>
+<ul>
+<li>OAuth 2.0 token for the current user.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p pretty-print=boolean</strong></p>
+<ul>
+<li>Returns response with indentations and line breaks.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p quota-user=string</strong></p>
+<ul>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-type=string</strong></p>
+<ul>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../projects_locations-catalogs-controls-create/" class="btn btn-neutral float-left" title="Locations Catalogs Controls Create"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects_locations-catalogs-controls-get/" class="btn btn-neutral float-right" title="Locations Catalogs Controls Get">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/retail2-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../projects_locations-catalogs-controls-create/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects_locations-catalogs-controls-get/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

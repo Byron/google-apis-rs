@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-firebasehosting1-cli/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-firebasehosting1-cli/operations_cancel/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-firebasehosting1-cli/operations_delete/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-firebasehosting1-cli/operations_list/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-firebasehosting1-cli/projects_sites-custom-domains-operations-cancel/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>http://byron.github.io/google-apis-rs/google-firebasehosting1-cli/projects_sites-custom-domains-operations-delete/</loc>
+         <lastmod>2024-03-05</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+</urlset>

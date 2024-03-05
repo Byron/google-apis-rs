@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="/google-apis-rs/google-compute1-cli/img/favicon.ico" />
+    <title>compute v5.0.4+20240218</title>
+    <link rel="stylesheet" href="/google-apis-rs/google-compute1-cli/css/theme.css" />
+    <link rel="stylesheet" href="/google-apis-rs/google-compute1-cli/css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+    <script src="/google-apis-rs/google-compute1-cli/js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="/google-apis-rs/google-compute1-cli/js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="/google-apis-rs/google-compute1-cli/." class="icon icon-home"> compute v5.0.4+20240218
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="/google-apis-rs/google-compute1-cli//search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/.">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Accelerator Types</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/accelerator-types_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/accelerator-types_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/accelerator-types_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Addresses</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/addresses_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/addresses_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/addresses_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/addresses_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/addresses_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/addresses_move/">Move</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/addresses_set-labels/">Set Labels</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Autoscalers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/autoscalers_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/autoscalers_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/autoscalers_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/autoscalers_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/autoscalers_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/autoscalers_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/autoscalers_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Backend Buckets</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-buckets_add-signed-url-key/">Add Signed Url Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-buckets_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-buckets_delete-signed-url-key/">Delete Signed Url Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-buckets_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-buckets_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-buckets_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-buckets_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-buckets_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-buckets_set-edge-security-policy/">Set Edge Security Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-buckets_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-buckets_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-buckets_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Backend Services</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_add-signed-url-key/">Add Signed Url Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_delete-signed-url-key/">Delete Signed Url Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_get-health/">Get Health</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_list-usable/">List Usable</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_set-edge-security-policy/">Set Edge Security Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_set-security-policy/">Set Security Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/backend-services_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Disk Types</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disk-types_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disk-types_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disk-types_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Disks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_add-resource-policies/">Add Resource Policies</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_bulk-insert/">Bulk Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_create-snapshot/">Create Snapshot</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_remove-resource-policies/">Remove Resource Policies</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_resize/">Resize</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_set-labels/">Set Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_start-async-replication/">Start Async Replication</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_stop-async-replication/">Stop Async Replication</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_stop-group-async-replication/">Stop Group Async Replication</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/disks_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">External Vpn Gateways</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/external-vpn-gateways_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/external-vpn-gateways_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/external-vpn-gateways_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/external-vpn-gateways_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/external-vpn-gateways_set-labels/">Set Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/external-vpn-gateways_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Firewall Policies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_add-association/">Add Association</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_add-rule/">Add Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_clone-rules/">Clone Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_get-association/">Get Association</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_get-rule/">Get Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_list-associations/">List Associations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_move/">Move</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_patch-rule/">Patch Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_remove-association/">Remove Association</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_remove-rule/">Remove Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewall-policies_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Firewalls</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewalls_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewalls_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewalls_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewalls_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewalls_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/firewalls_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Forwarding Rules</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/forwarding-rules_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/forwarding-rules_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/forwarding-rules_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/forwarding-rules_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/forwarding-rules_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/forwarding-rules_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/forwarding-rules_set-labels/">Set Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/forwarding-rules_set-target/">Set Target</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Global Addresses</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-addresses_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-addresses_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-addresses_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-addresses_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-addresses_move/">Move</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-addresses_set-labels/">Set Labels</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Global Forwarding Rules</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-forwarding-rules_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-forwarding-rules_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-forwarding-rules_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-forwarding-rules_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-forwarding-rules_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-forwarding-rules_set-labels/">Set Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-forwarding-rules_set-target/">Set Target</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Global Network Endpoint Groups</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-network-endpoint-groups_attach-network-endpoints/">Attach Network Endpoints</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-network-endpoint-groups_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-network-endpoint-groups_detach-network-endpoints/">Detach Network Endpoints</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-network-endpoint-groups_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-network-endpoint-groups_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-network-endpoint-groups_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-network-endpoint-groups_list-network-endpoints/">List Network Endpoints</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Global Operations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-operations_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-operations_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-operations_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-operations_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-operations_wait/">Wait</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Global Organization Operations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-organization-operations_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-organization-operations_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-organization-operations_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Global Public Delegated Prefixes</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-public-delegated-prefixes_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-public-delegated-prefixes_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-public-delegated-prefixes_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-public-delegated-prefixes_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/global-public-delegated-prefixes_patch/">Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Health Checks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/health-checks_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/health-checks_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/health-checks_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/health-checks_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/health-checks_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/health-checks_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/health-checks_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Http Health Checks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/http-health-checks_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/http-health-checks_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/http-health-checks_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/http-health-checks_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/http-health-checks_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/http-health-checks_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Https Health Checks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/https-health-checks_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/https-health-checks_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/https-health-checks_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/https-health-checks_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/https-health-checks_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/https-health-checks_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Image Family Views</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/image-family-views_get/">Get</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Images</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/images_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/images_deprecate/">Deprecate</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/images_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/images_get-from-family/">Get From Family</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/images_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/images_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/images_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/images_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/images_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/images_set-labels/">Set Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/images_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Instance Group Managers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_abandon-instances/">Abandon Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_apply-updates-to-instances/">Apply Updates To Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_create-instances/">Create Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_delete-instances/">Delete Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_delete-per-instance-configs/">Delete Per Instance Configs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_list-errors/">List Errors</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_list-managed-instances/">List Managed Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_list-per-instance-configs/">List Per Instance Configs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_patch-per-instance-configs/">Patch Per Instance Configs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_recreate-instances/">Recreate Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_resize/">Resize</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_set-instance-template/">Set Instance Template</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_set-target-pools/">Set Target Pools</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-group-managers_update-per-instance-configs/">Update Per Instance Configs</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Instance Groups</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-groups_add-instances/">Add Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-groups_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-groups_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-groups_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-groups_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-groups_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-groups_list-instances/">List Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-groups_remove-instances/">Remove Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-groups_set-named-ports/">Set Named Ports</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Instance Templates</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-templates_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-templates_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-templates_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-templates_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-templates_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-templates_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-templates_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instance-templates_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Instances</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_add-access-config/">Add Access Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_add-resource-policies/">Add Resource Policies</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_attach-disk/">Attach Disk</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_bulk-insert/">Bulk Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_delete-access-config/">Delete Access Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_detach-disk/">Detach Disk</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_get-effective-firewalls/">Get Effective Firewalls</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_get-guest-attributes/">Get Guest Attributes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_get-screenshot/">Get Screenshot</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_get-serial-port-output/">Get Serial Port Output</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_get-shielded-instance-identity/">Get Shielded Instance Identity</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_list-referrers/">List Referrers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_perform-maintenance/">Perform Maintenance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_remove-resource-policies/">Remove Resource Policies</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_reset/">Reset</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_resume/">Resume</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_send-diagnostic-interrupt/">Send Diagnostic Interrupt</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_set-deletion-protection/">Set Deletion Protection</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_set-disk-auto-delete/">Set Disk Auto Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_set-labels/">Set Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_set-machine-resources/">Set Machine Resources</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_set-machine-type/">Set Machine Type</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_set-metadata/">Set Metadata</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_set-min-cpu-platform/">Set Min Cpu Platform</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_set-name/">Set Name</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_set-scheduling/">Set Scheduling</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_set-security-policy/">Set Security Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_set-service-account/">Set Service Account</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_set-shielded-instance-integrity-policy/">Set Shielded Instance Integrity Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_set-tags/">Set Tags</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_simulate-maintenance-event/">Simulate Maintenance Event</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_start/">Start</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_start-with-encryption-key/">Start With Encryption Key</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_stop/">Stop</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_suspend/">Suspend</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_update/">Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_update-access-config/">Update Access Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_update-display-device/">Update Display Device</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_update-network-interface/">Update Network Interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instances_update-shielded-instance-config/">Update Shielded Instance Config</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Instant Snapshots</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instant-snapshots_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instant-snapshots_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instant-snapshots_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instant-snapshots_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instant-snapshots_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instant-snapshots_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instant-snapshots_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instant-snapshots_set-labels/">Set Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/instant-snapshots_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Interconnect Attachments</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnect-attachments_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnect-attachments_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnect-attachments_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnect-attachments_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnect-attachments_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnect-attachments_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnect-attachments_set-labels/">Set Labels</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Interconnect Locations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnect-locations_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnect-locations_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Interconnect Remote Locations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnect-remote-locations_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnect-remote-locations_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Interconnects</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnects_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnects_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnects_get-diagnostics/">Get Diagnostics</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnects_get-macsec-config/">Get Macsec Config</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnects_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnects_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnects_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/interconnects_set-labels/">Set Labels</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">License Codes</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/license-codes_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/license-codes_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Licenses</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/licenses_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/licenses_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/licenses_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/licenses_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/licenses_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/licenses_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/licenses_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Machine Images</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/machine-images_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/machine-images_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/machine-images_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/machine-images_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/machine-images_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/machine-images_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/machine-images_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Machine Types</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/machine-types_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/machine-types_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/machine-types_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Network Attachments</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-attachments_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-attachments_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-attachments_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-attachments_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-attachments_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-attachments_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-attachments_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-attachments_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-attachments_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Network Edge Security Services</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-edge-security-services_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-edge-security-services_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-edge-security-services_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-edge-security-services_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-edge-security-services_patch/">Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Network Endpoint Groups</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-endpoint-groups_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-endpoint-groups_attach-network-endpoints/">Attach Network Endpoints</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-endpoint-groups_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-endpoint-groups_detach-network-endpoints/">Detach Network Endpoints</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-endpoint-groups_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-endpoint-groups_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-endpoint-groups_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-endpoint-groups_list-network-endpoints/">List Network Endpoints</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-endpoint-groups_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Network Firewall Policies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_add-association/">Add Association</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_add-rule/">Add Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_clone-rules/">Clone Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_get-association/">Get Association</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_get-rule/">Get Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_patch-rule/">Patch Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_remove-association/">Remove Association</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_remove-rule/">Remove Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/network-firewall-policies_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Networks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/networks_add-peering/">Add Peering</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/networks_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/networks_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/networks_get-effective-firewalls/">Get Effective Firewalls</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/networks_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/networks_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/networks_list-peering-routes/">List Peering Routes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/networks_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/networks_remove-peering/">Remove Peering</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/networks_switch-to-custom-mode/">Switch To Custom Mode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/networks_update-peering/">Update Peering</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Node Groups</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-groups_add-nodes/">Add Nodes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-groups_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-groups_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-groups_delete-nodes/">Delete Nodes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-groups_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-groups_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-groups_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-groups_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-groups_list-nodes/">List Nodes</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-groups_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-groups_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-groups_set-node-template/">Set Node Template</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-groups_simulate-maintenance-event/">Simulate Maintenance Event</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-groups_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Node Templates</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-templates_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-templates_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-templates_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-templates_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-templates_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-templates_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-templates_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-templates_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Node Types</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-types_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-types_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/node-types_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Packet Mirrorings</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/packet-mirrorings_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/packet-mirrorings_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/packet-mirrorings_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/packet-mirrorings_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/packet-mirrorings_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/packet-mirrorings_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/packet-mirrorings_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/projects_disable-xpn-host/">Disable Xpn Host</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/projects_disable-xpn-resource/">Disable Xpn Resource</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/projects_enable-xpn-host/">Enable Xpn Host</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/projects_enable-xpn-resource/">Enable Xpn Resource</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/projects_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/projects_get-xpn-host/">Get Xpn Host</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/projects_get-xpn-resources/">Get Xpn Resources</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/projects_list-xpn-hosts/">List Xpn Hosts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/projects_move-disk/">Move Disk</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/projects_move-instance/">Move Instance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/projects_set-cloud-armor-tier/">Set Cloud Armor Tier</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/projects_set-common-instance-metadata/">Set Common Instance Metadata</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/projects_set-default-network-tier/">Set Default Network Tier</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/projects_set-usage-export-bucket/">Set Usage Export Bucket</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Public Advertised Prefixes</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/public-advertised-prefixes_announce/">Announce</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/public-advertised-prefixes_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/public-advertised-prefixes_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/public-advertised-prefixes_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/public-advertised-prefixes_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/public-advertised-prefixes_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/public-advertised-prefixes_withdraw/">Withdraw</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Public Delegated Prefixes</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/public-delegated-prefixes_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/public-delegated-prefixes_announce/">Announce</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/public-delegated-prefixes_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/public-delegated-prefixes_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/public-delegated-prefixes_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/public-delegated-prefixes_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/public-delegated-prefixes_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/public-delegated-prefixes_withdraw/">Withdraw</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Autoscalers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-autoscalers_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-autoscalers_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-autoscalers_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-autoscalers_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-autoscalers_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-autoscalers_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Backend Services</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-backend-services_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-backend-services_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-backend-services_get-health/">Get Health</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-backend-services_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-backend-services_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-backend-services_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-backend-services_list-usable/">List Usable</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-backend-services_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-backend-services_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-backend-services_set-security-policy/">Set Security Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-backend-services_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-backend-services_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Commitments</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-commitments_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-commitments_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-commitments_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-commitments_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-commitments_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Disk Types</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disk-types_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disk-types_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Disks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_add-resource-policies/">Add Resource Policies</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_bulk-insert/">Bulk Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_create-snapshot/">Create Snapshot</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_remove-resource-policies/">Remove Resource Policies</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_resize/">Resize</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_set-labels/">Set Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_start-async-replication/">Start Async Replication</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_stop-async-replication/">Stop Async Replication</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_stop-group-async-replication/">Stop Group Async Replication</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-disks_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Health Check Services</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-health-check-services_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-health-check-services_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-health-check-services_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-health-check-services_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-health-check-services_patch/">Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Health Checks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-health-checks_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-health-checks_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-health-checks_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-health-checks_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-health-checks_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-health-checks_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Instance Group Managers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_abandon-instances/">Abandon Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_apply-updates-to-instances/">Apply Updates To Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_create-instances/">Create Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_delete-instances/">Delete Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_delete-per-instance-configs/">Delete Per Instance Configs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_list-errors/">List Errors</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_list-managed-instances/">List Managed Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_list-per-instance-configs/">List Per Instance Configs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_patch-per-instance-configs/">Patch Per Instance Configs</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_recreate-instances/">Recreate Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_resize/">Resize</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_set-instance-template/">Set Instance Template</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_set-target-pools/">Set Target Pools</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-group-managers_update-per-instance-configs/">Update Per Instance Configs</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Instance Groups</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-groups_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-groups_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-groups_list-instances/">List Instances</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-groups_set-named-ports/">Set Named Ports</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Instance Templates</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-templates_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-templates_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-templates_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instance-templates_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Instances</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instances_bulk-insert/">Bulk Insert</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Instant Snapshots</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instant-snapshots_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instant-snapshots_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instant-snapshots_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instant-snapshots_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instant-snapshots_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instant-snapshots_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instant-snapshots_set-labels/">Set Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-instant-snapshots_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Network Endpoint Groups</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-endpoint-groups_attach-network-endpoints/">Attach Network Endpoints</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-endpoint-groups_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-endpoint-groups_detach-network-endpoints/">Detach Network Endpoints</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-endpoint-groups_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-endpoint-groups_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-endpoint-groups_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-endpoint-groups_list-network-endpoints/">List Network Endpoints</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Network Firewall Policies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_add-association/">Add Association</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_add-rule/">Add Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_clone-rules/">Clone Rules</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_get-association/">Get Association</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_get-effective-firewalls/">Get Effective Firewalls</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_get-rule/">Get Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_patch-rule/">Patch Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_remove-association/">Remove Association</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_remove-rule/">Remove Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-network-firewall-policies_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Notification Endpoints</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-notification-endpoints_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-notification-endpoints_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-notification-endpoints_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-notification-endpoints_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Operations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-operations_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-operations_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-operations_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-operations_wait/">Wait</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Security Policies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-security-policies_add-rule/">Add Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-security-policies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-security-policies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-security-policies_get-rule/">Get Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-security-policies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-security-policies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-security-policies_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-security-policies_patch-rule/">Patch Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-security-policies_remove-rule/">Remove Rule</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Ssl Certificates</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-ssl-certificates_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-ssl-certificates_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-ssl-certificates_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-ssl-certificates_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Ssl Policies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-ssl-policies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-ssl-policies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-ssl-policies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-ssl-policies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-ssl-policies_list-available-features/">List Available Features</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-ssl-policies_patch/">Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Target Http Proxies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-http-proxies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-http-proxies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-http-proxies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-http-proxies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-http-proxies_set-url-map/">Set Url Map</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Target Https Proxies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-https-proxies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-https-proxies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-https-proxies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-https-proxies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-https-proxies_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-https-proxies_set-ssl-certificates/">Set Ssl Certificates</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-https-proxies_set-url-map/">Set Url Map</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Target Tcp Proxies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-tcp-proxies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-tcp-proxies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-tcp-proxies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-target-tcp-proxies_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Url Maps</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-url-maps_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-url-maps_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-url-maps_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-url-maps_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-url-maps_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-url-maps_update/">Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-url-maps_validate/">Validate</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Region Zones</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/region-zones_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Regions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/regions_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/regions_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reservations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/reservations_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/reservations_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/reservations_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/reservations_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/reservations_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/reservations_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/reservations_resize/">Resize</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/reservations_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/reservations_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/reservations_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Resource Policies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/resource-policies_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/resource-policies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/resource-policies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/resource-policies_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/resource-policies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/resource-policies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/resource-policies_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/resource-policies_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/resource-policies_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Routers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/routers_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/routers_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/routers_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/routers_get-nat-ip-info/">Get Nat Ip Info</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/routers_get-nat-mapping-info/">Get Nat Mapping Info</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/routers_get-router-status/">Get Router Status</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/routers_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/routers_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/routers_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/routers_preview/">Preview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/routers_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Routes</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/routes_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/routes_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/routes_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/routes_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Security Policies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/security-policies_add-rule/">Add Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/security-policies_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/security-policies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/security-policies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/security-policies_get-rule/">Get Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/security-policies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/security-policies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/security-policies_list-preconfigured-expression-sets/">List Preconfigured Expression Sets</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/security-policies_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/security-policies_patch-rule/">Patch Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/security-policies_remove-rule/">Remove Rule</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/security-policies_set-labels/">Set Labels</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Service Attachments</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/service-attachments_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/service-attachments_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/service-attachments_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/service-attachments_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/service-attachments_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/service-attachments_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/service-attachments_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/service-attachments_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/service-attachments_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Snapshot Settings</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/snapshot-settings_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/snapshot-settings_patch/">Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Snapshots</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/snapshots_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/snapshots_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/snapshots_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/snapshots_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/snapshots_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/snapshots_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/snapshots_set-labels/">Set Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/snapshots_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Ssl Certificates</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/ssl-certificates_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/ssl-certificates_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/ssl-certificates_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/ssl-certificates_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/ssl-certificates_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Ssl Policies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/ssl-policies_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/ssl-policies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/ssl-policies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/ssl-policies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/ssl-policies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/ssl-policies_list-available-features/">List Available Features</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/ssl-policies_patch/">Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Subnetworks</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/subnetworks_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/subnetworks_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/subnetworks_expand-ip-cidr-range/">Expand Ip Cidr Range</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/subnetworks_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/subnetworks_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/subnetworks_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/subnetworks_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/subnetworks_list-usable/">List Usable</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/subnetworks_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/subnetworks_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/subnetworks_set-private-ip-google-access/">Set Private Ip Google Access</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/subnetworks_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Target Grpc Proxies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-grpc-proxies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-grpc-proxies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-grpc-proxies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-grpc-proxies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-grpc-proxies_patch/">Patch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Target Http Proxies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-http-proxies_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-http-proxies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-http-proxies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-http-proxies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-http-proxies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-http-proxies_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-http-proxies_set-url-map/">Set Url Map</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Target Https Proxies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-https-proxies_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-https-proxies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-https-proxies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-https-proxies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-https-proxies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-https-proxies_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-https-proxies_set-certificate-map/">Set Certificate Map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-https-proxies_set-quic-override/">Set Quic Override</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-https-proxies_set-ssl-certificates/">Set Ssl Certificates</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-https-proxies_set-ssl-policy/">Set Ssl Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-https-proxies_set-url-map/">Set Url Map</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Target Instances</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-instances_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-instances_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-instances_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-instances_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-instances_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-instances_set-security-policy/">Set Security Policy</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Target Pools</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-pools_add-health-check/">Add Health Check</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-pools_add-instance/">Add Instance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-pools_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-pools_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-pools_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-pools_get-health/">Get Health</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-pools_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-pools_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-pools_remove-health-check/">Remove Health Check</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-pools_remove-instance/">Remove Instance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-pools_set-backup/">Set Backup</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-pools_set-security-policy/">Set Security Policy</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Target Ssl Proxies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-ssl-proxies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-ssl-proxies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-ssl-proxies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-ssl-proxies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-ssl-proxies_set-backend-service/">Set Backend Service</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-ssl-proxies_set-certificate-map/">Set Certificate Map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-ssl-proxies_set-proxy-header/">Set Proxy Header</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-ssl-proxies_set-ssl-certificates/">Set Ssl Certificates</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-ssl-proxies_set-ssl-policy/">Set Ssl Policy</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Target Tcp Proxies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-tcp-proxies_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-tcp-proxies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-tcp-proxies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-tcp-proxies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-tcp-proxies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-tcp-proxies_set-backend-service/">Set Backend Service</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-tcp-proxies_set-proxy-header/">Set Proxy Header</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Target Vpn Gateways</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-vpn-gateways_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-vpn-gateways_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-vpn-gateways_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-vpn-gateways_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-vpn-gateways_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/target-vpn-gateways_set-labels/">Set Labels</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Url Maps</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/url-maps_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/url-maps_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/url-maps_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/url-maps_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/url-maps_invalidate-cache/">Invalidate Cache</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/url-maps_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/url-maps_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/url-maps_update/">Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/url-maps_validate/">Validate</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Vpn Gateways</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/vpn-gateways_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/vpn-gateways_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/vpn-gateways_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/vpn-gateways_get-status/">Get Status</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/vpn-gateways_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/vpn-gateways_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/vpn-gateways_set-labels/">Set Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/vpn-gateways_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Vpn Tunnels</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/vpn-tunnels_aggregated-list/">Aggregated List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/vpn-tunnels_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/vpn-tunnels_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/vpn-tunnels_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/vpn-tunnels_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/vpn-tunnels_set-labels/">Set Labels</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Zone Operations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/zone-operations_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/zone-operations_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/zone-operations_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/zone-operations_wait/">Wait</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Zones</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/zones_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="/google-apis-rs/google-compute1-cli/zones_list/">List</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="/google-apis-rs/google-compute1-cli/.">compute v5.0.4+20240218</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="/google-apis-rs/google-compute1-cli/." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+
+  <h1 id="404-page-not-found">404</h1>
+
+  <p><strong>Page not found</strong></p>
+
+
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/compute1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script>var base_url = '/google-apis-rs/google-compute1-cli/';</script>
+    <script src="/google-apis-rs/google-compute1-cli/js/theme_extra.js" defer></script>
+    <script src="/google-apis-rs/google-compute1-cli/js/theme.js" defer></script>
+      <script src="/google-apis-rs/google-compute1-cli/search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

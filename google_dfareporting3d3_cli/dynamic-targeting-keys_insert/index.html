@@ -1,1481 +1,666 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Insert - Dfareporting v3.0.0+20220104</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-dfareporting3d3-cli/dynamic-targeting-keys_insert/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Insert - Dfareporting v5.0.4+20220104</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Insert";
+        var mkdocs_page_input_path = "dynamic-targeting-keys_insert.md";
+        var mkdocs_page_url = "/google-apis-rs/google-dfareporting3d3-cli/dynamic-targeting-keys_insert/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> Dfareporting v3.0.0+20220104</a>
-        
+          <a href=".." class="icon icon-home"> Dfareporting v5.0.4+20220104
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Account Active Ad Summaries</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../account-active-ad-summaries_get">Get</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Account Permission Groups</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../account-permission-groups_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../account-permission-groups_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Account Permissions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../account-permissions_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../account-permissions_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Account User Profiles</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../account-user-profiles_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../account-user-profiles_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../account-user-profiles_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../account-user-profiles_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../account-user-profiles_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Accounts</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../accounts_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Ads</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../ads_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../ads_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../ads_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../ads_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../ads_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Advertiser Groups</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertiser-groups_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertiser-groups_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertiser-groups_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertiser-groups_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertiser-groups_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertiser-groups_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Advertiser Landing Pages</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertiser-landing-pages_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertiser-landing-pages_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertiser-landing-pages_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertiser-landing-pages_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertiser-landing-pages_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Advertisers</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertisers_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertisers_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertisers_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertisers_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../advertisers_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Browsers</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../browsers_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Campaign Creative Associations</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../campaign-creative-associations_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../campaign-creative-associations_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Campaigns</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../campaigns_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../campaigns_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../campaigns_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../campaigns_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../campaigns_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Change Logs</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../change-logs_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../change-logs_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Cities</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../cities_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Connection Types</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../connection-types_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../connection-types_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Content Categories</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../content-categories_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../content-categories_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../content-categories_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../content-categories_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../content-categories_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../content-categories_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Conversions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../conversions_batchinsert">Batchinsert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../conversions_batchupdate">Batchupdate</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Countries</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../countries_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../countries_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Creative Assets</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-assets_insert">Insert</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Creative Field Values</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-field-values_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-field-values_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-field-values_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-field-values_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-field-values_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-field-values_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Creative Fields</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-fields_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-fields_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-fields_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-fields_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-fields_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-fields_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Creative Groups</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-groups_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-groups_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-groups_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-groups_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creative-groups_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Creatives</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creatives_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creatives_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creatives_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creatives_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../creatives_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Dimension Values</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../dimension-values_query">Query</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Directory Sites</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../directory-sites_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../directory-sites_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../directory-sites_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Dynamic Targeting Keys</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../dynamic-targeting-keys_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Insert</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../dynamic-targeting-keys_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Event Tags</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../event-tags_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../event-tags_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../event-tags_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../event-tags_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../event-tags_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../event-tags_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Files</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Floodlight Activities</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-activities_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-activities_generatetag">Generatetag</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-activities_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-activities_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-activities_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-activities_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-activities_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Floodlight Activity Groups</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-activity-groups_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-activity-groups_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-activity-groups_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-activity-groups_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-activity-groups_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Floodlight Configurations</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-configurations_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-configurations_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-configurations_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../floodlight-configurations_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Inventory Items</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../inventory-items_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../inventory-items_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Languages</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../languages_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Metros</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../metros_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Mobile Apps</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../mobile-apps_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../mobile-apps_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Mobile Carriers</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../mobile-carriers_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../mobile-carriers_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Operating System Versions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../operating-system-versions_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../operating-system-versions_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Operating Systems</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../operating-systems_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../operating-systems_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Order Documents</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../order-documents_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../order-documents_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Orders</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../orders_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../orders_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Placement Groups</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placement-groups_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placement-groups_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placement-groups_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placement-groups_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placement-groups_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Placement Strategies</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placement-strategies_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placement-strategies_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placement-strategies_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placement-strategies_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placement-strategies_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placement-strategies_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Placements</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placements_generatetags">Generatetags</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placements_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placements_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placements_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placements_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../placements_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Platform Types</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../platform-types_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../platform-types_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Postal Codes</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../postal-codes_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../postal-codes_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Regions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../regions_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Remarketing List Shares</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../remarketing-list-shares_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../remarketing-list-shares_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../remarketing-list-shares_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Remarketing Lists</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../remarketing-lists_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../remarketing-lists_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../remarketing-lists_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../remarketing-lists_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../remarketing-lists_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Reports</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../reports_compatible-fields-query">Compatible Fields Query</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../reports_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../reports_files-get">Files Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../reports_files-list">Files List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../reports_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../reports_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../reports_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../reports_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../reports_run">Run</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../reports_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Sites</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../sites_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../sites_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../sites_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../sites_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../sites_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Sizes</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../sizes_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../sizes_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../sizes_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Subaccounts</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../subaccounts_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../subaccounts_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../subaccounts_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../subaccounts_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../subaccounts_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Targetable Remarketing Lists</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../targetable-remarketing-lists_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../targetable-remarketing-lists_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Targeting Templates</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../targeting-templates_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../targeting-templates_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../targeting-templates_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../targeting-templates_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../targeting-templates_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>User Profiles</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../user-profiles_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../user-profiles_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>User Role Permission Groups</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../user-role-permission-groups_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../user-role-permission-groups_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>User Role Permissions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../user-role-permissions_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../user-role-permissions_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>User Roles</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../user-roles_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../user-roles_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../user-roles_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../user-roles_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../user-roles_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../user-roles_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Video Formats</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../video-formats_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../video-formats_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Account Active Ad Summaries</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../account-active-ad-summaries_get/">Get</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Account Permission Groups</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../account-permission-groups_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../account-permission-groups_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Account Permissions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../account-permissions_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../account-permissions_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Account User Profiles</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../account-user-profiles_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../account-user-profiles_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../account-user-profiles_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../account-user-profiles_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../account-user-profiles_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Accounts</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../accounts_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Ads</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ads_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ads_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ads_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ads_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ads_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Advertiser Groups</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertiser-groups_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertiser-groups_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertiser-groups_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertiser-groups_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertiser-groups_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertiser-groups_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Advertiser Landing Pages</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertiser-landing-pages_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertiser-landing-pages_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertiser-landing-pages_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertiser-landing-pages_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertiser-landing-pages_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Advertisers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../advertisers_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Browsers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../browsers_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Campaign Creative Associations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../campaign-creative-associations_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../campaign-creative-associations_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Campaigns</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../campaigns_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../campaigns_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../campaigns_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../campaigns_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../campaigns_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Change Logs</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../change-logs_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../change-logs_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Cities</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../cities_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Connection Types</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../connection-types_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../connection-types_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Content Categories</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../content-categories_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../content-categories_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../content-categories_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../content-categories_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../content-categories_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../content-categories_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Conversions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../conversions_batchinsert/">Batchinsert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../conversions_batchupdate/">Batchupdate</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Countries</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../countries_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../countries_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Creative Assets</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-assets_insert/">Insert</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Creative Field Values</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-field-values_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-field-values_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-field-values_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-field-values_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-field-values_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-field-values_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Creative Fields</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-fields_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-fields_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-fields_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-fields_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-fields_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-fields_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Creative Groups</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-groups_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-groups_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-groups_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-groups_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creative-groups_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Creatives</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../creatives_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creatives_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creatives_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creatives_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../creatives_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Dimension Values</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../dimension-values_query/">Query</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Directory Sites</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../directory-sites_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../directory-sites_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../directory-sites_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Dynamic Targeting Keys</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../dynamic-targeting-keys_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Insert</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dynamic-targeting-keys_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Event Tags</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../event-tags_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../event-tags_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../event-tags_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../event-tags_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../event-tags_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../event-tags_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Files</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Floodlight Activities</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-activities_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-activities_generatetag/">Generatetag</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-activities_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-activities_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-activities_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-activities_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-activities_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Floodlight Activity Groups</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-activity-groups_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-activity-groups_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-activity-groups_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-activity-groups_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-activity-groups_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Floodlight Configurations</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-configurations_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-configurations_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-configurations_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../floodlight-configurations_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Inventory Items</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../inventory-items_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../inventory-items_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Languages</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../languages_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Metros</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../metros_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Mobile Apps</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../mobile-apps_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mobile-apps_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Mobile Carriers</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../mobile-carriers_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../mobile-carriers_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Operating System Versions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operating-system-versions_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operating-system-versions_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Operating Systems</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../operating-systems_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../operating-systems_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Order Documents</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../order-documents_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../order-documents_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Orders</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../orders_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../orders_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Placement Groups</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../placement-groups_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../placement-groups_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../placement-groups_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../placement-groups_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../placement-groups_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Placement Strategies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../placement-strategies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../placement-strategies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../placement-strategies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../placement-strategies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../placement-strategies_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../placement-strategies_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Placements</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../placements_generatetags/">Generatetags</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../placements_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../placements_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../placements_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../placements_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../placements_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Platform Types</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../platform-types_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../platform-types_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Postal Codes</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../postal-codes_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../postal-codes_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Regions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../regions_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Remarketing List Shares</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../remarketing-list-shares_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../remarketing-list-shares_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../remarketing-list-shares_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Remarketing Lists</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../remarketing-lists_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../remarketing-lists_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../remarketing-lists_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../remarketing-lists_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../remarketing-lists_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reports</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../reports_compatible-fields-query/">Compatible Fields Query</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../reports_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../reports_files-get/">Files Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../reports_files-list/">Files List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../reports_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../reports_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../reports_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../reports_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../reports_run/">Run</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../reports_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Sites</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../sites_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../sites_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../sites_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../sites_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../sites_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Sizes</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../sizes_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../sizes_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../sizes_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Subaccounts</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../subaccounts_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../subaccounts_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../subaccounts_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../subaccounts_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../subaccounts_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Targetable Remarketing Lists</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../targetable-remarketing-lists_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../targetable-remarketing-lists_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Targeting Templates</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../targeting-templates_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../targeting-templates_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../targeting-templates_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../targeting-templates_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../targeting-templates_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Profiles</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../user-profiles_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../user-profiles_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Role Permission Groups</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../user-role-permission-groups_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../user-role-permission-groups_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Role Permissions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../user-role-permissions_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../user-role-permissions_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">User Roles</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../user-roles_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../user-roles_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../user-roles_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../user-roles_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../user-roles_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../user-roles_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Video Formats</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../video-formats_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../video-formats_list/">List</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Dfareporting v5.0.4+20220104</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Insert</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dfareporting3d3-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Dynamic Targeting Keys &raquo;</li>
+      <li>Insert</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dfareporting3d3-cli/edit/master/docs/dynamic-targeting-keys_insert.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Inserts a new dynamic targeting key. Keys must be created at the advertiser level before being assigned to the advertiser&#39;s ads, creatives, or placements. There is a maximum of 1000 keys per advertiser, out of which a maximum of 20 keys can be assigned per ad, creative, or placement.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Inserts a new dynamic targeting key. Keys must be created at the advertiser level before being assigned to the advertiser&#39;s ads, creatives, or placements. There is a maximum of 1000 keys per advertiser, out of which a maximum of 20 keys can be assigned per ad, creative, or placement.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for the <em>https://www.googleapis.com/auth/dfatrafficking</em> scope to make a valid call.</p>
 <p>If unset, the scope for this method defaults to <em>https://www.googleapis.com/auth/dfatrafficking</em>.
@@ -1498,7 +683,6 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   object-type: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .    kind=tempor</code><ul>
@@ -1607,32 +791,24 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../dynamic-targeting-keys_list" class="btn btn-neutral float-right" title="List"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../dynamic-targeting-keys_delete" class="btn btn-neutral" title="Delete"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../dynamic-targeting-keys_delete/" class="btn btn-neutral float-left" title="Delete"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../dynamic-targeting-keys_list/" class="btn btn-neutral float-right" title="List">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -1640,14 +816,30 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../dynamic-targeting-keys_delete" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../dynamic-targeting-keys_list" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/dfareporting3d3-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../dynamic-targeting-keys_delete/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../dynamic-targeting-keys_list/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

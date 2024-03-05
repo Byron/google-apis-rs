@@ -1,551 +1,268 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Update - drive v3.0.0+20220225</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-drive2-cli/files_update/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Update - drive v5.0.4+20240227</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Update";
+        var mkdocs_page_input_path = "files_update.md";
+        var mkdocs_page_url = "/google-apis-rs/google-drive2-cli/files_update/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> drive v3.0.0+20220225</a>
-        
+          <a href=".." class="icon icon-home"> drive v5.0.4+20240227
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>About</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../about_get">Get</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Apps</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../apps_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../apps_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Changes</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../changes_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../changes_get-start-page-token">Get Start Page Token</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../changes_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../changes_watch">Watch</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Channels</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channels_stop">Stop</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Children</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../children_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../children_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../children_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../children_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Comments</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../comments_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Drives</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_hide">Hide</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_unhide">Unhide</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../drives_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Files</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_copy">Copy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_empty-trash">Empty Trash</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_export">Export</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_generate-ids">Generate Ids</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_touch">Touch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_trash">Trash</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_untrash">Untrash</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Update</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-upload-flags">Required Upload Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../files_watch">Watch</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Parents</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../parents_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../parents_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../parents_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../parents_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Permissions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_get-id-for-email">Get Id For Email</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../permissions_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Properties</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../properties_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Replies</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../replies_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Revisions</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../revisions_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Teamdrives</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../teamdrives_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../teamdrives_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../teamdrives_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../teamdrives_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../teamdrives_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">About</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../about_get/">Get</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Apps</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../apps_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../apps_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Changes</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../changes_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../changes_get-start-page-token/">Get Start Page Token</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../changes_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../changes_watch/">Watch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Channels</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../channels_stop/">Stop</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Children</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../children_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../children_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../children_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../children_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Comments</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../comments_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Drives</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_hide/">Hide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_unhide/">Unhide</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../drives_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Files</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../files_copy/">Copy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_empty-trash/">Empty Trash</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_export/">Export</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_generate-ids/">Generate Ids</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_list-labels/">List Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_modify-labels/">Modify Labels</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_touch/">Touch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_trash/">Trash</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_untrash/">Untrash</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Update</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../files_watch/">Watch</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Parents</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../parents_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../parents_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../parents_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../parents_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Permissions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_get-id-for-email/">Get Id For Email</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../permissions_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Properties</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../properties_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Replies</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../replies_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Revisions</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../revisions_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Teamdrives</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../teamdrives_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../teamdrives_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../teamdrives_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../teamdrives_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../teamdrives_update/">Update</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">drive v5.0.4+20240227</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Update</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/drive2-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Files &raquo;</li>
+      <li>Update</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/drive2-cli/edit/master/docs/files_update.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates a file&#39;s metadata and/or content. When calling this method, only populate fields in the request that you want to modify. When updating fields, some fields might be changed automatically, such as modifiedDate. This method supports patch semantics.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates a file&#39;s metadata and/or content. When calling this method, only populate fields in the request that you want to modify. When updating fields, some fields might be changed automatically, such as <code>modifiedDate</code>. This method supports patch semantics. This method supports an <em>/upload</em> URI and accepts uploaded media with the following characteristics: - <em>Maximum file size:</em> 5,120 GB - <em>Accepted Media MIME types:</em><code>*/*</code> Note: Specify a valid MIME type, rather than the literal <code>*/*</code> value. The literal <code>*/*</code> is only used to indicate that any valid MIME type can be uploaded. For more information on uploading files, see <a href="/drive/api/guides/manage-uploads">Upload file data</a>.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -591,6 +308,9 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     can-list-children: boolean
     can-modify-content: boolean
     can-modify-content-restriction: boolean
+    can-modify-editor-content-restriction: boolean
+    can-modify-labels: boolean
+    can-modify-owner-content-restriction: boolean
     can-move-children-out-of-drive: boolean
     can-move-children-out-of-team-drive: boolean
     can-move-children-within-drive: boolean
@@ -602,9 +322,11 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     can-move-item-within-team-drive: boolean
     can-move-team-drive-item: boolean
     can-read-drive: boolean
+    can-read-labels: boolean
     can-read-revisions: boolean
     can-read-team-drive: boolean
     can-remove-children: boolean
+    can-remove-content-restriction: boolean
     can-remove-my-drive-parent: boolean
     can-rename: boolean
     can-share: boolean
@@ -694,6 +416,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   quota-bytes-used: string
   resource-key: string
   self-link: string
+  sha1-checksum: string
+  sha256-checksum: string
   shareable: boolean
   shared: boolean
   shared-with-me-date: string
@@ -755,169 +479,188 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   writers-can-share: boolean
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
-<li><code>-r .    alternate-link=invidunt</code><ul>
-<li>A link for opening the file in a relevant Google editor or viewer.</li>
+<li><code>-r .    alternate-link=dolores</code><ul>
+<li>Output only. A link for opening the file in a relevant Google editor or viewer.</li>
 </ul>
 </li>
 <li><code>app-data-contents=true</code><ul>
-<li>Whether this file is in the Application Data folder.</li>
-</ul>
-</li>
-<li><code>can-comment=true</code><ul>
-<li>Deprecated: use capabilities/canComment.</li>
-</ul>
-</li>
-<li><code>can-read-revisions=false</code><ul>
-<li>Deprecated: use capabilities/canReadRevisions.</li>
-</ul>
-</li>
-<li><code>capabilities    can-accept-ownership=false</code><ul>
-<li>Whether the current user is the pending owner of the file. Not populated for shared drive files.</li>
-</ul>
-</li>
-<li><code>can-add-children=false</code><ul>
-<li>Whether the current user can add children to this folder. This is always false when the item is not a folder.</li>
-</ul>
-</li>
-<li><code>can-add-folder-from-another-drive=false</code><ul>
-<li>Whether the current user can add a folder from another drive (different shared drive or My Drive) to this folder. This is false when the item is not a folder. Only populated for items in shared drives.</li>
-</ul>
-</li>
-<li><code>can-add-my-drive-parent=true</code><ul>
-<li>Whether the current user can add a parent for the item without removing an existing parent in the same request. Not populated for shared drive files.</li>
-</ul>
-</li>
-<li><code>can-change-copy-requires-writer-permission=true</code><ul>
-<li>Whether the current user can change the copyRequiresWriterPermission restriction of this file.</li>
-</ul>
-</li>
-<li><code>can-change-restricted-download=false</code><ul>
-<li>Deprecated</li>
-</ul>
-</li>
-<li><code>can-change-security-update-enabled=false</code><ul>
-<li>Whether the current user can change the securityUpdateEnabled field on link share metadata.</li>
+<li>Output only. Whether this file is in the Application Data folder.</li>
 </ul>
 </li>
 <li><code>can-comment=false</code><ul>
-<li>Whether the current user can comment on this file.</li>
-</ul>
-</li>
-<li><code>can-copy=false</code><ul>
-<li>Whether the current user can copy this file. For an item in a shared drive, whether the current user can copy non-folder descendants of this item, or this item itself if it is not a folder.</li>
-</ul>
-</li>
-<li><code>can-delete=false</code><ul>
-<li>Whether the current user can delete this file.</li>
-</ul>
-</li>
-<li><code>can-delete-children=false</code><ul>
-<li>Whether the current user can delete children of this folder. This is false when the item is not a folder. Only populated for items in shared drives.</li>
-</ul>
-</li>
-<li><code>can-download=false</code><ul>
-<li>Whether the current user can download this file.</li>
-</ul>
-</li>
-<li><code>can-edit=true</code><ul>
-<li>Whether the current user can edit this file. Other factors may limit the type of changes a user can make to a file. For example, see canChangeCopyRequiresWriterPermission or canModifyContent.</li>
-</ul>
-</li>
-<li><code>can-list-children=true</code><ul>
-<li>Whether the current user can list the children of this folder. This is always false when the item is not a folder.</li>
-</ul>
-</li>
-<li><code>can-modify-content=false</code><ul>
-<li>Whether the current user can modify the content of this file.</li>
-</ul>
-</li>
-<li><code>can-modify-content-restriction=false</code><ul>
-<li>Whether the current user can modify restrictions on content of this file.</li>
-</ul>
-</li>
-<li><code>can-move-children-out-of-drive=true</code><ul>
-<li>Whether the current user can move children of this folder outside of the shared drive. This is false when the item is not a folder. Only populated for items in shared drives.</li>
-</ul>
-</li>
-<li><code>can-move-children-out-of-team-drive=true</code><ul>
-<li>Deprecated - use canMoveChildrenOutOfDrive instead.</li>
-</ul>
-</li>
-<li><code>can-move-children-within-drive=true</code><ul>
-<li>Whether the current user can move children of this folder within this drive. This is false when the item is not a folder. Note that a request to move the child may still fail depending on the current user&#39;s access to the child and to the destination folder.</li>
-</ul>
-</li>
-<li><code>can-move-children-within-team-drive=true</code><ul>
-<li>Deprecated - use canMoveChildrenWithinDrive instead.</li>
-</ul>
-</li>
-<li><code>can-move-item-into-team-drive=false</code><ul>
-<li>Deprecated - use canMoveItemOutOfDrive instead.</li>
-</ul>
-</li>
-<li><code>can-move-item-out-of-drive=true</code><ul>
-<li>Whether the current user can move this item outside of this drive by changing its parent. Note that a request to change the parent of the item may still fail depending on the new parent that is being added.</li>
-</ul>
-</li>
-<li><code>can-move-item-out-of-team-drive=false</code><ul>
-<li>Deprecated - use canMoveItemOutOfDrive instead.</li>
-</ul>
-</li>
-<li><code>can-move-item-within-drive=true</code><ul>
-<li>Whether the current user can move this item within this drive. Note that a request to change the parent of the item may still fail depending on the new parent that is being added and the parent that is being removed.</li>
-</ul>
-</li>
-<li><code>can-move-item-within-team-drive=true</code><ul>
-<li>Deprecated - use canMoveItemWithinDrive instead.</li>
-</ul>
-</li>
-<li><code>can-move-team-drive-item=true</code><ul>
-<li>Deprecated - use canMoveItemWithinDrive or canMoveItemOutOfDrive instead.</li>
-</ul>
-</li>
-<li><code>can-read-drive=true</code><ul>
-<li>Whether the current user can read the shared drive to which this file belongs. Only populated for items in shared drives.</li>
+<li>Output only. Deprecated: Use <code>capabilities/canComment</code> instead.</li>
 </ul>
 </li>
 <li><code>can-read-revisions=true</code><ul>
-<li>Whether the current user can read the revisions resource of this file. For a shared drive item, whether revisions of non-folder descendants of this item, or this item itself if it is not a folder, can be read.</li>
+<li>Output only. Deprecated: Use <code>capabilities/canReadRevisions</code> instead.</li>
 </ul>
 </li>
-<li><code>can-read-team-drive=false</code><ul>
-<li>Deprecated - use canReadDrive instead.</li>
+<li><code>capabilities    can-accept-ownership=false</code><ul>
+<li>Output only. Whether the current user is the pending owner of the file. Not populated for shared drive files.</li>
 </ul>
 </li>
-<li><code>can-remove-children=true</code><ul>
-<li>Whether the current user can remove children from this folder. This is always false when the item is not a folder. For a folder in a shared drive, use canDeleteChildren or canTrashChildren instead.</li>
+<li><code>can-add-children=true</code><ul>
+<li>Output only. Whether the current user can add children to this folder. This is always false when the item is not a folder.</li>
 </ul>
 </li>
-<li><code>can-remove-my-drive-parent=false</code><ul>
-<li>Whether the current user can remove a parent from the item without adding another parent in the same request. Not populated for shared drive files.</li>
+<li><code>can-add-folder-from-another-drive=true</code><ul>
+<li>Output only. Whether the current user can add a folder from another drive (different shared drive or My Drive) to this folder. This is false when the item is not a folder. Only populated for items in shared drives.</li>
 </ul>
 </li>
-<li><code>can-rename=true</code><ul>
-<li>Whether the current user can rename this file.</li>
+<li><code>can-add-my-drive-parent=true</code><ul>
+<li>Output only. Whether the current user can add a parent for the item without removing an existing parent in the same request. Not populated for shared drive files.</li>
+</ul>
+</li>
+<li><code>can-change-copy-requires-writer-permission=true</code><ul>
+<li>Output only. Whether the current user can change the <code>copyRequiresWriterPermission</code> restriction of this file.</li>
+</ul>
+</li>
+<li><code>can-change-restricted-download=true</code><ul>
+<li>Output only. Deprecated.</li>
+</ul>
+</li>
+<li><code>can-change-security-update-enabled=false</code><ul>
+<li>Output only. Whether the current user can change the securityUpdateEnabled field on link share metadata.</li>
+</ul>
+</li>
+<li><code>can-comment=true</code><ul>
+<li>Output only. Whether the current user can comment on this file.</li>
+</ul>
+</li>
+<li><code>can-copy=false</code><ul>
+<li>Output only. Whether the current user can copy this file. For an item in a shared drive, whether the current user can copy non-folder descendants of this item, or this item itself if it is not a folder.</li>
+</ul>
+</li>
+<li><code>can-delete=true</code><ul>
+<li>Output only. Whether the current user can delete this file.</li>
+</ul>
+</li>
+<li><code>can-delete-children=true</code><ul>
+<li>Output only. Whether the current user can delete children of this folder. This is false when the item is not a folder. Only populated for items in shared drives.</li>
+</ul>
+</li>
+<li><code>can-download=true</code><ul>
+<li>Output only. Whether the current user can download this file.</li>
+</ul>
+</li>
+<li><code>can-edit=true</code><ul>
+<li>Output only. Whether the current user can edit this file. Other factors may limit the type of changes a user can make to a file. For example, see <code>canChangeCopyRequiresWriterPermission</code> or <code>canModifyContent</code>.</li>
+</ul>
+</li>
+<li><code>can-list-children=false</code><ul>
+<li>Output only. Whether the current user can list the children of this folder. This is always false when the item is not a folder.</li>
+</ul>
+</li>
+<li><code>can-modify-content=true</code><ul>
+<li>Output only. Whether the current user can modify the content of this file.</li>
+</ul>
+</li>
+<li><code>can-modify-content-restriction=true</code><ul>
+<li>Deprecated: Output only. Use one of <code>canModifyEditorContentRestriction</code>, <code>canModifyOwnerContentRestriction</code> or <code>canRemoveContentRestriction</code>.</li>
+</ul>
+</li>
+<li><code>can-modify-editor-content-restriction=true</code><ul>
+<li>Output only. Whether the current user can add or modify content restrictions on the file which are editor restricted.</li>
+</ul>
+</li>
+<li><code>can-modify-labels=false</code><ul>
+<li>Output only. Whether the current user can modify the labels on the file.</li>
+</ul>
+</li>
+<li><code>can-modify-owner-content-restriction=true</code><ul>
+<li>Output only. Whether the current user can add or modify content restrictions which are owner restricted.</li>
+</ul>
+</li>
+<li><code>can-move-children-out-of-drive=true</code><ul>
+<li>Output only. Whether the current user can move children of this folder outside of the shared drive. This is false when the item is not a folder. Only populated for items in shared drives.</li>
+</ul>
+</li>
+<li><code>can-move-children-out-of-team-drive=false</code><ul>
+<li>Output only. Deprecated: Use <code>canMoveChildrenOutOfDrive</code> instead.</li>
+</ul>
+</li>
+<li><code>can-move-children-within-drive=true</code><ul>
+<li>Output only. Whether the current user can move children of this folder within this drive. This is false when the item is not a folder. Note that a request to move the child may still fail depending on the current user&#39;s access to the child and to the destination folder.</li>
+</ul>
+</li>
+<li><code>can-move-children-within-team-drive=true</code><ul>
+<li>Output only. Deprecated: Use <code>canMoveChildrenWithinDrive</code> instead.</li>
+</ul>
+</li>
+<li><code>can-move-item-into-team-drive=false</code><ul>
+<li>Output only. Deprecated: Use <code>canMoveItemOutOfDrive</code> instead.</li>
+</ul>
+</li>
+<li><code>can-move-item-out-of-drive=true</code><ul>
+<li>Output only. Whether the current user can move this item outside of this drive by changing its parent. Note that a request to change the parent of the item may still fail depending on the new parent that is being added.</li>
+</ul>
+</li>
+<li><code>can-move-item-out-of-team-drive=false</code><ul>
+<li>Output only. Deprecated: Use <code>canMoveItemOutOfDrive</code> instead.</li>
+</ul>
+</li>
+<li><code>can-move-item-within-drive=true</code><ul>
+<li>Output only. Whether the current user can move this item within this drive. Note that a request to change the parent of the item may still fail depending on the new parent that is being added and the parent that is being removed.</li>
+</ul>
+</li>
+<li><code>can-move-item-within-team-drive=true</code><ul>
+<li>Output only. Deprecated: Use <code>canMoveItemWithinDrive</code> instead.</li>
+</ul>
+</li>
+<li><code>can-move-team-drive-item=false</code><ul>
+<li>Output only. Deprecated: Use <code>canMoveItemWithinDrive</code> or <code>canMoveItemOutOfDrive</code> instead.</li>
+</ul>
+</li>
+<li><code>can-read-drive=true</code><ul>
+<li>Output only. Whether the current user can read the shared drive to which this file belongs. Only populated for items in shared drives.</li>
+</ul>
+</li>
+<li><code>can-read-labels=true</code><ul>
+<li>Output only. Whether the current user can read the labels on the file.</li>
+</ul>
+</li>
+<li><code>can-read-revisions=false</code><ul>
+<li>Output only. Whether the current user can read the revisions resource of this file. For a shared drive item, whether revisions of non-folder descendants of this item, or this item itself if it is not a folder, can be read.</li>
+</ul>
+</li>
+<li><code>can-read-team-drive=true</code><ul>
+<li>Output only. Deprecated: Use <code>canReadDrive</code> instead.</li>
+</ul>
+</li>
+<li><code>can-remove-children=false</code><ul>
+<li>Output only. Whether the current user can remove children from this folder. This is always false when the item is not a folder. For a folder in a shared drive, use <code>canDeleteChildren</code> or <code>canTrashChildren</code> instead.</li>
+</ul>
+</li>
+<li><code>can-remove-content-restriction=true</code><ul>
+<li>Output only. Whether there is a content restriction on the file that can be removed by the current user.</li>
+</ul>
+</li>
+<li><code>can-remove-my-drive-parent=true</code><ul>
+<li>Output only. Whether the current user can remove a parent from the item without adding another parent in the same request. Not populated for shared drive files.</li>
+</ul>
+</li>
+<li><code>can-rename=false</code><ul>
+<li>Output only. Whether the current user can rename this file.</li>
 </ul>
 </li>
 <li><code>can-share=true</code><ul>
-<li>Whether the current user can modify the sharing settings for this file.</li>
+<li>Output only. Whether the current user can modify the sharing settings for this file.</li>
 </ul>
 </li>
 <li><code>can-trash=true</code><ul>
-<li>Whether the current user can move this file to trash.</li>
+<li>Output only. Whether the current user can move this file to trash.</li>
 </ul>
 </li>
-<li><code>can-trash-children=true</code><ul>
-<li>Whether the current user can trash children of this folder. This is false when the item is not a folder. Only populated for items in shared drives.</li>
+<li><code>can-trash-children=false</code><ul>
+<li>Output only. Whether the current user can trash children of this folder. This is false when the item is not a folder. Only populated for items in shared drives.</li>
 </ul>
 </li>
 <li>
-<p><code>can-untrash=false</code></p>
+<p><code>can-untrash=true</code></p>
 <ul>
-<li>Whether the current user can restore this file from trash.</li>
+<li>Output only. Whether the current user can restore this file from trash.</li>
 </ul>
 </li>
 <li>
@@ -927,186 +670,186 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li><code>copyable=true</code><ul>
-<li>Deprecated: use capabilities/canCopy.</li>
+<li>Output only. Deprecated: Use <code>capabilities/canCopy</code> instead.</li>
 </ul>
 </li>
-<li><code>created-date=sadipscing</code><ul>
+<li><code>created-date=et</code><ul>
 <li>Create time for this file (formatted RFC 3339 timestamp).</li>
 </ul>
 </li>
-<li><code>default-open-with-link=stet</code><ul>
-<li>A link to open this file with the user&#39;s default app for this file. Only populated when the drive.apps.readonly scope is used.</li>
+<li><code>default-open-with-link=et</code><ul>
+<li>Output only. A link to open this file with the user&#39;s default app for this file. Only populated when the drive.apps.readonly scope is used.</li>
 </ul>
 </li>
-<li><code>description=et</code><ul>
+<li><code>description=lorem</code><ul>
 <li>A short description of the file.</li>
 </ul>
 </li>
-<li><code>download-url=diam</code><ul>
-<li>Short lived download URL for the file. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
+<li><code>download-url=et</code><ul>
+<li>Output only. Short lived download URL for the file. This field is only populated for files with content stored in Google Drive; it is not populated for Google Docs or shortcut files.</li>
 </ul>
 </li>
-<li><code>drive-id=et</code><ul>
-<li>ID of the shared drive the file resides in. Only populated for items in shared drives.</li>
+<li><code>drive-id=lorem</code><ul>
+<li>Output only. ID of the shared drive the file resides in. Only populated for items in shared drives.</li>
 </ul>
 </li>
 <li><code>editable=true</code><ul>
-<li>Deprecated: use capabilities/canEdit.</li>
+<li>Output only. Deprecated: Use <code>capabilities/canEdit</code> instead.</li>
 </ul>
 </li>
-<li><code>embed-link=dolor</code><ul>
-<li>A link for embedding the file.</li>
+<li><code>embed-link=eos</code><ul>
+<li>Output only. A link for embedding the file.</li>
 </ul>
 </li>
-<li><code>etag=sadipscing</code><ul>
-<li>ETag of the file.</li>
+<li><code>etag=magna</code><ul>
+<li>Output only. ETag of the file.</li>
 </ul>
 </li>
 <li><code>explicitly-trashed=true</code><ul>
-<li>Whether this file has been explicitly trashed, as opposed to recursively trashed.</li>
+<li>Output only. Whether this file has been explicitly trashed, as opposed to recursively trashed.</li>
 </ul>
 </li>
-<li><code>export-links=key=tempor</code><ul>
-<li>Links for exporting Docs Editors files to specific formats.</li>
+<li><code>export-links=key=stet</code><ul>
+<li>Output only. Links for exporting Docs Editors files to specific formats.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>file-extension=ipsum</code><ul>
-<li>The final component of fullFileExtension with trailing text that does not appear to be part of the extension removed. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
+<li><code>file-extension=sed</code><ul>
+<li>Output only. The final component of <code>fullFileExtension</code> with trailing text that does not appear to be part of the extension removed. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
 </ul>
 </li>
-<li><code>file-size=diam</code><ul>
-<li>The size of the file in bytes. This field is populated for files with content stored in Google Drive and for files in Docs Editors; it is not populated for shortcut files.</li>
+<li><code>file-size=eirmod</code><ul>
+<li>Output only. Size in bytes of blobs and first party editor files. Won&#39;t be populated for files that have no size, like shortcuts and folders.</li>
 </ul>
 </li>
 <li><code>folder-color-rgb=ea</code><ul>
 <li>Folder color as an RGB hex string if the file is a folder or a shortcut to a folder. The list of supported colors is available in the folderColorPalette field of the About resource. If an unsupported color is specified, it will be changed to the closest color in the palette.</li>
 </ul>
 </li>
-<li><code>full-file-extension=erat</code><ul>
-<li>The full file extension; extracted from the title. May contain multiple concatenated extensions, such as &#34;tar.gz&#34;. Removing an extension from the title does not clear this field; however, changing the extension on the title does update this field. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
+<li><code>full-file-extension=ipsum</code><ul>
+<li>Output only. The full file extension; extracted from the title. May contain multiple concatenated extensions, such as &#34;tar.gz&#34;. Removing an extension from the title does not clear this field; however, changing the extension on the title does update this field. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
 </ul>
 </li>
 <li><code>has-augmented-permissions=false</code><ul>
-<li>Whether there are permissions directly on this file. This field is only populated for items in shared drives.</li>
+<li>Output only. Whether there are permissions directly on this file. This field is only populated for items in shared drives.</li>
 </ul>
 </li>
 <li><code>has-thumbnail=true</code><ul>
-<li>Whether this file has a thumbnail. This does not indicate whether the requesting app has access to the thumbnail. To check access, look for the presence of the thumbnailLink field.</li>
+<li>Output only. Whether this file has a thumbnail. This does not indicate whether the requesting app has access to the thumbnail. To check access, look for the presence of the thumbnailLink field.</li>
 </ul>
 </li>
-<li><code>head-revision-id=kasd</code><ul>
-<li>The ID of the file&#39;s head revision. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
+<li><code>head-revision-id=justo</code><ul>
+<li>Output only. The ID of the file&#39;s head revision. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
 </ul>
 </li>
-<li><code>icon-link=sit</code><ul>
-<li>A link to the file&#39;s icon.</li>
+<li><code>icon-link=clita</code><ul>
+<li>Output only. A link to the file&#39;s icon.</li>
 </ul>
 </li>
-<li><code>id=sed</code><ul>
+<li><code>id=stet</code><ul>
 <li>The ID of the file.</li>
 </ul>
 </li>
-<li><code>image-media-metadata    aperture=0.8565788775531715</code><ul>
-<li>The aperture used to create the photo (f-number).</li>
+<li><code>image-media-metadata    aperture=0.32722640056533014</code><ul>
+<li>Output only. The aperture used to create the photo (f-number).</li>
 </ul>
 </li>
-<li><code>camera-make=ea</code><ul>
-<li>The make of the camera used to create the photo.</li>
+<li><code>camera-make=sed</code><ul>
+<li>Output only. The make of the camera used to create the photo.</li>
 </ul>
 </li>
-<li><code>camera-model=sit</code><ul>
-<li>The model of the camera used to create the photo.</li>
+<li><code>camera-model=et</code><ul>
+<li>Output only. The model of the camera used to create the photo.</li>
 </ul>
 </li>
-<li><code>color-space=lorem</code><ul>
-<li>The color space of the photo.</li>
+<li><code>color-space=no</code><ul>
+<li>Output only. The color space of the photo.</li>
 </ul>
 </li>
-<li><code>date=sed</code><ul>
-<li>The date and time the photo was taken (EXIF format timestamp).</li>
+<li><code>date=sit</code><ul>
+<li>Output only. The date and time the photo was taken (EXIF format timestamp).</li>
 </ul>
 </li>
-<li><code>exposure-bias=0.719154456145043</code><ul>
-<li>The exposure bias of the photo (APEX value).</li>
+<li><code>exposure-bias=0.12052507614381369</code><ul>
+<li>Output only. The exposure bias of the photo (APEX value).</li>
 </ul>
 </li>
-<li><code>exposure-mode=justo</code><ul>
-<li>The exposure mode used to create the photo.</li>
+<li><code>exposure-mode=sea</code><ul>
+<li>Output only. The exposure mode used to create the photo.</li>
 </ul>
 </li>
-<li><code>exposure-time=0.3342746663230596</code><ul>
-<li>The length of the exposure, in seconds.</li>
+<li><code>exposure-time=0.7165586728755385</code><ul>
+<li>Output only. The length of the exposure, in seconds.</li>
 </ul>
 </li>
-<li><code>flash-used=true</code><ul>
-<li>Whether a flash was used to create the photo.</li>
+<li><code>flash-used=false</code><ul>
+<li>Output only. Whether a flash was used to create the photo.</li>
 </ul>
 </li>
-<li><code>focal-length=0.8580613383828275</code><ul>
-<li>The focal length used to create the photo, in millimeters.</li>
+<li><code>focal-length=0.09075083521612615</code><ul>
+<li>Output only. The focal length used to create the photo, in millimeters.</li>
 </ul>
 </li>
-<li><code>height=68</code><ul>
-<li>The height of the image in pixels.</li>
+<li><code>height=81</code><ul>
+<li>Output only. The height of the image in pixels.</li>
 </ul>
 </li>
-<li><code>iso-speed=77</code><ul>
-<li>The ISO speed used to create the photo.</li>
+<li><code>iso-speed=65</code><ul>
+<li>Output only. The ISO speed used to create the photo.</li>
 </ul>
 </li>
-<li><code>lens=ipsum</code><ul>
-<li>The lens used to create the photo.</li>
+<li><code>lens=eos</code><ul>
+<li>Output only. The lens used to create the photo.</li>
 </ul>
 </li>
-<li><code>location    altitude=0.7524459911244585</code><ul>
-<li>The altitude stored in the image.</li>
+<li><code>location    altitude=0.97361164390737</code><ul>
+<li>Output only. The altitude stored in the image.</li>
 </ul>
 </li>
-<li><code>latitude=0.44943051689434776</code><ul>
-<li>The latitude stored in the image.</li>
+<li><code>latitude=0.49962163113163993</code><ul>
+<li>Output only. The latitude stored in the image.</li>
 </ul>
 </li>
 <li>
-<p><code>longitude=0.23206160858899927</code></p>
+<p><code>longitude=0.714971087865869</code></p>
 <ul>
-<li>The longitude stored in the image.</li>
+<li>Output only. The longitude stored in the image.</li>
 </ul>
 </li>
 <li>
-<p><code>..    max-aperture-value=0.7808437991181791</code></p>
+<p><code>..    max-aperture-value=0.9193415034852493</code></p>
 <ul>
-<li>The smallest f-number of the lens at the focal length used to create the photo (APEX value).</li>
+<li>Output only. The smallest f-number of the lens at the focal length used to create the photo (APEX value).</li>
 </ul>
 </li>
-<li><code>metering-mode=dolore</code><ul>
-<li>The metering mode used to create the photo.</li>
+<li><code>metering-mode=sed</code><ul>
+<li>Output only. The metering mode used to create the photo.</li>
 </ul>
 </li>
-<li><code>rotation=42</code><ul>
-<li>The number of clockwise 90 degree rotations applied from the image&#39;s original orientation.</li>
+<li><code>rotation=47</code><ul>
+<li>Output only. The number of clockwise 90 degree rotations applied from the image&#39;s original orientation.</li>
 </ul>
 </li>
-<li><code>sensor=justo</code><ul>
-<li>The type of sensor used to create the photo.</li>
+<li><code>sensor=dolor</code><ul>
+<li>Output only. The type of sensor used to create the photo.</li>
 </ul>
 </li>
-<li><code>subject-distance=61</code><ul>
-<li>The distance to the subject of the photo, in meters.</li>
+<li><code>subject-distance=21</code><ul>
+<li>Output only. The distance to the subject of the photo, in meters.</li>
 </ul>
 </li>
-<li><code>white-balance=at</code><ul>
-<li>The white balance mode used to create the photo.</li>
+<li><code>white-balance=et</code><ul>
+<li>Output only. The white balance mode used to create the photo.</li>
 </ul>
 </li>
 <li>
-<p><code>width=52</code></p>
+<p><code>width=27</code></p>
 <ul>
-<li>The width of the image in pixels.</li>
+<li>Output only. The width of the image in pixels.</li>
 </ul>
 </li>
 <li>
-<p><code>..indexable-text    text=et</code></p>
+<p><code>..indexable-text    text=duo</code></p>
 <ul>
 <li>The text to be indexed for this file.</li>
 </ul>
@@ -1114,31 +857,31 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>
 <p><code>..    is-app-authorized=false</code></p>
 <ul>
-<li>Whether the file was created or opened by the requesting app.</li>
+<li>Output only. Whether the file was created or opened by the requesting app.</li>
 </ul>
 </li>
-<li><code>kind=lorem</code><ul>
-<li>The type of file. This is always drive#file.</li>
+<li><code>kind=voluptua.</code><ul>
+<li>Output only. The type of file. This is always <code>drive#file</code>.</li>
 </ul>
 </li>
-<li><code>labels    hidden=false</code><ul>
-<li>Deprecated.</li>
+<li><code>labels    hidden=true</code><ul>
+<li>Output only. Deprecated.</li>
 </ul>
 </li>
-<li><code>modified=true</code><ul>
-<li>Whether the file has been modified by this user.</li>
+<li><code>modified=false</code><ul>
+<li>Output only. Whether the file has been modified by this user.</li>
 </ul>
 </li>
 <li><code>restricted=true</code><ul>
-<li>Deprecated - use copyRequiresWriterPermission instead.</li>
+<li>Output only. Deprecated: Use <code>copyRequiresWriterPermission</code> instead.</li>
 </ul>
 </li>
-<li><code>starred=false</code><ul>
+<li><code>starred=true</code><ul>
 <li>Whether this file is starred by the user.</li>
 </ul>
 </li>
 <li><code>trashed=false</code><ul>
-<li>Whether the file has been trashed, either explicitly or from a trashed parent folder. Only the owner may trash a file. The trashed item is excluded from all files.list responses returned for any user who does not own the file. However, all users with access to the file can see the trashed item metadata in an API response. All users with access can copy, download, export, and share the file.</li>
+<li>Whether this file has been trashed. This label applies to all users accessing the file; however, only owners are allowed to see and untrash files.</li>
 </ul>
 </li>
 <li>
@@ -1148,68 +891,68 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..last-modifying-user    display-name=stet</code></p>
+<p><code>..last-modifying-user    display-name=ut</code></p>
 <ul>
-<li>A plain text displayable name for this user.</li>
+<li>Output only. A plain text displayable name for this user.</li>
 </ul>
 </li>
-<li><code>email-address=sed</code><ul>
-<li>The email address of the user.</li>
+<li><code>email-address=voluptua.</code><ul>
+<li>Output only. The email address of the user.</li>
 </ul>
 </li>
 <li><code>is-authenticated-user=true</code><ul>
-<li>Whether this user is the same as the authenticated user for whom the request was made.</li>
+<li>Output only. Whether this user is the same as the authenticated user for whom the request was made.</li>
 </ul>
 </li>
-<li><code>kind=ea</code><ul>
-<li>This is always drive#user.</li>
+<li><code>kind=lorem</code><ul>
+<li>Output only. This is always <code>drive#user</code>.</li>
 </ul>
 </li>
-<li><code>permission-id=ipsum</code><ul>
-<li>The user&#39;s ID as visible in the permissions collection.</li>
-</ul>
-</li>
-<li>
-<p><code>picture    url=ea</code></p>
-<ul>
-<li>A URL that points to a profile picture of this user.</li>
+<li><code>permission-id=amet</code><ul>
+<li>Output only. The user&#39;s ID as visible in the permissions collection.</li>
 </ul>
 </li>
 <li>
-<p><code>...    last-modifying-user-name=amet.</code></p>
+<p><code>picture    url=sed</code></p>
 <ul>
-<li>Name of the last user to modify this file.</li>
+<li>Output Only. A URL that points to a profile picture of this user.</li>
 </ul>
 </li>
-<li><code>last-viewed-by-me-date=sadipscing</code><ul>
+<li>
+<p><code>...    last-modifying-user-name=rebum.</code></p>
+<ul>
+<li>Output only. Name of the last user to modify this file.</li>
+</ul>
+</li>
+<li><code>last-viewed-by-me-date=eirmod</code><ul>
 <li>Last time this file was viewed by the user (formatted RFC 3339 timestamp).</li>
 </ul>
 </li>
 <li><code>link-share-metadata    security-update-eligible=true</code><ul>
-<li>Whether the file is eligible for security update.</li>
+<li>Output only. Whether the file is eligible for security update.</li>
 </ul>
 </li>
 <li>
 <p><code>security-update-enabled=true</code></p>
 <ul>
-<li>Whether the security update is enabled for this file.</li>
+<li>Output only. Whether the security update is enabled for this file.</li>
 </ul>
 </li>
 <li>
-<p><code>..    marked-viewed-by-me-date=stet</code></p>
+<p><code>..    marked-viewed-by-me-date=kasd</code></p>
 <ul>
 <li>Deprecated.</li>
 </ul>
 </li>
-<li><code>md5-checksum=sea</code><ul>
-<li>An MD5 checksum for the content of this file. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
+<li><code>md5-checksum=stet</code><ul>
+<li>Output only. An MD5 checksum for the content of this file. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
 </ul>
 </li>
-<li><code>mime-type=sit</code><ul>
+<li><code>mime-type=accusam</code><ul>
 <li>The MIME type of the file. This is only mutable on update when uploading new content. This field can be left blank, and the mimetype will be determined from the uploaded content&#39;s MIME type.</li>
 </ul>
 </li>
-<li><code>modified-by-me-date=sed</code><ul>
+<li><code>modified-by-me-date=lorem</code><ul>
 <li>Last time this file was modified by the user (formatted RFC 3339 timestamp). Note that setting modifiedDate will also update the modifiedByMe date for the user which set the date.</li>
 </ul>
 </li>
@@ -1217,249 +960,237 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <li>Last time this file was modified by anyone (formatted RFC 3339 timestamp). This is only mutable on update when the setModifiedDate parameter is set.</li>
 </ul>
 </li>
-<li><code>open-with-links=key=no</code><ul>
-<li>A map of the id of each of the user&#39;s apps to a link to open this file with that app. Only populated when the drive.apps.readonly scope is used.</li>
+<li><code>open-with-links=key=nonumy</code><ul>
+<li>Output only. A map of the id of each of the user&#39;s apps to a link to open this file with that app. Only populated when the drive.apps.readonly scope is used.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>original-filename=sit</code><ul>
-<li>The original filename of the uploaded content if available, or else the original value of the title field. This is only available for files with binary content in Google Drive.</li>
+<li><code>original-filename=kasd</code><ul>
+<li>The original filename of the uploaded content if available, or else the original value of the <code>title</code> field. This is only available for files with binary content in Google Drive.</li>
 </ul>
 </li>
-<li><code>owned-by-me=false</code><ul>
-<li>Whether the file is owned by the current user. Not populated for items in shared drives.</li>
+<li><code>owned-by-me=true</code><ul>
+<li>Output only. Whether the file is owned by the current user. Not populated for items in shared drives.</li>
 </ul>
 </li>
-<li><code>owner-names=sea</code><ul>
-<li>Name(s) of the owner(s) of this file. Not populated for items in shared drives.</li>
+<li><code>owner-names=et</code><ul>
+<li>Output only. Name(s) of the owner(s) of this file. Not populated for items in shared drives.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>permission-ids=sea</code><ul>
-<li>List of permission IDs for users with access to this file.</li>
+<li><code>permission-ids=dolor</code><ul>
+<li>Output only. List of permission IDs for users with access to this file.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>quota-bytes-used=sadipscing</code><ul>
-<li>The number of quota bytes used by this file.</li>
+<li><code>quota-bytes-used=elitr</code><ul>
+<li>Output only. The number of quota bytes used by this file.</li>
 </ul>
 </li>
-<li><code>resource-key=justo</code><ul>
-<li>A key needed to access the item via a shared link.</li>
+<li><code>resource-key=sanctus</code><ul>
+<li>Output only. A key needed to access the item via a shared link.</li>
 </ul>
 </li>
-<li><code>self-link=aliquyam</code><ul>
-<li>A link back to this file.</li>
+<li><code>self-link=dolor</code><ul>
+<li>Output only. A link back to this file.</li>
 </ul>
 </li>
-<li><code>shareable=false</code><ul>
-<li>Deprecated: use capabilities/canShare.</li>
+<li><code>sha1-checksum=sea</code><ul>
+<li>Output only. The SHA1 checksum associated with this file, if available. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
 </ul>
 </li>
-<li><code>shared=false</code><ul>
-<li>Whether the file has been shared. Not populated for items in shared drives.</li>
+<li><code>sha256-checksum=sanctus</code><ul>
+<li>Output only. The SHA256 checksum associated with this file, if available. This field is only populated for files with content stored in Google Drive; it is not populated for Docs Editors or shortcut files.</li>
 </ul>
 </li>
-<li><code>shared-with-me-date=invidunt</code><ul>
+<li><code>shareable=true</code><ul>
+<li>Output only. Deprecated: Use <code>capabilities/canShare</code> instead.</li>
+</ul>
+</li>
+<li><code>shared=true</code><ul>
+<li>Output only. Whether the file has been shared. Not populated for items in shared drives.</li>
+</ul>
+</li>
+<li><code>shared-with-me-date=nonumy</code><ul>
 <li>Time at which this file was shared with the user (formatted RFC 3339 timestamp).</li>
 </ul>
 </li>
-<li><code>sharing-user    display-name=at</code><ul>
-<li>A plain text displayable name for this user.</li>
+<li><code>sharing-user    display-name=duo</code><ul>
+<li>Output only. A plain text displayable name for this user.</li>
 </ul>
 </li>
-<li><code>email-address=sea</code><ul>
-<li>The email address of the user.</li>
+<li><code>email-address=sed</code><ul>
+<li>Output only. The email address of the user.</li>
 </ul>
 </li>
 <li><code>is-authenticated-user=true</code><ul>
-<li>Whether this user is the same as the authenticated user for whom the request was made.</li>
+<li>Output only. Whether this user is the same as the authenticated user for whom the request was made.</li>
 </ul>
 </li>
-<li><code>kind=dolor</code><ul>
-<li>This is always drive#user.</li>
+<li><code>kind=takimata</code><ul>
+<li>Output only. This is always <code>drive#user</code>.</li>
 </ul>
 </li>
-<li><code>permission-id=sed</code><ul>
-<li>The user&#39;s ID as visible in the permissions collection.</li>
+<li><code>permission-id=et</code><ul>
+<li>Output only. The user&#39;s ID as visible in the permissions collection.</li>
 </ul>
 </li>
 <li>
-<p><code>picture    url=et</code></p>
+<p><code>picture    url=tempor</code></p>
 <ul>
-<li>A URL that points to a profile picture of this user.</li>
+<li>Output Only. A URL that points to a profile picture of this user.</li>
 </ul>
 </li>
 <li>
-<p><code>...shortcut-details    target-id=et</code></p>
+<p><code>...shortcut-details    target-id=nonumy</code></p>
 <ul>
 <li>The ID of the file that this shortcut points to.</li>
 </ul>
 </li>
-<li><code>target-mime-type=duo</code><ul>
-<li>The MIME type of the file that this shortcut points to. The value of this field is a snapshot of the target&#39;s MIME type, captured when the shortcut is created.</li>
+<li><code>target-mime-type=sanctus</code><ul>
+<li>Output only. The MIME type of the file that this shortcut points to. The value of this field is a snapshot of the target&#39;s MIME type, captured when the shortcut is created.</li>
 </ul>
 </li>
 <li>
-<p><code>target-resource-key=dolor</code></p>
+<p><code>target-resource-key=labore</code></p>
 <ul>
-<li>The ResourceKey for the target file.</li>
+<li>Output only. The ResourceKey for the target file.</li>
 </ul>
 </li>
 <li>
-<p><code>..    spaces=voluptua.</code></p>
+<p><code>..    spaces=est</code></p>
 <ul>
-<li>The list of spaces which contain the file. Supported values are &#39;drive&#39;, &#39;appDataFolder&#39; and &#39;photos&#39;.</li>
+<li>Output only. The list of spaces which contain the file. Supported values are <code>drive</code>, <code>appDataFolder</code> and <code>photos</code>.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>team-drive-id=magna</code><ul>
-<li>Deprecated - use driveId instead.</li>
+<li><code>team-drive-id=sadipscing</code><ul>
+<li>Output only. Deprecated: Use <code>driveId</code> instead.</li>
 </ul>
 </li>
-<li><code>thumbnail    image=est</code><ul>
+<li><code>thumbnail    image=accusam</code><ul>
 <li>The URL-safe Base64 encoded bytes of the thumbnail image. It should conform to RFC 4648 section 5.</li>
 </ul>
 </li>
 <li>
-<p><code>mime-type=voluptua.</code></p>
+<p><code>mime-type=elitr</code></p>
 <ul>
 <li>The MIME type of the thumbnail.</li>
 </ul>
 </li>
 <li>
-<p><code>..    thumbnail-link=voluptua.</code></p>
+<p><code>..    thumbnail-link=sit</code></p>
 <ul>
-<li>A short-lived link to the file&#39;s thumbnail. Typically lasts on the order of hours. Only populated when the requesting app can access the file&#39;s content. If the file isn&#39;t shared publicly, the URL returned in Files.thumbnailLink must be fetched using a credentialed request.</li>
+<li>Output only. A short-lived link to the file&#39;s thumbnail, if available. Typically lasts on the order of hours. Only populated when the requesting app can access the file&#39;s content. If the file isn&#39;t shared publicly, the URL returned in <code>Files.thumbnailLink</code> must be fetched using a credentialed request.</li>
 </ul>
 </li>
-<li><code>thumbnail-version=tempor</code><ul>
-<li>The thumbnail version for use in thumbnail cache invalidation.</li>
+<li><code>thumbnail-version=invidunt</code><ul>
+<li>Output only. The thumbnail version for use in thumbnail cache invalidation.</li>
 </ul>
 </li>
-<li><code>title=takimata</code><ul>
+<li><code>title=dolore</code><ul>
 <li>The title of this file. Note that for immutable items such as the top level folders of shared drives, My Drive root folder, and Application Data folder the title is constant.</li>
 </ul>
 </li>
-<li><code>trashed-date=ut</code><ul>
+<li><code>trashed-date=et</code><ul>
 <li>The time that the item was trashed (formatted RFC 3339 timestamp). Only populated for items in shared drives.</li>
 </ul>
 </li>
-<li><code>trashing-user    display-name=no</code><ul>
-<li>A plain text displayable name for this user.</li>
+<li><code>trashing-user    display-name=tempor</code><ul>
+<li>Output only. A plain text displayable name for this user.</li>
 </ul>
 </li>
-<li><code>email-address=gubergren</code><ul>
-<li>The email address of the user.</li>
+<li><code>email-address=nonumy</code><ul>
+<li>Output only. The email address of the user.</li>
 </ul>
 </li>
 <li><code>is-authenticated-user=false</code><ul>
-<li>Whether this user is the same as the authenticated user for whom the request was made.</li>
+<li>Output only. Whether this user is the same as the authenticated user for whom the request was made.</li>
 </ul>
 </li>
-<li><code>kind=voluptua.</code><ul>
-<li>This is always drive#user.</li>
+<li><code>kind=et</code><ul>
+<li>Output only. This is always <code>drive#user</code>.</li>
 </ul>
 </li>
-<li><code>permission-id=stet</code><ul>
-<li>The user&#39;s ID as visible in the permissions collection.</li>
-</ul>
-</li>
-<li>
-<p><code>picture    url=lorem</code></p>
-<ul>
-<li>A URL that points to a profile picture of this user.</li>
+<li><code>permission-id=et</code><ul>
+<li>Output only. The user&#39;s ID as visible in the permissions collection.</li>
 </ul>
 </li>
 <li>
-<p><code>...user-permission    additional-roles=amet</code></p>
+<p><code>picture    url=nonumy</code></p>
 <ul>
-<li>Additional roles for this user. Only commenter is currently allowed, though more may be supported in the future.</li>
+<li>Output Only. A URL that points to a profile picture of this user.</li>
+</ul>
+</li>
+<li>
+<p><code>...user-permission    additional-roles=sit</code></p>
+<ul>
+<li>Additional roles for this user. Only <code>commenter</code> is currently allowed, though more may be supported in the future.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
 </ul>
 </li>
-<li><code>auth-key=sed</code><ul>
-<li>Deprecated.</li>
+<li><code>auth-key=lorem</code><ul>
+<li>Output only. Deprecated.</li>
 </ul>
 </li>
 <li><code>deleted=true</code><ul>
-<li>Whether the account associated with this permission has been deleted. This field only pertains to user and group permissions.</li>
+<li>Output only. Whether the account associated with this permission has been deleted. This field only pertains to user and group permissions.</li>
 </ul>
 </li>
-<li><code>domain=eirmod</code><ul>
-<li>The domain name of the entity this permission refers to. This is an output-only field which is present when the permission type is user, group or domain.</li>
+<li><code>domain=sea</code><ul>
+<li>Output only. The domain name of the entity this permission refers to. This is an output-only field which is present when the permission type is <code>user</code>, <code>group</code> or <code>domain</code>.</li>
 </ul>
 </li>
-<li><code>email-address=sit</code><ul>
-<li>The email address of the user or group this permission refers to. This is an output-only field which is present when the permission type is user or group.</li>
+<li><code>email-address=duo</code><ul>
+<li>Output only. The email address of the user or group this permission refers to. This is an output-only field which is present when the permission type is <code>user</code> or <code>group</code>.</li>
 </ul>
 </li>
-<li><code>etag=no</code><ul>
-<li>The ETag of the permission.</li>
+<li><code>etag=sea</code><ul>
+<li>Output only. The ETag of the permission.</li>
 </ul>
 </li>
-<li><code>expiration-date=kasd</code><ul>
-<li>The time at which this permission will expire (RFC 3339 date-time). Expiration dates have the following restrictions:  <ul>
-<li>They cannot be set on shared drive items </li>
-<li>They can only be set on user and group permissions </li>
-<li>The date must be in the future </li>
-<li>The date cannot be more than a year in the future </li>
-<li>The date can only be set on drive.permissions.update or drive.permissions.patch requests</li>
+<li><code>expiration-date=stet</code><ul>
+<li>The time at which this permission will expire (RFC 3339 date-time). Expiration dates have the following restrictions: - They can only be set on user and group permissions - The date must be in the future - The date cannot be more than a year in the future - The date can only be set on drive.permissions.update or drive.permissions.patch requests</li>
 </ul>
 </li>
+<li><code>id=erat</code><ul>
+<li>The ID of the user this permission refers to, and identical to the <code>permissionId</code> in the About and Files resources. When making a <code>drive.permissions.insert</code> request, exactly one of the <code>id</code> or <code>value</code> fields must be specified unless the permission type is <code>anyone</code>, in which case both <code>id</code> and <code>value</code> are ignored.</li>
 </ul>
 </li>
-<li><code>id=stet</code><ul>
-<li>The ID of the user this permission refers to, and identical to the permissionId in the About and Files resources. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type is anyone, in which case both id and value are ignored.</li>
+<li><code>kind=eirmod</code><ul>
+<li>Output only. This is always <code>drive#permission</code>.</li>
 </ul>
 </li>
-<li><code>kind=accusam</code><ul>
-<li>This is always drive#permission.</li>
+<li><code>name=no</code><ul>
+<li>Output only. The name for this permission.</li>
 </ul>
 </li>
-<li><code>name=lorem</code><ul>
-<li>The name for this permission.</li>
+<li><code>pending-owner=true</code><ul>
+<li>Whether the account associated with this permission is a pending owner. Only populated for <code>user</code> type permissions for files that are not in a shared drive.</li>
 </ul>
 </li>
-<li><code>pending-owner=false</code><ul>
-<li>Whether the account associated with this permission is a pending owner. Only populated for user type permissions for files that are not in a shared drive.</li>
+<li><code>photo-link=accusam</code><ul>
+<li>Output only. A link to the profile photo, if available.</li>
 </ul>
 </li>
-<li><code>photo-link=nonumy</code><ul>
-<li>A link to the profile photo, if available.</li>
+<li><code>role=et</code><ul>
+<li>The primary role for this user. While new values may be supported in the future, the following are currently allowed: * <code>owner</code> * <code>organizer</code> * <code>fileOrganizer</code> * <code>writer</code> * <code>reader</code></li>
 </ul>
 </li>
-<li><code>role=kasd</code><ul>
-<li>The primary role for this user. While new values may be supported in the future, the following are currently allowed:  <ul>
-<li>owner </li>
-<li>organizer </li>
-<li>fileOrganizer </li>
-<li>writer </li>
-<li>reader</li>
+<li><code>self-link=sit</code><ul>
+<li>Output only. A link back to this permission.</li>
 </ul>
 </li>
-</ul>
-</li>
-<li><code>self-link=et</code><ul>
-<li>A link back to this permission.</li>
-</ul>
-</li>
-<li><code>type=amet</code><ul>
-<li>The account type. Allowed values are:  <ul>
-<li>user </li>
-<li>group </li>
-<li>domain </li>
-<li>anyone</li>
-</ul>
-</li>
+<li><code>type=lorem</code><ul>
+<li>The account type. Allowed values are: * <code>user</code> * <code>group</code> * <code>domain</code> * <code>anyone</code></li>
 </ul>
 </li>
 <li><code>value=et</code><ul>
-<li>The email address or domain name for the entity. This is used during inserts and is not populated in responses. When making a drive.permissions.insert request, exactly one of the id or value fields must be specified unless the permission type is anyone, in which case both id and value are ignored.</li>
+<li>The email address or domain name for the entity. This is used during inserts and is not populated in responses. When making a <code>drive.permissions.insert</code> request, exactly one of the <code>id</code> or <code>value</code> fields must be specified unless the permission type is <code>anyone</code>, in which case both <code>id</code> and <code>value</code> are ignored.</li>
 </ul>
 </li>
-<li><code>view=dolor</code><ul>
-<li>Indicates the view for this permission. Only populated for permissions that belong to a view. published is the only supported value.</li>
+<li><code>view=tempor</code><ul>
+<li>Indicates the view for this permission. Only populated for permissions that belong to a view. <code>published</code> is the only supported value.</li>
 </ul>
 </li>
 <li>
@@ -1469,33 +1200,33 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..    version=sanctus</code></p>
+<p><code>..    version=vero</code></p>
 <ul>
-<li>A monotonically increasing version number for the file. This reflects every change made to the file on the server, even those not visible to the requesting user.</li>
+<li>Output only. A monotonically increasing version number for the file. This reflects every change made to the file on the server, even those not visible to the requesting user.</li>
 </ul>
 </li>
-<li><code>video-media-metadata    duration-millis=dolor</code><ul>
-<li>The duration of the video in milliseconds.</li>
+<li><code>video-media-metadata    duration-millis=at</code><ul>
+<li>Output only. The duration of the video in milliseconds.</li>
 </ul>
 </li>
-<li><code>height=100</code><ul>
-<li>The height of the video in pixels.</li>
+<li><code>height=81</code><ul>
+<li>Output only. The height of the video in pixels.</li>
 </ul>
 </li>
 <li>
-<p><code>width=91</code></p>
+<p><code>width=34</code></p>
 <ul>
-<li>The width of the video in pixels.</li>
+<li>Output only. The width of the video in pixels.</li>
 </ul>
 </li>
 <li>
-<p><code>..    web-content-link=sanctus</code></p>
+<p><code>..    web-content-link=et</code></p>
 <ul>
-<li>A link for downloading the content of the file in a browser using cookie based authentication. In cases where the content is shared publicly, the content can be downloaded without any credentials.</li>
+<li>Output only. A link for downloading the content of the file in a browser using cookie based authentication. In cases where the content is shared publicly, the content can be downloaded without any credentials.</li>
 </ul>
 </li>
-<li><code>web-view-link=sit</code><ul>
-<li>A link only available on public folders for viewing their static web assets (HTML, CSS, JS, etc) via Google Drive&#39;s Website Hosting.</li>
+<li><code>web-view-link=lorem</code><ul>
+<li>Output only. A link only available on public folders for viewing their static web assets (HTML, CSS, JS, etc) via Google Drive&#39;s Website Hosting.</li>
 </ul>
 </li>
 <li><code>writers-can-share=true</code><ul>
@@ -1555,31 +1286,37 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p convert=boolean</strong></p>
 <ul>
-<li>This parameter is deprecated and has no function.</li>
+<li>Deprecated: This parameter has no function.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p enforce-single-parent=boolean</strong></p>
 <ul>
-<li>Deprecated. Adding files to multiple folders is no longer supported. Use shortcuts instead.</li>
+<li>Deprecated: Adding files to multiple folders is no longer supported. Use <code>shortcuts</code> instead.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p include-labels=string</strong></p>
+<ul>
+<li>A comma-separated list of IDs of labels to include in the <code>labelInfo</code> part of the response.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p include-permissions-for-view=string</strong></p>
 <ul>
-<li>Specifies which additional view&#39;s permissions to include in the response. Only &#39;published&#39; is supported.</li>
+<li>Specifies which additional view&#39;s permissions to include in the response. Only <code>published</code> is supported.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p modified-date-behavior=string</strong></p>
 <ul>
-<li>Determines the behavior in which modifiedDate is updated. This overrides setModifiedDate.</li>
+<li>Determines the behavior in which <code>modifiedDate</code> is updated. This overrides <code>setModifiedDate</code>.</li>
 </ul>
 </li>
 <li>
 <p><strong>-p new-revision=boolean</strong></p>
 <ul>
-<li>Whether a blob upload should create a new revision. If false, the blob data in the current head revision is replaced. If true or not set, a new blob is created as head revision, and previous unpinned revisions are preserved for a short period of time. Pinned revisions are stored indefinitely, using additional storage quota, up to a maximum of 200 revisions. For details on how revisions are retained, see the Drive Help Center. Note that this field is ignored if there is no payload in the request.</li>
+<li>Whether a blob upload should create a new revision. If false, the blob data in the current head revision is replaced. If true or not set, a new blob is created as head revision, and previous unpinned revisions are preserved for a short period of time. Pinned revisions are stored indefinitely, using additional storage quota, up to a maximum of 200 revisions. For details on how revisions are retained, see the <a href="https://support.google.com/drive/answer/2409045">Drive Help Center</a>.</li>
 </ul>
 </li>
 <li>
@@ -1597,7 +1334,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p pinned=boolean</strong></p>
 <ul>
-<li>Whether to pin the new revision. A file can have a maximum of 200 pinned revisions. Note that this field is ignored if there is no payload in the request.</li>
+<li>Whether to pin the new revision. A file can have a maximum of 200 pinned revisions.</li>
 </ul>
 </li>
 <li>
@@ -1609,7 +1346,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p set-modified-date=boolean</strong></p>
 <ul>
-<li>Whether to set the modified date using the value supplied in the request body. Setting this field to true is equivalent to modifiedDateBehavior=fromBodyOrNow, and false is equivalent to modifiedDateBehavior=now. To prevent any changes to the modified date set modifiedDateBehavior=noChange.</li>
+<li>Whether to set the modified date using the value supplied in the request body. Setting this field to <code>true</code> is equivalent to <code>modifiedDateBehavior=fromBodyOrNow</code>, and <code>false</code> is equivalent to <code>modifiedDateBehavior=now</code>. To prevent any changes to the modified date set <code>modifiedDateBehavior=noChange</code>.</li>
 </ul>
 </li>
 <li>
@@ -1621,7 +1358,7 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p supports-team-drives=boolean</strong></p>
 <ul>
-<li>Deprecated use supportsAllDrives instead.</li>
+<li>Deprecated: Use <code>supportsAllDrives</code> instead.</li>
 </ul>
 </li>
 <li>
@@ -1653,9 +1390,27 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <p>The following properties can configure any call, and are not specific to this method.</p>
 <ul>
 <li>
+<p><strong>-p $-xgafv=string</strong></p>
+<ul>
+<li>V1 error format.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p access-token=string</strong></p>
+<ul>
+<li>OAuth access token.</li>
+</ul>
+</li>
+<li>
 <p><strong>-p alt=string</strong></p>
 <ul>
-<li>Data format for the response.</li>
+<li>Data format for response.</li>
+</ul>
+</li>
+<li>
+<p><strong>-p callback=string</strong></p>
+<ul>
+<li>JSONP</li>
 </ul>
 </li>
 <li>
@@ -1685,42 +1440,40 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <li>
 <p><strong>-p quota-user=string</strong></p>
 <ul>
-<li>An opaque string that represents a user for quota purposes. Must not exceed 40 characters.</li>
+<li>Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.</li>
 </ul>
 </li>
 <li>
-<p><strong>-p user-ip=string</strong></p>
+<p><strong>-p upload-type=string</strong></p>
 <ul>
-<li>Deprecated. Please use quotaUser instead.</li>
+<li>Legacy upload protocol for media (e.g. &#34;media&#34;, &#34;multipart&#34;).</li>
+</ul>
+</li>
+<li>
+<p><strong>-p upload-protocol=string</strong></p>
+<ul>
+<li>Upload protocol for media (e.g. &#34;raw&#34;, &#34;multipart&#34;).</li>
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../files_watch" class="btn btn-neutral float-right" title="Watch"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../files_untrash" class="btn btn-neutral" title="Untrash"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../files_untrash/" class="btn btn-neutral float-left" title="Untrash"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../files_watch/" class="btn btn-neutral float-right" title="Watch">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -1728,14 +1481,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../files_untrash" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../files_watch" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/drive2-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../files_untrash/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../files_watch/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>

@@ -1,412 +1,263 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <title>Update - storage v3.0.0+20220228</title>
-  
-
-  
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../css/highlight.css">
-
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  <script type="text/javascript" src="../js/highlight.pack.js"></script>
-  <script src="../js/theme.js"></script>
-
-  <style>
-    body {font-size: 90%;}
-    pre, code {font-size: 100%;}
-    h3, h4, h5, h6 {color: #2980b9; font-weight: 300}
-  </style> 
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="http://byron.github.io/google-apis-rs/google-storage1-cli/buckets_update/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Update - storage v5.0.4+20240229</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Update";
+        var mkdocs_page_input_path = "buckets_update.md";
+        var mkdocs_page_url = "/google-apis-rs/google-storage1-cli/buckets_update/";
+      </script>
+    
+    <script src="../js/jquery-3.6.0.min.js" defer></script>
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+      <script>hljs.initHighlightingOnLoad();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href=".." class="icon icon-home"> storage v3.0.0+20220228</a>
-        
+          <a href=".." class="icon icon-home"> storage v5.0.4+20240229
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-      <ul class="current">
-    
-        
-        <span>Bucket Access Controls</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bucket-access-controls_delete">Delete</a>
-                    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bucket-access-controls_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bucket-access-controls_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bucket-access-controls_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bucket-access-controls_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../bucket-access-controls_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Buckets</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buckets_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buckets_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buckets_get-iam-policy">Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buckets_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buckets_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buckets_lock-retention-policy">Lock Retention Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buckets_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buckets_set-iam-policy">Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../buckets_test-iam-permissions">Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 current">
-                    <a class="current" href=".">Update</a>
-                    
-                        <ul>
-                        
-                            <li class="toctree-l2"><a href="#scopes">Scopes</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-scalar-argument">Required Scalar Argument</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#required-request-value">Required Request Value</a></li>
-                            
-                                <li><a class="toctree-l3" href="#about-cursors">About Cursors</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-output-flags">Optional Output Flags</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-method-properties">Optional Method Properties</a></li>
-                            
-                        
-                            <li class="toctree-l2"><a href="#optional-general-properties">Optional General Properties</a></li>
-                            
-                        
-                        </ul>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Channels</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../channels_stop">Stop</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Default Object Access Controls</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../default-object-access-controls_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../default-object-access-controls_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../default-object-access-controls_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../default-object-access-controls_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../default-object-access-controls_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../default-object-access-controls_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Notifications</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../notifications_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../notifications_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../notifications_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../notifications_list">List</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Object Access Controls</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../object-access-controls_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../object-access-controls_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../object-access-controls_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../object-access-controls_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../object-access-controls_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../object-access-controls_update">Update</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Objects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../objects_compose">Compose</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../objects_copy">Copy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../objects_delete">Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../objects_get">Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../objects_get-iam-policy">Get Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../objects_insert">Insert</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../objects_list">List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../objects_patch">Patch</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../objects_rewrite">Rewrite</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../objects_set-iam-policy">Set Iam Policy</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../objects_test-iam-permissions">Test Iam Permissions</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../objects_update">Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../objects_watch-all">Watch All</a>
-                    
-                </li>
-            
-        
-
-    
-        
-        <span>Projects</span>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_hmac-keys-create">Hmac Keys Create</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_hmac-keys-delete">Hmac Keys Delete</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_hmac-keys-get">Hmac Keys Get</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_hmac-keys-list">Hmac Keys List</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_hmac-keys-update">Hmac Keys Update</a>
-                    
-                </li>
-            
-                <li class="toctree-l1 ">
-                    <a class="" href="../projects_service-account-get">Service Account Get</a>
-                    
-                </li>
-            
-        
-
-    
-</ul>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Anywhere Caches</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../anywhere-caches_disable/">Disable</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../anywhere-caches_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../anywhere-caches_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../anywhere-caches_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../anywhere-caches_pause/">Pause</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../anywhere-caches_resume/">Resume</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../anywhere-caches_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Bucket Access Controls</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../bucket-access-controls_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bucket-access-controls_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bucket-access-controls_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bucket-access-controls_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bucket-access-controls_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../bucket-access-controls_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Buckets</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_lock-retention-policy/">Lock Retention Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_operations-cancel/">Operations Cancel</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_operations-get/">Operations Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_operations-list/">Operations List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../buckets_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Update</a>
+    <ul class="current">
+    </ul>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Channels</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../channels_stop/">Stop</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Default Object Access Controls</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../default-object-access-controls_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../default-object-access-controls_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../default-object-access-controls_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../default-object-access-controls_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../default-object-access-controls_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../default-object-access-controls_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Folders</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../folders_rename/">Rename</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Managed Folders</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../managed-folders_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../managed-folders_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../managed-folders_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../managed-folders_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../managed-folders_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../managed-folders_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../managed-folders_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Notifications</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../notifications_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../notifications_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../notifications_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../notifications_list/">List</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Object Access Controls</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../object-access-controls_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object-access-controls_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object-access-controls_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object-access-controls_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object-access-controls_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../object-access-controls_update/">Update</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Objects</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_bulk-restore/">Bulk Restore</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_compose/">Compose</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_copy/">Copy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_delete/">Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_get/">Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_get-iam-policy/">Get Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_insert/">Insert</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_list/">List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_patch/">Patch</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_restore/">Restore</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_rewrite/">Rewrite</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_set-iam-policy/">Set Iam Policy</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_test-iam-permissions/">Test Iam Permissions</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_update/">Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../objects_watch-all/">Watch All</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Projects</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_hmac-keys-create/">Hmac Keys Create</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_hmac-keys-delete/">Hmac Keys Delete</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_hmac-keys-get/">Hmac Keys Get</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_hmac-keys-list/">Hmac Keys List</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_hmac-keys-update/">Hmac Keys Update</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects_service-account-get/">Service Account Get</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="icon icon-reorder"></i>
-        <a href=".."></a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">storage v5.0.4+20240229</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="..">Docs</a> &raquo;</li>
-    <li>Update</li>
-      <li class="wy-breadcrumbs-aside">
-        
-          
-            <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/storage1-cli" class="icon icon-github"> Edit on GitHub</a>
-          
-        
-      </li>
+    <li><a href=".." class="icon icon-home" alt="Docs"></a> &raquo;</li>
+          <li>Buckets &raquo;</li>
+      <li>Update</li>
+    <li class="wy-breadcrumbs-aside">
+        <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/storage1-cli/edit/master/docs/buckets_update.md"
+          class="icon icon-github"> Edit on GitHub</a>
+    </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-              <p>Updates a bucket. Changes to the bucket will be readable immediately after writing, but configuration changes may take time to propagate.</p>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p>Updates a bucket. Changes to the bucket will be readable immediately after writing, but configuration changes may take time to propagate.</p>
 <h1 id="scopes">Scopes</h1>
 <p>You will need authorization for at least one of the following scopes to make a valid call:</p>
 <ul>
@@ -429,6 +280,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 <pre><code>Bucket:
   autoclass:
     enabled: boolean
+    terminal-storage-class: string
+    terminal-storage-class-update-time: string
     toggle-time: string
   billing:
     requester-pays: boolean
@@ -438,6 +291,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   encryption:
     default-kms-key-name: string
   etag: string
+  hierarchical-namespace:
+    enabled: boolean
   iam-configuration:
     bucket-policy-only:
       enabled: boolean
@@ -456,6 +311,8 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     log-object-prefix: string
   metageneration: string
   name: string
+  object-retention:
+    mode: string
   owner:
     entity: string
     entity-id: string
@@ -467,6 +324,9 @@ In the latter case it is advised to set the field-cursor to the data-structure's
   rpo: string
   satisfies-pzs: boolean
   self-link: string
+  soft-delete-policy:
+    effective-time: string
+    retention-duration-seconds: string
   storage-class: string
   time-created: string
   updated: string
@@ -477,15 +337,22 @@ In the latter case it is advised to set the field-cursor to the data-structure's
     not-found-page: string
 
 </code></pre>
-
 <p>can be set completely with the following arguments which are assumed to be executed in the given order. Note how the cursor position is adjusted to the respective structures, allowing simple field names to be used most of the time.</p>
 <ul>
 <li><code>-r .autoclass    enabled=true</code><ul>
 <li>Whether or not Autoclass is enabled on this bucket</li>
 </ul>
 </li>
+<li><code>terminal-storage-class=erat</code><ul>
+<li>The storage class that objects in the bucket eventually transition to if they are not read for a certain length of time. Valid values are NEARLINE and ARCHIVE.</li>
+</ul>
+</li>
+<li><code>terminal-storage-class-update-time=dolores</code><ul>
+<li>A date and time in RFC 3339 format representing the time of the most recent update to &#34;terminalStorageClass&#34;.</li>
+</ul>
+</li>
 <li>
-<p><code>toggle-time=nonumy</code></p>
+<p><code>toggle-time=erat</code></p>
 <ul>
 <li>A date and time in RFC 3339 format representing the instant at which &#34;enabled&#34; was last toggled.</li>
 </ul>
@@ -497,7 +364,7 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..custom-placement-config    data-locations=sadipscing</code></p>
+<p><code>..custom-placement-config    data-locations=sea</code></p>
 <ul>
 <li>The list of regional locations in which data is placed.</li>
 <li>Each invocation of this argument appends the given value to the array.</li>
@@ -510,103 +377,119 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>encryption    default-kms-key-name=sadipscing</code></p>
+<p><code>encryption    default-kms-key-name=lorem</code></p>
 <ul>
 <li>A Cloud KMS key that will be used to encrypt objects inserted into this bucket, if no encryption method is specified.</li>
 </ul>
 </li>
 <li>
-<p><code>..    etag=erat</code></p>
+<p><code>..    etag=et</code></p>
 <ul>
 <li>HTTP 1.1 Entity tag for the bucket.</li>
 </ul>
 </li>
-<li><code>iam-configuration.bucket-policy-only    enabled=false</code><ul>
+<li>
+<p><code>hierarchical-namespace    enabled=false</code></p>
+<ul>
+<li>When set to true, hierarchical namespace is enabled for this bucket.</li>
+</ul>
+</li>
+<li>
+<p><code>..iam-configuration.bucket-policy-only    enabled=true</code></p>
+<ul>
 <li>If set, access is controlled only by bucket-level or above IAM policies.</li>
 </ul>
 </li>
 <li>
-<p><code>locked-time=amet</code></p>
+<p><code>locked-time=erat</code></p>
 <ul>
 <li>The deadline for changing iamConfiguration.bucketPolicyOnly.enabled from true to false in RFC 3339 format. iamConfiguration.bucketPolicyOnly.enabled may be changed from true to false until the locked time, after which the field is immutable.</li>
 </ul>
 </li>
 <li>
-<p><code>..    public-access-prevention=est</code></p>
+<p><code>..    public-access-prevention=sea</code></p>
 <ul>
 <li>The bucket&#39;s Public Access Prevention configuration. Currently, &#39;inherited&#39; and &#39;enforced&#39; are supported.</li>
 </ul>
 </li>
-<li><code>uniform-bucket-level-access    enabled=false</code><ul>
+<li><code>uniform-bucket-level-access    enabled=true</code><ul>
 <li>If set, access is controlled only by bucket-level or above IAM policies.</li>
 </ul>
 </li>
 <li>
-<p><code>locked-time=consetetur</code></p>
+<p><code>locked-time=et</code></p>
 <ul>
 <li>The deadline for changing iamConfiguration.uniformBucketLevelAccess.enabled from true to false in RFC 3339  format. iamConfiguration.uniformBucketLevelAccess.enabled may be changed from true to false until the locked time, after which the field is immutable.</li>
 </ul>
 </li>
 <li>
-<p><code>...    id=stet</code></p>
+<p><code>...    id=gubergren</code></p>
 <ul>
 <li>The ID of the bucket. For buckets, the id and name properties are the same.</li>
 </ul>
 </li>
-<li><code>kind=est</code><ul>
+<li><code>kind=justo</code><ul>
 <li>The kind of item this is. For buckets, this is always storage#bucket.</li>
 </ul>
 </li>
-<li><code>labels=key=aliquyam</code><ul>
+<li><code>labels=key=sea</code><ul>
 <li>User-provided labels, in key/value pairs.</li>
 <li>the value will be associated with the given <code>key</code></li>
 </ul>
 </li>
-<li><code>location=elitr</code><ul>
+<li><code>location=consetetur</code><ul>
 <li>The location of the bucket. Object data for objects in the bucket resides in physical storage within this region. Defaults to US. See the developer&#39;s guide for the authoritative list.</li>
 </ul>
 </li>
-<li><code>location-type=duo</code><ul>
+<li><code>location-type=sit</code><ul>
 <li>The type of the bucket location.</li>
 </ul>
 </li>
-<li><code>logging    log-bucket=diam</code><ul>
+<li><code>logging    log-bucket=aliquyam</code><ul>
 <li>The destination bucket where the current bucket&#39;s logs should be placed.</li>
 </ul>
 </li>
 <li>
-<p><code>log-object-prefix=est</code></p>
+<p><code>log-object-prefix=eos</code></p>
 <ul>
 <li>A prefix for log object names.</li>
 </ul>
 </li>
 <li>
-<p><code>..    metageneration=sit</code></p>
+<p><code>..    metageneration=at</code></p>
 <ul>
 <li>The metadata generation of this bucket.</li>
 </ul>
 </li>
-<li><code>name=sed</code><ul>
+<li><code>name=dolores</code><ul>
 <li>The name of the bucket.</li>
 </ul>
 </li>
-<li><code>owner    entity=eos</code><ul>
+<li>
+<p><code>object-retention    mode=consetetur</code></p>
+<ul>
+<li>The bucket&#39;s object retention mode. Can be Enabled.</li>
+</ul>
+</li>
+<li>
+<p><code>..owner    entity=gubergren</code></p>
+<ul>
 <li>The entity, in the form project-owner-projectId.</li>
 </ul>
 </li>
 <li>
-<p><code>entity-id=lorem</code></p>
+<p><code>entity-id=dolor</code></p>
 <ul>
 <li>The ID for the entity.</li>
 </ul>
 </li>
 <li>
-<p><code>..    project-number=ea</code></p>
+<p><code>..    project-number=aliquyam</code></p>
 <ul>
 <li>The project number of the project the bucket belongs to.</li>
 </ul>
 </li>
-<li><code>retention-policy    effective-time=stet</code><ul>
+<li><code>retention-policy    effective-time=no</code><ul>
 <li>Server-determined value that indicates the time from which policy was enforced and effective. This value is in RFC 3339 format.</li>
 </ul>
 </li>
@@ -615,34 +498,46 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>retention-period=sea</code></p>
+<p><code>retention-period=lorem</code></p>
 <ul>
 <li>The duration in seconds that objects need to be retained. Retention duration must be greater than zero and less than 100 years. Note that enforcement of retention periods less than a day is not guaranteed. Such periods should only be used for testing purposes.</li>
 </ul>
 </li>
 <li>
-<p><code>..    rpo=et</code></p>
+<p><code>..    rpo=accusam</code></p>
 <ul>
 <li>The Recovery Point Objective (RPO) of this bucket. Set to ASYNC_TURBO to turn on Turbo Replication on a bucket.</li>
 </ul>
 </li>
-<li><code>satisfies-pzs=false</code><ul>
+<li><code>satisfies-pzs=true</code><ul>
 <li>Reserved for future use.</li>
 </ul>
 </li>
-<li><code>self-link=dolore</code><ul>
+<li><code>self-link=sadipscing</code><ul>
 <li>The URI of this bucket.</li>
 </ul>
 </li>
-<li><code>storage-class=eirmod</code><ul>
+<li><code>soft-delete-policy    effective-time=at</code><ul>
+<li>Server-determined value that indicates the time from which the policy, or one with a greater retention, was effective. This value is in RFC 3339 format.</li>
+</ul>
+</li>
+<li>
+<p><code>retention-duration-seconds=sit</code></p>
+<ul>
+<li>The duration in seconds that soft-deleted objects in the bucket will be retained and cannot be permanently deleted.</li>
+</ul>
+</li>
+<li>
+<p><code>..    storage-class=duo</code></p>
+<ul>
 <li>The bucket&#39;s default storage class, used whenever no storageClass is specified for a newly-created object. This defines how objects in the bucket are stored and determines the SLA and the cost of storage. Values include MULTI_REGIONAL, REGIONAL, STANDARD, NEARLINE, COLDLINE, ARCHIVE, and DURABLE_REDUCED_AVAILABILITY. If this value is not specified when the bucket is created, it will default to STANDARD. For more information, see storage classes.</li>
 </ul>
 </li>
-<li><code>time-created=lorem</code><ul>
+<li><code>time-created=sit</code><ul>
 <li>The creation time of the bucket in RFC 3339 format.</li>
 </ul>
 </li>
-<li><code>updated=accusam</code><ul>
+<li><code>updated=magna</code><ul>
 <li>The modification time of the bucket in RFC 3339 format.</li>
 </ul>
 </li>
@@ -653,12 +548,12 @@ In the latter case it is advised to set the field-cursor to the data-structure's
 </ul>
 </li>
 <li>
-<p><code>..website    main-page-suffix=erat</code></p>
+<p><code>..website    main-page-suffix=dolor</code></p>
 <ul>
 <li>If the requested object path is missing, the service will ensure the path has a trailing &#39;/&#39;, append this suffix, and attempt to retrieve the resulting object. This allows the creation of index.html objects to represent directory pages.</li>
 </ul>
 </li>
-<li><code>not-found-page=dolores</code><ul>
+<li><code>not-found-page=lorem</code><ul>
 <li>If the requested object path is missing, and any mainPageSuffix object is missing, if applicable, the service will return the named object from this bucket as the content for a 404 Not Found result.</li>
 </ul>
 </li>
@@ -715,12 +610,6 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 <p><strong>-p projection=string</strong></p>
 <ul>
 <li>Set of properties to return. Defaults to full.</li>
-</ul>
-</li>
-<li>
-<p><strong>-p provisional-user-project=string</strong></p>
-<ul>
-<li>The project to be billed for this request if the target bucket is requester-pays bucket.</li>
 </ul>
 </li>
 <li>
@@ -782,32 +671,24 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 </ul>
 </li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../channels_stop" class="btn btn-neutral float-right" title="Stop"/>Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../buckets_test-iam-permissions" class="btn btn-neutral" title="Test Iam Permissions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../buckets_test-iam-permissions/" class="btn btn-neutral float-left" title="Test Iam Permissions"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../channels_stop/" class="btn btn-neutral float-right" title="Stop">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
     <!-- Copyright etc -->
-    </p>
+      <p>Copyright &copy; 2015-2020, `Sebastian Thiel`</p>
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a>, using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
@@ -815,14 +696,30 @@ or more key-value-pairs, and is called like this <code>-p k1=v1 k2=v2</code> eve
 
   </div>
 
-<div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-        
-            <a class="icon icon-github" style="float: left; color: #fcfcfc"> GitHub</a>
-        
-      <span><a href="../buckets_test-iam-permissions" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      <span style="margin-left: 15px"><a href="../channels_stop" style="color: #fcfcfc">Next &raquo;</a></span>
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Byron/google-apis-rs/tree/main/gen/storage1-cli" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../buckets_test-iam-permissions/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../channels_stop/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme_extra.js" defer></script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
 </body>
 </html>
