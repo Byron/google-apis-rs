@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 6.0.2 (2024-03-11)
 
 Fix deprecation warnings in latest version of the `chrono` crate.
 
@@ -13,7 +13,7 @@ Fix deprecation warnings in latest version of the `chrono` crate.
 
 <csr-read-only-do-not-edit/>
 
- - 9 commits contributed to the release over the course of 65 calendar days.
+ - 10 commits contributed to the release over the course of 65 calendar days.
  - 65 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -25,6 +25,7 @@ Fix deprecation warnings in latest version of the `chrono` crate.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Prepare changelog prior to release of google-apis-common ([`7ecead7`](https://github.com/Byron/google-apis-rs/commit/7ecead753cddcd890626e465f95d7fc9dee594db))
     - Merge branch 'docker' ([`292a86e`](https://github.com/Byron/google-apis-rs/commit/292a86ee5a44a41533bbc3cde66c8739766b46a5))
     - Fix lints by avoiding deprecated methods with latest chrono ([`36f78cd`](https://github.com/Byron/google-apis-rs/commit/36f78cdebfa1c9dc8ac7b58ceb1f3f889a14b20c))
     - Merge pull request #471 from ytanay/fix-base64-deserialization-borrowed ([`b74056b`](https://github.com/Byron/google-apis-rs/commit/b74056b4b7e4e573e83e0fa2237b622be9655195))
