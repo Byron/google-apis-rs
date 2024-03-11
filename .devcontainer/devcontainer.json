@@ -1,0 +1,8 @@
+{
+    "name": "Google-ApiS-rs Dev Container",
+    "build": {
+        "context": "..",
+        "dockerfile": "Dockerfile"
+    },
+    "remoteUser": "root"
+}
