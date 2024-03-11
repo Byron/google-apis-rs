@@ -9,13 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Fix deprecation warnings in latest version of the `chrono` crate.
 
+### Bug Fixes
+
+ - <csr-id-fa7f7b13fb07aa64be95a1d6fc42906f4d14a13c/> update `chrono` dependency version
+   It now requires a minimal version that introduced `try_seconds()`,
+   which is now being used instead of `seconds()`.
+
 ### Commit Statistics
 
 <csr-read-only-do-not-edit/>
 
- - 10 commits contributed to the release over the course of 65 calendar days.
- - 65 days passed between releases.
- - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 1 commit contributed to the release.
+ - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
 ### Commit Details
@@ -25,16 +30,7 @@ Fix deprecation warnings in latest version of the `chrono` crate.
 <details><summary>view details</summary>
 
  * **Uncategorized**
-    - Prepare changelog prior to release of google-apis-common ([`7ecead7`](https://github.com/Byron/google-apis-rs/commit/7ecead753cddcd890626e465f95d7fc9dee594db))
-    - Merge branch 'docker' ([`292a86e`](https://github.com/Byron/google-apis-rs/commit/292a86ee5a44a41533bbc3cde66c8739766b46a5))
-    - Fix lints by avoiding deprecated methods with latest chrono ([`36f78cd`](https://github.com/Byron/google-apis-rs/commit/36f78cdebfa1c9dc8ac7b58ceb1f3f889a14b20c))
-    - Merge pull request #471 from ytanay/fix-base64-deserialization-borrowed ([`b74056b`](https://github.com/Byron/google-apis-rs/commit/b74056b4b7e4e573e83e0fa2237b622be9655195))
-    - Use Cow for reading base64 strings ([`a8d7356`](https://github.com/Byron/google-apis-rs/commit/a8d735628215d13d736447e919d0bd57767135c5))
-    - Add failing test case for reading base64 string via reader ([`f990fd0`](https://github.com/Byron/google-apis-rs/commit/f990fd0589bb7f5d904c4ef613cd004c4883bcc1))
-    - Merge pull request #465 from andrewbaxter/field-mask-pub-value ([`00a3e18`](https://github.com/Byron/google-apis-rs/commit/00a3e18145c9163a314253a62a4d28d5606c2944))
-    - Add docstring ([`d09893e`](https://github.com/Byron/google-apis-rs/commit/d09893e9212be1f346f6fe8ca61d39ff6c8b8232))
-    - Add FieldMask new method instead of making internals public ([`157b45f`](https://github.com/Byron/google-apis-rs/commit/157b45f6064b9d2c95c2b7057c60875312530103))
-    - Make field mask inner public ([`1ee4014`](https://github.com/Byron/google-apis-rs/commit/1ee401408c6c5ec78b229f9cea556dbb583d296b))
+    - Update `chrono` dependency version ([`fa7f7b1`](https://github.com/Byron/google-apis-rs/commit/fa7f7b13fb07aa64be95a1d6fc42906f4d14a13c))
 </details>
 
 ## 6.0.1 (2024-01-05)
