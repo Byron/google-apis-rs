@@ -36,6 +36,7 @@ async fn main() {
 
     let debug = matches.is_present("a${DEBUG_FLAG}");
     let connector = hyper_rustls::HttpsConnectorBuilder::new().with_native_roots()
+        .unwrap()
         .https_or_http()
         .enable_http1()
         .build();
