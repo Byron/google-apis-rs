@@ -1,3 +1,20 @@
+These crates have been published under the `google-*` prefix in the early days of the Rust ecosystem, but by now it has become 
+more of an issue as Google might become interested in publishing their own, and wondering why someone unaffiliated would take their name.
+
+For that reason, these crates are now unmaintained and shall be handed over to Google when they choose to release their own.
+
+### WARNING
+
+The following crates are not under my control and have been published by another party
+
+* `google-privateca1-cli`
+* `google-recaptchaenterprise1-cli`
+* `google-resourcesettings1-cli`
+
+Use at your own risk.
+
+----
+
 This repository holds [mako][mako] scripts to generate all Google APIs as described by the [google discovery service][api-discovery].
 
 The generate source code of each google API can be found in the `gen` subdirectory. Each google API resides in it's own crate which can be used as any other crate.
