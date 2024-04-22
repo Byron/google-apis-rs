@@ -169,7 +169,7 @@
             }
         }
     },
-    "revision": "20240223",
+    "revision": "20240412",
     "rootUrl": "https://servicecontrol.googleapis.com/",
     "schemas": {
         "Api": {
@@ -424,6 +424,24 @@
                     "description": "The required IAM permission.",
                     "type": "string"
                 },
+                "permissionType": {
+                    "description": "The type of the permission that was checked. For data access audit logs this corresponds with the permission type that must be enabled in the project/folder/organization IAM policy in order for the log to be written.",
+                    "enum": [
+                        "PERMISSION_TYPE_UNSPECIFIED",
+                        "ADMIN_READ",
+                        "ADMIN_WRITE",
+                        "DATA_READ",
+                        "DATA_WRITE"
+                    ],
+                    "enumDescriptions": [
+                        "Default. Should not be used.",
+                        "Permissions that gate reading resource configuration or metadata.",
+                        "Permissions that gate modification of resource configuration or metadata.",
+                        "Permissions that gate reading user-provided data.",
+                        "Permissions that gate writing user-provided data."
+                    ],
+                    "type": "string"
+                },
                 "resource": {
                     "description": "The resource being accessed, as a REST-style or cloud resource string. For example: bigquery.googleapis.com/projects/PROJECTID/datasets/DATASETID or projects/PROJECTID/datasets/DATASETID",
                     "type": "string"
@@ -594,7 +612,16 @@
         "ReportResponse": {
             "description": "Response message for the Report method.",
             "id": "ReportResponse",
-            "properties": {},
+            "properties": {
+                "extensions": {
+                    "additionalProperties": {
+                        "description": "Properties of the object. Contains field @type with type URL.",
+                        "type": "any"
+                    },
+                    "description": "The extension field to store serialized OTel responses. e.g. ExportLogsServiceResponse, ExportMetricsServiceResponse.",
+                    "type": "object"
+                }
+            },
             "type": "object"
         },
         "Request": {

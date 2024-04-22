@@ -632,11 +632,11 @@
             }
         }
     },
-    "revision": "20240224",
+    "revision": "20240412",
     "rootUrl": "https://storagetransfer.googleapis.com/",
     "schemas": {
         "AgentPool": {
-            "description": "Represents an On-Premises Agent pool.",
+            "description": "Represents an agent pool.",
             "id": "AgentPool",
             "properties": {
                 "bandwidthLimit": {
@@ -661,7 +661,7 @@
                     ],
                     "enumDescriptions": [
                         "Default value. This value is unused.",
-                        "This is an initialization state. During this stage, the resources such as Pub/Sub topics are allocated for the AgentPool.",
+                        "This is an initialization state. During this stage, resources are allocated for the AgentPool.",
                         "Determines that the AgentPool is created for use. At this state, Agents can join the AgentPool and participate in the transfer jobs in that pool.",
                         "Determines that the AgentPool deletion has been initiated, and all the resources are scheduled to be cleaned up and freed."
                     ],
@@ -726,11 +726,11 @@
                     "type": "string"
                 },
                 "cloudfrontDomain": {
-                    "description": "Optional. Cloudfront domain name pointing to this bucket (as origin), to use when fetching. Format: `https://{id}.cloudfront.net` or any valid custom domain `https://...`",
+                    "description": "Optional. The CloudFront distribution domain name pointing to this bucket, to use when fetching. See [Transfer from S3 via CloudFront](https://cloud.google.com/storage-transfer/docs/s3-cloudfront) for more information. Format: `https://{id}.cloudfront.net` or any valid custom domain. Must begin with `https://`.",
                     "type": "string"
                 },
                 "credentialsSecret": {
-                    "description": "Optional. The Resource name of a secret in Secret Manager. AWS credentials must be stored in Secret Manager in JSON format: { \"access_key_id\": \"ACCESS_KEY_ID\", \"secret_access_key\": \"SECRET_ACCESS_KEY\" } GoogleServiceAccount must be granted `roles/secretmanager.secretAccessor` for the resource. See [Configure access to a source: Amazon S3] (https://cloud.google.com/storage-transfer/docs/source-amazon-s3#secret_manager) for more information. If `credentials_secret` is specified, do not specify role_arn or aws_access_key. This feature is in [preview](https://cloud.google.com/terms/service-terms#1). Format: `projects/{project_number}/secrets/{secret_name}`",
+                    "description": "Optional. The Resource name of a secret in Secret Manager. AWS credentials must be stored in Secret Manager in JSON format: { \"access_key_id\": \"ACCESS_KEY_ID\", \"secret_access_key\": \"SECRET_ACCESS_KEY\" } GoogleServiceAccount must be granted `roles/secretmanager.secretAccessor` for the resource. See [Configure access to a source: Amazon S3] (https://cloud.google.com/storage-transfer/docs/source-amazon-s3#secret_manager) for more information. If `credentials_secret` is specified, do not specify role_arn or aws_access_key. Format: `projects/{project_number}/secrets/{secret_name}`",
                     "type": "string"
                 },
                 "path": {
@@ -757,7 +757,7 @@
                     "type": "string"
                 },
                 "credentialsSecret": {
-                    "description": "Optional. The Resource name of a secret in Secret Manager. The Azure SAS token must be stored in Secret Manager in JSON format: { \"sas_token\" : \"SAS_TOKEN\" } GoogleServiceAccount must be granted `roles/secretmanager.secretAccessor` for the resource. See [Configure access to a source: Microsoft Azure Blob Storage] (https://cloud.google.com/storage-transfer/docs/source-microsoft-azure#secret_manager) for more information. If `credentials_secret` is specified, do not specify azure_credentials. This feature is in [preview](https://cloud.google.com/terms/service-terms#1). Format: `projects/{project_number}/secrets/{secret_name}`",
+                    "description": "Optional. The Resource name of a secret in Secret Manager. The Azure SAS token must be stored in Secret Manager in JSON format: { \"sas_token\" : \"SAS_TOKEN\" } GoogleServiceAccount must be granted `roles/secretmanager.secretAccessor` for the resource. See [Configure access to a source: Microsoft Azure Blob Storage] (https://cloud.google.com/storage-transfer/docs/source-microsoft-azure#secret_manager) for more information. If `credentials_secret` is specified, do not specify azure_credentials. Format: `projects/{project_number}/secrets/{secret_name}`",
                     "type": "string"
                 },
                 "path": {
@@ -937,7 +937,7 @@
                     "type": "string"
                 },
                 "managedFolderTransferEnabled": {
-                    "description": "Transfer managed folders is in public preview. This option is only applicable to the Cloud Storage source bucket. If set to true: - The source managed folder will be transferred to the destination bucket - The destination managed folder will always be overwritten, other OVERWRITE options will not be supported",
+                    "description": "Preview. Enables the transfer of managed folders between Cloud Storage buckets. Set this option on the gcs_data_source. If set to true: - Managed folders in the source bucket are transferred to the destination bucket. - Managed folders in the destination bucket are overwritten. Other OVERWRITE options are not supported. See [Transfer Cloud Storage managed folders](/storage-transfer/docs/managed-folders).",
                     "type": "boolean"
                 },
                 "path": {
@@ -1196,7 +1196,7 @@
                     "type": "string"
                 },
                 "timeCreated": {
-                    "description": "Specifies how each object's `timeCreated` metadata is preserved for transfers. If unspecified, the default behavior is the same as TIME_CREATED_SKIP.",
+                    "description": "Specifies how each object's `timeCreated` metadata is preserved for transfers. If unspecified, the default behavior is the same as TIME_CREATED_SKIP. This behavior is supported for transfers to GCS buckets from GCS, S3, Azure, S3 Compatible, and Azure sources.",
                     "enum": [
                         "TIME_CREATED_UNSPECIFIED",
                         "TIME_CREATED_SKIP",
@@ -1359,6 +1359,29 @@
                 "rootDirectory": {
                     "description": "Root directory path to the filesystem.",
                     "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ReplicationSpec": {
+            "description": "Specifies the configuration for running a replication job.",
+            "id": "ReplicationSpec",
+            "properties": {
+                "gcsDataSink": {
+                    "$ref": "GcsData",
+                    "description": "Specifies cloud Storage data sink."
+                },
+                "gcsDataSource": {
+                    "$ref": "GcsData",
+                    "description": "Specifies cloud Storage data source."
+                },
+                "objectConditions": {
+                    "$ref": "ObjectConditions",
+                    "description": "Specifies the object conditions to only include objects that satisfy these conditions in the set of data source objects. Object conditions based on objects' \"last modification time\" do not exclude objects in a data sink."
+                },
+                "transferOptions": {
+                    "$ref": "TransferOptions",
+                    "description": "Specifies the actions to be performed on the object during replication. Delete options are not supported for replication and when specified, the request fails with an INVALID_ARGUMENT error."
                 }
             },
             "type": "object"
@@ -1681,11 +1704,15 @@
                 },
                 "notificationConfig": {
                     "$ref": "NotificationConfig",
-                    "description": "Notification configuration. This is not supported for transfers involving PosixFilesystem."
+                    "description": "Notification configuration."
                 },
                 "projectId": {
                     "description": "The ID of the Google Cloud project that owns the job.",
                     "type": "string"
+                },
+                "replicationSpec": {
+                    "$ref": "ReplicationSpec",
+                    "description": "Replication specification."
                 },
                 "schedule": {
                     "$ref": "Schedule",

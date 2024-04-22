@@ -440,7 +440,7 @@
             }
         }
     },
-    "revision": "20240304",
+    "revision": "20240417",
     "rootUrl": "https://analyticsdata.googleapis.com/",
     "schemas": {
         "ActiveMetricRestriction": {
