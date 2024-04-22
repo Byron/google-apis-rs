@@ -31,8 +31,8 @@ API_SHARED_INFO = $(API_DIR)/shared.yaml
 TYPE_API_INFO = $(API_DIR)/type-api.yaml
 TYPE_CLI_INFO = $(API_DIR)/type-cli.yaml
 API_LIST = $(API_DIR)/
-ifdef TRAVIS
-API_LIST := $(API_LIST)api-list_travis.yaml
+ifdef CI
+API_LIST := $(API_LIST)api-list-ci.yaml
 else
 API_LIST := $(API_LIST)api-list.yaml
 endif
