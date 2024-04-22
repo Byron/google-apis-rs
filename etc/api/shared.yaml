@@ -27,7 +27,6 @@ api:
     # Has a struct field called 'async', which is now reserved
     - homegraph
     - gkehub
-    - spanner
     - firebaserules
     - servicemanagement
     # defines its own `Option` type

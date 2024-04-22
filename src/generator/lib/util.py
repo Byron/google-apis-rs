@@ -1059,7 +1059,9 @@ def mb_additional_type_params(m):
 
 # return type name for a method on the given resource
 def mb_type(r, m):
-    return "%s%sCall" % (singular(canonical_type_name(r)), dot_sep_to_canonical_type_name(m))
+    resource = singular(canonical_type_name(r))
+    method = dot_sep_to_canonical_type_name(m)
+    return unique(f"{r}: {m}", f"{resource}{method}Call")
 
 
 # canonicalName = util.canonical_name()
@@ -1158,10 +1160,12 @@ def method_name_to_variant(name):
 # given a rust type-name (no optional, as from to_rust_type), you will get a suitable random default value
 # as string suitable to be passed as reference (or copy, where applicable)
 def rnd_arg_val_for_type(tn):
-    try:
-        return str(RUST_TYPE_RND_MAP[tn]())
-    except KeyError:
-        return '&Default::default()'
+    segments = tn.split("::")
+    for index in range(len(segments)):
+        name = "::".join(segments[index:])
+        if name in RUST_TYPE_RND_MAP:
+            return str(RUST_TYPE_RND_MAP[name]())
+    return "&Default::default()"
 
 
 # Converts a size to the respective integer
@@ -1189,6 +1193,22 @@ def string_impl(p):
         "google-fieldmask": lambda x: f"{x}.to_string()",
         "string": lambda x: x
     }.get(p.get("format", p["type"]), lambda x: f"{x}.to_string()")
+
+
+def unique(
+    original: str,
+    desired: str,
+    attempts: int = 0,
+    assigned: dict[str, str] = {},
+) -> str:
+    if original in assigned:
+        return assigned[original]
+    candidate = desired + ("" if attempts == 0 else str(attempts))
+    if candidate not in assigned.values():
+        assigned[original] = candidate
+        return candidate
+    return unique(original, desired, attempts + 1)
+
 
 if __name__ == '__main__':
     raise AssertionError('For import only')

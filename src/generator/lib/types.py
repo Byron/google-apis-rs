@@ -70,7 +70,7 @@ RUST_TYPE_RND_MAP = {
     f"{CHRONO_PATH}::Duration": lambda: f"chrono::Duration::seconds({randint(0, 9999999)})",
     CHRONO_DATE: chrono_date,
     CHRONO_DATETIME: lambda: CHRONO_UTC_NOW,
-    "FieldMask": lambda: f"FieldMask(vec![{choice(WORDS)}])",
+    "FieldMask": lambda: "FieldMask::new::<&str>(&[])",
 }
 
 JSON_TO_RUST_DEFAULT = {
