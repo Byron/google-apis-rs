@@ -1,4 +1,6 @@
 api:
   list:
+    spanner:
+    - v1
     youtube:
     - v3
