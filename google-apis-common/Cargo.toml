@@ -25,8 +25,7 @@ base64 = "0.13.0"
 chrono = { version = "0.4.35", default-features = false, features = ["clock", "serde"] }
 url = "= 1.7"
 
-# 8.1 needed for hyper-rustls 0.23, as >= 8.2 comes with 0.24 which is incompatible
-yup-oauth2 = { version = "^ 8.2", optional = true }
+yup-oauth2 = { version = "8.3.3", optional = true }
 itertools = "^ 0.10"
 hyper = { version = "^ 0.14", features = ["client", "http2"] }
 http = "^0.2"
