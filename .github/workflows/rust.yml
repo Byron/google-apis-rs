@@ -18,7 +18,9 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     env:
-      TRAVIS: true # emulate CI, some code depends on it to do less work
+      # The environment variable is set to test only on a few selected APIs,
+      # speeding up the integration process. See etc/api/api-list-ci.yaml.
+      CI: true
     steps:
       - uses: actions/checkout@v2
       - uses: Swatinem/rust-cache@v2
