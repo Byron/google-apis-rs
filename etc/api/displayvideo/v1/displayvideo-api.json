@@ -4173,7 +4173,7 @@
                                             "type": "string"
                                         },
                                         "targetingType": {
-                                            "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION`",
+                                            "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`",
                                             "enum": [
                                                 "TARGETING_TYPE_UNSPECIFIED",
                                                 "TARGETING_TYPE_CHANNEL",
@@ -4314,7 +4314,7 @@
                                             "type": "string"
                                         },
                                         "targetingType": {
-                                            "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION`",
+                                            "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`",
                                             "enum": [
                                                 "TARGETING_TYPE_UNSPECIFIED",
                                                 "TARGETING_TYPE_CHANNEL",
@@ -8079,7 +8079,7 @@
                     "parameterOrder": [],
                     "parameters": {
                         "filter": {
-                            "description": "Allows filtering by user fields. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `AND`. * A restriction has the form of `{field} {operator} {value}`. * The `budget.budget_segments.date_range.end_date` field must use the `LESS THAN (<)` operator. * The `displayName and `email` field must use the `HAS (:)` operator. * All other fields must use the `EQUALS (=)` operator. Supported fields: * `assignedUserRole.advertiserId` * `assignedUserRole.entityType` * This is synthetic field of `AssignedUserRole` used for filtering. Identifies the type of entity to which the user role is assigned. Valid values are `Partner` and `Advertiser`. * `assignedUserRole.parentPartnerId` * This is a synthetic field of `AssignedUserRole` used for filtering. Identifies the parent partner of the entity to which the user role is assigned. * `assignedUserRole.partnerId` * `assignedUserRole.userRole` * `displayName` * `email` Examples: * The user with `displayName` containing \"foo\": `displayName:\"foo\"` * The user with `email` containing \"bar\": `email:\"bar\"` * All users with standard user roles: `assignedUserRole.userRole=\"STANDARD\"` * All users with user roles for partner 123: `assignedUserRole.partnerId=\"123\"` * All users with user roles for advertiser 123: `assignedUserRole.advertiserId=\"123\"` * All users with partner level user roles: `entityType=\"PARTNER\"` * All users with user roles for partner 123 and advertisers under partner 123: `parentPartnerId=\"123\"` The length of this field should be no more than 500 characters. Reference our [filter `LIST` requests](/display-video/api/guides/how-tos/filters) guide for more information.",
+                            "description": "Allows filtering by user fields. Supported syntax: * Filter expressions are made up of one or more restrictions. * Restrictions can be combined by the logical operator `AND`. * A restriction has the form of `{field} {operator} {value}`. * The `displayName` and `email` fields must use the `HAS (:)` operator. * The `lastLoginTime` field must use either the `LESS THAN OR EQUAL TO (<=)` or `GREATER THAN OR EQUAL TO (>=)` operator. * All other fields must use the `EQUALS (=)` operator. Supported fields: * `assignedUserRole.advertiserId` * `assignedUserRole.entityType`: This is synthetic field of `AssignedUserRole` used for filtering. Identifies the type of entity to which the user role is assigned. Valid values are `Partner` and `Advertiser`. * `assignedUserRole.parentPartnerId`: This is a synthetic field of `AssignedUserRole` used for filtering. Identifies the parent partner of the entity to which the user role is assigned. * `assignedUserRole.partnerId` * `assignedUserRole.userRole` * `displayName` * `email` * `lastLoginTime` (input in ISO 8601 format, or `YYYY-MM-DDTHH:MM:SSZ`) Examples: * The user with `displayName` containing \"foo\": `displayName:\"foo\"` * The user with `email` containing \"bar\": `email:\"bar\"` * All users with standard user roles: `assignedUserRole.userRole=\"STANDARD\"` * All users with user roles for partner 123: `assignedUserRole.partnerId=\"123\"` * All users with user roles for advertiser 123: `assignedUserRole.advertiserId=\"123\"` * All users with partner level user roles: `entityType=\"PARTNER\"` * All users with user roles for partner 123 and advertisers under partner 123: `parentPartnerId=\"123\"` * All users that last logged in on or after 2023-01-01T00:00:00Z (format of ISO 8601): `lastLoginTime>=\"2023-01-01T00:00:00Z\"` The length of this field should be no more than 500 characters. Reference our [filter `LIST` requests](/display-video/api/guides/how-tos/filters) guide for more information.",
                             "location": "query",
                             "type": "string"
                         },
@@ -8146,7 +8146,7 @@
             }
         }
     },
-    "revision": "20240229",
+    "revision": "20240418",
     "rootUrl": "https://displayvideo.googleapis.com/",
     "schemas": {
         "ActivateManualTriggerRequest": {
@@ -8571,7 +8571,9 @@
                         "APP_PLATFORM_XBOX",
                         "APP_PLATFORM_SAMSUNG_TV",
                         "APP_PLATFORM_ANDROID_TV",
-                        "APP_PLATFORM_GENERIC_CTV"
+                        "APP_PLATFORM_GENERIC_CTV",
+                        "APP_PLATFORM_LG_TV",
+                        "APP_PLATFORM_VIZIO_TV"
                     ],
                     "enumDescriptions": [
                         "Default value when app platform is not specified in this version. This enum is a placeholder for default value and does not represent a real platform option.",
@@ -8584,7 +8586,9 @@
                         "The app platform is Xbox.",
                         "The app platform is Samsung TV.",
                         "The app platform is Android TV.",
-                        "The app platform is a CTV platform that is not explicitly listed elsewhere."
+                        "The app platform is a CTV platform that is not explicitly listed elsewhere.",
+                        "The app platform is LG TV.",
+                        "The app platform is VIZIO TV."
                     ],
                     "type": "string"
                 },
@@ -9401,14 +9405,14 @@
             "id": "BulkEditAdvertiserAssignedTargetingOptionsRequest",
             "properties": {
                 "createRequests": {
-                    "description": "The assigned targeting options to create in batch, specified as a list of `CreateAssignedTargetingOptionsRequest`. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION`",
+                    "description": "The assigned targeting options to create in batch, specified as a list of `CreateAssignedTargetingOptionsRequest`. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`",
                     "items": {
                         "$ref": "CreateAssignedTargetingOptionsRequest"
                     },
                     "type": "array"
                 },
                 "deleteRequests": {
-                    "description": "The assigned targeting options to delete in batch, specified as a list of `DeleteAssignedTargetingOptionsRequest`. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION`",
+                    "description": "The assigned targeting options to delete in batch, specified as a list of `DeleteAssignedTargetingOptionsRequest`. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_KEYWORD`",
                     "items": {
                         "$ref": "DeleteAssignedTargetingOptionsRequest"
                     },
@@ -10946,7 +10950,7 @@
                         true,
                         true,
                         true,
-                        false,
+                        true,
                         false,
                         false,
                         false
@@ -10964,7 +10968,7 @@
                         "SDF version 5.4",
                         "SDF version 5.5",
                         "SDF version 6",
-                        "SDF version 7. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version. Currently in beta. Only available for use by a subset of users."
+                        "SDF version 7. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version."
                     ],
                     "type": "string"
                 }
@@ -12657,6 +12661,7 @@
                         "EXCHANGE_CONNATIX",
                         "EXCHANGE_RESET_DIGITAL",
                         "EXCHANGE_HIVESTACK",
+                        "EXCHANGE_DRAX",
                         "EXCHANGE_APPLOVIN_GBID",
                         "EXCHANGE_FYBER_GBID",
                         "EXCHANGE_UNITY_GBID",
@@ -12740,6 +12745,7 @@
                         "Connatix.",
                         "Reset Digital.",
                         "Hivestack.",
+                        "Drax.",
                         "AppLovin MAX.",
                         "DT Fairbid.",
                         "Unity LevelPlay.",
@@ -12849,6 +12855,7 @@
                         "EXCHANGE_CONNATIX",
                         "EXCHANGE_RESET_DIGITAL",
                         "EXCHANGE_HIVESTACK",
+                        "EXCHANGE_DRAX",
                         "EXCHANGE_APPLOVIN_GBID",
                         "EXCHANGE_FYBER_GBID",
                         "EXCHANGE_UNITY_GBID",
@@ -12932,6 +12939,7 @@
                         "Connatix.",
                         "Reset Digital.",
                         "Hivestack.",
+                        "Drax.",
                         "AppLovin MAX.",
                         "DT Fairbid.",
                         "Unity LevelPlay.",
@@ -13042,6 +13050,7 @@
                         "EXCHANGE_CONNATIX",
                         "EXCHANGE_RESET_DIGITAL",
                         "EXCHANGE_HIVESTACK",
+                        "EXCHANGE_DRAX",
                         "EXCHANGE_APPLOVIN_GBID",
                         "EXCHANGE_FYBER_GBID",
                         "EXCHANGE_UNITY_GBID",
@@ -13125,6 +13134,7 @@
                         "Connatix.",
                         "Reset Digital.",
                         "Hivestack.",
+                        "Drax.",
                         "AppLovin MAX.",
                         "DT Fairbid.",
                         "Unity LevelPlay.",
@@ -14000,6 +14010,7 @@
                         "EXCHANGE_CONNATIX",
                         "EXCHANGE_RESET_DIGITAL",
                         "EXCHANGE_HIVESTACK",
+                        "EXCHANGE_DRAX",
                         "EXCHANGE_APPLOVIN_GBID",
                         "EXCHANGE_FYBER_GBID",
                         "EXCHANGE_UNITY_GBID",
@@ -14083,6 +14094,7 @@
                         "Connatix.",
                         "Reset Digital.",
                         "Hivestack.",
+                        "Drax.",
                         "AppLovin MAX.",
                         "DT Fairbid.",
                         "Unity LevelPlay.",
@@ -14871,6 +14883,7 @@
                         "EXCHANGE_CONNATIX",
                         "EXCHANGE_RESET_DIGITAL",
                         "EXCHANGE_HIVESTACK",
+                        "EXCHANGE_DRAX",
                         "EXCHANGE_APPLOVIN_GBID",
                         "EXCHANGE_FYBER_GBID",
                         "EXCHANGE_UNITY_GBID",
@@ -14954,6 +14967,7 @@
                         "Connatix.",
                         "Reset Digital.",
                         "Hivestack.",
+                        "Drax.",
                         "AppLovin MAX.",
                         "DT Fairbid.",
                         "Unity LevelPlay.",
@@ -17552,33 +17566,6 @@
             },
             "type": "object"
         },
-        "PublisherReviewStatus": {
-            "description": "Publisher review status for the creative.",
-            "id": "PublisherReviewStatus",
-            "properties": {
-                "publisherName": {
-                    "description": "The publisher reviewing the creative.",
-                    "type": "string"
-                },
-                "status": {
-                    "description": "Status of the publisher review.",
-                    "enum": [
-                        "REVIEW_STATUS_UNSPECIFIED",
-                        "REVIEW_STATUS_APPROVED",
-                        "REVIEW_STATUS_REJECTED",
-                        "REVIEW_STATUS_PENDING"
-                    ],
-                    "enumDescriptions": [
-                        "Type value is not specified or is unknown in this version.",
-                        "The creative is approved.",
-                        "The creative is rejected.",
-                        "The creative is pending review."
-                    ],
-                    "type": "string"
-                }
-            },
-            "type": "object"
-        },
         "RateDetails": {
             "description": "The rate related settings of the inventory source.",
             "id": "RateDetails",
@@ -17760,13 +17747,6 @@
                         "$ref": "ExchangeReviewStatus"
                     },
                     "type": "array"
-                },
-                "publisherReviewStatuses": {
-                    "description": "Publisher review statuses for the creative.",
-                    "items": {
-                        "$ref": "PublisherReviewStatus"
-                    },
-                    "type": "array"
                 }
             },
             "type": "object"
@@ -17843,7 +17823,7 @@
                         true,
                         true,
                         true,
-                        false,
+                        true,
                         false,
                         false,
                         false
@@ -17861,7 +17841,7 @@
                         "SDF version 5.4",
                         "SDF version 5.5",
                         "SDF version 6",
-                        "SDF version 7. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version. Currently in beta. Only available for use by a subset of users."
+                        "SDF version 7. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version."
                     ],
                     "type": "string"
                 }
@@ -17920,7 +17900,7 @@
                         true,
                         true,
                         true,
-                        false,
+                        true,
                         false,
                         false,
                         false
@@ -17938,7 +17918,7 @@
                         "SDF version 5.4",
                         "SDF version 5.5",
                         "SDF version 6",
-                        "SDF version 7. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version. Currently in beta. Only available for use by a subset of users."
+                        "SDF version 7. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version."
                     ],
                     "type": "string"
                 }

@@ -135,6 +135,31 @@
                         "https://www.googleapis.com/auth/cloud-platform"
                     ]
                 },
+                "getAlertConfig": {
+                    "description": "Get the AlertConfig of the requested project.",
+                    "flatPath": "v2alpha/projects/{projectsId}/alertConfig",
+                    "httpMethod": "GET",
+                    "id": "retail.projects.getAlertConfig",
+                    "parameterOrder": [
+                        "name"
+                    ],
+                    "parameters": {
+                        "name": {
+                            "description": "Required. Full AlertConfig resource name. Format: projects/{project_number}/alertConfig",
+                            "location": "path",
+                            "pattern": "^projects/[^/]+/alertConfig$",
+                            "required": true,
+                            "type": "string"
+                        }
+                    },
+                    "path": "v2alpha/{+name}",
+                    "response": {
+                        "$ref": "GoogleCloudRetailV2alphaAlertConfig"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                    ]
+                },
                 "getLoggingConfig": {
                     "description": "Gets the LoggingConfig of the requested project.",
                     "flatPath": "v2alpha/projects/{projectsId}/loggingConfig",
@@ -210,6 +235,40 @@
                         "https://www.googleapis.com/auth/cloud-platform"
                     ]
                 },
+                "updateAlertConfig": {
+                    "description": "Update the alert config of the requested project.",
+                    "flatPath": "v2alpha/projects/{projectsId}/alertConfig",
+                    "httpMethod": "PATCH",
+                    "id": "retail.projects.updateAlertConfig",
+                    "parameterOrder": [
+                        "name"
+                    ],
+                    "parameters": {
+                        "name": {
+                            "description": "Required. Immutable. The name of the AlertConfig singleton resource. Format: projects/*/alertConfig",
+                            "location": "path",
+                            "pattern": "^projects/[^/]+/alertConfig$",
+                            "required": true,
+                            "type": "string"
+                        },
+                        "updateMask": {
+                            "description": "Indicates which fields in the provided AlertConfig to update. If not set, all supported fields are updated.",
+                            "format": "google-fieldmask",
+                            "location": "query",
+                            "type": "string"
+                        }
+                    },
+                    "path": "v2alpha/{+name}",
+                    "request": {
+                        "$ref": "GoogleCloudRetailV2alphaAlertConfig"
+                    },
+                    "response": {
+                        "$ref": "GoogleCloudRetailV2alphaAlertConfig"
+                    },
+                    "scopes": [
+                        "https://www.googleapis.com/auth/cloud-platform"
+                    ]
+                },
                 "updateLoggingConfig": {
                     "description": "Updates the LoggingConfig of the requested project.",
                     "flatPath": "v2alpha/projects/{projectsId}/loggingConfig",
@@ -227,7 +286,7 @@
                             "type": "string"
                         },
                         "updateMask": {
-                            "description": "Indicates which fields in the provided LoggingConfig to update. The following are the only supported fields: * default_log_generation_rule * per_service_log_generation_rules If not set, all supported fields are updated.",
+                            "description": "Indicates which fields in the provided LoggingConfig to update. The following are the only supported fields: * LoggingConfig.default_log_generation_rule * LoggingConfig.per_service_log_generation_rules If not set, all supported fields are updated.",
                             "format": "google-fieldmask",
                             "location": "query",
                             "type": "string"
@@ -2416,7 +2475,7 @@
             }
         }
     },
-    "revision": "20240222",
+    "revision": "20240411",
     "rootUrl": "https://retail.googleapis.com/",
     "schemas": {
         "GoogleApiHttpBody": {
@@ -3239,6 +3298,67 @@
             "description": "Response of the ProductService.AddLocalInventories API. Currently empty because there is no meaningful response populated from the ProductService.AddLocalInventories method.",
             "id": "GoogleCloudRetailV2alphaAddLocalInventoriesResponse",
             "properties": {},
+            "type": "object"
+        },
+        "GoogleCloudRetailV2alphaAlertConfig": {
+            "description": "Project level alert config.",
+            "id": "GoogleCloudRetailV2alphaAlertConfig",
+            "properties": {
+                "alertPolicies": {
+                    "description": "Alert policies for a customer. They must be unique by [AlertPolicy.alert_group]",
+                    "items": {
+                        "$ref": "GoogleCloudRetailV2alphaAlertConfigAlertPolicy"
+                    },
+                    "type": "array"
+                },
+                "name": {
+                    "description": "Required. Immutable. The name of the AlertConfig singleton resource. Format: projects/*/alertConfig",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudRetailV2alphaAlertConfigAlertPolicy": {
+            "description": "Alert policy for a customer.",
+            "id": "GoogleCloudRetailV2alphaAlertConfigAlertPolicy",
+            "properties": {
+                "alertGroup": {
+                    "description": "The feature that provides alerting capability. Supported value is only `search-data-quality` for now.",
+                    "type": "string"
+                },
+                "enrollStatus": {
+                    "description": "The enrollment status of a customer.",
+                    "enum": [
+                        "ENROLL_STATUS_UNSPECIFIED",
+                        "ENROLLED",
+                        "DECLINED"
+                    ],
+                    "enumDescriptions": [
+                        "Default value. Used for customers who have not responded to the alert policy.",
+                        "Customer is enrolled in this policy.",
+                        "Customer declined this policy."
+                    ],
+                    "type": "string"
+                },
+                "recipients": {
+                    "description": "Recipients for the alert policy. One alert policy should not exceed 20 recipients.",
+                    "items": {
+                        "$ref": "GoogleCloudRetailV2alphaAlertConfigAlertPolicyRecipient"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "GoogleCloudRetailV2alphaAlertConfigAlertPolicyRecipient": {
+            "description": "Recipient contact information.",
+            "id": "GoogleCloudRetailV2alphaAlertConfigAlertPolicyRecipient",
+            "properties": {
+                "emailAddress": {
+                    "description": "Email address of the recipient.",
+                    "type": "string"
+                }
+            },
             "type": "object"
         },
         "GoogleCloudRetailV2alphaAttributesConfig": {
@@ -4087,7 +4207,7 @@
             "id": "GoogleCloudRetailV2alphaExperimentInfoServingConfigExperiment",
             "properties": {
                 "experimentServingConfig": {
-                    "description": "The fully qualified resource name of the serving config VariantArm.serving_config_id responsible for generating the search response. For example: `projects/*/locations/*/catalogs/*/servingConfigs/*`.",
+                    "description": "The fully qualified resource name of the serving config Experiment.VariantArm.serving_config_id responsible for generating the search response. For example: `projects/*/locations/*/catalogs/*/servingConfigs/*`.",
                     "type": "string"
                 },
                 "originalServingConfig": {
@@ -5405,7 +5525,7 @@
                     "type": "array"
                 },
                 "categories": {
-                    "description": "Product categories. This field is repeated for supporting one product belonging to several parallel categories. Strongly recommended using the full path for better search / recommendation quality. To represent full path of category, use '>' sign to separate different hierarchies. If '>' is part of the category name, replace it with other character(s). For example, if a shoes product belongs to both [\"Shoes & Accessories\" -> \"Shoes\"] and [\"Sports & Fitness\" -> \"Athletic Clothing\" -> \"Shoes\"], it could be represented as: \"categories\": [ \"Shoes & Accessories > Shoes\", \"Sports & Fitness > Athletic Clothing > Shoes\" ] Must be set for Type.PRIMARY Product otherwise an INVALID_ARGUMENT error is returned. At most 250 values are allowed per Product unless overridden via pantheon UI. Empty values are not allowed. Each value must be a UTF-8 encoded string with a length limit of 5,000 characters. Otherwise, an INVALID_ARGUMENT error is returned. Corresponding properties: Google Merchant Center property google_product_category. Schema.org property [Product.category] (https://schema.org/category). [mc_google_product_category]: https://support.google.com/merchants/answer/6324436",
+                    "description": "Product categories. This field is repeated for supporting one product belonging to several parallel categories. Strongly recommended using the full path for better search / recommendation quality. To represent full path of category, use '>' sign to separate different hierarchies. If '>' is part of the category name, replace it with other character(s). For example, if a shoes product belongs to both [\"Shoes & Accessories\" -> \"Shoes\"] and [\"Sports & Fitness\" -> \"Athletic Clothing\" -> \"Shoes\"], it could be represented as: \"categories\": [ \"Shoes & Accessories > Shoes\", \"Sports & Fitness > Athletic Clothing > Shoes\" ] Must be set for Type.PRIMARY Product otherwise an INVALID_ARGUMENT error is returned. At most 250 values are allowed per Product unless overridden through the Google Cloud console. Empty values are not allowed. Each value must be a UTF-8 encoded string with a length limit of 5,000 characters. Otherwise, an INVALID_ARGUMENT error is returned. Corresponding properties: Google Merchant Center property google_product_category. Schema.org property [Product.category] (https://schema.org/category). [mc_google_product_category]: https://support.google.com/merchants/answer/6324436",
                     "items": {
                         "type": "string"
                     },
@@ -6807,6 +6927,10 @@
                         "type": "string"
                     },
                     "type": "array"
+                },
+                "ignoreRecsDenylist": {
+                    "description": "When the flag is enabled, the products in the denylist will not be filtered out in the recommendation filtering results.",
+                    "type": "boolean"
                 },
                 "modelId": {
                     "description": "The id of the model in the same Catalog to use at serving time. Currently only RecommendationModels are supported: https://cloud.google.com/retail/recommendations-ai/docs/create-models Can be changed but only to a compatible model (e.g. others-you-may-like CTR to others-you-may-like CVR). Required when solution_types is SOLUTION_TYPE_RECOMMENDATION.",

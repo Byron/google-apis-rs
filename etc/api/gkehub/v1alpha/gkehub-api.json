@@ -2175,7 +2175,7 @@
             }
         }
     },
-    "revision": "20240225",
+    "revision": "20240412",
     "rootUrl": "https://gkehub.googleapis.com/",
     "schemas": {
         "AnthosObservabilityFeatureSpec": {
@@ -4313,6 +4313,10 @@
                     "$ref": "IdentityServiceGoogleConfig",
                     "description": "GoogleConfig specific configuration."
                 },
+                "ldapConfig": {
+                    "$ref": "IdentityServiceLdapConfig",
+                    "description": "LDAP specific configuration."
+                },
                 "name": {
                     "description": "Identifier for auth config.",
                     "type": "string"
@@ -4324,6 +4328,10 @@
                 "proxy": {
                     "description": "Proxy server address to use for auth method.",
                     "type": "string"
+                },
+                "samlConfig": {
+                    "$ref": "IdentityServiceSamlConfig",
+                    "description": "SAML specific configuration."
                 }
             },
             "type": "object"
@@ -4346,12 +4354,20 @@
                     "readOnly": true,
                     "type": "string"
                 },
+                "groupFormat": {
+                    "description": "Optional. Format of the AzureAD groups that the client wants for auth.",
+                    "type": "string"
+                },
                 "kubectlRedirectUri": {
                     "description": "The redirect URL that kubectl uses for authorization.",
                     "type": "string"
                 },
                 "tenant": {
                     "description": "Kind of Azure AD account to be authenticated. Supported values are or for accounts belonging to a specific tenant.",
+                    "type": "string"
+                },
+                "userClaim": {
+                    "description": "Optional. Claim in the AzureAD ID Token that holds the user details.",
                     "type": "string"
                 }
             },
@@ -4364,6 +4380,48 @@
                 "disable": {
                     "description": "Disable automatic configuration of Google Plugin on supported platforms.",
                     "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "IdentityServiceGroupConfig": {
+            "description": "Contains the properties for locating and authenticating groups in the directory.",
+            "id": "IdentityServiceGroupConfig",
+            "properties": {
+                "baseDn": {
+                    "description": "Required. The location of the subtree in the LDAP directory to search for group entries.",
+                    "type": "string"
+                },
+                "filter": {
+                    "description": "Optional. Optional filter to be used when searching for groups a user belongs to. This can be used to explicitly match only certain groups in order to reduce the amount of groups returned for each user. This defaults to \"(objectClass=Group)\".",
+                    "type": "string"
+                },
+                "idAttribute": {
+                    "description": "Optional. The identifying name of each group a user belongs to. For example, if this is set to \"distinguishedName\" then RBACs and other group expectations should be written as full DNs. This defaults to \"distinguishedName\".",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "IdentityServiceLdapConfig": {
+            "description": "Configuration for the LDAP Auth flow.",
+            "id": "IdentityServiceLdapConfig",
+            "properties": {
+                "group": {
+                    "$ref": "IdentityServiceGroupConfig",
+                    "description": "Optional. Contains the properties for locating and authenticating groups in the directory."
+                },
+                "server": {
+                    "$ref": "IdentityServiceServerConfig",
+                    "description": "Required. Server settings for the external LDAP server."
+                },
+                "serviceAccount": {
+                    "$ref": "IdentityServiceServiceAccountConfig",
+                    "description": "Required. Contains the credentials of the service account which is authorized to perform the LDAP search in the directory. The credentials can be supplied by the combination of the DN and password or the client certificate."
+                },
+                "user": {
+                    "$ref": "IdentityServiceUserConfig",
+                    "description": "Required. Defines where users exist in the LDAP directory."
                 }
             },
             "type": "object"
@@ -4475,6 +4533,126 @@
                 },
                 "userPrefix": {
                     "description": "Prefix to prepend to user name.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "IdentityServiceSamlConfig": {
+            "description": "Configuration for the SAML Auth flow.",
+            "id": "IdentityServiceSamlConfig",
+            "properties": {
+                "attributeMapping": {
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "description": "Optional. The mapping of additional user attributes like nickname, birthday and address etc.. `key` is the name of this additional attribute. `value` is a string presenting as CEL(common expression language, go/cel) used for getting the value from the resources. Take nickname as an example, in this case, `key` is \"attribute.nickname\" and `value` is \"assertion.nickname\".",
+                    "type": "object"
+                },
+                "groupPrefix": {
+                    "description": "Optional. Prefix to prepend to group name.",
+                    "type": "string"
+                },
+                "groupsAttribute": {
+                    "description": "Optional. The SAML attribute to read groups from. This value is expected to be a string and will be passed along as-is (with the option of being prefixed by the `group_prefix`).",
+                    "type": "string"
+                },
+                "identityProviderCertificates": {
+                    "description": "Required. The list of IdP certificates to validate the SAML response against.",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "identityProviderId": {
+                    "description": "Required. The entity ID of the SAML IdP.",
+                    "type": "string"
+                },
+                "identityProviderSsoUri": {
+                    "description": "Required. The URI where the SAML IdP exposes the SSO service.",
+                    "type": "string"
+                },
+                "userAttribute": {
+                    "description": "Optional. The SAML attribute to read username from. If unspecified, the username will be read from the NameID element of the assertion in SAML response. This value is expected to be a string and will be passed along as-is (with the option of being prefixed by the `user_prefix`).",
+                    "type": "string"
+                },
+                "userPrefix": {
+                    "description": "Optional. Prefix to prepend to user name.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "IdentityServiceServerConfig": {
+            "description": "Server settings for the external LDAP server.",
+            "id": "IdentityServiceServerConfig",
+            "properties": {
+                "certificateAuthorityData": {
+                    "description": "Optional. Contains a Base64 encoded, PEM formatted certificate authority certificate for the LDAP server. This must be provided for the \"ldaps\" and \"startTLS\" connections.",
+                    "format": "byte",
+                    "type": "string"
+                },
+                "connectionType": {
+                    "description": "Optional. Defines the connection type to communicate with the LDAP server. If `starttls` or `ldaps` is specified, the certificate_authority_data should not be empty.",
+                    "type": "string"
+                },
+                "host": {
+                    "description": "Required. Defines the hostname or IP of the LDAP server. Port is optional and will default to 389, if unspecified. For example, \"ldap.server.example\" or \"10.10.10.10:389\".",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "IdentityServiceServiceAccountConfig": {
+            "description": "Contains the credentials of the service account which is authorized to perform the LDAP search in the directory. The credentials can be supplied by the combination of the DN and password or the client certificate.",
+            "id": "IdentityServiceServiceAccountConfig",
+            "properties": {
+                "simpleBindCredentials": {
+                    "$ref": "IdentityServiceSimpleBindCredentials",
+                    "description": "Credentials for basic auth."
+                }
+            },
+            "type": "object"
+        },
+        "IdentityServiceSimpleBindCredentials": {
+            "description": "The structure holds the LDAP simple binding credential.",
+            "id": "IdentityServiceSimpleBindCredentials",
+            "properties": {
+                "dn": {
+                    "description": "Required. The distinguished name(DN) of the service account object/user.",
+                    "type": "string"
+                },
+                "encryptedPassword": {
+                    "description": "Output only. The encrypted password of the service account object/user.",
+                    "format": "byte",
+                    "readOnly": true,
+                    "type": "string"
+                },
+                "password": {
+                    "description": "Required. Input only. The password of the service account object/user.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "IdentityServiceUserConfig": {
+            "description": "Defines where users exist in the LDAP directory.",
+            "id": "IdentityServiceUserConfig",
+            "properties": {
+                "baseDn": {
+                    "description": "Required. The location of the subtree in the LDAP directory to search for user entries.",
+                    "type": "string"
+                },
+                "filter": {
+                    "description": "Optional. Filter to apply when searching for the user. This can be used to further restrict the user accounts which are allowed to login. This defaults to \"(objectClass=User)\".",
+                    "type": "string"
+                },
+                "idAttribute": {
+                    "description": "Optional. Determines which attribute to use as the user's identity after they are authenticated. This is distinct from the loginAttribute field to allow users to login with a username, but then have their actual identifier be an email address or full Distinguished Name (DN). For example, setting loginAttribute to \"sAMAccountName\" and identifierAttribute to \"userPrincipalName\" would allow a user to login as \"bsmith\", but actual RBAC policies for the user would be written as \"bsmith@example.com\". Using \"userPrincipalName\" is recommended since this will be unique for each user. This defaults to \"userPrincipalName\".",
+                    "type": "string"
+                },
+                "loginAttribute": {
+                    "description": "Optional. The name of the attribute which matches against the input username. This is used to find the user in the LDAP database e.g. \"(=)\" and is combined with the optional filter field. This defaults to \"userPrincipalName\".",
                     "type": "string"
                 }
             },
@@ -6275,6 +6453,63 @@
             },
             "type": "object"
         },
+        "ServiceMeshCondition": {
+            "description": "Condition being reported.",
+            "id": "ServiceMeshCondition",
+            "properties": {
+                "code": {
+                    "description": "Unique identifier of the condition which describes the condition recognizable to the user.",
+                    "enum": [
+                        "CODE_UNSPECIFIED",
+                        "MESH_IAM_PERMISSION_DENIED",
+                        "CNI_CONFIG_UNSUPPORTED",
+                        "GKE_SANDBOX_UNSUPPORTED",
+                        "NODEPOOL_WORKLOAD_IDENTITY_FEDERATION_REQUIRED",
+                        "CNI_INSTALLATION_FAILED",
+                        "CNI_POD_UNSCHEDULABLE",
+                        "UNSUPPORTED_MULTIPLE_CONTROL_PLANES",
+                        "VPCSC_GA_SUPPORTED"
+                    ],
+                    "enumDescriptions": [
+                        "Default Unspecified code",
+                        "Mesh IAM permission denied error code",
+                        "CNI config unsupported error code",
+                        "GKE sandbox unsupported error code",
+                        "Nodepool workload identity federation required error code",
+                        "CNI installation failed error code",
+                        "CNI pod unschedulable error code",
+                        "Multiple control planes unsupported error code",
+                        "VPC-SC GA is supported for this control plane."
+                    ],
+                    "type": "string"
+                },
+                "details": {
+                    "description": "A short summary about the issue.",
+                    "type": "string"
+                },
+                "documentationLink": {
+                    "description": "Links contains actionable information.",
+                    "type": "string"
+                },
+                "severity": {
+                    "description": "Severity level of the condition.",
+                    "enum": [
+                        "SEVERITY_UNSPECIFIED",
+                        "ERROR",
+                        "WARNING",
+                        "INFO"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified severity",
+                        "Indicates an issue that prevents the mesh from operating correctly",
+                        "Indicates a setting is likely wrong, but the mesh is still able to operate",
+                        "An informational message, not requiring any action"
+                    ],
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
         "ServiceMeshControlPlaneManagement": {
             "description": "Status of control plane management.",
             "id": "ServiceMeshControlPlaneManagement",
@@ -6285,6 +6520,23 @@
                         "$ref": "ServiceMeshStatusDetails"
                     },
                     "type": "array"
+                },
+                "implementation": {
+                    "description": "Output only. Implementation of managed control plane.",
+                    "enum": [
+                        "IMPLEMENTATION_UNSPECIFIED",
+                        "ISTIOD",
+                        "TRAFFIC_DIRECTOR",
+                        "UPDATING"
+                    ],
+                    "enumDescriptions": [
+                        "Unspecified",
+                        "A Google build of istiod is used for the managed control plane.",
+                        "Traffic director is used for the managed control plane.",
+                        "The control plane implementation is being updated."
+                    ],
+                    "readOnly": true,
+                    "type": "string"
                 },
                 "state": {
                     "description": "LifecycleState of control plane management.",
@@ -6426,6 +6678,14 @@
                     "description": "Output only. Results of running Service Mesh analyzers.",
                     "items": {
                         "$ref": "ServiceMeshAnalysisMessage"
+                    },
+                    "readOnly": true,
+                    "type": "array"
+                },
+                "conditions": {
+                    "description": "Output only. List of conditions reported for this membership.",
+                    "items": {
+                        "$ref": "ServiceMeshCondition"
                     },
                     "readOnly": true,
                     "type": "array"
