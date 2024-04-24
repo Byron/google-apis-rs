@@ -7,7 +7,7 @@
 The MIT License (MIT)
 =====================
 
-Copyright © `${copyright.years}` ${util.put_and(["`%s`" % a for a in copyright.authors])}
+Copyright ${copyright.years} ${util.put_and(copyright.authors)}
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation

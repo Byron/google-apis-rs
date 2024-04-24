@@ -1,12 +1,7 @@
-<!---
-DO NOT EDIT !
-This file was generated automatically from 'src/generator/templates/LICENSE.md.mako'
-DO NOT EDIT !
--->
 The MIT License (MIT)
 =====================
 
-Copyright © `2015-2020` `Sebastian Thiel`
+Copyright 2015–2024 Sebastian Thiel
 
 Permission is hereby granted, free of charge, to any person
 obtaining a copy of this software and associated documentation
