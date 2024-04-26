@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use ::url::percent_encoding::{percent_encode, DEFAULT_ENCODE_SET};
+use ::percent_encoding::{percent_encode, AsciiSet, CONTROLS};
 use ::url::Url;
 
 pub struct Params<'a> {
@@ -40,6 +40,7 @@ impl<'a> Params<'a> {
         from: &str,
         url_encode: bool,
     ) -> String {
+        const DEFAULT_ENCODE_SET: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'#').add(b'<').add(b'>').add(b'`').add(b'?').add(b'{').add(b'}');
         if url_encode {
             let mut replace_with: Cow<str> = self.get(param).unwrap_or_default().into();
             if from.as_bytes()[1] == b'+' {
