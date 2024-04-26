@@ -144,6 +144,7 @@ pub mod duration {
 }
 
 pub mod standard_base64 {
+    use base64::Engine as _;
     use serde::{Deserialize, Deserializer, Serializer};
     use serde_with::{DeserializeAs, SerializeAs};
     use std::borrow::Cow;
@@ -151,7 +152,7 @@ pub mod standard_base64 {
     pub struct Wrapper;
 
     pub fn to_string(bytes: &Vec<u8>) -> String {
-        base64::encode_config(bytes, base64::STANDARD)
+        base64::prelude::BASE64_STANDARD.encode(bytes)
     }
 
     impl SerializeAs<Vec<u8>> for Wrapper {
@@ -169,12 +170,13 @@ pub mod standard_base64 {
             D: Deserializer<'de>,
         {
             let s: Cow<str> = Deserialize::deserialize(deserializer)?;
-            base64::decode_config(s.as_ref(), base64::STANDARD).map_err(serde::de::Error::custom)
+            base64::prelude::BASE64_STANDARD.decode(s.as_ref()).map_err(serde::de::Error::custom)
         }
     }
 }
 
 pub mod urlsafe_base64 {
+    use base64::Engine as _;
     use serde::{Deserialize, Deserializer, Serializer};
     use serde_with::{DeserializeAs, SerializeAs};
     use std::borrow::Cow;
@@ -182,7 +184,7 @@ pub mod urlsafe_base64 {
     pub struct Wrapper;
 
     pub fn to_string(bytes: &Vec<u8>) -> String {
-        base64::encode_config(bytes, base64::URL_SAFE)
+        base64::prelude::BASE64_URL_SAFE.encode(bytes)
     }
 
     impl SerializeAs<Vec<u8>> for Wrapper {
@@ -200,7 +202,7 @@ pub mod urlsafe_base64 {
             D: Deserializer<'de>,
         {
             let s: Cow<str> = Deserialize::deserialize(deserializer)?;
-            base64::decode_config(s.as_ref(), base64::URL_SAFE).map_err(serde::de::Error::custom)
+            base64::prelude::BASE64_URL_SAFE.decode(s.as_ref()).map_err(serde::de::Error::custom)
         }
     }
 }
@@ -212,6 +214,7 @@ pub fn datetime_to_string(datetime: &chrono::DateTime<chrono::offset::Utc>) -> S
 #[cfg(test)]
 mod test {
     use super::{duration, standard_base64, urlsafe_base64};
+    use base64::Engine as _;
     use serde::{Deserialize, Serialize};
     use serde_with::{serde_as, DisplayFromStr};
 
