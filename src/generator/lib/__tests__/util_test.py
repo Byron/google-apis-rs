@@ -3,11 +3,20 @@
 import unittest
 import json
 
-from generator.lib.util import to_api_version, library_name, re_find_replacements, to_rust_type
+from generator.lib.util import to_api_version, library_name, re_find_replacements, to_rust_type, singular
+
+from src.generator.lib.util import inflection
 from .test_data.discovery_document import DISCOVERY_DOC
 
 
 class UtilsTest(unittest.TestCase):
+    def test_singular_status(self):
+        singular_word = singular('Status')
+        self.assertEqual(singular_word, 'Status')
+
+    def test_singular_upload_status(self):
+        singular_word = singular('UploadStatus')
+        self.assertEqual(singular_word, 'UploadStatus')
 
     def test_to_version_ok(self):
         for v, want in (('v1.3', '1d3'),
