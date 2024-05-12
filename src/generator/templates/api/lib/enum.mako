@@ -75,7 +75,14 @@ impl Default for Scope {
 /// ${e.description}
 % endif
 pub enum ${enum_type} {
-% for (variant_name,description) in zip(e.get('enum'), e.get('enumDescriptions')):
+<%
+enum_names = e.get('enum')
+enum_descriptions = e.get('enumDescriptions')
+if not enum_descriptions:
+    enum_descriptions = ['no description found'] * len(enum_names)
+
+%>\
+% for (variant_name,description) in zip(enum_names, enum_descriptions):
     <% #print(variant_name, '=>', description)
     %>
     % if description:

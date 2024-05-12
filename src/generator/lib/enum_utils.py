@@ -75,11 +75,24 @@ def find_enums_in_context(c: Context) -> list:
     enums = {}
     for k, s in c.schemas.items():
         if UNUSED_TYPE_MARKER not in schema_markers(s, c, transitive=True):
-            # properties = s.get('properties')
+            properties = s.get('properties')
             # printed_name = False
-            if s.properties:
-                for pv, pk in zip(s.properties.values(), s.properties.keys()):
-                    enums = _add_enum_value(k, pk, pv, enums)
+            if properties:
+                try:
+                    p = properties.to_dict()
+                    vals = p.values()
+                    keys = p.keys()
+
+                    for pv, pk in zip(vals, keys):
+                        enums = _add_enum_value(k, pk, pv, enums)
+                except TypeError as e:
+                    print('exception in find_enums_in_context:', e)
+                    print('k:', k)
+                    print('s:', s)
+                    print('props:', properties)
+                    print('props type:', type(properties))
+                    # print('c:', c)
+                    raise e
 
     for k, v in c.fqan_map.items():
         # print(k)
