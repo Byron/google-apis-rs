@@ -314,6 +314,10 @@ def singular(s):
     if single_noun is False:
         return s
     else:
+        # special case for upload-status which is not properly singularized by inflection
+        if s.lower().endswith('status') and single_noun.lower().endswith('statu'):
+            return single_noun + 's'
+
         return single_noun
 
 
