@@ -101,7 +101,7 @@ impl AsRef<str> for ${enum_type} {
     fn as_ref(&self) -> &str {
         match *self {
             % for variant in e.get('enum'):
-            ${enum_type}::${to_enum_variant_name(variant)} => "${variant_name}",
+            ${enum_type}::${to_enum_variant_name(variant)} => "${variant}",
             % endfor
         }
     }
