@@ -1,0 +1,30 @@
+site_name: replicapool v5.0.4+20160512
+site_url: http://byron.github.io/google-apis-rs/google-replicapool1_beta2-cli
+site_description: A complete library to interact with replicapool (protocol v1beta2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/replicapool1_beta2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Instance Group Managers':
+    - 'Abandon Instances': 'instance-group-managers_abandon-instances.md'
+    - 'Delete': 'instance-group-managers_delete.md'
+    - 'Delete Instances': 'instance-group-managers_delete-instances.md'
+    - 'Get': 'instance-group-managers_get.md'
+    - 'Insert': 'instance-group-managers_insert.md'
+    - 'List': 'instance-group-managers_list.md'
+    - 'Recreate Instances': 'instance-group-managers_recreate-instances.md'
+    - 'Resize': 'instance-group-managers_resize.md'
+    - 'Set Instance Template': 'instance-group-managers_set-instance-template.md'
+    - 'Set Target Pools': 'instance-group-managers_set-target-pools.md'
+- 'Zone Operations':
+    - 'Get': 'zone-operations_get.md'
+    - 'List': 'zone-operations_list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

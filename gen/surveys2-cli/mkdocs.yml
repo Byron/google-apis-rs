@@ -1,0 +1,26 @@
+site_name: Surveys v5.0.4+20180508
+site_url: http://byron.github.io/google-apis-rs/google-surveys2-cli
+site_description: A complete library to interact with Surveys (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/surveys2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Results':
+    - 'Get': 'results_get.md'
+- 'Surveys':
+    - 'Delete': 'surveys_delete.md'
+    - 'Get': 'surveys_get.md'
+    - 'Insert': 'surveys_insert.md'
+    - 'List': 'surveys_list.md'
+    - 'Start': 'surveys_start.md'
+    - 'Stop': 'surveys_stop.md'
+    - 'Update': 'surveys_update.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

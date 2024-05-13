@@ -1,0 +1,84 @@
+site_name: Firebase Hosting v5.0.4+20240303
+site_url: http://byron.github.io/google-apis-rs/google-firebasehosting1_beta1-cli
+site_description: A complete library to interact with Firebase Hosting (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/firebasehosting1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Operations Get': 'projects_operations-get.md'
+    - 'Sites Channels Create': 'projects_sites-channels-create.md'
+    - 'Sites Channels Delete': 'projects_sites-channels-delete.md'
+    - 'Sites Channels Get': 'projects_sites-channels-get.md'
+    - 'Sites Channels List': 'projects_sites-channels-list.md'
+    - 'Sites Channels Patch': 'projects_sites-channels-patch.md'
+    - 'Sites Channels Releases Create': 'projects_sites-channels-releases-create.md'
+    - 'Sites Channels Releases Get': 'projects_sites-channels-releases-get.md'
+    - 'Sites Channels Releases List': 'projects_sites-channels-releases-list.md'
+    - 'Sites Create': 'projects_sites-create.md'
+    - 'Sites Custom Domains Create': 'projects_sites-custom-domains-create.md'
+    - 'Sites Custom Domains Delete': 'projects_sites-custom-domains-delete.md'
+    - 'Sites Custom Domains Get': 'projects_sites-custom-domains-get.md'
+    - 'Sites Custom Domains List': 'projects_sites-custom-domains-list.md'
+    - 'Sites Custom Domains Operations Get': 'projects_sites-custom-domains-operations-get.md'
+    - 'Sites Custom Domains Operations List': 'projects_sites-custom-domains-operations-list.md'
+    - 'Sites Custom Domains Patch': 'projects_sites-custom-domains-patch.md'
+    - 'Sites Custom Domains Undelete': 'projects_sites-custom-domains-undelete.md'
+    - 'Sites Delete': 'projects_sites-delete.md'
+    - 'Sites Domains Create': 'projects_sites-domains-create.md'
+    - 'Sites Domains Delete': 'projects_sites-domains-delete.md'
+    - 'Sites Domains Get': 'projects_sites-domains-get.md'
+    - 'Sites Domains List': 'projects_sites-domains-list.md'
+    - 'Sites Domains Update': 'projects_sites-domains-update.md'
+    - 'Sites Get': 'projects_sites-get.md'
+    - 'Sites Get Config': 'projects_sites-get-config.md'
+    - 'Sites List': 'projects_sites-list.md'
+    - 'Sites Patch': 'projects_sites-patch.md'
+    - 'Sites Releases Create': 'projects_sites-releases-create.md'
+    - 'Sites Releases Get': 'projects_sites-releases-get.md'
+    - 'Sites Releases List': 'projects_sites-releases-list.md'
+    - 'Sites Update Config': 'projects_sites-update-config.md'
+    - 'Sites Versions Clone': 'projects_sites-versions-clone.md'
+    - 'Sites Versions Create': 'projects_sites-versions-create.md'
+    - 'Sites Versions Delete': 'projects_sites-versions-delete.md'
+    - 'Sites Versions Files List': 'projects_sites-versions-files-list.md'
+    - 'Sites Versions Get': 'projects_sites-versions-get.md'
+    - 'Sites Versions List': 'projects_sites-versions-list.md'
+    - 'Sites Versions Patch': 'projects_sites-versions-patch.md'
+    - 'Sites Versions Populate Files': 'projects_sites-versions-populate-files.md'
+- 'Sites':
+    - 'Channels Create': 'sites_channels-create.md'
+    - 'Channels Delete': 'sites_channels-delete.md'
+    - 'Channels Get': 'sites_channels-get.md'
+    - 'Channels List': 'sites_channels-list.md'
+    - 'Channels Patch': 'sites_channels-patch.md'
+    - 'Channels Releases Create': 'sites_channels-releases-create.md'
+    - 'Channels Releases Get': 'sites_channels-releases-get.md'
+    - 'Channels Releases List': 'sites_channels-releases-list.md'
+    - 'Domains Create': 'sites_domains-create.md'
+    - 'Domains Delete': 'sites_domains-delete.md'
+    - 'Domains Get': 'sites_domains-get.md'
+    - 'Domains List': 'sites_domains-list.md'
+    - 'Domains Update': 'sites_domains-update.md'
+    - 'Get Config': 'sites_get-config.md'
+    - 'Releases Create': 'sites_releases-create.md'
+    - 'Releases Get': 'sites_releases-get.md'
+    - 'Releases List': 'sites_releases-list.md'
+    - 'Update Config': 'sites_update-config.md'
+    - 'Versions Clone': 'sites_versions-clone.md'
+    - 'Versions Create': 'sites_versions-create.md'
+    - 'Versions Delete': 'sites_versions-delete.md'
+    - 'Versions Files List': 'sites_versions-files-list.md'
+    - 'Versions Get': 'sites_versions-get.md'
+    - 'Versions List': 'sites_versions-list.md'
+    - 'Versions Patch': 'sites_versions-patch.md'
+    - 'Versions Populate Files': 'sites_versions-populate-files.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

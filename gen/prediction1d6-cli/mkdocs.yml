@@ -1,0 +1,26 @@
+site_name: prediction v5.0.4+20160511
+site_url: http://byron.github.io/google-apis-rs/google-prediction1d6-cli
+site_description: A complete library to interact with prediction (protocol v1.6)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/prediction1d6-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Hostedmodels':
+    - 'Predict': 'hostedmodels_predict.md'
+- 'Trainedmodels':
+    - 'Analyze': 'trainedmodels_analyze.md'
+    - 'Delete': 'trainedmodels_delete.md'
+    - 'Get': 'trainedmodels_get.md'
+    - 'Insert': 'trainedmodels_insert.md'
+    - 'List': 'trainedmodels_list.md'
+    - 'Predict': 'trainedmodels_predict.md'
+    - 'Update': 'trainedmodels_update.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

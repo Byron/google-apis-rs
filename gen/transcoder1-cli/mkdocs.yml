@@ -1,0 +1,25 @@
+site_name: Transcoder v5.0.4+20240221
+site_url: http://byron.github.io/google-apis-rs/google-transcoder1-cli
+site_description: A complete library to interact with Transcoder (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/transcoder1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Job Templates Create': 'projects_locations-job-templates-create.md'
+    - 'Locations Job Templates Delete': 'projects_locations-job-templates-delete.md'
+    - 'Locations Job Templates Get': 'projects_locations-job-templates-get.md'
+    - 'Locations Job Templates List': 'projects_locations-job-templates-list.md'
+    - 'Locations Jobs Create': 'projects_locations-jobs-create.md'
+    - 'Locations Jobs Delete': 'projects_locations-jobs-delete.md'
+    - 'Locations Jobs Get': 'projects_locations-jobs-get.md'
+    - 'Locations Jobs List': 'projects_locations-jobs-list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

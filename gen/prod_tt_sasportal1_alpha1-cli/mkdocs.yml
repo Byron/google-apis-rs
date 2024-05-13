@@ -1,0 +1,103 @@
+site_name: SAS Portal Testing v5.0.4+20240226
+site_url: http://byron.github.io/google-apis-rs/google-prod_tt_sasportal1_alpha1-cli
+site_description: A complete library to interact with SAS Portal Testing (protocol v1alpha1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/prod_tt_sasportal1_alpha1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Customers':
+    - 'Deployments Create': 'customers_deployments-create.md'
+    - 'Deployments Delete': 'customers_deployments-delete.md'
+    - 'Deployments Devices Create': 'customers_deployments-devices-create.md'
+    - 'Deployments Devices Create Signed': 'customers_deployments-devices-create-signed.md'
+    - 'Deployments Devices List': 'customers_deployments-devices-list.md'
+    - 'Deployments Get': 'customers_deployments-get.md'
+    - 'Deployments List': 'customers_deployments-list.md'
+    - 'Deployments Move': 'customers_deployments-move.md'
+    - 'Deployments Patch': 'customers_deployments-patch.md'
+    - 'Devices Create': 'customers_devices-create.md'
+    - 'Devices Create Signed': 'customers_devices-create-signed.md'
+    - 'Devices Delete': 'customers_devices-delete.md'
+    - 'Devices Get': 'customers_devices-get.md'
+    - 'Devices List': 'customers_devices-list.md'
+    - 'Devices Move': 'customers_devices-move.md'
+    - 'Devices Patch': 'customers_devices-patch.md'
+    - 'Devices Sign Device': 'customers_devices-sign-device.md'
+    - 'Devices Update Signed': 'customers_devices-update-signed.md'
+    - 'Get': 'customers_get.md'
+    - 'List': 'customers_list.md'
+    - 'List Gcp Project Deployments': 'customers_list-gcp-project-deployments.md'
+    - 'List Legacy Organizations': 'customers_list-legacy-organizations.md'
+    - 'Migrate Organization': 'customers_migrate-organization.md'
+    - 'Nodes Create': 'customers_nodes-create.md'
+    - 'Nodes Delete': 'customers_nodes-delete.md'
+    - 'Nodes Deployments Create': 'customers_nodes-deployments-create.md'
+    - 'Nodes Deployments List': 'customers_nodes-deployments-list.md'
+    - 'Nodes Devices Create': 'customers_nodes-devices-create.md'
+    - 'Nodes Devices Create Signed': 'customers_nodes-devices-create-signed.md'
+    - 'Nodes Devices List': 'customers_nodes-devices-list.md'
+    - 'Nodes Get': 'customers_nodes-get.md'
+    - 'Nodes List': 'customers_nodes-list.md'
+    - 'Nodes Move': 'customers_nodes-move.md'
+    - 'Nodes Nodes Create': 'customers_nodes-nodes-create.md'
+    - 'Nodes Nodes List': 'customers_nodes-nodes-list.md'
+    - 'Nodes Patch': 'customers_nodes-patch.md'
+    - 'Patch': 'customers_patch.md'
+    - 'Provision Deployment': 'customers_provision-deployment.md'
+    - 'Setup Sas Analytics': 'customers_setup-sas-analytics.md'
+- 'Deployments':
+    - 'Devices Delete': 'deployments_devices-delete.md'
+    - 'Devices Get': 'deployments_devices-get.md'
+    - 'Devices Move': 'deployments_devices-move.md'
+    - 'Devices Patch': 'deployments_devices-patch.md'
+    - 'Devices Sign Device': 'deployments_devices-sign-device.md'
+    - 'Devices Update Signed': 'deployments_devices-update-signed.md'
+    - 'Get': 'deployments_get.md'
+- 'Installer':
+    - 'Generate Secret': 'installer_generate-secret.md'
+    - 'Validate': 'installer_validate.md'
+- 'Nodes':
+    - 'Deployments Delete': 'nodes_deployments-delete.md'
+    - 'Deployments Devices Create': 'nodes_deployments-devices-create.md'
+    - 'Deployments Devices Create Signed': 'nodes_deployments-devices-create-signed.md'
+    - 'Deployments Devices List': 'nodes_deployments-devices-list.md'
+    - 'Deployments Get': 'nodes_deployments-get.md'
+    - 'Deployments List': 'nodes_deployments-list.md'
+    - 'Deployments Move': 'nodes_deployments-move.md'
+    - 'Deployments Patch': 'nodes_deployments-patch.md'
+    - 'Devices Create': 'nodes_devices-create.md'
+    - 'Devices Create Signed': 'nodes_devices-create-signed.md'
+    - 'Devices Delete': 'nodes_devices-delete.md'
+    - 'Devices Get': 'nodes_devices-get.md'
+    - 'Devices List': 'nodes_devices-list.md'
+    - 'Devices Move': 'nodes_devices-move.md'
+    - 'Devices Patch': 'nodes_devices-patch.md'
+    - 'Devices Sign Device': 'nodes_devices-sign-device.md'
+    - 'Devices Update Signed': 'nodes_devices-update-signed.md'
+    - 'Get': 'nodes_get.md'
+    - 'Nodes Create': 'nodes_nodes-create.md'
+    - 'Nodes Delete': 'nodes_nodes-delete.md'
+    - 'Nodes Deployments Create': 'nodes_nodes-deployments-create.md'
+    - 'Nodes Deployments List': 'nodes_nodes-deployments-list.md'
+    - 'Nodes Devices Create': 'nodes_nodes-devices-create.md'
+    - 'Nodes Devices Create Signed': 'nodes_nodes-devices-create-signed.md'
+    - 'Nodes Devices List': 'nodes_nodes-devices-list.md'
+    - 'Nodes Get': 'nodes_nodes-get.md'
+    - 'Nodes List': 'nodes_nodes-list.md'
+    - 'Nodes Move': 'nodes_nodes-move.md'
+    - 'Nodes Nodes Create': 'nodes_nodes-nodes-create.md'
+    - 'Nodes Nodes List': 'nodes_nodes-nodes-list.md'
+    - 'Nodes Patch': 'nodes_nodes-patch.md'
+- 'Policies':
+    - 'Get': 'policies_get.md'
+    - 'Set': 'policies_set.md'
+    - 'Test': 'policies_test.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

@@ -1,0 +1,28 @@
+site_name: AnalyticsData v5.0.4+20240304
+site_url: http://byron.github.io/google-apis-rs/google-analyticsdata1_beta-cli
+site_description: A complete library to interact with AnalyticsData (protocol v1beta)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/analyticsdata1_beta-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Properties':
+    - 'Audience Exports Create': 'properties_audience-exports-create.md'
+    - 'Audience Exports Get': 'properties_audience-exports-get.md'
+    - 'Audience Exports List': 'properties_audience-exports-list.md'
+    - 'Audience Exports Query': 'properties_audience-exports-query.md'
+    - 'Batch Run Pivot Reports': 'properties_batch-run-pivot-reports.md'
+    - 'Batch Run Reports': 'properties_batch-run-reports.md'
+    - 'Check Compatibility': 'properties_check-compatibility.md'
+    - 'Get Metadata': 'properties_get-metadata.md'
+    - 'Run Pivot Report': 'properties_run-pivot-report.md'
+    - 'Run Realtime Report': 'properties_run-realtime-report.md'
+    - 'Run Report': 'properties_run-report.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

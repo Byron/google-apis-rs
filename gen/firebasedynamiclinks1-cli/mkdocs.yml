@@ -1,0 +1,24 @@
+site_name: Firebase Dynamic Links v5.0.4+20240226
+site_url: http://byron.github.io/google-apis-rs/google-firebasedynamiclinks1-cli
+site_description: A complete library to interact with Firebase Dynamic Links (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/firebasedynamiclinks1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Managed Short Links':
+    - 'Create': 'managed-short-links_create.md'
+- 'Methods':
+    - 'Get Link Stats': 'methods_get-link-stats.md'
+    - 'Install Attribution': 'methods_install-attribution.md'
+    - 'Reopen Attribution': 'methods_reopen-attribution.md'
+- 'Short Links':
+    - 'Create': 'short-links_create.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

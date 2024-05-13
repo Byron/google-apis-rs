@@ -1,0 +1,56 @@
+site_name: Firebase Management v5.0.4+20240304
+site_url: http://byron.github.io/google-apis-rs/google-firebase1_beta1-cli
+site_description: A complete library to interact with Firebase Management (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/firebase1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Available Projects':
+    - 'List': 'available-projects_list.md'
+- 'Operations':
+    - 'Get': 'operations_get.md'
+- 'Projects':
+    - 'Add Firebase': 'projects_add-firebase.md'
+    - 'Add Google Analytics': 'projects_add-google-analytics.md'
+    - 'Android Apps Create': 'projects_android-apps-create.md'
+    - 'Android Apps Get': 'projects_android-apps-get.md'
+    - 'Android Apps Get Config': 'projects_android-apps-get-config.md'
+    - 'Android Apps List': 'projects_android-apps-list.md'
+    - 'Android Apps Patch': 'projects_android-apps-patch.md'
+    - 'Android Apps Remove': 'projects_android-apps-remove.md'
+    - 'Android Apps Sha Create': 'projects_android-apps-sha-create.md'
+    - 'Android Apps Sha Delete': 'projects_android-apps-sha-delete.md'
+    - 'Android Apps Sha List': 'projects_android-apps-sha-list.md'
+    - 'Android Apps Undelete': 'projects_android-apps-undelete.md'
+    - 'Available Locations List': 'projects_available-locations-list.md'
+    - 'Default Location Finalize': 'projects_default-location-finalize.md'
+    - 'Get': 'projects_get.md'
+    - 'Get Admin Sdk Config': 'projects_get-admin-sdk-config.md'
+    - 'Get Analytics Details': 'projects_get-analytics-details.md'
+    - 'Ios Apps Create': 'projects_ios-apps-create.md'
+    - 'Ios Apps Get': 'projects_ios-apps-get.md'
+    - 'Ios Apps Get Config': 'projects_ios-apps-get-config.md'
+    - 'Ios Apps List': 'projects_ios-apps-list.md'
+    - 'Ios Apps Patch': 'projects_ios-apps-patch.md'
+    - 'Ios Apps Remove': 'projects_ios-apps-remove.md'
+    - 'Ios Apps Undelete': 'projects_ios-apps-undelete.md'
+    - 'List': 'projects_list.md'
+    - 'Patch': 'projects_patch.md'
+    - 'Remove Analytics': 'projects_remove-analytics.md'
+    - 'Search Apps': 'projects_search-apps.md'
+    - 'Web Apps Create': 'projects_web-apps-create.md'
+    - 'Web Apps Get': 'projects_web-apps-get.md'
+    - 'Web Apps Get Config': 'projects_web-apps-get-config.md'
+    - 'Web Apps List': 'projects_web-apps-list.md'
+    - 'Web Apps Patch': 'projects_web-apps-patch.md'
+    - 'Web Apps Remove': 'projects_web-apps-remove.md'
+    - 'Web Apps Undelete': 'projects_web-apps-undelete.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

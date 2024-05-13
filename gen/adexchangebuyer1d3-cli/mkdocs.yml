@@ -1,0 +1,44 @@
+site_name: Ad Exchange Buyer v5.0.4+20210330
+site_url: http://byron.github.io/google-apis-rs/google-adexchangebuyer1d3-cli
+site_description: A complete library to interact with Ad Exchange Buyer (protocol v1.3)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/adexchangebuyer1d3-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Accounts':
+    - 'Get': 'accounts_get.md'
+    - 'List': 'accounts_list.md'
+    - 'Patch': 'accounts_patch.md'
+    - 'Update': 'accounts_update.md'
+- 'Billing Info':
+    - 'Get': 'billing-info_get.md'
+    - 'List': 'billing-info_list.md'
+- 'Budget':
+    - 'Get': 'budget_get.md'
+    - 'Patch': 'budget_patch.md'
+    - 'Update': 'budget_update.md'
+- 'Creatives':
+    - 'Get': 'creatives_get.md'
+    - 'Insert': 'creatives_insert.md'
+    - 'List': 'creatives_list.md'
+- 'Direct Deals':
+    - 'Get': 'direct-deals_get.md'
+    - 'List': 'direct-deals_list.md'
+- 'Performance Report':
+    - 'List': 'performance-report_list.md'
+- 'Pretargeting Config':
+    - 'Delete': 'pretargeting-config_delete.md'
+    - 'Get': 'pretargeting-config_get.md'
+    - 'Insert': 'pretargeting-config_insert.md'
+    - 'List': 'pretargeting-config_list.md'
+    - 'Patch': 'pretargeting-config_patch.md'
+    - 'Update': 'pretargeting-config_update.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

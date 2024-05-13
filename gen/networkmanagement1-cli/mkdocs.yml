@@ -1,0 +1,32 @@
+site_name: Network Management v5.0.4+20240221
+site_url: http://byron.github.io/google-apis-rs/google-networkmanagement1-cli
+site_description: A complete library to interact with Network Management (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/networkmanagement1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations Global Connectivity Tests Create': 'projects_locations-global-connectivity-tests-create.md'
+    - 'Locations Global Connectivity Tests Delete': 'projects_locations-global-connectivity-tests-delete.md'
+    - 'Locations Global Connectivity Tests Get': 'projects_locations-global-connectivity-tests-get.md'
+    - 'Locations Global Connectivity Tests Get Iam Policy': 'projects_locations-global-connectivity-tests-get-iam-policy.md'
+    - 'Locations Global Connectivity Tests List': 'projects_locations-global-connectivity-tests-list.md'
+    - 'Locations Global Connectivity Tests Patch': 'projects_locations-global-connectivity-tests-patch.md'
+    - 'Locations Global Connectivity Tests Rerun': 'projects_locations-global-connectivity-tests-rerun.md'
+    - 'Locations Global Connectivity Tests Set Iam Policy': 'projects_locations-global-connectivity-tests-set-iam-policy.md'
+    - 'Locations Global Connectivity Tests Test Iam Permissions': 'projects_locations-global-connectivity-tests-test-iam-permissions.md'
+    - 'Locations Global Operations Cancel': 'projects_locations-global-operations-cancel.md'
+    - 'Locations Global Operations Delete': 'projects_locations-global-operations-delete.md'
+    - 'Locations Global Operations Get': 'projects_locations-global-operations-get.md'
+    - 'Locations Global Operations List': 'projects_locations-global-operations-list.md'
+    - 'Locations List': 'projects_locations-list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

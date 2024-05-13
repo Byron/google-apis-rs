@@ -1,0 +1,28 @@
+site_name: Cloud Private Catalog v5.0.4+20200405
+site_url: http://byron.github.io/google-apis-rs/google-cloudprivatecatalog1_beta1-cli
+site_description: A complete library to interact with Cloud Private Catalog (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudprivatecatalog1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Folders':
+    - 'Catalogs Search': 'folders_catalogs-search.md'
+    - 'Products Search': 'folders_products-search.md'
+    - 'Versions Search': 'folders_versions-search.md'
+- 'Organizations':
+    - 'Catalogs Search': 'organizations_catalogs-search.md'
+    - 'Products Search': 'organizations_products-search.md'
+    - 'Versions Search': 'organizations_versions-search.md'
+- 'Projects':
+    - 'Catalogs Search': 'projects_catalogs-search.md'
+    - 'Products Search': 'projects_products-search.md'
+    - 'Versions Search': 'projects_versions-search.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

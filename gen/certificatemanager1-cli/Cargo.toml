@@ -1,0 +1,42 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/generator/templates/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-certificatemanager1-cli"
+version = "5.0.4+20240221"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with Certificate Manager (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/certificatemanager1-cli"
+homepage = "https://cloud.google.com/certificate-manager"
+documentation = "http://byron.github.io/google-apis-rs/google_certificatemanager1_cli"
+license = "MIT"
+keywords = ["certificatemanager", "google", "cli"]
+autobins = false
+edition = "2018"
+
+[[bin]]
+name = "certificatemanager1"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "^ 1.0"
+hyper-rustls = "0.24.0"
+mime = "^ 0.3.0"
+serde = { version = "^ 1.0", features = ["derive"] }
+serde_json = "^ 1.0"
+itertools = "^ 0.10"
+google-clis-common = { path = "../../google-clis-common", version = "6.0" }
+strsim = "^0.5"
+clap = "^2.0"
+http = "^0.2"
+hyper = { version = "0.14", features = ["full"] }
+tokio = { version = "^ 1.0", features = ["full"] }
+tower-service = "^0.3.1"
+
+
+
+[dependencies.google-certificatemanager1]
+path = "../certificatemanager1"
+version = "5.0.4+20240221"
+

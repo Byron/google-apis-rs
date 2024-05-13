@@ -1,0 +1,108 @@
+site_name: Android Enterprise v5.0.4+20240304
+site_url: http://byron.github.io/google-apis-rs/google-androidenterprise1-cli
+site_description: A complete library to interact with Android Enterprise (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/androidenterprise1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Devices':
+    - 'Force Report Upload': 'devices_force-report-upload.md'
+    - 'Get': 'devices_get.md'
+    - 'Get State': 'devices_get-state.md'
+    - 'List': 'devices_list.md'
+    - 'Set State': 'devices_set-state.md'
+    - 'Update': 'devices_update.md'
+- 'Enterprises':
+    - 'Acknowledge Notification Set': 'enterprises_acknowledge-notification-set.md'
+    - 'Complete Signup': 'enterprises_complete-signup.md'
+    - 'Create Enrollment Token': 'enterprises_create-enrollment-token.md'
+    - 'Create Web Token': 'enterprises_create-web-token.md'
+    - 'Enroll': 'enterprises_enroll.md'
+    - 'Generate Signup Url': 'enterprises_generate-signup-url.md'
+    - 'Get': 'enterprises_get.md'
+    - 'Get Service Account': 'enterprises_get-service-account.md'
+    - 'Get Store Layout': 'enterprises_get-store-layout.md'
+    - 'List': 'enterprises_list.md'
+    - 'Pull Notification Set': 'enterprises_pull-notification-set.md'
+    - 'Send Test Push Notification': 'enterprises_send-test-push-notification.md'
+    - 'Set Account': 'enterprises_set-account.md'
+    - 'Set Store Layout': 'enterprises_set-store-layout.md'
+    - 'Unenroll': 'enterprises_unenroll.md'
+- 'Entitlements':
+    - 'Delete': 'entitlements_delete.md'
+    - 'Get': 'entitlements_get.md'
+    - 'List': 'entitlements_list.md'
+    - 'Update': 'entitlements_update.md'
+- 'Grouplicenses':
+    - 'Get': 'grouplicenses_get.md'
+    - 'List': 'grouplicenses_list.md'
+- 'Grouplicenseusers':
+    - 'List': 'grouplicenseusers_list.md'
+- 'Installs':
+    - 'Delete': 'installs_delete.md'
+    - 'Get': 'installs_get.md'
+    - 'List': 'installs_list.md'
+    - 'Update': 'installs_update.md'
+- 'Managedconfigurationsfordevice':
+    - 'Delete': 'managedconfigurationsfordevice_delete.md'
+    - 'Get': 'managedconfigurationsfordevice_get.md'
+    - 'List': 'managedconfigurationsfordevice_list.md'
+    - 'Update': 'managedconfigurationsfordevice_update.md'
+- 'Managedconfigurationsforuser':
+    - 'Delete': 'managedconfigurationsforuser_delete.md'
+    - 'Get': 'managedconfigurationsforuser_get.md'
+    - 'List': 'managedconfigurationsforuser_list.md'
+    - 'Update': 'managedconfigurationsforuser_update.md'
+- 'Managedconfigurationssettings':
+    - 'List': 'managedconfigurationssettings_list.md'
+- 'Permissions':
+    - 'Get': 'permissions_get.md'
+- 'Products':
+    - 'Approve': 'products_approve.md'
+    - 'Generate Approval Url': 'products_generate-approval-url.md'
+    - 'Get': 'products_get.md'
+    - 'Get App Restrictions Schema': 'products_get-app-restrictions-schema.md'
+    - 'Get Permissions': 'products_get-permissions.md'
+    - 'List': 'products_list.md'
+    - 'Unapprove': 'products_unapprove.md'
+- 'Serviceaccountkeys':
+    - 'Delete': 'serviceaccountkeys_delete.md'
+    - 'Insert': 'serviceaccountkeys_insert.md'
+    - 'List': 'serviceaccountkeys_list.md'
+- 'Storelayoutclusters':
+    - 'Delete': 'storelayoutclusters_delete.md'
+    - 'Get': 'storelayoutclusters_get.md'
+    - 'Insert': 'storelayoutclusters_insert.md'
+    - 'List': 'storelayoutclusters_list.md'
+    - 'Update': 'storelayoutclusters_update.md'
+- 'Storelayoutpages':
+    - 'Delete': 'storelayoutpages_delete.md'
+    - 'Get': 'storelayoutpages_get.md'
+    - 'Insert': 'storelayoutpages_insert.md'
+    - 'List': 'storelayoutpages_list.md'
+    - 'Update': 'storelayoutpages_update.md'
+- 'Users':
+    - 'Delete': 'users_delete.md'
+    - 'Generate Authentication Token': 'users_generate-authentication-token.md'
+    - 'Get': 'users_get.md'
+    - 'Get Available Product Set': 'users_get-available-product-set.md'
+    - 'Insert': 'users_insert.md'
+    - 'List': 'users_list.md'
+    - 'Revoke Device Access': 'users_revoke-device-access.md'
+    - 'Set Available Product Set': 'users_set-available-product-set.md'
+    - 'Update': 'users_update.md'
+- 'Webapps':
+    - 'Delete': 'webapps_delete.md'
+    - 'Get': 'webapps_get.md'
+    - 'Insert': 'webapps_insert.md'
+    - 'List': 'webapps_list.md'
+    - 'Update': 'webapps_update.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

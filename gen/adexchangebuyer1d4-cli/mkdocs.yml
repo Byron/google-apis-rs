@@ -1,0 +1,66 @@
+site_name: Ad Exchange Buyer v5.0.4+20210330
+site_url: http://byron.github.io/google-apis-rs/google-adexchangebuyer1d4-cli
+site_description: A complete library to interact with Ad Exchange Buyer (protocol v1.4)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/adexchangebuyer1d4-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Accounts':
+    - 'Get': 'accounts_get.md'
+    - 'List': 'accounts_list.md'
+    - 'Patch': 'accounts_patch.md'
+    - 'Update': 'accounts_update.md'
+- 'Billing Info':
+    - 'Get': 'billing-info_get.md'
+    - 'List': 'billing-info_list.md'
+- 'Budget':
+    - 'Get': 'budget_get.md'
+    - 'Patch': 'budget_patch.md'
+    - 'Update': 'budget_update.md'
+- 'Creatives':
+    - 'Add Deal': 'creatives_add-deal.md'
+    - 'Get': 'creatives_get.md'
+    - 'Insert': 'creatives_insert.md'
+    - 'List': 'creatives_list.md'
+    - 'List Deals': 'creatives_list-deals.md'
+    - 'Remove Deal': 'creatives_remove-deal.md'
+- 'Marketplacedeals':
+    - 'Delete': 'marketplacedeals_delete.md'
+    - 'Insert': 'marketplacedeals_insert.md'
+    - 'List': 'marketplacedeals_list.md'
+    - 'Update': 'marketplacedeals_update.md'
+- 'Marketplacenotes':
+    - 'Insert': 'marketplacenotes_insert.md'
+    - 'List': 'marketplacenotes_list.md'
+- 'Marketplaceprivateauction':
+    - 'Updateproposal': 'marketplaceprivateauction_updateproposal.md'
+- 'Performance Report':
+    - 'List': 'performance-report_list.md'
+- 'Pretargeting Config':
+    - 'Delete': 'pretargeting-config_delete.md'
+    - 'Get': 'pretargeting-config_get.md'
+    - 'Insert': 'pretargeting-config_insert.md'
+    - 'List': 'pretargeting-config_list.md'
+    - 'Patch': 'pretargeting-config_patch.md'
+    - 'Update': 'pretargeting-config_update.md'
+- 'Products':
+    - 'Get': 'products_get.md'
+    - 'Search': 'products_search.md'
+- 'Proposals':
+    - 'Get': 'proposals_get.md'
+    - 'Insert': 'proposals_insert.md'
+    - 'Patch': 'proposals_patch.md'
+    - 'Search': 'proposals_search.md'
+    - 'Setupcomplete': 'proposals_setupcomplete.md'
+    - 'Update': 'proposals_update.md'
+- 'Pubprofiles':
+    - 'List': 'pubprofiles_list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

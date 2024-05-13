@@ -1,0 +1,28 @@
+site_name: Games Configuration v5.0.4+20240228
+site_url: http://byron.github.io/google-apis-rs/google-gamesconfiguration1_configuration-cli
+site_description: A complete library to interact with Games Configuration (protocol v1configuration)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/gamesconfiguration1_configuration-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Achievement Configurations':
+    - 'Delete': 'achievement-configurations_delete.md'
+    - 'Get': 'achievement-configurations_get.md'
+    - 'Insert': 'achievement-configurations_insert.md'
+    - 'List': 'achievement-configurations_list.md'
+    - 'Update': 'achievement-configurations_update.md'
+- 'Leaderboard Configurations':
+    - 'Delete': 'leaderboard-configurations_delete.md'
+    - 'Get': 'leaderboard-configurations_get.md'
+    - 'Insert': 'leaderboard-configurations_insert.md'
+    - 'List': 'leaderboard-configurations_list.md'
+    - 'Update': 'leaderboard-configurations_update.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

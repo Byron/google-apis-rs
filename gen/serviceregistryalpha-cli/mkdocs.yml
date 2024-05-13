@@ -1,0 +1,26 @@
+site_name: Service Registry v5.0.4+20160401
+site_url: http://byron.github.io/google-apis-rs/google-serviceregistryalpha-cli
+site_description: A complete library to interact with Service Registry (protocol alpha)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/serviceregistryalpha-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Endpoints':
+    - 'Delete': 'endpoints_delete.md'
+    - 'Get': 'endpoints_get.md'
+    - 'Insert': 'endpoints_insert.md'
+    - 'List': 'endpoints_list.md'
+    - 'Patch': 'endpoints_patch.md'
+    - 'Update': 'endpoints_update.md'
+- 'Operations':
+    - 'Get': 'operations_get.md'
+    - 'List': 'operations_list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

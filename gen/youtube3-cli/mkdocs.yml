@@ -1,0 +1,127 @@
+site_name: YouTube v5.0.4+20240303
+site_url: http://byron.github.io/google-apis-rs/google-youtube3-cli
+site_description: A complete library to interact with YouTube (protocol v3)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/youtube3-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Abuse Reports':
+    - 'Insert': 'abuse-reports_insert.md'
+- 'Activities':
+    - 'List': 'activities_list.md'
+- 'Captions':
+    - 'Delete': 'captions_delete.md'
+    - 'Download': 'captions_download.md'
+    - 'Insert': 'captions_insert.md'
+    - 'List': 'captions_list.md'
+    - 'Update': 'captions_update.md'
+- 'Channel Banners':
+    - 'Insert': 'channel-banners_insert.md'
+- 'Channel Sections':
+    - 'Delete': 'channel-sections_delete.md'
+    - 'Insert': 'channel-sections_insert.md'
+    - 'List': 'channel-sections_list.md'
+    - 'Update': 'channel-sections_update.md'
+- 'Channels':
+    - 'List': 'channels_list.md'
+    - 'Update': 'channels_update.md'
+- 'Comment Threads':
+    - 'Insert': 'comment-threads_insert.md'
+    - 'List': 'comment-threads_list.md'
+- 'Comments':
+    - 'Delete': 'comments_delete.md'
+    - 'Insert': 'comments_insert.md'
+    - 'List': 'comments_list.md'
+    - 'Mark As Spam': 'comments_mark-as-spam.md'
+    - 'Set Moderation Status': 'comments_set-moderation-status.md'
+    - 'Update': 'comments_update.md'
+- 'I18n Languages':
+    - 'List': 'i18n-languages_list.md'
+- 'I18n Regions':
+    - 'List': 'i18n-regions_list.md'
+- 'Live Broadcasts':
+    - 'Bind': 'live-broadcasts_bind.md'
+    - 'Delete': 'live-broadcasts_delete.md'
+    - 'Insert': 'live-broadcasts_insert.md'
+    - 'Insert Cuepoint': 'live-broadcasts_insert-cuepoint.md'
+    - 'List': 'live-broadcasts_list.md'
+    - 'Transition': 'live-broadcasts_transition.md'
+    - 'Update': 'live-broadcasts_update.md'
+- 'Live Chat Bans':
+    - 'Delete': 'live-chat-bans_delete.md'
+    - 'Insert': 'live-chat-bans_insert.md'
+- 'Live Chat Messages':
+    - 'Delete': 'live-chat-messages_delete.md'
+    - 'Insert': 'live-chat-messages_insert.md'
+    - 'List': 'live-chat-messages_list.md'
+- 'Live Chat Moderators':
+    - 'Delete': 'live-chat-moderators_delete.md'
+    - 'Insert': 'live-chat-moderators_insert.md'
+    - 'List': 'live-chat-moderators_list.md'
+- 'Live Streams':
+    - 'Delete': 'live-streams_delete.md'
+    - 'Insert': 'live-streams_insert.md'
+    - 'List': 'live-streams_list.md'
+    - 'Update': 'live-streams_update.md'
+- 'Members':
+    - 'List': 'members_list.md'
+- 'Memberships Levels':
+    - 'List': 'memberships-levels_list.md'
+- 'Playlist Images':
+    - 'Delete': 'playlist-images_delete.md'
+    - 'Insert': 'playlist-images_insert.md'
+    - 'List': 'playlist-images_list.md'
+    - 'Update': 'playlist-images_update.md'
+- 'Playlist Items':
+    - 'Delete': 'playlist-items_delete.md'
+    - 'Insert': 'playlist-items_insert.md'
+    - 'List': 'playlist-items_list.md'
+    - 'Update': 'playlist-items_update.md'
+- 'Playlists':
+    - 'Delete': 'playlists_delete.md'
+    - 'Insert': 'playlists_insert.md'
+    - 'List': 'playlists_list.md'
+    - 'Update': 'playlists_update.md'
+- 'Search':
+    - 'List': 'search_list.md'
+- 'Subscriptions':
+    - 'Delete': 'subscriptions_delete.md'
+    - 'Insert': 'subscriptions_insert.md'
+    - 'List': 'subscriptions_list.md'
+- 'Super Chat Events':
+    - 'List': 'super-chat-events_list.md'
+- 'Tests':
+    - 'Insert': 'tests_insert.md'
+- 'Third Party Links':
+    - 'Delete': 'third-party-links_delete.md'
+    - 'Insert': 'third-party-links_insert.md'
+    - 'List': 'third-party-links_list.md'
+    - 'Update': 'third-party-links_update.md'
+- 'Thumbnails':
+    - 'Set': 'thumbnails_set.md'
+- 'Video Abuse Report Reasons':
+    - 'List': 'video-abuse-report-reasons_list.md'
+- 'Video Categories':
+    - 'List': 'video-categories_list.md'
+- 'Videos':
+    - 'Delete': 'videos_delete.md'
+    - 'Get Rating': 'videos_get-rating.md'
+    - 'Insert': 'videos_insert.md'
+    - 'List': 'videos_list.md'
+    - 'Rate': 'videos_rate.md'
+    - 'Report Abuse': 'videos_report-abuse.md'
+    - 'Update': 'videos_update.md'
+- 'Watermarks':
+    - 'Set': 'watermarks_set.md'
+    - 'Unset': 'watermarks_unset.md'
+- 'Youtube':
+    - 'V3 Update Comment Threads': 'youtube_v3-update-comment-threads.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

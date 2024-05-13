@@ -1,0 +1,56 @@
+site_name: fusiontables v5.0.4+20171117
+site_url: http://byron.github.io/google-apis-rs/google-fusiontables2-cli
+site_description: A complete library to interact with fusiontables (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/fusiontables2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Column':
+    - 'Delete': 'column_delete.md'
+    - 'Get': 'column_get.md'
+    - 'Insert': 'column_insert.md'
+    - 'List': 'column_list.md'
+    - 'Patch': 'column_patch.md'
+    - 'Update': 'column_update.md'
+- 'Query':
+    - 'Sql': 'query_sql.md'
+    - 'Sql Get': 'query_sql-get.md'
+- 'Style':
+    - 'Delete': 'style_delete.md'
+    - 'Get': 'style_get.md'
+    - 'Insert': 'style_insert.md'
+    - 'List': 'style_list.md'
+    - 'Patch': 'style_patch.md'
+    - 'Update': 'style_update.md'
+- 'Table':
+    - 'Copy': 'table_copy.md'
+    - 'Delete': 'table_delete.md'
+    - 'Get': 'table_get.md'
+    - 'Import Rows': 'table_import-rows.md'
+    - 'Import Table': 'table_import-table.md'
+    - 'Insert': 'table_insert.md'
+    - 'List': 'table_list.md'
+    - 'Patch': 'table_patch.md'
+    - 'Refetch Sheet': 'table_refetch-sheet.md'
+    - 'Replace Rows': 'table_replace-rows.md'
+    - 'Update': 'table_update.md'
+- 'Task':
+    - 'Delete': 'task_delete.md'
+    - 'Get': 'task_get.md'
+    - 'List': 'task_list.md'
+- 'Template':
+    - 'Delete': 'template_delete.md'
+    - 'Get': 'template_get.md'
+    - 'Insert': 'template_insert.md'
+    - 'List': 'template_list.md'
+    - 'Patch': 'template_patch.md'
+    - 'Update': 'template_update.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

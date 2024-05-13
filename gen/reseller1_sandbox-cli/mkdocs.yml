@@ -1,0 +1,32 @@
+site_name: reseller v5.0.4+20160329
+site_url: http://byron.github.io/google-apis-rs/google-reseller1_sandbox-cli
+site_description: A complete library to interact with reseller (protocol v1sandbox)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/reseller1_sandbox-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Customers':
+    - 'Get': 'customers_get.md'
+    - 'Insert': 'customers_insert.md'
+    - 'Patch': 'customers_patch.md'
+    - 'Update': 'customers_update.md'
+- 'Subscriptions':
+    - 'Activate': 'subscriptions_activate.md'
+    - 'Change Plan': 'subscriptions_change-plan.md'
+    - 'Change Renewal Settings': 'subscriptions_change-renewal-settings.md'
+    - 'Change Seats': 'subscriptions_change-seats.md'
+    - 'Delete': 'subscriptions_delete.md'
+    - 'Get': 'subscriptions_get.md'
+    - 'Insert': 'subscriptions_insert.md'
+    - 'List': 'subscriptions_list.md'
+    - 'Start Paid Service': 'subscriptions_start-paid-service.md'
+    - 'Suspend': 'subscriptions_suspend.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

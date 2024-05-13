@@ -1,0 +1,28 @@
+site_name: Api Keys Service v5.0.4+20240303
+site_url: http://byron.github.io/google-apis-rs/google-apikeys2-cli
+site_description: A complete library to interact with Api Keys Service (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/apikeys2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Keys':
+    - 'Lookup Key': 'keys_lookup-key.md'
+- 'Operations':
+    - 'Get': 'operations_get.md'
+- 'Projects':
+    - 'Locations Keys Create': 'projects_locations-keys-create.md'
+    - 'Locations Keys Delete': 'projects_locations-keys-delete.md'
+    - 'Locations Keys Get': 'projects_locations-keys-get.md'
+    - 'Locations Keys Get Key String': 'projects_locations-keys-get-key-string.md'
+    - 'Locations Keys List': 'projects_locations-keys-list.md'
+    - 'Locations Keys Patch': 'projects_locations-keys-patch.md'
+    - 'Locations Keys Undelete': 'projects_locations-keys-undelete.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

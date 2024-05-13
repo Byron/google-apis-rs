@@ -1,0 +1,32 @@
+site_name: Certificate Authority Service v5.0.4+20240221
+site_url: http://byron.github.io/google-apis-rs/google-privateca1_beta1-cli
+site_description: A complete library to interact with Certificate Authority Service (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/privateca1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Certificate Authorities Certificate Revocation Lists Get Iam Policy': 'projects_locations-certificate-authorities-certificate-revocation-lists-get-iam-policy.md'
+    - 'Locations Certificate Authorities Certificate Revocation Lists Set Iam Policy': 'projects_locations-certificate-authorities-certificate-revocation-lists-set-iam-policy.md'
+    - 'Locations Certificate Authorities Certificate Revocation Lists Test Iam Permissions': 'projects_locations-certificate-authorities-certificate-revocation-lists-test-iam-permissions.md'
+    - 'Locations Certificate Authorities Get Iam Policy': 'projects_locations-certificate-authorities-get-iam-policy.md'
+    - 'Locations Certificate Authorities Set Iam Policy': 'projects_locations-certificate-authorities-set-iam-policy.md'
+    - 'Locations Certificate Authorities Test Iam Permissions': 'projects_locations-certificate-authorities-test-iam-permissions.md'
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Reusable Configs Get Iam Policy': 'projects_locations-reusable-configs-get-iam-policy.md'
+    - 'Locations Reusable Configs Set Iam Policy': 'projects_locations-reusable-configs-set-iam-policy.md'
+    - 'Locations Reusable Configs Test Iam Permissions': 'projects_locations-reusable-configs-test-iam-permissions.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

@@ -1,0 +1,31 @@
+site_name: Ad Exchange Seller v5.0.4+20171101
+site_url: http://byron.github.io/google-apis-rs/google-adexchangeseller2-cli
+site_description: A complete library to interact with Ad Exchange Seller (protocol v2.0)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/adexchangeseller2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Accounts':
+    - 'Adclients List': 'accounts_adclients-list.md'
+    - 'Alerts List': 'accounts_alerts-list.md'
+    - 'Customchannels Get': 'accounts_customchannels-get.md'
+    - 'Customchannels List': 'accounts_customchannels-list.md'
+    - 'Get': 'accounts_get.md'
+    - 'List': 'accounts_list.md'
+    - 'Metadata Dimensions List': 'accounts_metadata-dimensions-list.md'
+    - 'Metadata Metrics List': 'accounts_metadata-metrics-list.md'
+    - 'Preferreddeals Get': 'accounts_preferreddeals-get.md'
+    - 'Preferreddeals List': 'accounts_preferreddeals-list.md'
+    - 'Reports Generate': 'accounts_reports-generate.md'
+    - 'Reports Saved Generate': 'accounts_reports-saved-generate.md'
+    - 'Reports Saved List': 'accounts_reports-saved-list.md'
+    - 'Urlchannels List': 'accounts_urlchannels-list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

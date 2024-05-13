@@ -1,0 +1,37 @@
+site_name: appengine v5.0.4+20181005
+site_url: http://byron.github.io/google-apis-rs/google-appengine1_beta5-cli
+site_description: A complete library to interact with appengine (protocol v1beta5)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/appengine1_beta5-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Apps':
+    - 'Create': 'apps_create.md'
+    - 'Get': 'apps_get.md'
+    - 'Locations Get': 'apps_locations-get.md'
+    - 'Locations List': 'apps_locations-list.md'
+    - 'Operations Get': 'apps_operations-get.md'
+    - 'Operations List': 'apps_operations-list.md'
+    - 'Patch': 'apps_patch.md'
+    - 'Services Delete': 'apps_services-delete.md'
+    - 'Services Get': 'apps_services-get.md'
+    - 'Services List': 'apps_services-list.md'
+    - 'Services Patch': 'apps_services-patch.md'
+    - 'Services Versions Create': 'apps_services-versions-create.md'
+    - 'Services Versions Delete': 'apps_services-versions-delete.md'
+    - 'Services Versions Get': 'apps_services-versions-get.md'
+    - 'Services Versions Instances Debug': 'apps_services-versions-instances-debug.md'
+    - 'Services Versions Instances Delete': 'apps_services-versions-instances-delete.md'
+    - 'Services Versions Instances Get': 'apps_services-versions-instances-get.md'
+    - 'Services Versions Instances List': 'apps_services-versions-instances-list.md'
+    - 'Services Versions List': 'apps_services-versions-list.md'
+    - 'Services Versions Patch': 'apps_services-versions-patch.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

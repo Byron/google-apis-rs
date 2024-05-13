@@ -1,0 +1,83 @@
+site_name: Connectors v5.0.4+20240221
+site_url: http://byron.github.io/google-apis-rs/google-connectors1-cli
+site_description: A complete library to interact with Connectors (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/connectors1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Connections Connection Schema Metadata Get Action': 'projects_locations-connections-connection-schema-metadata-get-action.md'
+    - 'Locations Connections Connection Schema Metadata Get Entity Type': 'projects_locations-connections-connection-schema-metadata-get-entity-type.md'
+    - 'Locations Connections Connection Schema Metadata List Actions': 'projects_locations-connections-connection-schema-metadata-list-actions.md'
+    - 'Locations Connections Connection Schema Metadata List Entity Types': 'projects_locations-connections-connection-schema-metadata-list-entity-types.md'
+    - 'Locations Connections Connection Schema Metadata Refresh': 'projects_locations-connections-connection-schema-metadata-refresh.md'
+    - 'Locations Connections Create': 'projects_locations-connections-create.md'
+    - 'Locations Connections Delete': 'projects_locations-connections-delete.md'
+    - 'Locations Connections Event Subscriptions Create': 'projects_locations-connections-event-subscriptions-create.md'
+    - 'Locations Connections Event Subscriptions Delete': 'projects_locations-connections-event-subscriptions-delete.md'
+    - 'Locations Connections Event Subscriptions Get': 'projects_locations-connections-event-subscriptions-get.md'
+    - 'Locations Connections Event Subscriptions List': 'projects_locations-connections-event-subscriptions-list.md'
+    - 'Locations Connections Event Subscriptions Patch': 'projects_locations-connections-event-subscriptions-patch.md'
+    - 'Locations Connections Event Subscriptions Retry': 'projects_locations-connections-event-subscriptions-retry.md'
+    - 'Locations Connections Get': 'projects_locations-connections-get.md'
+    - 'Locations Connections Get Connection Schema Metadata': 'projects_locations-connections-get-connection-schema-metadata.md'
+    - 'Locations Connections Get Iam Policy': 'projects_locations-connections-get-iam-policy.md'
+    - 'Locations Connections List': 'projects_locations-connections-list.md'
+    - 'Locations Connections Listen Event': 'projects_locations-connections-listen-event.md'
+    - 'Locations Connections Patch': 'projects_locations-connections-patch.md'
+    - 'Locations Connections Repair Eventing': 'projects_locations-connections-repair-eventing.md'
+    - 'Locations Connections Runtime Action Schemas List': 'projects_locations-connections-runtime-action-schemas-list.md'
+    - 'Locations Connections Runtime Entity Schemas List': 'projects_locations-connections-runtime-entity-schemas-list.md'
+    - 'Locations Connections Set Iam Policy': 'projects_locations-connections-set-iam-policy.md'
+    - 'Locations Connections Test Iam Permissions': 'projects_locations-connections-test-iam-permissions.md'
+    - 'Locations Endpoint Attachments Create': 'projects_locations-endpoint-attachments-create.md'
+    - 'Locations Endpoint Attachments Delete': 'projects_locations-endpoint-attachments-delete.md'
+    - 'Locations Endpoint Attachments Get': 'projects_locations-endpoint-attachments-get.md'
+    - 'Locations Endpoint Attachments List': 'projects_locations-endpoint-attachments-list.md'
+    - 'Locations Endpoint Attachments Patch': 'projects_locations-endpoint-attachments-patch.md'
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations Get Regional Settings': 'projects_locations-get-regional-settings.md'
+    - 'Locations Get Runtime Config': 'projects_locations-get-runtime-config.md'
+    - 'Locations Global Custom Connectors Create': 'projects_locations-global-custom-connectors-create.md'
+    - 'Locations Global Custom Connectors Custom Connector Versions Create': 'projects_locations-global-custom-connectors-custom-connector-versions-create.md'
+    - 'Locations Global Custom Connectors Custom Connector Versions Delete': 'projects_locations-global-custom-connectors-custom-connector-versions-delete.md'
+    - 'Locations Global Custom Connectors Custom Connector Versions Get': 'projects_locations-global-custom-connectors-custom-connector-versions-get.md'
+    - 'Locations Global Custom Connectors Custom Connector Versions List': 'projects_locations-global-custom-connectors-custom-connector-versions-list.md'
+    - 'Locations Global Custom Connectors Custom Connector Versions Patch': 'projects_locations-global-custom-connectors-custom-connector-versions-patch.md'
+    - 'Locations Global Custom Connectors Delete': 'projects_locations-global-custom-connectors-delete.md'
+    - 'Locations Global Custom Connectors Get': 'projects_locations-global-custom-connectors-get.md'
+    - 'Locations Global Custom Connectors List': 'projects_locations-global-custom-connectors-list.md'
+    - 'Locations Global Custom Connectors Patch': 'projects_locations-global-custom-connectors-patch.md'
+    - 'Locations Global Get Settings': 'projects_locations-global-get-settings.md'
+    - 'Locations Global Managed Zones Create': 'projects_locations-global-managed-zones-create.md'
+    - 'Locations Global Managed Zones Delete': 'projects_locations-global-managed-zones-delete.md'
+    - 'Locations Global Managed Zones Get': 'projects_locations-global-managed-zones-get.md'
+    - 'Locations Global Managed Zones List': 'projects_locations-global-managed-zones-list.md'
+    - 'Locations Global Managed Zones Patch': 'projects_locations-global-managed-zones-patch.md'
+    - 'Locations Global Update Settings': 'projects_locations-global-update-settings.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Providers Connectors Get': 'projects_locations-providers-connectors-get.md'
+    - 'Locations Providers Connectors List': 'projects_locations-providers-connectors-list.md'
+    - 'Locations Providers Connectors Versions Eventtypes Get': 'projects_locations-providers-connectors-versions-eventtypes-get.md'
+    - 'Locations Providers Connectors Versions Eventtypes List': 'projects_locations-providers-connectors-versions-eventtypes-list.md'
+    - 'Locations Providers Connectors Versions Get': 'projects_locations-providers-connectors-versions-get.md'
+    - 'Locations Providers Connectors Versions List': 'projects_locations-providers-connectors-versions-list.md'
+    - 'Locations Providers Get': 'projects_locations-providers-get.md'
+    - 'Locations Providers Get Iam Policy': 'projects_locations-providers-get-iam-policy.md'
+    - 'Locations Providers List': 'projects_locations-providers-list.md'
+    - 'Locations Providers Set Iam Policy': 'projects_locations-providers-set-iam-policy.md'
+    - 'Locations Providers Test Iam Permissions': 'projects_locations-providers-test-iam-permissions.md'
+    - 'Locations Update Regional Settings': 'projects_locations-update-regional-settings.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

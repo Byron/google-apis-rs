@@ -1,0 +1,22 @@
+site_name: Ideahub v5.0.4+20220305
+site_url: http://byron.github.io/google-apis-rs/google-ideahub1_beta-cli
+site_description: A complete library to interact with Ideahub (protocol v1beta)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/ideahub1_beta-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Platforms':
+    - 'Properties Idea Activities Create': 'platforms_properties-idea-activities-create.md'
+    - 'Properties Idea States Patch': 'platforms_properties-idea-states-patch.md'
+    - 'Properties Ideas List': 'platforms_properties-ideas-list.md'
+    - 'Properties Locales List': 'platforms_properties-locales-list.md'
+    - 'Properties Topic States Patch': 'platforms_properties-topic-states-patch.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

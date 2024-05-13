@@ -1,0 +1,46 @@
+site_name: mirror v5.0.4+20190424
+site_url: http://byron.github.io/google-apis-rs/google-mirror1-cli
+site_description: A complete library to interact with mirror (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/mirror1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Accounts':
+    - 'Insert': 'accounts_insert.md'
+- 'Contacts':
+    - 'Delete': 'contacts_delete.md'
+    - 'Get': 'contacts_get.md'
+    - 'Insert': 'contacts_insert.md'
+    - 'List': 'contacts_list.md'
+    - 'Patch': 'contacts_patch.md'
+    - 'Update': 'contacts_update.md'
+- 'Locations':
+    - 'Get': 'locations_get.md'
+    - 'List': 'locations_list.md'
+- 'Settings':
+    - 'Get': 'settings_get.md'
+- 'Subscriptions':
+    - 'Delete': 'subscriptions_delete.md'
+    - 'Insert': 'subscriptions_insert.md'
+    - 'List': 'subscriptions_list.md'
+    - 'Update': 'subscriptions_update.md'
+- 'Timeline':
+    - 'Attachments Delete': 'timeline_attachments-delete.md'
+    - 'Attachments Get': 'timeline_attachments-get.md'
+    - 'Attachments Insert': 'timeline_attachments-insert.md'
+    - 'Attachments List': 'timeline_attachments-list.md'
+    - 'Delete': 'timeline_delete.md'
+    - 'Get': 'timeline_get.md'
+    - 'Insert': 'timeline_insert.md'
+    - 'List': 'timeline_list.md'
+    - 'Patch': 'timeline_patch.md'
+    - 'Update': 'timeline_update.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

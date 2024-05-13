@@ -1,0 +1,66 @@
+site_name: baremetalsolution v5.0.4+20240228
+site_url: http://byron.github.io/google-apis-rs/google-baremetalsolution2-cli
+site_description: A complete library to interact with baremetalsolution (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/baremetalsolution2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations Instances Detach Lun': 'projects_locations-instances-detach-lun.md'
+    - 'Locations Instances Disable Interactive Serial Console': 'projects_locations-instances-disable-interactive-serial-console.md'
+    - 'Locations Instances Enable Interactive Serial Console': 'projects_locations-instances-enable-interactive-serial-console.md'
+    - 'Locations Instances Get': 'projects_locations-instances-get.md'
+    - 'Locations Instances List': 'projects_locations-instances-list.md'
+    - 'Locations Instances Load Auth Info': 'projects_locations-instances-load-auth-info.md'
+    - 'Locations Instances Patch': 'projects_locations-instances-patch.md'
+    - 'Locations Instances Rename': 'projects_locations-instances-rename.md'
+    - 'Locations Instances Reset': 'projects_locations-instances-reset.md'
+    - 'Locations Instances Start': 'projects_locations-instances-start.md'
+    - 'Locations Instances Stop': 'projects_locations-instances-stop.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Networks Get': 'projects_locations-networks-get.md'
+    - 'Locations Networks List': 'projects_locations-networks-list.md'
+    - 'Locations Networks List Network Usage': 'projects_locations-networks-list-network-usage.md'
+    - 'Locations Networks Patch': 'projects_locations-networks-patch.md'
+    - 'Locations Networks Rename': 'projects_locations-networks-rename.md'
+    - 'Locations Nfs Shares Create': 'projects_locations-nfs-shares-create.md'
+    - 'Locations Nfs Shares Delete': 'projects_locations-nfs-shares-delete.md'
+    - 'Locations Nfs Shares Get': 'projects_locations-nfs-shares-get.md'
+    - 'Locations Nfs Shares List': 'projects_locations-nfs-shares-list.md'
+    - 'Locations Nfs Shares Patch': 'projects_locations-nfs-shares-patch.md'
+    - 'Locations Nfs Shares Rename': 'projects_locations-nfs-shares-rename.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Os Images Get': 'projects_locations-os-images-get.md'
+    - 'Locations Os Images List': 'projects_locations-os-images-list.md'
+    - 'Locations Provisioning Configs Create': 'projects_locations-provisioning-configs-create.md'
+    - 'Locations Provisioning Configs Get': 'projects_locations-provisioning-configs-get.md'
+    - 'Locations Provisioning Configs Patch': 'projects_locations-provisioning-configs-patch.md'
+    - 'Locations Provisioning Configs Submit': 'projects_locations-provisioning-configs-submit.md'
+    - 'Locations Provisioning Quotas List': 'projects_locations-provisioning-quotas-list.md'
+    - 'Locations Ssh Keys Create': 'projects_locations-ssh-keys-create.md'
+    - 'Locations Ssh Keys Delete': 'projects_locations-ssh-keys-delete.md'
+    - 'Locations Ssh Keys List': 'projects_locations-ssh-keys-list.md'
+    - 'Locations Volumes Evict': 'projects_locations-volumes-evict.md'
+    - 'Locations Volumes Get': 'projects_locations-volumes-get.md'
+    - 'Locations Volumes List': 'projects_locations-volumes-list.md'
+    - 'Locations Volumes Luns Evict': 'projects_locations-volumes-luns-evict.md'
+    - 'Locations Volumes Luns Get': 'projects_locations-volumes-luns-get.md'
+    - 'Locations Volumes Luns List': 'projects_locations-volumes-luns-list.md'
+    - 'Locations Volumes Patch': 'projects_locations-volumes-patch.md'
+    - 'Locations Volumes Rename': 'projects_locations-volumes-rename.md'
+    - 'Locations Volumes Resize': 'projects_locations-volumes-resize.md'
+    - 'Locations Volumes Snapshots Create': 'projects_locations-volumes-snapshots-create.md'
+    - 'Locations Volumes Snapshots Delete': 'projects_locations-volumes-snapshots-delete.md'
+    - 'Locations Volumes Snapshots Get': 'projects_locations-volumes-snapshots-get.md'
+    - 'Locations Volumes Snapshots List': 'projects_locations-volumes-snapshots-list.md'
+    - 'Locations Volumes Snapshots Restore Volume Snapshot': 'projects_locations-volumes-snapshots-restore-volume-snapshot.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

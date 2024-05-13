@@ -1,0 +1,40 @@
+site_name: Firestore v5.0.4+20240226
+site_url: http://byron.github.io/google-apis-rs/google-firestore1_beta1-cli
+site_description: A complete library to interact with Firestore (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/firestore1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Databases Documents Batch Get': 'projects_databases-documents-batch-get.md'
+    - 'Databases Documents Batch Write': 'projects_databases-documents-batch-write.md'
+    - 'Databases Documents Begin Transaction': 'projects_databases-documents-begin-transaction.md'
+    - 'Databases Documents Commit': 'projects_databases-documents-commit.md'
+    - 'Databases Documents Create Document': 'projects_databases-documents-create-document.md'
+    - 'Databases Documents Delete': 'projects_databases-documents-delete.md'
+    - 'Databases Documents Get': 'projects_databases-documents-get.md'
+    - 'Databases Documents List': 'projects_databases-documents-list.md'
+    - 'Databases Documents List Collection Ids': 'projects_databases-documents-list-collection-ids.md'
+    - 'Databases Documents List Documents': 'projects_databases-documents-list-documents.md'
+    - 'Databases Documents Listen': 'projects_databases-documents-listen.md'
+    - 'Databases Documents Partition Query': 'projects_databases-documents-partition-query.md'
+    - 'Databases Documents Patch': 'projects_databases-documents-patch.md'
+    - 'Databases Documents Rollback': 'projects_databases-documents-rollback.md'
+    - 'Databases Documents Run Aggregation Query': 'projects_databases-documents-run-aggregation-query.md'
+    - 'Databases Documents Run Query': 'projects_databases-documents-run-query.md'
+    - 'Databases Documents Write': 'projects_databases-documents-write.md'
+    - 'Databases Export Documents': 'projects_databases-export-documents.md'
+    - 'Databases Import Documents': 'projects_databases-import-documents.md'
+    - 'Databases Indexes Create': 'projects_databases-indexes-create.md'
+    - 'Databases Indexes Delete': 'projects_databases-indexes-delete.md'
+    - 'Databases Indexes Get': 'projects_databases-indexes-get.md'
+    - 'Databases Indexes List': 'projects_databases-indexes-list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

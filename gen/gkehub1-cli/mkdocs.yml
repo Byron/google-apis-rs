@@ -1,0 +1,70 @@
+site_name: GKE Hub v5.0.3+20240225
+site_url: http://byron.github.io/google-apis-rs/google-gkehub1-cli
+site_description: A complete library to interact with GKE Hub (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/gkehub1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Organizations':
+    - 'Locations Fleets List': 'organizations_locations-fleets-list.md'
+- 'Projects':
+    - 'Locations Features Create': 'projects_locations-features-create.md'
+    - 'Locations Features Delete': 'projects_locations-features-delete.md'
+    - 'Locations Features Get': 'projects_locations-features-get.md'
+    - 'Locations Features Get Iam Policy': 'projects_locations-features-get-iam-policy.md'
+    - 'Locations Features List': 'projects_locations-features-list.md'
+    - 'Locations Features Patch': 'projects_locations-features-patch.md'
+    - 'Locations Features Set Iam Policy': 'projects_locations-features-set-iam-policy.md'
+    - 'Locations Features Test Iam Permissions': 'projects_locations-features-test-iam-permissions.md'
+    - 'Locations Fleets Create': 'projects_locations-fleets-create.md'
+    - 'Locations Fleets Delete': 'projects_locations-fleets-delete.md'
+    - 'Locations Fleets Get': 'projects_locations-fleets-get.md'
+    - 'Locations Fleets List': 'projects_locations-fleets-list.md'
+    - 'Locations Fleets Patch': 'projects_locations-fleets-patch.md'
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Memberships Bindings Create': 'projects_locations-memberships-bindings-create.md'
+    - 'Locations Memberships Bindings Delete': 'projects_locations-memberships-bindings-delete.md'
+    - 'Locations Memberships Bindings Get': 'projects_locations-memberships-bindings-get.md'
+    - 'Locations Memberships Bindings List': 'projects_locations-memberships-bindings-list.md'
+    - 'Locations Memberships Bindings Patch': 'projects_locations-memberships-bindings-patch.md'
+    - 'Locations Memberships Create': 'projects_locations-memberships-create.md'
+    - 'Locations Memberships Delete': 'projects_locations-memberships-delete.md'
+    - 'Locations Memberships Generate Connect Manifest': 'projects_locations-memberships-generate-connect-manifest.md'
+    - 'Locations Memberships Get': 'projects_locations-memberships-get.md'
+    - 'Locations Memberships Get Iam Policy': 'projects_locations-memberships-get-iam-policy.md'
+    - 'Locations Memberships List': 'projects_locations-memberships-list.md'
+    - 'Locations Memberships Patch': 'projects_locations-memberships-patch.md'
+    - 'Locations Memberships Set Iam Policy': 'projects_locations-memberships-set-iam-policy.md'
+    - 'Locations Memberships Test Iam Permissions': 'projects_locations-memberships-test-iam-permissions.md'
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Scopes Create': 'projects_locations-scopes-create.md'
+    - 'Locations Scopes Delete': 'projects_locations-scopes-delete.md'
+    - 'Locations Scopes Get': 'projects_locations-scopes-get.md'
+    - 'Locations Scopes Get Iam Policy': 'projects_locations-scopes-get-iam-policy.md'
+    - 'Locations Scopes List': 'projects_locations-scopes-list.md'
+    - 'Locations Scopes Namespaces Create': 'projects_locations-scopes-namespaces-create.md'
+    - 'Locations Scopes Namespaces Delete': 'projects_locations-scopes-namespaces-delete.md'
+    - 'Locations Scopes Namespaces Get': 'projects_locations-scopes-namespaces-get.md'
+    - 'Locations Scopes Namespaces List': 'projects_locations-scopes-namespaces-list.md'
+    - 'Locations Scopes Namespaces Patch': 'projects_locations-scopes-namespaces-patch.md'
+    - 'Locations Scopes Patch': 'projects_locations-scopes-patch.md'
+    - 'Locations Scopes Rbacrolebindings Create': 'projects_locations-scopes-rbacrolebindings-create.md'
+    - 'Locations Scopes Rbacrolebindings Delete': 'projects_locations-scopes-rbacrolebindings-delete.md'
+    - 'Locations Scopes Rbacrolebindings Get': 'projects_locations-scopes-rbacrolebindings-get.md'
+    - 'Locations Scopes Rbacrolebindings List': 'projects_locations-scopes-rbacrolebindings-list.md'
+    - 'Locations Scopes Rbacrolebindings Patch': 'projects_locations-scopes-rbacrolebindings-patch.md'
+    - 'Locations Scopes Set Iam Policy': 'projects_locations-scopes-set-iam-policy.md'
+    - 'Locations Scopes Test Iam Permissions': 'projects_locations-scopes-test-iam-permissions.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

@@ -1,0 +1,50 @@
+site_name: Eventarc v5.0.4+20240223
+site_url: http://byron.github.io/google-apis-rs/google-eventarc1-cli
+site_description: A complete library to interact with Eventarc (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/eventarc1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Channel Connections Create': 'projects_locations-channel-connections-create.md'
+    - 'Locations Channel Connections Delete': 'projects_locations-channel-connections-delete.md'
+    - 'Locations Channel Connections Get': 'projects_locations-channel-connections-get.md'
+    - 'Locations Channel Connections Get Iam Policy': 'projects_locations-channel-connections-get-iam-policy.md'
+    - 'Locations Channel Connections List': 'projects_locations-channel-connections-list.md'
+    - 'Locations Channel Connections Set Iam Policy': 'projects_locations-channel-connections-set-iam-policy.md'
+    - 'Locations Channel Connections Test Iam Permissions': 'projects_locations-channel-connections-test-iam-permissions.md'
+    - 'Locations Channels Create': 'projects_locations-channels-create.md'
+    - 'Locations Channels Delete': 'projects_locations-channels-delete.md'
+    - 'Locations Channels Get': 'projects_locations-channels-get.md'
+    - 'Locations Channels Get Iam Policy': 'projects_locations-channels-get-iam-policy.md'
+    - 'Locations Channels List': 'projects_locations-channels-list.md'
+    - 'Locations Channels Patch': 'projects_locations-channels-patch.md'
+    - 'Locations Channels Set Iam Policy': 'projects_locations-channels-set-iam-policy.md'
+    - 'Locations Channels Test Iam Permissions': 'projects_locations-channels-test-iam-permissions.md'
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations Get Google Channel Config': 'projects_locations-get-google-channel-config.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Providers Get': 'projects_locations-providers-get.md'
+    - 'Locations Providers List': 'projects_locations-providers-list.md'
+    - 'Locations Triggers Create': 'projects_locations-triggers-create.md'
+    - 'Locations Triggers Delete': 'projects_locations-triggers-delete.md'
+    - 'Locations Triggers Get': 'projects_locations-triggers-get.md'
+    - 'Locations Triggers Get Iam Policy': 'projects_locations-triggers-get-iam-policy.md'
+    - 'Locations Triggers List': 'projects_locations-triggers-list.md'
+    - 'Locations Triggers Patch': 'projects_locations-triggers-patch.md'
+    - 'Locations Triggers Set Iam Policy': 'projects_locations-triggers-set-iam-policy.md'
+    - 'Locations Triggers Test Iam Permissions': 'projects_locations-triggers-test-iam-permissions.md'
+    - 'Locations Update Google Channel Config': 'projects_locations-update-google-channel-config.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

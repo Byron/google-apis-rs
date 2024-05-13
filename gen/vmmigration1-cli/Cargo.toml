@@ -1,0 +1,42 @@
+# DO NOT EDIT !
+# This file was generated automatically from 'src/generator/templates/Cargo.toml.mako'
+# DO NOT EDIT !
+[package]
+
+name = "google-vmmigration1-cli"
+version = "5.0.4+20240222"
+authors = ["Sebastian Thiel <byronimo@gmail.com>"]
+description = "A complete library to interact with VM Migration Service (protocol v1)"
+repository = "https://github.com/Byron/google-apis-rs/tree/main/gen/vmmigration1-cli"
+homepage = "https://cloud.google.com/migrate/virtual-machines"
+documentation = "http://byron.github.io/google-apis-rs/google_vmmigration1_cli"
+license = "MIT"
+keywords = ["vmmigration", "google", "cli"]
+autobins = false
+edition = "2018"
+
+[[bin]]
+name = "vmmigration1"
+path = "src/main.rs"
+
+[dependencies]
+anyhow = "^ 1.0"
+hyper-rustls = "0.24.0"
+mime = "^ 0.3.0"
+serde = { version = "^ 1.0", features = ["derive"] }
+serde_json = "^ 1.0"
+itertools = "^ 0.10"
+google-clis-common = { path = "../../google-clis-common", version = "6.0" }
+strsim = "^0.5"
+clap = "^2.0"
+http = "^0.2"
+hyper = { version = "0.14", features = ["full"] }
+tokio = { version = "^ 1.0", features = ["full"] }
+tower-service = "^0.3.1"
+
+
+
+[dependencies.google-vmmigration1]
+path = "../vmmigration1"
+version = "5.0.4+20240222"
+

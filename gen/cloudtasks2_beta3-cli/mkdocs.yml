@@ -1,0 +1,38 @@
+site_name: Cloud Tasks v5.0.4+20240223
+site_url: http://byron.github.io/google-apis-rs/google-cloudtasks2_beta3-cli
+site_description: A complete library to interact with Cloud Tasks (protocol v2beta3)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudtasks2_beta3-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations Get Cmek Config': 'projects_locations-get-cmek-config.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Queues Create': 'projects_locations-queues-create.md'
+    - 'Locations Queues Delete': 'projects_locations-queues-delete.md'
+    - 'Locations Queues Get': 'projects_locations-queues-get.md'
+    - 'Locations Queues Get Iam Policy': 'projects_locations-queues-get-iam-policy.md'
+    - 'Locations Queues List': 'projects_locations-queues-list.md'
+    - 'Locations Queues Patch': 'projects_locations-queues-patch.md'
+    - 'Locations Queues Pause': 'projects_locations-queues-pause.md'
+    - 'Locations Queues Purge': 'projects_locations-queues-purge.md'
+    - 'Locations Queues Resume': 'projects_locations-queues-resume.md'
+    - 'Locations Queues Set Iam Policy': 'projects_locations-queues-set-iam-policy.md'
+    - 'Locations Queues Tasks Buffer': 'projects_locations-queues-tasks-buffer.md'
+    - 'Locations Queues Tasks Create': 'projects_locations-queues-tasks-create.md'
+    - 'Locations Queues Tasks Delete': 'projects_locations-queues-tasks-delete.md'
+    - 'Locations Queues Tasks Get': 'projects_locations-queues-tasks-get.md'
+    - 'Locations Queues Tasks List': 'projects_locations-queues-tasks-list.md'
+    - 'Locations Queues Tasks Run': 'projects_locations-queues-tasks-run.md'
+    - 'Locations Queues Test Iam Permissions': 'projects_locations-queues-test-iam-permissions.md'
+    - 'Locations Update Cmek Config': 'projects_locations-update-cmek-config.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

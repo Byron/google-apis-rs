@@ -1,0 +1,59 @@
+site_name: Access Context Manager v5.0.4+20240226
+site_url: http://byron.github.io/google-apis-rs/google-accesscontextmanager1-cli
+site_description: A complete library to interact with Access Context Manager (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/accesscontextmanager1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Access Policies':
+    - 'Access Levels Create': 'access-policies_access-levels-create.md'
+    - 'Access Levels Delete': 'access-policies_access-levels-delete.md'
+    - 'Access Levels Get': 'access-policies_access-levels-get.md'
+    - 'Access Levels List': 'access-policies_access-levels-list.md'
+    - 'Access Levels Patch': 'access-policies_access-levels-patch.md'
+    - 'Access Levels Replace All': 'access-policies_access-levels-replace-all.md'
+    - 'Access Levels Test Iam Permissions': 'access-policies_access-levels-test-iam-permissions.md'
+    - 'Authorized Orgs Descs Create': 'access-policies_authorized-orgs-descs-create.md'
+    - 'Authorized Orgs Descs Delete': 'access-policies_authorized-orgs-descs-delete.md'
+    - 'Authorized Orgs Descs Get': 'access-policies_authorized-orgs-descs-get.md'
+    - 'Authorized Orgs Descs List': 'access-policies_authorized-orgs-descs-list.md'
+    - 'Authorized Orgs Descs Patch': 'access-policies_authorized-orgs-descs-patch.md'
+    - 'Create': 'access-policies_create.md'
+    - 'Delete': 'access-policies_delete.md'
+    - 'Get': 'access-policies_get.md'
+    - 'Get Iam Policy': 'access-policies_get-iam-policy.md'
+    - 'List': 'access-policies_list.md'
+    - 'Patch': 'access-policies_patch.md'
+    - 'Service Perimeters Commit': 'access-policies_service-perimeters-commit.md'
+    - 'Service Perimeters Create': 'access-policies_service-perimeters-create.md'
+    - 'Service Perimeters Delete': 'access-policies_service-perimeters-delete.md'
+    - 'Service Perimeters Get': 'access-policies_service-perimeters-get.md'
+    - 'Service Perimeters List': 'access-policies_service-perimeters-list.md'
+    - 'Service Perimeters Patch': 'access-policies_service-perimeters-patch.md'
+    - 'Service Perimeters Replace All': 'access-policies_service-perimeters-replace-all.md'
+    - 'Service Perimeters Test Iam Permissions': 'access-policies_service-perimeters-test-iam-permissions.md'
+    - 'Set Iam Policy': 'access-policies_set-iam-policy.md'
+    - 'Test Iam Permissions': 'access-policies_test-iam-permissions.md'
+- 'Operations':
+    - 'Cancel': 'operations_cancel.md'
+    - 'Delete': 'operations_delete.md'
+    - 'Get': 'operations_get.md'
+    - 'List': 'operations_list.md'
+- 'Organizations':
+    - 'Gcp User Access Bindings Create': 'organizations_gcp-user-access-bindings-create.md'
+    - 'Gcp User Access Bindings Delete': 'organizations_gcp-user-access-bindings-delete.md'
+    - 'Gcp User Access Bindings Get': 'organizations_gcp-user-access-bindings-get.md'
+    - 'Gcp User Access Bindings List': 'organizations_gcp-user-access-bindings-list.md'
+    - 'Gcp User Access Bindings Patch': 'organizations_gcp-user-access-bindings-patch.md'
+- 'Services':
+    - 'Get': 'services_get.md'
+    - 'List': 'services_list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

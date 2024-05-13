@@ -1,0 +1,23 @@
+site_name: Document v5.0.4+20240223
+site_url: http://byron.github.io/google-apis-rs/google-documentai1_beta2-cli
+site_description: A complete library to interact with Document (protocol v1beta2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/documentai1_beta2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Documents Batch Process': 'projects_documents-batch-process.md'
+    - 'Documents Process': 'projects_documents-process.md'
+    - 'Locations Documents Batch Process': 'projects_locations-documents-batch-process.md'
+    - 'Locations Documents Process': 'projects_locations-documents-process.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Operations Get': 'projects_operations-get.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

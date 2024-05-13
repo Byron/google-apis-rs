@@ -1,0 +1,38 @@
+site_name: Cloudbilling v5.0.4+20240214
+site_url: http://byron.github.io/google-apis-rs/google-cloudbilling1-cli
+site_description: A complete library to interact with Cloudbilling (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudbilling1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Billing Accounts':
+    - 'Create': 'billing-accounts_create.md'
+    - 'Get': 'billing-accounts_get.md'
+    - 'Get Iam Policy': 'billing-accounts_get-iam-policy.md'
+    - 'List': 'billing-accounts_list.md'
+    - 'Move': 'billing-accounts_move.md'
+    - 'Patch': 'billing-accounts_patch.md'
+    - 'Projects List': 'billing-accounts_projects-list.md'
+    - 'Set Iam Policy': 'billing-accounts_set-iam-policy.md'
+    - 'Sub Accounts Create': 'billing-accounts_sub-accounts-create.md'
+    - 'Sub Accounts List': 'billing-accounts_sub-accounts-list.md'
+    - 'Test Iam Permissions': 'billing-accounts_test-iam-permissions.md'
+- 'Organizations':
+    - 'Billing Accounts Create': 'organizations_billing-accounts-create.md'
+    - 'Billing Accounts List': 'organizations_billing-accounts-list.md'
+    - 'Billing Accounts Move': 'organizations_billing-accounts-move.md'
+- 'Projects':
+    - 'Get Billing Info': 'projects_get-billing-info.md'
+    - 'Update Billing Info': 'projects_update-billing-info.md'
+- 'Services':
+    - 'List': 'services_list.md'
+    - 'Skus List': 'services_skus-list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

@@ -1,0 +1,26 @@
+site_name: manager v5.0.4+20140915
+site_url: http://byron.github.io/google-apis-rs/google-manager1_beta2-cli
+site_description: A complete library to interact with manager (protocol v1beta2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/manager1_beta2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Deployments':
+    - 'Delete': 'deployments_delete.md'
+    - 'Get': 'deployments_get.md'
+    - 'Insert': 'deployments_insert.md'
+    - 'List': 'deployments_list.md'
+- 'Templates':
+    - 'Delete': 'templates_delete.md'
+    - 'Get': 'templates_get.md'
+    - 'Insert': 'templates_insert.md'
+    - 'List': 'templates_list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

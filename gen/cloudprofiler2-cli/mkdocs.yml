@@ -1,0 +1,21 @@
+site_name: Cloud Profiler v5.0.4+20240219
+site_url: http://byron.github.io/google-apis-rs/google-cloudprofiler2-cli
+site_description: A complete library to interact with Cloud Profiler (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudprofiler2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Profiles Create': 'projects_profiles-create.md'
+    - 'Profiles Create Offline': 'projects_profiles-create-offline.md'
+    - 'Profiles List': 'projects_profiles-list.md'
+    - 'Profiles Patch': 'projects_profiles-patch.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

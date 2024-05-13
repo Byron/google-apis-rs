@@ -1,0 +1,79 @@
+site_name: Android Publisher v5.0.4+20200331
+site_url: http://byron.github.io/google-apis-rs/google-androidpublisher2-cli
+site_description: A complete library to interact with Android Publisher (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/androidpublisher2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Edits':
+    - 'Apklistings Delete': 'edits_apklistings-delete.md'
+    - 'Apklistings Deleteall': 'edits_apklistings-deleteall.md'
+    - 'Apklistings Get': 'edits_apklistings-get.md'
+    - 'Apklistings List': 'edits_apklistings-list.md'
+    - 'Apklistings Patch': 'edits_apklistings-patch.md'
+    - 'Apklistings Update': 'edits_apklistings-update.md'
+    - 'Apks Addexternallyhosted': 'edits_apks-addexternallyhosted.md'
+    - 'Apks List': 'edits_apks-list.md'
+    - 'Apks Upload': 'edits_apks-upload.md'
+    - 'Bundles List': 'edits_bundles-list.md'
+    - 'Bundles Upload': 'edits_bundles-upload.md'
+    - 'Commit': 'edits_commit.md'
+    - 'Delete': 'edits_delete.md'
+    - 'Deobfuscationfiles Upload': 'edits_deobfuscationfiles-upload.md'
+    - 'Details Get': 'edits_details-get.md'
+    - 'Details Patch': 'edits_details-patch.md'
+    - 'Details Update': 'edits_details-update.md'
+    - 'Expansionfiles Get': 'edits_expansionfiles-get.md'
+    - 'Expansionfiles Patch': 'edits_expansionfiles-patch.md'
+    - 'Expansionfiles Update': 'edits_expansionfiles-update.md'
+    - 'Expansionfiles Upload': 'edits_expansionfiles-upload.md'
+    - 'Get': 'edits_get.md'
+    - 'Images Delete': 'edits_images-delete.md'
+    - 'Images Deleteall': 'edits_images-deleteall.md'
+    - 'Images List': 'edits_images-list.md'
+    - 'Images Upload': 'edits_images-upload.md'
+    - 'Insert': 'edits_insert.md'
+    - 'Listings Delete': 'edits_listings-delete.md'
+    - 'Listings Deleteall': 'edits_listings-deleteall.md'
+    - 'Listings Get': 'edits_listings-get.md'
+    - 'Listings List': 'edits_listings-list.md'
+    - 'Listings Patch': 'edits_listings-patch.md'
+    - 'Listings Update': 'edits_listings-update.md'
+    - 'Testers Get': 'edits_testers-get.md'
+    - 'Testers Patch': 'edits_testers-patch.md'
+    - 'Testers Update': 'edits_testers-update.md'
+    - 'Tracks Get': 'edits_tracks-get.md'
+    - 'Tracks List': 'edits_tracks-list.md'
+    - 'Tracks Patch': 'edits_tracks-patch.md'
+    - 'Tracks Update': 'edits_tracks-update.md'
+    - 'Validate': 'edits_validate.md'
+- 'Inappproducts':
+    - 'Delete': 'inappproducts_delete.md'
+    - 'Get': 'inappproducts_get.md'
+    - 'Insert': 'inappproducts_insert.md'
+    - 'List': 'inappproducts_list.md'
+    - 'Patch': 'inappproducts_patch.md'
+    - 'Update': 'inappproducts_update.md'
+- 'Orders':
+    - 'Refund': 'orders_refund.md'
+- 'Purchases':
+    - 'Products Get': 'purchases_products-get.md'
+    - 'Subscriptions Cancel': 'purchases_subscriptions-cancel.md'
+    - 'Subscriptions Defer': 'purchases_subscriptions-defer.md'
+    - 'Subscriptions Get': 'purchases_subscriptions-get.md'
+    - 'Subscriptions Refund': 'purchases_subscriptions-refund.md'
+    - 'Subscriptions Revoke': 'purchases_subscriptions-revoke.md'
+    - 'Voidedpurchases List': 'purchases_voidedpurchases-list.md'
+- 'Reviews':
+    - 'Get': 'reviews_get.md'
+    - 'List': 'reviews_list.md'
+    - 'Reply': 'reviews_reply.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

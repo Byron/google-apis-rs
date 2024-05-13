@@ -1,0 +1,24 @@
+site_name: Cloud Natural Language v5.0.4+20240303
+site_url: http://byron.github.io/google-apis-rs/google-language1-cli
+site_description: A complete library to interact with Cloud Natural Language (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/language1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Documents':
+    - 'Analyze Entities': 'documents_analyze-entities.md'
+    - 'Analyze Entity Sentiment': 'documents_analyze-entity-sentiment.md'
+    - 'Analyze Sentiment': 'documents_analyze-sentiment.md'
+    - 'Analyze Syntax': 'documents_analyze-syntax.md'
+    - 'Annotate Text': 'documents_annotate-text.md'
+    - 'Classify Text': 'documents_classify-text.md'
+    - 'Moderate Text': 'documents_moderate-text.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

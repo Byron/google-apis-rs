@@ -1,0 +1,29 @@
+site_name: AlertCenter v5.0.4+20240304
+site_url: http://byron.github.io/google-apis-rs/google-alertcenter1_beta1-cli
+site_description: A complete library to interact with AlertCenter (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/alertcenter1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Alerts':
+    - 'Batch Delete': 'alerts_batch-delete.md'
+    - 'Batch Undelete': 'alerts_batch-undelete.md'
+    - 'Delete': 'alerts_delete.md'
+    - 'Feedback Create': 'alerts_feedback-create.md'
+    - 'Feedback List': 'alerts_feedback-list.md'
+    - 'Get': 'alerts_get.md'
+    - 'Get Metadata': 'alerts_get-metadata.md'
+    - 'List': 'alerts_list.md'
+    - 'Undelete': 'alerts_undelete.md'
+- 'Methods':
+    - 'Get Settings': 'methods_get-settings.md'
+    - 'Update Settings': 'methods_update-settings.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

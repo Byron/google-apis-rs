@@ -1,0 +1,47 @@
+site_name: Cloud PrivateCatalog Producer v5.0.4+20200405
+site_url: http://byron.github.io/google-apis-rs/google-cloudprivatecatalogproducer1_beta1-cli
+site_description: A complete library to interact with Cloud PrivateCatalog Producer (protocol v1beta1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudprivatecatalogproducer1_beta1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Catalogs':
+    - 'Associations Create': 'catalogs_associations-create.md'
+    - 'Associations Delete': 'catalogs_associations-delete.md'
+    - 'Associations Get': 'catalogs_associations-get.md'
+    - 'Associations List': 'catalogs_associations-list.md'
+    - 'Create': 'catalogs_create.md'
+    - 'Delete': 'catalogs_delete.md'
+    - 'Get': 'catalogs_get.md'
+    - 'Get Iam Policy': 'catalogs_get-iam-policy.md'
+    - 'List': 'catalogs_list.md'
+    - 'Patch': 'catalogs_patch.md'
+    - 'Products Copy': 'catalogs_products-copy.md'
+    - 'Products Create': 'catalogs_products-create.md'
+    - 'Products Delete': 'catalogs_products-delete.md'
+    - 'Products Get': 'catalogs_products-get.md'
+    - 'Products Icons Upload': 'catalogs_products-icons-upload.md'
+    - 'Products List': 'catalogs_products-list.md'
+    - 'Products Patch': 'catalogs_products-patch.md'
+    - 'Products Versions Create': 'catalogs_products-versions-create.md'
+    - 'Products Versions Delete': 'catalogs_products-versions-delete.md'
+    - 'Products Versions Get': 'catalogs_products-versions-get.md'
+    - 'Products Versions List': 'catalogs_products-versions-list.md'
+    - 'Products Versions Patch': 'catalogs_products-versions-patch.md'
+    - 'Set Iam Policy': 'catalogs_set-iam-policy.md'
+    - 'Test Iam Permissions': 'catalogs_test-iam-permissions.md'
+    - 'Undelete': 'catalogs_undelete.md'
+- 'Operations':
+    - 'Cancel': 'operations_cancel.md'
+    - 'Delete': 'operations_delete.md'
+    - 'Get': 'operations_get.md'
+    - 'List': 'operations_list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

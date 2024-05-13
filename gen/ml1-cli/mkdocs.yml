@@ -1,0 +1,63 @@
+site_name: Cloud Machine Learning Engine v5.0.4+20240127
+site_url: http://byron.github.io/google-apis-rs/google-ml1-cli
+site_description: A complete library to interact with Cloud Machine Learning Engine (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/ml1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Explain': 'projects_explain.md'
+    - 'Get Config': 'projects_get-config.md'
+    - 'Jobs Cancel': 'projects_jobs-cancel.md'
+    - 'Jobs Create': 'projects_jobs-create.md'
+    - 'Jobs Get': 'projects_jobs-get.md'
+    - 'Jobs Get Iam Policy': 'projects_jobs-get-iam-policy.md'
+    - 'Jobs List': 'projects_jobs-list.md'
+    - 'Jobs Patch': 'projects_jobs-patch.md'
+    - 'Jobs Set Iam Policy': 'projects_jobs-set-iam-policy.md'
+    - 'Jobs Test Iam Permissions': 'projects_jobs-test-iam-permissions.md'
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Studies Create': 'projects_locations-studies-create.md'
+    - 'Locations Studies Delete': 'projects_locations-studies-delete.md'
+    - 'Locations Studies Get': 'projects_locations-studies-get.md'
+    - 'Locations Studies List': 'projects_locations-studies-list.md'
+    - 'Locations Studies Trials Add Measurement': 'projects_locations-studies-trials-add-measurement.md'
+    - 'Locations Studies Trials Check Early Stopping State': 'projects_locations-studies-trials-check-early-stopping-state.md'
+    - 'Locations Studies Trials Complete': 'projects_locations-studies-trials-complete.md'
+    - 'Locations Studies Trials Create': 'projects_locations-studies-trials-create.md'
+    - 'Locations Studies Trials Delete': 'projects_locations-studies-trials-delete.md'
+    - 'Locations Studies Trials Get': 'projects_locations-studies-trials-get.md'
+    - 'Locations Studies Trials List': 'projects_locations-studies-trials-list.md'
+    - 'Locations Studies Trials List Optimal Trials': 'projects_locations-studies-trials-list-optimal-trials.md'
+    - 'Locations Studies Trials Stop': 'projects_locations-studies-trials-stop.md'
+    - 'Locations Studies Trials Suggest': 'projects_locations-studies-trials-suggest.md'
+    - 'Models Create': 'projects_models-create.md'
+    - 'Models Delete': 'projects_models-delete.md'
+    - 'Models Get': 'projects_models-get.md'
+    - 'Models Get Iam Policy': 'projects_models-get-iam-policy.md'
+    - 'Models List': 'projects_models-list.md'
+    - 'Models Patch': 'projects_models-patch.md'
+    - 'Models Set Iam Policy': 'projects_models-set-iam-policy.md'
+    - 'Models Test Iam Permissions': 'projects_models-test-iam-permissions.md'
+    - 'Models Versions Create': 'projects_models-versions-create.md'
+    - 'Models Versions Delete': 'projects_models-versions-delete.md'
+    - 'Models Versions Get': 'projects_models-versions-get.md'
+    - 'Models Versions List': 'projects_models-versions-list.md'
+    - 'Models Versions Patch': 'projects_models-versions-patch.md'
+    - 'Models Versions Set Default': 'projects_models-versions-set-default.md'
+    - 'Operations Cancel': 'projects_operations-cancel.md'
+    - 'Operations Get': 'projects_operations-get.md'
+    - 'Operations List': 'projects_operations-list.md'
+    - 'Predict': 'projects_predict.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

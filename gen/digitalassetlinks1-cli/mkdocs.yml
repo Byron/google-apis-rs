@@ -1,0 +1,21 @@
+site_name: digitalassetlinks v5.0.4+20240224
+site_url: http://byron.github.io/google-apis-rs/google-digitalassetlinks1-cli
+site_description: A complete library to interact with digitalassetlinks (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/digitalassetlinks1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Assetlinks':
+    - 'Bulk Check': 'assetlinks_bulk-check.md'
+    - 'Check': 'assetlinks_check.md'
+- 'Statements':
+    - 'List': 'statements_list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

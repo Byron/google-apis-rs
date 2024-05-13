@@ -1,0 +1,34 @@
+site_name: Sheets v5.0.4+20240229
+site_url: http://byron.github.io/google-apis-rs/google-sheets4-cli
+site_description: A complete library to interact with Sheets (protocol v4)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/sheets4-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Spreadsheets':
+    - 'Batch Update': 'spreadsheets_batch-update.md'
+    - 'Create': 'spreadsheets_create.md'
+    - 'Developer Metadata Get': 'spreadsheets_developer-metadata-get.md'
+    - 'Developer Metadata Search': 'spreadsheets_developer-metadata-search.md'
+    - 'Get': 'spreadsheets_get.md'
+    - 'Get By Data Filter': 'spreadsheets_get-by-data-filter.md'
+    - 'Sheets Copy To': 'spreadsheets_sheets-copy-to.md'
+    - 'Values Append': 'spreadsheets_values-append.md'
+    - 'Values Batch Clear': 'spreadsheets_values-batch-clear.md'
+    - 'Values Batch Clear By Data Filter': 'spreadsheets_values-batch-clear-by-data-filter.md'
+    - 'Values Batch Get': 'spreadsheets_values-batch-get.md'
+    - 'Values Batch Get By Data Filter': 'spreadsheets_values-batch-get-by-data-filter.md'
+    - 'Values Batch Update': 'spreadsheets_values-batch-update.md'
+    - 'Values Batch Update By Data Filter': 'spreadsheets_values-batch-update-by-data-filter.md'
+    - 'Values Clear': 'spreadsheets_values-clear.md'
+    - 'Values Get': 'spreadsheets_values-get.md'
+    - 'Values Update': 'spreadsheets_values-update.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

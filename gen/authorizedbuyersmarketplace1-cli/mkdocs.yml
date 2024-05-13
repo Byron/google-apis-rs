@@ -1,0 +1,56 @@
+site_name: Authorized Buyers Marketplace v5.0.4+20240305
+site_url: http://byron.github.io/google-apis-rs/google-authorizedbuyersmarketplace1-cli
+site_description: A complete library to interact with Authorized Buyers Marketplace (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/authorizedbuyersmarketplace1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Bidders':
+    - 'Finalized Deals List': 'bidders_finalized-deals-list.md'
+- 'Buyers':
+    - 'Auction Packages Get': 'buyers_auction-packages-get.md'
+    - 'Auction Packages List': 'buyers_auction-packages-list.md'
+    - 'Auction Packages Subscribe': 'buyers_auction-packages-subscribe.md'
+    - 'Auction Packages Subscribe Clients': 'buyers_auction-packages-subscribe-clients.md'
+    - 'Auction Packages Unsubscribe': 'buyers_auction-packages-unsubscribe.md'
+    - 'Auction Packages Unsubscribe Clients': 'buyers_auction-packages-unsubscribe-clients.md'
+    - 'Clients Activate': 'buyers_clients-activate.md'
+    - 'Clients Create': 'buyers_clients-create.md'
+    - 'Clients Deactivate': 'buyers_clients-deactivate.md'
+    - 'Clients Get': 'buyers_clients-get.md'
+    - 'Clients List': 'buyers_clients-list.md'
+    - 'Clients Patch': 'buyers_clients-patch.md'
+    - 'Clients Users Activate': 'buyers_clients-users-activate.md'
+    - 'Clients Users Create': 'buyers_clients-users-create.md'
+    - 'Clients Users Deactivate': 'buyers_clients-users-deactivate.md'
+    - 'Clients Users Delete': 'buyers_clients-users-delete.md'
+    - 'Clients Users Get': 'buyers_clients-users-get.md'
+    - 'Clients Users List': 'buyers_clients-users-list.md'
+    - 'Finalized Deals Add Creative': 'buyers_finalized-deals-add-creative.md'
+    - 'Finalized Deals Get': 'buyers_finalized-deals-get.md'
+    - 'Finalized Deals List': 'buyers_finalized-deals-list.md'
+    - 'Finalized Deals Pause': 'buyers_finalized-deals-pause.md'
+    - 'Finalized Deals Resume': 'buyers_finalized-deals-resume.md'
+    - 'Finalized Deals Set Ready To Serve': 'buyers_finalized-deals-set-ready-to-serve.md'
+    - 'Proposals Accept': 'buyers_proposals-accept.md'
+    - 'Proposals Add Note': 'buyers_proposals-add-note.md'
+    - 'Proposals Cancel Negotiation': 'buyers_proposals-cancel-negotiation.md'
+    - 'Proposals Deals Batch Update': 'buyers_proposals-deals-batch-update.md'
+    - 'Proposals Deals Get': 'buyers_proposals-deals-get.md'
+    - 'Proposals Deals List': 'buyers_proposals-deals-list.md'
+    - 'Proposals Deals Patch': 'buyers_proposals-deals-patch.md'
+    - 'Proposals Get': 'buyers_proposals-get.md'
+    - 'Proposals List': 'buyers_proposals-list.md'
+    - 'Proposals Patch': 'buyers_proposals-patch.md'
+    - 'Proposals Send Rfp': 'buyers_proposals-send-rfp.md'
+    - 'Publisher Profiles Get': 'buyers_publisher-profiles-get.md'
+    - 'Publisher Profiles List': 'buyers_publisher-profiles-list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

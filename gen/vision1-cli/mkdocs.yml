@@ -1,0 +1,59 @@
+site_name: Vision v5.0.4+20240223
+site_url: http://byron.github.io/google-apis-rs/google-vision1-cli
+site_description: A complete library to interact with Vision (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/vision1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Files':
+    - 'Annotate': 'files_annotate.md'
+    - 'Async Batch Annotate': 'files_async-batch-annotate.md'
+- 'Images':
+    - 'Annotate': 'images_annotate.md'
+    - 'Async Batch Annotate': 'images_async-batch-annotate.md'
+- 'Locations':
+    - 'Operations Get': 'locations_operations-get.md'
+- 'Operations':
+    - 'Cancel': 'operations_cancel.md'
+    - 'Delete': 'operations_delete.md'
+    - 'Get': 'operations_get.md'
+    - 'List': 'operations_list.md'
+- 'Projects':
+    - 'Files Annotate': 'projects_files-annotate.md'
+    - 'Files Async Batch Annotate': 'projects_files-async-batch-annotate.md'
+    - 'Images Annotate': 'projects_images-annotate.md'
+    - 'Images Async Batch Annotate': 'projects_images-async-batch-annotate.md'
+    - 'Locations Files Annotate': 'projects_locations-files-annotate.md'
+    - 'Locations Files Async Batch Annotate': 'projects_locations-files-async-batch-annotate.md'
+    - 'Locations Images Annotate': 'projects_locations-images-annotate.md'
+    - 'Locations Images Async Batch Annotate': 'projects_locations-images-async-batch-annotate.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Product Sets Add Product': 'projects_locations-product-sets-add-product.md'
+    - 'Locations Product Sets Create': 'projects_locations-product-sets-create.md'
+    - 'Locations Product Sets Delete': 'projects_locations-product-sets-delete.md'
+    - 'Locations Product Sets Get': 'projects_locations-product-sets-get.md'
+    - 'Locations Product Sets Import': 'projects_locations-product-sets-import.md'
+    - 'Locations Product Sets List': 'projects_locations-product-sets-list.md'
+    - 'Locations Product Sets Patch': 'projects_locations-product-sets-patch.md'
+    - 'Locations Product Sets Products List': 'projects_locations-product-sets-products-list.md'
+    - 'Locations Product Sets Remove Product': 'projects_locations-product-sets-remove-product.md'
+    - 'Locations Products Create': 'projects_locations-products-create.md'
+    - 'Locations Products Delete': 'projects_locations-products-delete.md'
+    - 'Locations Products Get': 'projects_locations-products-get.md'
+    - 'Locations Products List': 'projects_locations-products-list.md'
+    - 'Locations Products Patch': 'projects_locations-products-patch.md'
+    - 'Locations Products Purge': 'projects_locations-products-purge.md'
+    - 'Locations Products Reference Images Create': 'projects_locations-products-reference-images-create.md'
+    - 'Locations Products Reference Images Delete': 'projects_locations-products-reference-images-delete.md'
+    - 'Locations Products Reference Images Get': 'projects_locations-products-reference-images-get.md'
+    - 'Locations Products Reference Images List': 'projects_locations-products-reference-images-list.md'
+    - 'Operations Get': 'projects_operations-get.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

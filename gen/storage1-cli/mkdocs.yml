@@ -1,0 +1,103 @@
+site_name: storage v5.0.4+20240229
+site_url: http://byron.github.io/google-apis-rs/google-storage1-cli
+site_description: A complete library to interact with storage (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/storage1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Anywhere Caches':
+    - 'Disable': 'anywhere-caches_disable.md'
+    - 'Get': 'anywhere-caches_get.md'
+    - 'Insert': 'anywhere-caches_insert.md'
+    - 'List': 'anywhere-caches_list.md'
+    - 'Pause': 'anywhere-caches_pause.md'
+    - 'Resume': 'anywhere-caches_resume.md'
+    - 'Update': 'anywhere-caches_update.md'
+- 'Bucket Access Controls':
+    - 'Delete': 'bucket-access-controls_delete.md'
+    - 'Get': 'bucket-access-controls_get.md'
+    - 'Insert': 'bucket-access-controls_insert.md'
+    - 'List': 'bucket-access-controls_list.md'
+    - 'Patch': 'bucket-access-controls_patch.md'
+    - 'Update': 'bucket-access-controls_update.md'
+- 'Buckets':
+    - 'Delete': 'buckets_delete.md'
+    - 'Get': 'buckets_get.md'
+    - 'Get Iam Policy': 'buckets_get-iam-policy.md'
+    - 'Insert': 'buckets_insert.md'
+    - 'List': 'buckets_list.md'
+    - 'Lock Retention Policy': 'buckets_lock-retention-policy.md'
+    - 'Operations Cancel': 'buckets_operations-cancel.md'
+    - 'Operations Get': 'buckets_operations-get.md'
+    - 'Operations List': 'buckets_operations-list.md'
+    - 'Patch': 'buckets_patch.md'
+    - 'Set Iam Policy': 'buckets_set-iam-policy.md'
+    - 'Test Iam Permissions': 'buckets_test-iam-permissions.md'
+    - 'Update': 'buckets_update.md'
+- 'Channels':
+    - 'Stop': 'channels_stop.md'
+- 'Default Object Access Controls':
+    - 'Delete': 'default-object-access-controls_delete.md'
+    - 'Get': 'default-object-access-controls_get.md'
+    - 'Insert': 'default-object-access-controls_insert.md'
+    - 'List': 'default-object-access-controls_list.md'
+    - 'Patch': 'default-object-access-controls_patch.md'
+    - 'Update': 'default-object-access-controls_update.md'
+- 'Folders':
+    - 'Delete': 'folders_delete.md'
+    - 'Get': 'folders_get.md'
+    - 'Insert': 'folders_insert.md'
+    - 'List': 'folders_list.md'
+    - 'Rename': 'folders_rename.md'
+- 'Managed Folders':
+    - 'Delete': 'managed-folders_delete.md'
+    - 'Get': 'managed-folders_get.md'
+    - 'Get Iam Policy': 'managed-folders_get-iam-policy.md'
+    - 'Insert': 'managed-folders_insert.md'
+    - 'List': 'managed-folders_list.md'
+    - 'Set Iam Policy': 'managed-folders_set-iam-policy.md'
+    - 'Test Iam Permissions': 'managed-folders_test-iam-permissions.md'
+- 'Notifications':
+    - 'Delete': 'notifications_delete.md'
+    - 'Get': 'notifications_get.md'
+    - 'Insert': 'notifications_insert.md'
+    - 'List': 'notifications_list.md'
+- 'Object Access Controls':
+    - 'Delete': 'object-access-controls_delete.md'
+    - 'Get': 'object-access-controls_get.md'
+    - 'Insert': 'object-access-controls_insert.md'
+    - 'List': 'object-access-controls_list.md'
+    - 'Patch': 'object-access-controls_patch.md'
+    - 'Update': 'object-access-controls_update.md'
+- 'Objects':
+    - 'Bulk Restore': 'objects_bulk-restore.md'
+    - 'Compose': 'objects_compose.md'
+    - 'Copy': 'objects_copy.md'
+    - 'Delete': 'objects_delete.md'
+    - 'Get': 'objects_get.md'
+    - 'Get Iam Policy': 'objects_get-iam-policy.md'
+    - 'Insert': 'objects_insert.md'
+    - 'List': 'objects_list.md'
+    - 'Patch': 'objects_patch.md'
+    - 'Restore': 'objects_restore.md'
+    - 'Rewrite': 'objects_rewrite.md'
+    - 'Set Iam Policy': 'objects_set-iam-policy.md'
+    - 'Test Iam Permissions': 'objects_test-iam-permissions.md'
+    - 'Update': 'objects_update.md'
+    - 'Watch All': 'objects_watch-all.md'
+- 'Projects':
+    - 'Hmac Keys Create': 'projects_hmac-keys-create.md'
+    - 'Hmac Keys Delete': 'projects_hmac-keys-delete.md'
+    - 'Hmac Keys Get': 'projects_hmac-keys-get.md'
+    - 'Hmac Keys List': 'projects_hmac-keys-list.md'
+    - 'Hmac Keys Update': 'projects_hmac-keys-update.md'
+    - 'Service Account Get': 'projects_service-account-get.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

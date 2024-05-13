@@ -1,0 +1,69 @@
+site_name: Cloud KMS v5.0.4+20240219
+site_url: http://byron.github.io/google-apis-rs/google-cloudkms1-cli
+site_description: A complete library to interact with Cloud KMS (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/cloudkms1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Ekm Config Get Iam Policy': 'projects_locations-ekm-config-get-iam-policy.md'
+    - 'Locations Ekm Config Set Iam Policy': 'projects_locations-ekm-config-set-iam-policy.md'
+    - 'Locations Ekm Config Test Iam Permissions': 'projects_locations-ekm-config-test-iam-permissions.md'
+    - 'Locations Ekm Connections Create': 'projects_locations-ekm-connections-create.md'
+    - 'Locations Ekm Connections Get': 'projects_locations-ekm-connections-get.md'
+    - 'Locations Ekm Connections Get Iam Policy': 'projects_locations-ekm-connections-get-iam-policy.md'
+    - 'Locations Ekm Connections List': 'projects_locations-ekm-connections-list.md'
+    - 'Locations Ekm Connections Patch': 'projects_locations-ekm-connections-patch.md'
+    - 'Locations Ekm Connections Set Iam Policy': 'projects_locations-ekm-connections-set-iam-policy.md'
+    - 'Locations Ekm Connections Test Iam Permissions': 'projects_locations-ekm-connections-test-iam-permissions.md'
+    - 'Locations Ekm Connections Verify Connectivity': 'projects_locations-ekm-connections-verify-connectivity.md'
+    - 'Locations Generate Random Bytes': 'projects_locations-generate-random-bytes.md'
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations Get Ekm Config': 'projects_locations-get-ekm-config.md'
+    - 'Locations Key Rings Create': 'projects_locations-key-rings-create.md'
+    - 'Locations Key Rings Crypto Keys Create': 'projects_locations-key-rings-crypto-keys-create.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Asymmetric Decrypt': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-decrypt.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Asymmetric Sign': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-asymmetric-sign.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Create': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-create.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Destroy': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-destroy.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Get': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-get.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Get Public Key': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-get-public-key.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Import': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-import.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions List': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-list.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Mac Sign': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-sign.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Mac Verify': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-mac-verify.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Patch': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-patch.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Raw Decrypt': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-raw-decrypt.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Raw Encrypt': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-raw-encrypt.md'
+    - 'Locations Key Rings Crypto Keys Crypto Key Versions Restore': 'projects_locations-key-rings-crypto-keys-crypto-key-versions-restore.md'
+    - 'Locations Key Rings Crypto Keys Decrypt': 'projects_locations-key-rings-crypto-keys-decrypt.md'
+    - 'Locations Key Rings Crypto Keys Encrypt': 'projects_locations-key-rings-crypto-keys-encrypt.md'
+    - 'Locations Key Rings Crypto Keys Get': 'projects_locations-key-rings-crypto-keys-get.md'
+    - 'Locations Key Rings Crypto Keys Get Iam Policy': 'projects_locations-key-rings-crypto-keys-get-iam-policy.md'
+    - 'Locations Key Rings Crypto Keys List': 'projects_locations-key-rings-crypto-keys-list.md'
+    - 'Locations Key Rings Crypto Keys Patch': 'projects_locations-key-rings-crypto-keys-patch.md'
+    - 'Locations Key Rings Crypto Keys Set Iam Policy': 'projects_locations-key-rings-crypto-keys-set-iam-policy.md'
+    - 'Locations Key Rings Crypto Keys Test Iam Permissions': 'projects_locations-key-rings-crypto-keys-test-iam-permissions.md'
+    - 'Locations Key Rings Crypto Keys Update Primary Version': 'projects_locations-key-rings-crypto-keys-update-primary-version.md'
+    - 'Locations Key Rings Get': 'projects_locations-key-rings-get.md'
+    - 'Locations Key Rings Get Iam Policy': 'projects_locations-key-rings-get-iam-policy.md'
+    - 'Locations Key Rings Import Jobs Create': 'projects_locations-key-rings-import-jobs-create.md'
+    - 'Locations Key Rings Import Jobs Get': 'projects_locations-key-rings-import-jobs-get.md'
+    - 'Locations Key Rings Import Jobs Get Iam Policy': 'projects_locations-key-rings-import-jobs-get-iam-policy.md'
+    - 'Locations Key Rings Import Jobs List': 'projects_locations-key-rings-import-jobs-list.md'
+    - 'Locations Key Rings Import Jobs Set Iam Policy': 'projects_locations-key-rings-import-jobs-set-iam-policy.md'
+    - 'Locations Key Rings Import Jobs Test Iam Permissions': 'projects_locations-key-rings-import-jobs-test-iam-permissions.md'
+    - 'Locations Key Rings List': 'projects_locations-key-rings-list.md'
+    - 'Locations Key Rings Set Iam Policy': 'projects_locations-key-rings-set-iam-policy.md'
+    - 'Locations Key Rings Test Iam Permissions': 'projects_locations-key-rings-test-iam-permissions.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Update Ekm Config': 'projects_locations-update-ekm-config.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

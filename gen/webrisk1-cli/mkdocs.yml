@@ -1,0 +1,28 @@
+site_name: Web Risk v5.0.4+20240303
+site_url: http://byron.github.io/google-apis-rs/google-webrisk1-cli
+site_description: A complete library to interact with Web Risk (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/webrisk1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Hashes':
+    - 'Search': 'hashes_search.md'
+- 'Projects':
+    - 'Operations Cancel': 'projects_operations-cancel.md'
+    - 'Operations Delete': 'projects_operations-delete.md'
+    - 'Operations Get': 'projects_operations-get.md'
+    - 'Operations List': 'projects_operations-list.md'
+    - 'Submissions Create': 'projects_submissions-create.md'
+- 'Threat Lists':
+    - 'Compute Diff': 'threat-lists_compute-diff.md'
+- 'Uris':
+    - 'Search': 'uris_search.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

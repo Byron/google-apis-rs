@@ -1,0 +1,24 @@
+site_name: My Business Place Actions v5.0.4+20240304
+site_url: http://byron.github.io/google-apis-rs/google-mybusinessplaceactions1-cli
+site_description: A complete library to interact with My Business Place Actions (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/mybusinessplaceactions1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Locations':
+    - 'Place Action Links Create': 'locations_place-action-links-create.md'
+    - 'Place Action Links Delete': 'locations_place-action-links-delete.md'
+    - 'Place Action Links Get': 'locations_place-action-links-get.md'
+    - 'Place Action Links List': 'locations_place-action-links-list.md'
+    - 'Place Action Links Patch': 'locations_place-action-links-patch.md'
+- 'Place Action Type Metadata':
+    - 'List': 'place-action-type-metadata_list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

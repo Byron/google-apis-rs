@@ -1,0 +1,280 @@
+site_name: dfareporting v5.0.4+20180830
+site_url: http://byron.github.io/google-apis-rs/google-dfareporting3-cli
+site_description: A complete library to interact with dfareporting (protocol v3.0)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/dfareporting3-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Account Active Ad Summaries':
+    - 'Get': 'account-active-ad-summaries_get.md'
+- 'Account Permission Groups':
+    - 'Get': 'account-permission-groups_get.md'
+    - 'List': 'account-permission-groups_list.md'
+- 'Account Permissions':
+    - 'Get': 'account-permissions_get.md'
+    - 'List': 'account-permissions_list.md'
+- 'Account User Profiles':
+    - 'Get': 'account-user-profiles_get.md'
+    - 'Insert': 'account-user-profiles_insert.md'
+    - 'List': 'account-user-profiles_list.md'
+    - 'Patch': 'account-user-profiles_patch.md'
+    - 'Update': 'account-user-profiles_update.md'
+- 'Accounts':
+    - 'Get': 'accounts_get.md'
+    - 'List': 'accounts_list.md'
+    - 'Patch': 'accounts_patch.md'
+    - 'Update': 'accounts_update.md'
+- 'Ads':
+    - 'Get': 'ads_get.md'
+    - 'Insert': 'ads_insert.md'
+    - 'List': 'ads_list.md'
+    - 'Patch': 'ads_patch.md'
+    - 'Update': 'ads_update.md'
+- 'Advertiser Groups':
+    - 'Delete': 'advertiser-groups_delete.md'
+    - 'Get': 'advertiser-groups_get.md'
+    - 'Insert': 'advertiser-groups_insert.md'
+    - 'List': 'advertiser-groups_list.md'
+    - 'Patch': 'advertiser-groups_patch.md'
+    - 'Update': 'advertiser-groups_update.md'
+- 'Advertiser Landing Pages':
+    - 'Get': 'advertiser-landing-pages_get.md'
+    - 'Insert': 'advertiser-landing-pages_insert.md'
+    - 'List': 'advertiser-landing-pages_list.md'
+    - 'Patch': 'advertiser-landing-pages_patch.md'
+    - 'Update': 'advertiser-landing-pages_update.md'
+- 'Advertisers':
+    - 'Get': 'advertisers_get.md'
+    - 'Insert': 'advertisers_insert.md'
+    - 'List': 'advertisers_list.md'
+    - 'Patch': 'advertisers_patch.md'
+    - 'Update': 'advertisers_update.md'
+- 'Browsers':
+    - 'List': 'browsers_list.md'
+- 'Campaign Creative Associations':
+    - 'Insert': 'campaign-creative-associations_insert.md'
+    - 'List': 'campaign-creative-associations_list.md'
+- 'Campaigns':
+    - 'Get': 'campaigns_get.md'
+    - 'Insert': 'campaigns_insert.md'
+    - 'List': 'campaigns_list.md'
+    - 'Patch': 'campaigns_patch.md'
+    - 'Update': 'campaigns_update.md'
+- 'Change Logs':
+    - 'Get': 'change-logs_get.md'
+    - 'List': 'change-logs_list.md'
+- 'Cities':
+    - 'List': 'cities_list.md'
+- 'Connection Types':
+    - 'Get': 'connection-types_get.md'
+    - 'List': 'connection-types_list.md'
+- 'Content Categories':
+    - 'Delete': 'content-categories_delete.md'
+    - 'Get': 'content-categories_get.md'
+    - 'Insert': 'content-categories_insert.md'
+    - 'List': 'content-categories_list.md'
+    - 'Patch': 'content-categories_patch.md'
+    - 'Update': 'content-categories_update.md'
+- 'Conversions':
+    - 'Batchinsert': 'conversions_batchinsert.md'
+    - 'Batchupdate': 'conversions_batchupdate.md'
+- 'Countries':
+    - 'Get': 'countries_get.md'
+    - 'List': 'countries_list.md'
+- 'Creative Assets':
+    - 'Insert': 'creative-assets_insert.md'
+- 'Creative Field Values':
+    - 'Delete': 'creative-field-values_delete.md'
+    - 'Get': 'creative-field-values_get.md'
+    - 'Insert': 'creative-field-values_insert.md'
+    - 'List': 'creative-field-values_list.md'
+    - 'Patch': 'creative-field-values_patch.md'
+    - 'Update': 'creative-field-values_update.md'
+- 'Creative Fields':
+    - 'Delete': 'creative-fields_delete.md'
+    - 'Get': 'creative-fields_get.md'
+    - 'Insert': 'creative-fields_insert.md'
+    - 'List': 'creative-fields_list.md'
+    - 'Patch': 'creative-fields_patch.md'
+    - 'Update': 'creative-fields_update.md'
+- 'Creative Groups':
+    - 'Get': 'creative-groups_get.md'
+    - 'Insert': 'creative-groups_insert.md'
+    - 'List': 'creative-groups_list.md'
+    - 'Patch': 'creative-groups_patch.md'
+    - 'Update': 'creative-groups_update.md'
+- 'Creatives':
+    - 'Get': 'creatives_get.md'
+    - 'Insert': 'creatives_insert.md'
+    - 'List': 'creatives_list.md'
+    - 'Patch': 'creatives_patch.md'
+    - 'Update': 'creatives_update.md'
+- 'Dimension Values':
+    - 'Query': 'dimension-values_query.md'
+- 'Directory Site Contacts':
+    - 'Get': 'directory-site-contacts_get.md'
+    - 'List': 'directory-site-contacts_list.md'
+- 'Directory Sites':
+    - 'Get': 'directory-sites_get.md'
+    - 'Insert': 'directory-sites_insert.md'
+    - 'List': 'directory-sites_list.md'
+- 'Dynamic Targeting Keys':
+    - 'Delete': 'dynamic-targeting-keys_delete.md'
+    - 'Insert': 'dynamic-targeting-keys_insert.md'
+    - 'List': 'dynamic-targeting-keys_list.md'
+- 'Event Tags':
+    - 'Delete': 'event-tags_delete.md'
+    - 'Get': 'event-tags_get.md'
+    - 'Insert': 'event-tags_insert.md'
+    - 'List': 'event-tags_list.md'
+    - 'Patch': 'event-tags_patch.md'
+    - 'Update': 'event-tags_update.md'
+- 'Files':
+    - 'Get': 'files_get.md'
+    - 'List': 'files_list.md'
+- 'Floodlight Activities':
+    - 'Delete': 'floodlight-activities_delete.md'
+    - 'Generatetag': 'floodlight-activities_generatetag.md'
+    - 'Get': 'floodlight-activities_get.md'
+    - 'Insert': 'floodlight-activities_insert.md'
+    - 'List': 'floodlight-activities_list.md'
+    - 'Patch': 'floodlight-activities_patch.md'
+    - 'Update': 'floodlight-activities_update.md'
+- 'Floodlight Activity Groups':
+    - 'Get': 'floodlight-activity-groups_get.md'
+    - 'Insert': 'floodlight-activity-groups_insert.md'
+    - 'List': 'floodlight-activity-groups_list.md'
+    - 'Patch': 'floodlight-activity-groups_patch.md'
+    - 'Update': 'floodlight-activity-groups_update.md'
+- 'Floodlight Configurations':
+    - 'Get': 'floodlight-configurations_get.md'
+    - 'List': 'floodlight-configurations_list.md'
+    - 'Patch': 'floodlight-configurations_patch.md'
+    - 'Update': 'floodlight-configurations_update.md'
+- 'Inventory Items':
+    - 'Get': 'inventory-items_get.md'
+    - 'List': 'inventory-items_list.md'
+- 'Languages':
+    - 'List': 'languages_list.md'
+- 'Metros':
+    - 'List': 'metros_list.md'
+- 'Mobile Carriers':
+    - 'Get': 'mobile-carriers_get.md'
+    - 'List': 'mobile-carriers_list.md'
+- 'Operating System Versions':
+    - 'Get': 'operating-system-versions_get.md'
+    - 'List': 'operating-system-versions_list.md'
+- 'Operating Systems':
+    - 'Get': 'operating-systems_get.md'
+    - 'List': 'operating-systems_list.md'
+- 'Order Documents':
+    - 'Get': 'order-documents_get.md'
+    - 'List': 'order-documents_list.md'
+- 'Orders':
+    - 'Get': 'orders_get.md'
+    - 'List': 'orders_list.md'
+- 'Placement Groups':
+    - 'Get': 'placement-groups_get.md'
+    - 'Insert': 'placement-groups_insert.md'
+    - 'List': 'placement-groups_list.md'
+    - 'Patch': 'placement-groups_patch.md'
+    - 'Update': 'placement-groups_update.md'
+- 'Placement Strategies':
+    - 'Delete': 'placement-strategies_delete.md'
+    - 'Get': 'placement-strategies_get.md'
+    - 'Insert': 'placement-strategies_insert.md'
+    - 'List': 'placement-strategies_list.md'
+    - 'Patch': 'placement-strategies_patch.md'
+    - 'Update': 'placement-strategies_update.md'
+- 'Placements':
+    - 'Generatetags': 'placements_generatetags.md'
+    - 'Get': 'placements_get.md'
+    - 'Insert': 'placements_insert.md'
+    - 'List': 'placements_list.md'
+    - 'Patch': 'placements_patch.md'
+    - 'Update': 'placements_update.md'
+- 'Platform Types':
+    - 'Get': 'platform-types_get.md'
+    - 'List': 'platform-types_list.md'
+- 'Postal Codes':
+    - 'Get': 'postal-codes_get.md'
+    - 'List': 'postal-codes_list.md'
+- 'Projects':
+    - 'Get': 'projects_get.md'
+    - 'List': 'projects_list.md'
+- 'Regions':
+    - 'List': 'regions_list.md'
+- 'Remarketing List Shares':
+    - 'Get': 'remarketing-list-shares_get.md'
+    - 'Patch': 'remarketing-list-shares_patch.md'
+    - 'Update': 'remarketing-list-shares_update.md'
+- 'Remarketing Lists':
+    - 'Get': 'remarketing-lists_get.md'
+    - 'Insert': 'remarketing-lists_insert.md'
+    - 'List': 'remarketing-lists_list.md'
+    - 'Patch': 'remarketing-lists_patch.md'
+    - 'Update': 'remarketing-lists_update.md'
+- 'Reports':
+    - 'Compatible Fields Query': 'reports_compatible-fields-query.md'
+    - 'Delete': 'reports_delete.md'
+    - 'Files Get': 'reports_files-get.md'
+    - 'Files List': 'reports_files-list.md'
+    - 'Get': 'reports_get.md'
+    - 'Insert': 'reports_insert.md'
+    - 'List': 'reports_list.md'
+    - 'Patch': 'reports_patch.md'
+    - 'Run': 'reports_run.md'
+    - 'Update': 'reports_update.md'
+- 'Sites':
+    - 'Get': 'sites_get.md'
+    - 'Insert': 'sites_insert.md'
+    - 'List': 'sites_list.md'
+    - 'Patch': 'sites_patch.md'
+    - 'Update': 'sites_update.md'
+- 'Sizes':
+    - 'Get': 'sizes_get.md'
+    - 'Insert': 'sizes_insert.md'
+    - 'List': 'sizes_list.md'
+- 'Subaccounts':
+    - 'Get': 'subaccounts_get.md'
+    - 'Insert': 'subaccounts_insert.md'
+    - 'List': 'subaccounts_list.md'
+    - 'Patch': 'subaccounts_patch.md'
+    - 'Update': 'subaccounts_update.md'
+- 'Targetable Remarketing Lists':
+    - 'Get': 'targetable-remarketing-lists_get.md'
+    - 'List': 'targetable-remarketing-lists_list.md'
+- 'Targeting Templates':
+    - 'Get': 'targeting-templates_get.md'
+    - 'Insert': 'targeting-templates_insert.md'
+    - 'List': 'targeting-templates_list.md'
+    - 'Patch': 'targeting-templates_patch.md'
+    - 'Update': 'targeting-templates_update.md'
+- 'User Profiles':
+    - 'Get': 'user-profiles_get.md'
+    - 'List': 'user-profiles_list.md'
+- 'User Role Permission Groups':
+    - 'Get': 'user-role-permission-groups_get.md'
+    - 'List': 'user-role-permission-groups_list.md'
+- 'User Role Permissions':
+    - 'Get': 'user-role-permissions_get.md'
+    - 'List': 'user-role-permissions_list.md'
+- 'User Roles':
+    - 'Delete': 'user-roles_delete.md'
+    - 'Get': 'user-roles_get.md'
+    - 'Insert': 'user-roles_insert.md'
+    - 'List': 'user-roles_list.md'
+    - 'Patch': 'user-roles_patch.md'
+    - 'Update': 'user-roles_update.md'
+- 'Video Formats':
+    - 'Get': 'video-formats_get.md'
+    - 'List': 'video-formats_list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

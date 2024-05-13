@@ -1,0 +1,63 @@
+site_name: Games v5.0.4+20240228
+site_url: http://byron.github.io/google-apis-rs/google-games1-cli
+site_description: A complete library to interact with Games (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/games1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Achievement Definitions':
+    - 'List': 'achievement-definitions_list.md'
+- 'Achievements':
+    - 'Increment': 'achievements_increment.md'
+    - 'List': 'achievements_list.md'
+    - 'Reveal': 'achievements_reveal.md'
+    - 'Set Steps At Least': 'achievements_set-steps-at-least.md'
+    - 'Unlock': 'achievements_unlock.md'
+    - 'Update Multiple': 'achievements_update-multiple.md'
+- 'Applications':
+    - 'Get': 'applications_get.md'
+    - 'Get End Point': 'applications_get-end-point.md'
+    - 'Played': 'applications_played.md'
+    - 'Verify': 'applications_verify.md'
+- 'Events':
+    - 'List By Player': 'events_list-by-player.md'
+    - 'List Definitions': 'events_list-definitions.md'
+    - 'Record': 'events_record.md'
+- 'Leaderboards':
+    - 'Get': 'leaderboards_get.md'
+    - 'List': 'leaderboards_list.md'
+- 'Metagame':
+    - 'Get Metagame Config': 'metagame_get-metagame-config.md'
+    - 'List Categories By Player': 'metagame_list-categories-by-player.md'
+- 'Players':
+    - 'Get': 'players_get.md'
+    - 'Get Multiple Application Player Ids': 'players_get-multiple-application-player-ids.md'
+    - 'Get Scoped Player Ids': 'players_get-scoped-player-ids.md'
+    - 'List': 'players_list.md'
+- 'Recall':
+    - 'Link Persona': 'recall_link-persona.md'
+    - 'Reset Persona': 'recall_reset-persona.md'
+    - 'Retrieve Tokens': 'recall_retrieve-tokens.md'
+    - 'Unlink Persona': 'recall_unlink-persona.md'
+- 'Revisions':
+    - 'Check': 'revisions_check.md'
+- 'Scores':
+    - 'Get': 'scores_get.md'
+    - 'List': 'scores_list.md'
+    - 'List Window': 'scores_list-window.md'
+    - 'Submit': 'scores_submit.md'
+    - 'Submit Multiple': 'scores_submit-multiple.md'
+- 'Snapshots':
+    - 'Get': 'snapshots_get.md'
+    - 'List': 'snapshots_list.md'
+- 'Stats':
+    - 'Get': 'stats_get.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

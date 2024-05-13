@@ -1,0 +1,36 @@
+site_name: Recaptcha Enterprise v5.0.4+20240303
+site_url: http://byron.github.io/google-apis-rs/google-recaptchaenterprise1-cli
+site_description: A complete library to interact with Recaptcha Enterprise (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/recaptchaenterprise1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Assessments Annotate': 'projects_assessments-annotate.md'
+    - 'Assessments Create': 'projects_assessments-create.md'
+    - 'Firewallpolicies Create': 'projects_firewallpolicies-create.md'
+    - 'Firewallpolicies Delete': 'projects_firewallpolicies-delete.md'
+    - 'Firewallpolicies Get': 'projects_firewallpolicies-get.md'
+    - 'Firewallpolicies List': 'projects_firewallpolicies-list.md'
+    - 'Firewallpolicies Patch': 'projects_firewallpolicies-patch.md'
+    - 'Firewallpolicies Reorder': 'projects_firewallpolicies-reorder.md'
+    - 'Keys Create': 'projects_keys-create.md'
+    - 'Keys Delete': 'projects_keys-delete.md'
+    - 'Keys Get': 'projects_keys-get.md'
+    - 'Keys Get Metrics': 'projects_keys-get-metrics.md'
+    - 'Keys List': 'projects_keys-list.md'
+    - 'Keys Migrate': 'projects_keys-migrate.md'
+    - 'Keys Patch': 'projects_keys-patch.md'
+    - 'Keys Retrieve Legacy Secret Key': 'projects_keys-retrieve-legacy-secret-key.md'
+    - 'Relatedaccountgroupmemberships Search': 'projects_relatedaccountgroupmemberships-search.md'
+    - 'Relatedaccountgroups List': 'projects_relatedaccountgroups-list.md'
+    - 'Relatedaccountgroups Memberships List': 'projects_relatedaccountgroups-memberships-list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

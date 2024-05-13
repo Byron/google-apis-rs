@@ -1,0 +1,63 @@
+site_name: Bigquery v5.0.3+20240214
+site_url: http://byron.github.io/google-apis-rs/google-bigquery2-cli
+site_description: A complete library to interact with Bigquery (protocol v2)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/bigquery2-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Datasets':
+    - 'Delete': 'datasets_delete.md'
+    - 'Get': 'datasets_get.md'
+    - 'Insert': 'datasets_insert.md'
+    - 'List': 'datasets_list.md'
+    - 'Patch': 'datasets_patch.md'
+    - 'Undelete': 'datasets_undelete.md'
+    - 'Update': 'datasets_update.md'
+- 'Jobs':
+    - 'Cancel': 'jobs_cancel.md'
+    - 'Delete': 'jobs_delete.md'
+    - 'Get': 'jobs_get.md'
+    - 'Get Query Results': 'jobs_get-query-results.md'
+    - 'Insert': 'jobs_insert.md'
+    - 'List': 'jobs_list.md'
+    - 'Query': 'jobs_query.md'
+- 'Models':
+    - 'Delete': 'models_delete.md'
+    - 'Get': 'models_get.md'
+    - 'List': 'models_list.md'
+    - 'Patch': 'models_patch.md'
+- 'Projects':
+    - 'Get Service Account': 'projects_get-service-account.md'
+    - 'List': 'projects_list.md'
+- 'Routines':
+    - 'Delete': 'routines_delete.md'
+    - 'Get': 'routines_get.md'
+    - 'Insert': 'routines_insert.md'
+    - 'List': 'routines_list.md'
+    - 'Update': 'routines_update.md'
+- 'Row Access Policies':
+    - 'Get Iam Policy': 'row-access-policies_get-iam-policy.md'
+    - 'List': 'row-access-policies_list.md'
+    - 'Test Iam Permissions': 'row-access-policies_test-iam-permissions.md'
+- 'Tabledata':
+    - 'Insert All': 'tabledata_insert-all.md'
+    - 'List': 'tabledata_list.md'
+- 'Tables':
+    - 'Delete': 'tables_delete.md'
+    - 'Get': 'tables_get.md'
+    - 'Get Iam Policy': 'tables_get-iam-policy.md'
+    - 'Insert': 'tables_insert.md'
+    - 'List': 'tables_list.md'
+    - 'Patch': 'tables_patch.md'
+    - 'Set Iam Policy': 'tables_set-iam-policy.md'
+    - 'Test Iam Permissions': 'tables_test-iam-permissions.md'
+    - 'Update': 'tables_update.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

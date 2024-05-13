@@ -1,0 +1,80 @@
+site_name: books v5.0.4+20240222
+site_url: http://byron.github.io/google-apis-rs/google-books1-cli
+site_description: A complete library to interact with books (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/books1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Bookshelves':
+    - 'Get': 'bookshelves_get.md'
+    - 'List': 'bookshelves_list.md'
+    - 'Volumes List': 'bookshelves_volumes-list.md'
+- 'Cloudloading':
+    - 'Add Book': 'cloudloading_add-book.md'
+    - 'Delete Book': 'cloudloading_delete-book.md'
+    - 'Update Book': 'cloudloading_update-book.md'
+- 'Dictionary':
+    - 'List Offline Metadata': 'dictionary_list-offline-metadata.md'
+- 'Familysharing':
+    - 'Get Family Info': 'familysharing_get-family-info.md'
+    - 'Share': 'familysharing_share.md'
+    - 'Unshare': 'familysharing_unshare.md'
+- 'Layers':
+    - 'Annotation Data Get': 'layers_annotation-data-get.md'
+    - 'Annotation Data List': 'layers_annotation-data-list.md'
+    - 'Get': 'layers_get.md'
+    - 'List': 'layers_list.md'
+    - 'Volume Annotations Get': 'layers_volume-annotations-get.md'
+    - 'Volume Annotations List': 'layers_volume-annotations-list.md'
+- 'Myconfig':
+    - 'Get User Settings': 'myconfig_get-user-settings.md'
+    - 'Release Download Access': 'myconfig_release-download-access.md'
+    - 'Request Access': 'myconfig_request-access.md'
+    - 'Sync Volume Licenses': 'myconfig_sync-volume-licenses.md'
+    - 'Update User Settings': 'myconfig_update-user-settings.md'
+- 'Mylibrary':
+    - 'Annotations Delete': 'mylibrary_annotations-delete.md'
+    - 'Annotations Insert': 'mylibrary_annotations-insert.md'
+    - 'Annotations List': 'mylibrary_annotations-list.md'
+    - 'Annotations Summary': 'mylibrary_annotations-summary.md'
+    - 'Annotations Update': 'mylibrary_annotations-update.md'
+    - 'Bookshelves Add Volume': 'mylibrary_bookshelves-add-volume.md'
+    - 'Bookshelves Clear Volumes': 'mylibrary_bookshelves-clear-volumes.md'
+    - 'Bookshelves Get': 'mylibrary_bookshelves-get.md'
+    - 'Bookshelves List': 'mylibrary_bookshelves-list.md'
+    - 'Bookshelves Move Volume': 'mylibrary_bookshelves-move-volume.md'
+    - 'Bookshelves Remove Volume': 'mylibrary_bookshelves-remove-volume.md'
+    - 'Bookshelves Volumes List': 'mylibrary_bookshelves-volumes-list.md'
+    - 'Readingpositions Get': 'mylibrary_readingpositions-get.md'
+    - 'Readingpositions Set Position': 'mylibrary_readingpositions-set-position.md'
+- 'Notification':
+    - 'Get': 'notification_get.md'
+- 'Onboarding':
+    - 'List Categories': 'onboarding_list-categories.md'
+    - 'List Category Volumes': 'onboarding_list-category-volumes.md'
+- 'Personalizedstream':
+    - 'Get': 'personalizedstream_get.md'
+- 'Promooffer':
+    - 'Accept': 'promooffer_accept.md'
+    - 'Dismiss': 'promooffer_dismiss.md'
+    - 'Get': 'promooffer_get.md'
+- 'Series':
+    - 'Get': 'series_get.md'
+    - 'Membership Get': 'series_membership-get.md'
+- 'Volumes':
+    - 'Associated List': 'volumes_associated-list.md'
+    - 'Get': 'volumes_get.md'
+    - 'List': 'volumes_list.md'
+    - 'Mybooks List': 'volumes_mybooks-list.md'
+    - 'Recommended List': 'volumes_recommended-list.md'
+    - 'Recommended Rate': 'volumes_recommended-rate.md'
+    - 'Useruploaded List': 'volumes_useruploaded-list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

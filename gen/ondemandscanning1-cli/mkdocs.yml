@@ -1,0 +1,24 @@
+site_name: On-Demand Scanning v5.0.4+20240226
+site_url: http://byron.github.io/google-apis-rs/google-ondemandscanning1-cli
+site_description: A complete library to interact with On-Demand Scanning (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/ondemandscanning1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Operations Wait': 'projects_locations-operations-wait.md'
+    - 'Locations Scans Analyze Packages': 'projects_locations-scans-analyze-packages.md'
+    - 'Locations Scans Vulnerabilities List': 'projects_locations-scans-vulnerabilities-list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

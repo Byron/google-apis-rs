@@ -1,0 +1,77 @@
+site_name: Database Migration Service v5.0.4+20240221
+site_url: http://byron.github.io/google-apis-rs/google-datamigration1-cli
+site_description: A complete library to interact with Database Migration Service (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/datamigration1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Locations Connection Profiles Create': 'projects_locations-connection-profiles-create.md'
+    - 'Locations Connection Profiles Delete': 'projects_locations-connection-profiles-delete.md'
+    - 'Locations Connection Profiles Get': 'projects_locations-connection-profiles-get.md'
+    - 'Locations Connection Profiles Get Iam Policy': 'projects_locations-connection-profiles-get-iam-policy.md'
+    - 'Locations Connection Profiles List': 'projects_locations-connection-profiles-list.md'
+    - 'Locations Connection Profiles Patch': 'projects_locations-connection-profiles-patch.md'
+    - 'Locations Connection Profiles Set Iam Policy': 'projects_locations-connection-profiles-set-iam-policy.md'
+    - 'Locations Connection Profiles Test Iam Permissions': 'projects_locations-connection-profiles-test-iam-permissions.md'
+    - 'Locations Conversion Workspaces Apply': 'projects_locations-conversion-workspaces-apply.md'
+    - 'Locations Conversion Workspaces Commit': 'projects_locations-conversion-workspaces-commit.md'
+    - 'Locations Conversion Workspaces Convert': 'projects_locations-conversion-workspaces-convert.md'
+    - 'Locations Conversion Workspaces Create': 'projects_locations-conversion-workspaces-create.md'
+    - 'Locations Conversion Workspaces Delete': 'projects_locations-conversion-workspaces-delete.md'
+    - 'Locations Conversion Workspaces Describe Conversion Workspace Revisions': 'projects_locations-conversion-workspaces-describe-conversion-workspace-revisions.md'
+    - 'Locations Conversion Workspaces Describe Database Entities': 'projects_locations-conversion-workspaces-describe-database-entities.md'
+    - 'Locations Conversion Workspaces Get': 'projects_locations-conversion-workspaces-get.md'
+    - 'Locations Conversion Workspaces Get Iam Policy': 'projects_locations-conversion-workspaces-get-iam-policy.md'
+    - 'Locations Conversion Workspaces List': 'projects_locations-conversion-workspaces-list.md'
+    - 'Locations Conversion Workspaces Mapping Rules Create': 'projects_locations-conversion-workspaces-mapping-rules-create.md'
+    - 'Locations Conversion Workspaces Mapping Rules Delete': 'projects_locations-conversion-workspaces-mapping-rules-delete.md'
+    - 'Locations Conversion Workspaces Mapping Rules Get': 'projects_locations-conversion-workspaces-mapping-rules-get.md'
+    - 'Locations Conversion Workspaces Mapping Rules Import': 'projects_locations-conversion-workspaces-mapping-rules-import.md'
+    - 'Locations Conversion Workspaces Mapping Rules List': 'projects_locations-conversion-workspaces-mapping-rules-list.md'
+    - 'Locations Conversion Workspaces Patch': 'projects_locations-conversion-workspaces-patch.md'
+    - 'Locations Conversion Workspaces Rollback': 'projects_locations-conversion-workspaces-rollback.md'
+    - 'Locations Conversion Workspaces Search Background Jobs': 'projects_locations-conversion-workspaces-search-background-jobs.md'
+    - 'Locations Conversion Workspaces Seed': 'projects_locations-conversion-workspaces-seed.md'
+    - 'Locations Conversion Workspaces Set Iam Policy': 'projects_locations-conversion-workspaces-set-iam-policy.md'
+    - 'Locations Conversion Workspaces Test Iam Permissions': 'projects_locations-conversion-workspaces-test-iam-permissions.md'
+    - 'Locations Fetch Static Ips': 'projects_locations-fetch-static-ips.md'
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Migration Jobs Create': 'projects_locations-migration-jobs-create.md'
+    - 'Locations Migration Jobs Delete': 'projects_locations-migration-jobs-delete.md'
+    - 'Locations Migration Jobs Demote Destination': 'projects_locations-migration-jobs-demote-destination.md'
+    - 'Locations Migration Jobs Generate Ssh Script': 'projects_locations-migration-jobs-generate-ssh-script.md'
+    - 'Locations Migration Jobs Generate Tcp Proxy Script': 'projects_locations-migration-jobs-generate-tcp-proxy-script.md'
+    - 'Locations Migration Jobs Get': 'projects_locations-migration-jobs-get.md'
+    - 'Locations Migration Jobs Get Iam Policy': 'projects_locations-migration-jobs-get-iam-policy.md'
+    - 'Locations Migration Jobs List': 'projects_locations-migration-jobs-list.md'
+    - 'Locations Migration Jobs Patch': 'projects_locations-migration-jobs-patch.md'
+    - 'Locations Migration Jobs Promote': 'projects_locations-migration-jobs-promote.md'
+    - 'Locations Migration Jobs Restart': 'projects_locations-migration-jobs-restart.md'
+    - 'Locations Migration Jobs Resume': 'projects_locations-migration-jobs-resume.md'
+    - 'Locations Migration Jobs Set Iam Policy': 'projects_locations-migration-jobs-set-iam-policy.md'
+    - 'Locations Migration Jobs Start': 'projects_locations-migration-jobs-start.md'
+    - 'Locations Migration Jobs Stop': 'projects_locations-migration-jobs-stop.md'
+    - 'Locations Migration Jobs Test Iam Permissions': 'projects_locations-migration-jobs-test-iam-permissions.md'
+    - 'Locations Migration Jobs Verify': 'projects_locations-migration-jobs-verify.md'
+    - 'Locations Operations Cancel': 'projects_locations-operations-cancel.md'
+    - 'Locations Operations Delete': 'projects_locations-operations-delete.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Operations List': 'projects_locations-operations-list.md'
+    - 'Locations Private Connections Create': 'projects_locations-private-connections-create.md'
+    - 'Locations Private Connections Delete': 'projects_locations-private-connections-delete.md'
+    - 'Locations Private Connections Get': 'projects_locations-private-connections-get.md'
+    - 'Locations Private Connections Get Iam Policy': 'projects_locations-private-connections-get-iam-policy.md'
+    - 'Locations Private Connections List': 'projects_locations-private-connections-list.md'
+    - 'Locations Private Connections Set Iam Policy': 'projects_locations-private-connections-set-iam-policy.md'
+    - 'Locations Private Connections Test Iam Permissions': 'projects_locations-private-connections-test-iam-permissions.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

@@ -1,0 +1,23 @@
+site_name: Firebase Hosting v5.0.4+20240303
+site_url: http://byron.github.io/google-apis-rs/google-firebasehosting1-cli
+site_description: A complete library to interact with Firebase Hosting (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/firebasehosting1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Operations':
+    - 'Cancel': 'operations_cancel.md'
+    - 'Delete': 'operations_delete.md'
+    - 'List': 'operations_list.md'
+- 'Projects':
+    - 'Sites Custom Domains Operations Cancel': 'projects_sites-custom-domains-operations-cancel.md'
+    - 'Sites Custom Domains Operations Delete': 'projects_sites-custom-domains-operations-delete.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

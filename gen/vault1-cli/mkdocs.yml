@@ -1,0 +1,51 @@
+site_name: Vault v5.0.4+20240220
+site_url: http://byron.github.io/google-apis-rs/google-vault1-cli
+site_description: A complete library to interact with Vault (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/vault1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Matters':
+    - 'Add Permissions': 'matters_add-permissions.md'
+    - 'Close': 'matters_close.md'
+    - 'Count': 'matters_count.md'
+    - 'Create': 'matters_create.md'
+    - 'Delete': 'matters_delete.md'
+    - 'Exports Create': 'matters_exports-create.md'
+    - 'Exports Delete': 'matters_exports-delete.md'
+    - 'Exports Get': 'matters_exports-get.md'
+    - 'Exports List': 'matters_exports-list.md'
+    - 'Get': 'matters_get.md'
+    - 'Holds Accounts Create': 'matters_holds-accounts-create.md'
+    - 'Holds Accounts Delete': 'matters_holds-accounts-delete.md'
+    - 'Holds Accounts List': 'matters_holds-accounts-list.md'
+    - 'Holds Add Held Accounts': 'matters_holds-add-held-accounts.md'
+    - 'Holds Create': 'matters_holds-create.md'
+    - 'Holds Delete': 'matters_holds-delete.md'
+    - 'Holds Get': 'matters_holds-get.md'
+    - 'Holds List': 'matters_holds-list.md'
+    - 'Holds Remove Held Accounts': 'matters_holds-remove-held-accounts.md'
+    - 'Holds Update': 'matters_holds-update.md'
+    - 'List': 'matters_list.md'
+    - 'Remove Permissions': 'matters_remove-permissions.md'
+    - 'Reopen': 'matters_reopen.md'
+    - 'Saved Queries Create': 'matters_saved-queries-create.md'
+    - 'Saved Queries Delete': 'matters_saved-queries-delete.md'
+    - 'Saved Queries Get': 'matters_saved-queries-get.md'
+    - 'Saved Queries List': 'matters_saved-queries-list.md'
+    - 'Undelete': 'matters_undelete.md'
+    - 'Update': 'matters_update.md'
+- 'Operations':
+    - 'Cancel': 'operations_cancel.md'
+    - 'Delete': 'operations_delete.md'
+    - 'Get': 'operations_get.md'
+    - 'List': 'operations_list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

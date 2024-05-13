@@ -1,0 +1,92 @@
+site_name: My Business v5.0.4+0
+site_url: http://byron.github.io/google-apis-rs/google-mybusiness4-cli
+site_description: A complete library to interact with My Business (protocol v4)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/mybusiness4-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Accounts':
+    - 'Admins Create': 'accounts_admins-create.md'
+    - 'Admins Delete': 'accounts_admins-delete.md'
+    - 'Admins List': 'accounts_admins-list.md'
+    - 'Admins Patch': 'accounts_admins-patch.md'
+    - 'Create': 'accounts_create.md'
+    - 'Delete Notifications': 'accounts_delete-notifications.md'
+    - 'Generate Account Number': 'accounts_generate-account-number.md'
+    - 'Get': 'accounts_get.md'
+    - 'Get Notifications': 'accounts_get-notifications.md'
+    - 'Invitations Accept': 'accounts_invitations-accept.md'
+    - 'Invitations Decline': 'accounts_invitations-decline.md'
+    - 'Invitations List': 'accounts_invitations-list.md'
+    - 'List': 'accounts_list.md'
+    - 'List Recommend Google Locations': 'accounts_list-recommend-google-locations.md'
+    - 'Locations Admins Create': 'accounts_locations-admins-create.md'
+    - 'Locations Admins Delete': 'accounts_locations-admins-delete.md'
+    - 'Locations Admins List': 'accounts_locations-admins-list.md'
+    - 'Locations Admins Patch': 'accounts_locations-admins-patch.md'
+    - 'Locations Associate': 'accounts_locations-associate.md'
+    - 'Locations Batch Get': 'accounts_locations-batch-get.md'
+    - 'Locations Batch Get Reviews': 'accounts_locations-batch-get-reviews.md'
+    - 'Locations Clear Association': 'accounts_locations-clear-association.md'
+    - 'Locations Create': 'accounts_locations-create.md'
+    - 'Locations Delete': 'accounts_locations-delete.md'
+    - 'Locations Fetch Verification Options': 'accounts_locations-fetch-verification-options.md'
+    - 'Locations Find Matches': 'accounts_locations-find-matches.md'
+    - 'Locations Followers Get Metadata': 'accounts_locations-followers-get-metadata.md'
+    - 'Locations Get': 'accounts_locations-get.md'
+    - 'Locations Get Google Updated': 'accounts_locations-get-google-updated.md'
+    - 'Locations List': 'accounts_locations-list.md'
+    - 'Locations Local Posts Create': 'accounts_locations-local-posts-create.md'
+    - 'Locations Local Posts Delete': 'accounts_locations-local-posts-delete.md'
+    - 'Locations Local Posts Get': 'accounts_locations-local-posts-get.md'
+    - 'Locations Local Posts List': 'accounts_locations-local-posts-list.md'
+    - 'Locations Local Posts Patch': 'accounts_locations-local-posts-patch.md'
+    - 'Locations Local Posts Report Insights': 'accounts_locations-local-posts-report-insights.md'
+    - 'Locations Media Create': 'accounts_locations-media-create.md'
+    - 'Locations Media Customers Get': 'accounts_locations-media-customers-get.md'
+    - 'Locations Media Customers List': 'accounts_locations-media-customers-list.md'
+    - 'Locations Media Delete': 'accounts_locations-media-delete.md'
+    - 'Locations Media Get': 'accounts_locations-media-get.md'
+    - 'Locations Media List': 'accounts_locations-media-list.md'
+    - 'Locations Media Patch': 'accounts_locations-media-patch.md'
+    - 'Locations Media Start Upload': 'accounts_locations-media-start-upload.md'
+    - 'Locations Patch': 'accounts_locations-patch.md'
+    - 'Locations Questions Answers Delete': 'accounts_locations-questions-answers-delete.md'
+    - 'Locations Questions Answers List': 'accounts_locations-questions-answers-list.md'
+    - 'Locations Questions Answers Upsert': 'accounts_locations-questions-answers-upsert.md'
+    - 'Locations Questions Create': 'accounts_locations-questions-create.md'
+    - 'Locations Questions Delete': 'accounts_locations-questions-delete.md'
+    - 'Locations Questions List': 'accounts_locations-questions-list.md'
+    - 'Locations Questions Patch': 'accounts_locations-questions-patch.md'
+    - 'Locations Report Insights': 'accounts_locations-report-insights.md'
+    - 'Locations Reviews Delete Reply': 'accounts_locations-reviews-delete-reply.md'
+    - 'Locations Reviews Get': 'accounts_locations-reviews-get.md'
+    - 'Locations Reviews List': 'accounts_locations-reviews-list.md'
+    - 'Locations Reviews Update Reply': 'accounts_locations-reviews-update-reply.md'
+    - 'Locations Transfer': 'accounts_locations-transfer.md'
+    - 'Locations Verifications Complete': 'accounts_locations-verifications-complete.md'
+    - 'Locations Verifications List': 'accounts_locations-verifications-list.md'
+    - 'Locations Verify': 'accounts_locations-verify.md'
+    - 'Update': 'accounts_update.md'
+    - 'Update Notifications': 'accounts_update-notifications.md'
+- 'Attributes':
+    - 'List': 'attributes_list.md'
+- 'Categories':
+    - 'List': 'categories_list.md'
+- 'Chains':
+    - 'Get': 'chains_get.md'
+    - 'Search': 'chains_search.md'
+- 'Google Locations':
+    - 'Report': 'google-locations_report.md'
+    - 'Search': 'google-locations_search.md'
+- 'Verification Tokens':
+    - 'Generate': 'verification-tokens_generate.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

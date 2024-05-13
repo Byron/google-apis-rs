@@ -1,0 +1,62 @@
+site_name: Artifact Registry v5.0.4+20240213
+site_url: http://byron.github.io/google-apis-rs/google-artifactregistry1-cli
+site_description: A complete library to interact with Artifact Registry (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/artifactregistry1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Projects':
+    - 'Get Project Settings': 'projects_get-project-settings.md'
+    - 'Locations Get': 'projects_locations-get.md'
+    - 'Locations Get Vpcsc Config': 'projects_locations-get-vpcsc-config.md'
+    - 'Locations List': 'projects_locations-list.md'
+    - 'Locations Operations Get': 'projects_locations-operations-get.md'
+    - 'Locations Repositories Apt Artifacts Import': 'projects_locations-repositories-apt-artifacts-import.md'
+    - 'Locations Repositories Apt Artifacts Upload': 'projects_locations-repositories-apt-artifacts-upload.md'
+    - 'Locations Repositories Create': 'projects_locations-repositories-create.md'
+    - 'Locations Repositories Delete': 'projects_locations-repositories-delete.md'
+    - 'Locations Repositories Docker Images Get': 'projects_locations-repositories-docker-images-get.md'
+    - 'Locations Repositories Docker Images List': 'projects_locations-repositories-docker-images-list.md'
+    - 'Locations Repositories Files Get': 'projects_locations-repositories-files-get.md'
+    - 'Locations Repositories Files List': 'projects_locations-repositories-files-list.md'
+    - 'Locations Repositories Get': 'projects_locations-repositories-get.md'
+    - 'Locations Repositories Get Iam Policy': 'projects_locations-repositories-get-iam-policy.md'
+    - 'Locations Repositories Go Modules Upload': 'projects_locations-repositories-go-modules-upload.md'
+    - 'Locations Repositories Googet Artifacts Import': 'projects_locations-repositories-googet-artifacts-import.md'
+    - 'Locations Repositories Googet Artifacts Upload': 'projects_locations-repositories-googet-artifacts-upload.md'
+    - 'Locations Repositories Kfp Artifacts Upload': 'projects_locations-repositories-kfp-artifacts-upload.md'
+    - 'Locations Repositories List': 'projects_locations-repositories-list.md'
+    - 'Locations Repositories Maven Artifacts Get': 'projects_locations-repositories-maven-artifacts-get.md'
+    - 'Locations Repositories Maven Artifacts List': 'projects_locations-repositories-maven-artifacts-list.md'
+    - 'Locations Repositories Npm Packages Get': 'projects_locations-repositories-npm-packages-get.md'
+    - 'Locations Repositories Npm Packages List': 'projects_locations-repositories-npm-packages-list.md'
+    - 'Locations Repositories Packages Delete': 'projects_locations-repositories-packages-delete.md'
+    - 'Locations Repositories Packages Get': 'projects_locations-repositories-packages-get.md'
+    - 'Locations Repositories Packages List': 'projects_locations-repositories-packages-list.md'
+    - 'Locations Repositories Packages Tags Create': 'projects_locations-repositories-packages-tags-create.md'
+    - 'Locations Repositories Packages Tags Delete': 'projects_locations-repositories-packages-tags-delete.md'
+    - 'Locations Repositories Packages Tags Get': 'projects_locations-repositories-packages-tags-get.md'
+    - 'Locations Repositories Packages Tags List': 'projects_locations-repositories-packages-tags-list.md'
+    - 'Locations Repositories Packages Tags Patch': 'projects_locations-repositories-packages-tags-patch.md'
+    - 'Locations Repositories Packages Versions Batch Delete': 'projects_locations-repositories-packages-versions-batch-delete.md'
+    - 'Locations Repositories Packages Versions Delete': 'projects_locations-repositories-packages-versions-delete.md'
+    - 'Locations Repositories Packages Versions Get': 'projects_locations-repositories-packages-versions-get.md'
+    - 'Locations Repositories Packages Versions List': 'projects_locations-repositories-packages-versions-list.md'
+    - 'Locations Repositories Patch': 'projects_locations-repositories-patch.md'
+    - 'Locations Repositories Python Packages Get': 'projects_locations-repositories-python-packages-get.md'
+    - 'Locations Repositories Python Packages List': 'projects_locations-repositories-python-packages-list.md'
+    - 'Locations Repositories Set Iam Policy': 'projects_locations-repositories-set-iam-policy.md'
+    - 'Locations Repositories Test Iam Permissions': 'projects_locations-repositories-test-iam-permissions.md'
+    - 'Locations Repositories Yum Artifacts Import': 'projects_locations-repositories-yum-artifacts-import.md'
+    - 'Locations Repositories Yum Artifacts Upload': 'projects_locations-repositories-yum-artifacts-upload.md'
+    - 'Locations Update Vpcsc Config': 'projects_locations-update-vpcsc-config.md'
+    - 'Update Project Settings': 'projects_update-project-settings.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

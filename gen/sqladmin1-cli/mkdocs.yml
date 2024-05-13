@@ -1,0 +1,84 @@
+site_name: SQL Admin v5.0.4+20240219
+site_url: http://byron.github.io/google-apis-rs/google-sqladmin1-cli
+site_description: A complete library to interact with SQL Admin (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/sqladmin1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Backup Runs':
+    - 'Delete': 'backup-runs_delete.md'
+    - 'Get': 'backup-runs_get.md'
+    - 'Insert': 'backup-runs_insert.md'
+    - 'List': 'backup-runs_list.md'
+- 'Connect':
+    - 'Generate Ephemeral': 'connect_generate-ephemeral.md'
+    - 'Get': 'connect_get.md'
+- 'Databases':
+    - 'Delete': 'databases_delete.md'
+    - 'Get': 'databases_get.md'
+    - 'Insert': 'databases_insert.md'
+    - 'List': 'databases_list.md'
+    - 'Patch': 'databases_patch.md'
+    - 'Update': 'databases_update.md'
+- 'Flags':
+    - 'List': 'flags_list.md'
+- 'Instances':
+    - 'Add Server Ca': 'instances_add-server-ca.md'
+    - 'Clone': 'instances_clone.md'
+    - 'Delete': 'instances_delete.md'
+    - 'Demote': 'instances_demote.md'
+    - 'Demote Master': 'instances_demote-master.md'
+    - 'Export': 'instances_export.md'
+    - 'Failover': 'instances_failover.md'
+    - 'Get': 'instances_get.md'
+    - 'Import': 'instances_import.md'
+    - 'Insert': 'instances_insert.md'
+    - 'List': 'instances_list.md'
+    - 'List Server Cas': 'instances_list-server-cas.md'
+    - 'Patch': 'instances_patch.md'
+    - 'Promote Replica': 'instances_promote-replica.md'
+    - 'Reencrypt': 'instances_reencrypt.md'
+    - 'Reset Ssl Config': 'instances_reset-ssl-config.md'
+    - 'Restart': 'instances_restart.md'
+    - 'Restore Backup': 'instances_restore-backup.md'
+    - 'Rotate Server Ca': 'instances_rotate-server-ca.md'
+    - 'Start Replica': 'instances_start-replica.md'
+    - 'Stop Replica': 'instances_stop-replica.md'
+    - 'Switchover': 'instances_switchover.md'
+    - 'Truncate Log': 'instances_truncate-log.md'
+    - 'Update': 'instances_update.md'
+- 'Operations':
+    - 'Cancel': 'operations_cancel.md'
+    - 'Get': 'operations_get.md'
+    - 'List': 'operations_list.md'
+- 'Projects':
+    - 'Instances Get Disk Shrink Config': 'projects_instances-get-disk-shrink-config.md'
+    - 'Instances Get Latest Recovery Time': 'projects_instances-get-latest-recovery-time.md'
+    - 'Instances Perform Disk Shrink': 'projects_instances-perform-disk-shrink.md'
+    - 'Instances Reschedule Maintenance': 'projects_instances-reschedule-maintenance.md'
+    - 'Instances Reset Replica Size': 'projects_instances-reset-replica-size.md'
+    - 'Instances Start External Sync': 'projects_instances-start-external-sync.md'
+    - 'Instances Verify External Sync Settings': 'projects_instances-verify-external-sync-settings.md'
+- 'Ssl Certs':
+    - 'Create Ephemeral': 'ssl-certs_create-ephemeral.md'
+    - 'Delete': 'ssl-certs_delete.md'
+    - 'Get': 'ssl-certs_get.md'
+    - 'Insert': 'ssl-certs_insert.md'
+    - 'List': 'ssl-certs_list.md'
+- 'Tiers':
+    - 'List': 'tiers_list.md'
+- 'Users':
+    - 'Delete': 'users_delete.md'
+    - 'Get': 'users_get.md'
+    - 'Insert': 'users_insert.md'
+    - 'List': 'users_list.md'
+    - 'Update': 'users_update.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

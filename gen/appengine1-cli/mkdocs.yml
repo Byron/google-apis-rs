@@ -1,0 +1,58 @@
+site_name: appengine v5.0.4+20240226
+site_url: http://byron.github.io/google-apis-rs/google-appengine1-cli
+site_description: A complete library to interact with appengine (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/appengine1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Apps':
+    - 'Authorized Certificates Create': 'apps_authorized-certificates-create.md'
+    - 'Authorized Certificates Delete': 'apps_authorized-certificates-delete.md'
+    - 'Authorized Certificates Get': 'apps_authorized-certificates-get.md'
+    - 'Authorized Certificates List': 'apps_authorized-certificates-list.md'
+    - 'Authorized Certificates Patch': 'apps_authorized-certificates-patch.md'
+    - 'Authorized Domains List': 'apps_authorized-domains-list.md'
+    - 'Create': 'apps_create.md'
+    - 'Domain Mappings Create': 'apps_domain-mappings-create.md'
+    - 'Domain Mappings Delete': 'apps_domain-mappings-delete.md'
+    - 'Domain Mappings Get': 'apps_domain-mappings-get.md'
+    - 'Domain Mappings List': 'apps_domain-mappings-list.md'
+    - 'Domain Mappings Patch': 'apps_domain-mappings-patch.md'
+    - 'Firewall Ingress Rules Batch Update': 'apps_firewall-ingress-rules-batch-update.md'
+    - 'Firewall Ingress Rules Create': 'apps_firewall-ingress-rules-create.md'
+    - 'Firewall Ingress Rules Delete': 'apps_firewall-ingress-rules-delete.md'
+    - 'Firewall Ingress Rules Get': 'apps_firewall-ingress-rules-get.md'
+    - 'Firewall Ingress Rules List': 'apps_firewall-ingress-rules-list.md'
+    - 'Firewall Ingress Rules Patch': 'apps_firewall-ingress-rules-patch.md'
+    - 'Get': 'apps_get.md'
+    - 'List Runtimes': 'apps_list-runtimes.md'
+    - 'Locations Get': 'apps_locations-get.md'
+    - 'Locations List': 'apps_locations-list.md'
+    - 'Operations Get': 'apps_operations-get.md'
+    - 'Operations List': 'apps_operations-list.md'
+    - 'Patch': 'apps_patch.md'
+    - 'Repair': 'apps_repair.md'
+    - 'Services Delete': 'apps_services-delete.md'
+    - 'Services Get': 'apps_services-get.md'
+    - 'Services List': 'apps_services-list.md'
+    - 'Services Patch': 'apps_services-patch.md'
+    - 'Services Versions Create': 'apps_services-versions-create.md'
+    - 'Services Versions Delete': 'apps_services-versions-delete.md'
+    - 'Services Versions Get': 'apps_services-versions-get.md'
+    - 'Services Versions Instances Debug': 'apps_services-versions-instances-debug.md'
+    - 'Services Versions Instances Delete': 'apps_services-versions-instances-delete.md'
+    - 'Services Versions Instances Get': 'apps_services-versions-instances-get.md'
+    - 'Services Versions Instances List': 'apps_services-versions-instances-list.md'
+    - 'Services Versions List': 'apps_services-versions-list.md'
+    - 'Services Versions Patch': 'apps_services-versions-patch.md'
+- 'Projects':
+    - 'Locations Applications Authorized Domains List': 'projects_locations-applications-authorized-domains-list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

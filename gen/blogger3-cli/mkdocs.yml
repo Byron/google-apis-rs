@@ -1,0 +1,57 @@
+site_name: Blogger v5.0.4+20240304
+site_url: http://byron.github.io/google-apis-rs/google-blogger3-cli
+site_description: A complete library to interact with Blogger (protocol v3)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/blogger3-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Blog User Infos':
+    - 'Get': 'blog-user-infos_get.md'
+- 'Blogs':
+    - 'Get': 'blogs_get.md'
+    - 'Get By Url': 'blogs_get-by-url.md'
+    - 'List By User': 'blogs_list-by-user.md'
+- 'Comments':
+    - 'Approve': 'comments_approve.md'
+    - 'Delete': 'comments_delete.md'
+    - 'Get': 'comments_get.md'
+    - 'List': 'comments_list.md'
+    - 'List By Blog': 'comments_list-by-blog.md'
+    - 'Mark As Spam': 'comments_mark-as-spam.md'
+    - 'Remove Content': 'comments_remove-content.md'
+- 'Page Views':
+    - 'Get': 'page-views_get.md'
+- 'Pages':
+    - 'Delete': 'pages_delete.md'
+    - 'Get': 'pages_get.md'
+    - 'Insert': 'pages_insert.md'
+    - 'List': 'pages_list.md'
+    - 'Patch': 'pages_patch.md'
+    - 'Publish': 'pages_publish.md'
+    - 'Revert': 'pages_revert.md'
+    - 'Update': 'pages_update.md'
+- 'Post User Infos':
+    - 'Get': 'post-user-infos_get.md'
+    - 'List': 'post-user-infos_list.md'
+- 'Posts':
+    - 'Delete': 'posts_delete.md'
+    - 'Get': 'posts_get.md'
+    - 'Get By Path': 'posts_get-by-path.md'
+    - 'Insert': 'posts_insert.md'
+    - 'List': 'posts_list.md'
+    - 'Patch': 'posts_patch.md'
+    - 'Publish': 'posts_publish.md'
+    - 'Revert': 'posts_revert.md'
+    - 'Search': 'posts_search.md'
+    - 'Update': 'posts_update.md'
+- 'Users':
+    - 'Get': 'users_get.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+

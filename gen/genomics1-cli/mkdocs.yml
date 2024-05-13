@@ -1,0 +1,20 @@
+site_name: genomics v5.0.4+20210324
+site_url: http://byron.github.io/google-apis-rs/google-genomics1-cli
+site_description: A complete library to interact with genomics (protocol v1)
+
+repo_url: https://github.com/Byron/google-apis-rs/tree/main/gen/genomics1-cli
+
+docs_dir: docs
+site_dir: build_html
+
+nav:
+- Home: 'index.md'
+- 'Operations':
+    - 'Cancel': 'operations_cancel.md'
+    - 'Get': 'operations_get.md'
+    - 'List': 'operations_list.md'
+
+theme: readthedocs
+
+copyright: Copyright &copy; 2015-2020, `Sebastian Thiel`
+
