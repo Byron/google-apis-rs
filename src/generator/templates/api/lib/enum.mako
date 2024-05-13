@@ -107,6 +107,18 @@ impl AsRef<str> for ${enum_type} {
     }
 }
 
+impl<T: AsRef<str>> std::convert::TryFrom<T> for ${enum_type} {
+    type Error = ();
+    fn try_from(value: T) -> Result<Self, Self::Error> {
+        match value.as_ref() {
+            % for variant in e.get('enum'):
+           "${variant}" => Ok(${enum_type}::${to_enum_variant_name(variant)}),
+            % endfor
+            _=> Err(()),
+        }
+    }
+}
+
 impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ${enum_type} {
     fn into(self) -> std::borrow::Cow<'a, str> {
         self.as_ref().into()
