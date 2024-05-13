@@ -69,6 +69,9 @@ impl Default for Scope {
 </%def>
 
 
+## Builds any generic enum for the API
+###############################################################################################
+###############################################################################################
 <%def name="new(enum_type, e, c)">\
 #[derive(Clone, Copy, Eq, Hash, Debug, PartialEq, Serialize, Deserialize)]
 % if e.get('description'):
