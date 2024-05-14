@@ -461,7 +461,7 @@ def to_rust_type_inner(
         return wrap_type(rt)
     try:
         if is_property_enum(t):
-            x = get_enum_type(schema_name, property_name, t, schemas)
+            x = get_enum_type(schema_name, property_name)
             return wrap_type(x)
         # prefer format if present
         rust_type = RUST_TYPE_MAP[t.get("format", t["type"])]
@@ -774,6 +774,7 @@ class Context:
     rta_map: Dict[str, Any]
     rtc_map: Dict[str, Any]
     schemas: Dict[str, Any]
+    enums: List[Tuple[str, str, RustType, Dict[str, Any]]]
 
 
 # return a newly build context from the given data
@@ -899,7 +900,7 @@ def new_context(schemas: Dict[str, Dict[str, Any]], resources: Dict[str, Any]) -
 
     all_schemas = schemas and build_schema_map() or dict()
     if not resources:
-        return Context(dict(), dict(), dict(), dict(), all_schemas)
+        return Context(dict(), dict(), dict(), dict(), all_schemas, [])
 
     rta_map: Dict[str, Any] = {}
     rtc_map: Dict[str, Any] = {}
@@ -914,7 +915,12 @@ def new_context(schemas: Dict[str, Dict[str, Any]], resources: Dict[str, Any]) -
     # end for each fqan
     sta_map.update(_sta_map)
     fqan_map.update(_fqan_map)
-    return Context(sta_map, fqan_map, rta_map, rtc_map, all_schemas)
+    context = Context(sta_map, fqan_map, rta_map, rtc_map, all_schemas, [])
+
+    from .enum_utils import find_enums_in_context
+    context.enums = find_enums_in_context(context)
+
+    return context
 
 
 def _is_special_version(v):

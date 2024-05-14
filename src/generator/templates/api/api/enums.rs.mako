@@ -12,7 +12,6 @@
     hub_type = hub_type(c.schemas, util.canonical_name())
     ht_params = hub_type_params_s()
 
-    enums = find_enums_in_context(c)
 
     default_user_agent = "google-api-rust-client/" + cargo.build_version
 %>\
@@ -20,6 +19,6 @@ use super::*;
 
 
 
-% for schema_name,property_name,enum_type, e in enums:
+% for schema_name,property_name,enum_type, e in c.enums:
 ${enum.new(enum_type, e, c)}
 % endfor
