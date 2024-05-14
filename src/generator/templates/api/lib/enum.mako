@@ -9,7 +9,7 @@
                       upload_action_fn, METHODS_BUILDER_MARKER_TRAIT, DELEGATE_TYPE,
                       to_extern_crate_name, rust_doc_sanitize)
 
-    from generator.lib.enum_utils import (to_enum_variant_name)
+    from generator.lib.enum_utils import (to_enum_variant_name, get_enum_variants, get_enum_variants_descriptions, get_enum_default)
 
     def pretty_name(name):
         return ' '.join(split_camelcase_s(name).split('.'))
@@ -79,13 +79,16 @@ impl Default for Scope {
 % endif
 pub enum ${enum_type} {
 <%
-enum_names = e.get('enum')
-enum_descriptions = e.get('enumDescriptions')
+enum_variants = get_enum_variants(e)
+if not enum_variants:
+    print('enum had no variants', e)
+    enum_variants = ['NO_VARIANTS_FOUND']
+enum_descriptions = get_enum_variants_descriptions(e)
 if not enum_descriptions:
-    enum_descriptions = ['no description found'] * len(enum_names)
+    enum_descriptions = ['no description found'] * len(enum_variants)
 
 %>\
-% for (variant_name,description) in zip(enum_names, enum_descriptions):
+% for (variant_name,description) in zip(enum_variants, enum_descriptions):
     <% #print(variant_name, '=>', description)
     %>
     % if description:
@@ -103,7 +106,7 @@ if not enum_descriptions:
 impl AsRef<str> for ${enum_type} {
     fn as_ref(&self) -> &str {
         match *self {
-            % for variant in e.get('enum'):
+            % for variant in enum_variants:
             ${enum_type}::${to_enum_variant_name(variant)} => "${variant}",
             % endfor
         }
@@ -114,7 +117,7 @@ impl std::convert::TryFrom< &str> for ${enum_type} {
     type Error = ();
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
-            % for variant in e.get('enum'):
+            % for variant in enum_variants:
            "${variant}" => Ok(${enum_type}::${to_enum_variant_name(variant)}),
             % endfor
             _=> Err(()),
@@ -128,7 +131,7 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ${enum_type} {
     }
 }
 
-% if e.get('default') is not None:
+% if get_enum_default(e) is not None:
 impl Default for ${enum_type} {
     fn default() -> ${enum_type} {
         ${enum_type}::${to_enum_variant_name(e.get('default'))}

@@ -30,6 +30,38 @@ def get_enum_type(schema_name: str, property_name: str) -> RustType:
     return Base(name)
 
 
+def get_enum_variants(enum: dict) -> list[str]:
+    return get_from_enum(enum, 'enum')
+
+
+def get_enum_variants_descriptions(enum: dict) -> list[str]:
+    return get_from_enum(enum, 'enumDescriptions')
+
+
+def get_enum_default(enum: dict) -> str | None:
+    return get_from_enum(enum, 'default')
+
+
+def get_from_enum(enum: dict, key: str) -> list[Any] | None:
+    if enum is None:
+        return None
+
+    variants = enum.get(key)
+    if variants is not None:
+        return variants
+
+    nested_enum = enum.get('items')
+    if nested_enum:
+        return get_from_enum(nested_enum, key)
+    nested_enum = enum.get('additionalProperties')
+    if nested_enum:
+        return get_from_enum(nested_enum, key)
+
+    if key != 'default':
+        print(f"could not find key '{key}' in enum:", enum)
+    return None
+
+
 def get_enum_if_is_enum(k, property_name: str, property_value: dict) -> RustType | None:
     if property_value is None:
         return None
