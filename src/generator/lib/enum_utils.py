@@ -2,7 +2,7 @@ from typing import Any
 from .rust_type import RustType
 from .types import Base
 from .util import Context, UNUSED_TYPE_MARKER, schema_markers, canonical_type_name, remove_invalid_chars_in_ident, \
-    singular, activity_split
+    singular, activity_split, items
 
 
 def is_property_enum(s: dict) -> bool:
@@ -79,10 +79,9 @@ def _get_inner_enum(pv: dict):
     return None
 
 
-
 def find_enums_in_context(c: Context) -> list[tuple[str, Any, RustType, Any]]:
     enums:  dict[tuple, tuple[str, Any, RustType, Any]] = {}
-    for name, s in c.schemas.items():
+    for name, s in items(c.schemas):
         if UNUSED_TYPE_MARKER in schema_markers(s, c, transitive=True):
             continue
 
@@ -90,16 +89,16 @@ def find_enums_in_context(c: Context) -> list[tuple[str, Any, RustType, Any]]:
         if not properties:
             continue
 
-        for pk, pv in properties.items():
+        for pk, pv in items(properties):
             enum = get_enum_if_is_enum(name, pk, pv)
             if enum:
                 enums[(name, pk)] = (name, pk, enum, pv)
 
-    for name, v in c.fqan_map.items():
+    for name, v in items(c.fqan_map):
         name = activity_split(name)[1]
         parameters = v.get('parameters')
         if parameters:
-            for pk, pv in parameters.items():
+            for pk, pv in items(parameters):
                 enum = get_enum_if_is_enum(name, pk, pv)
 
                 if enum:
