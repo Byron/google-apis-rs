@@ -48,4 +48,4 @@ mod call_builders;
 pub use call_builders::*;
 
 pub mod enums;
-pub(crate) use enums::*;
+pub use enums::*;
