@@ -1,6 +1,6 @@
 <%!
     from generator.lib.util import (put_and, rust_test_fn_invisible, rust_doc_test_norun, rust_doc_comment,
-                      rb_type, mb_type, singular, hub_type, to_fqan, indent_all_but_first_by,
+                      rb_type, mb_type, singular, hub_type, to_fqan, indent_all_but_first_by, new_context,
                       activity_rust_type, mangle_ident, activity_input_type, get_word,
                       split_camelcase_s, property, is_pod_property, TREF, IO_REQUEST,
                       schema_to_required_property, rust_copy_value_s, is_required_property,
@@ -292,6 +292,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
 ###############################################################################################
 <%def name="usage(resource, method, m, params, request_value, parts=None, show_all=False, rust_doc=True, handle_result=False)">\
 <%
+    c = new_context(schemas, resources)
     hub_type_name = hub_type(schemas, util.canonical_name())
     required_props, optional_props, part_prop = organize_params(params, request_value)
     is_string_value = lambda v: v.endswith('"')
@@ -304,7 +305,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
         sp.repeated = prev
         return res
     # rvfrt = random value for rust type
-    rvfrt = lambda spn, sp, sn=None: rnd_arg_val_for_type(trv(spn, sp, sn))
+    rvfrt = lambda spn, sp, sn: rnd_arg_val_for_type(trv(spn, sp, sn), c)
 
     rb_name = 'req'   # name of request binding
     required_args = request_value and [rb_name] or []
@@ -392,7 +393,7 @@ let result = hub.${mangle_ident(resource)}().${mangle_ident(method)}(${required_
 % endif
 
 <%block  filter="indent_by(13)">\
-.${mangle_ident(setter_fn_name(p))}(${rvfrt(p.name, p)})\
+.${mangle_ident(setter_fn_name(p))}(${rvfrt(p.name, p, resource)})\
 </%block>\
 % endfor
 

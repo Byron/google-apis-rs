@@ -1180,12 +1180,24 @@ def method_name_to_variant(name):
 
 # given a rust type-name (no optional, as from to_rust_type), you will get a suitable random default value
 # as string suitable to be passed as reference (or copy, where applicable)
-def rnd_arg_val_for_type(tn):
+def rnd_arg_val_for_type(tn, c: Context = None) -> str:
     segments = tn.split("::")
     for index in range(len(segments)):
         name = "::".join(segments[index:])
         if name in RUST_TYPE_RND_MAP:
             return str(RUST_TYPE_RND_MAP[name]())
+
+    if c:
+        from .enum_utils import get_enum_variants, to_enum_variant_name
+        for (_, _, enum, values) in c.enums:
+            if tn == enum.name:
+                variants = get_enum_variants(values)
+                if len(variants) > 0:
+                    variant = to_enum_variant_name(variants[0])
+                    return f"&{tn}::{variant}"
+
+                print('Enum has no variants. This is probably not right...', enum, values)
+
     return "&Default::default()"
 
 
