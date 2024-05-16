@@ -345,7 +345,6 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
         request_value_type = request_value.id
 %>\
 <%block filter="test_block_filter">\
-use ${util.library_name()}::api::enums::*;
 ${capture(util.test_prelude) | hide_filter}\
 % if request_value:
 use ${util.library_name()}::api::${request_value_type};
@@ -353,6 +352,7 @@ use ${util.library_name()}::api::${request_value_type};
 % if handle_result:
 use ${util.library_name()}::{Result, Error};
 % endif
+use ${util.library_name()}::api::enums::*;
 % if media_params:
 use std::fs;
 % endif
