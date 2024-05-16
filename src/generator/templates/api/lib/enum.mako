@@ -73,6 +73,7 @@ impl Default for Scope {
 ###############################################################################################
 ###############################################################################################
 <%def name="new(enum_type, e, c)">\
+// region ${enum_type}
 #[derive(Clone, Copy, Eq, Hash, Debug, PartialEq, Serialize, Deserialize)]
 % if e.get('description'):
 /// ${e.description}
@@ -138,4 +139,7 @@ impl Default for ${enum_type} {
     }
 }
 % endif
+
+// endregion
+
 </%def>
