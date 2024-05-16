@@ -7,11 +7,8 @@ from .util import Context, UNUSED_TYPE_MARKER, schema_markers, canonical_type_na
 
 def is_property_enum(s: dict) -> bool:
     enum = s.get("enum")
-    enum_description = s.get("enumDescriptions")
     if enum is None:
         return False
-    if enum_description is None:
-        print("could not find enumDescriptions for enum in s", s)
     return True
 
 
