@@ -90,28 +90,16 @@ def find_enums_in_context(c: Context) -> list[tuple[str, Any, RustType, Any]]:
         if not properties:
             continue
 
-        try:
-            p = properties.to_dict()
-            vals = p.values()
-            keys = p.keys()
-
-            for pv, pk in zip(vals, keys):
-                enum = get_enum_if_is_enum(name, pk, pv)
-                if enum:
-                    enums[(name, pk)] = (name, pk, enum, pv)
-        except TypeError as e:
-            print('exception in find_enums_in_context:', e)
-            print('name:', name)
-            print('s:', s)
-            print('props:', properties)
-            print('props type:', type(properties))
-            raise e
+        for pk, pv in properties.items():
+            enum = get_enum_if_is_enum(name, pk, pv)
+            if enum:
+                enums[(name, pk)] = (name, pk, enum, pv)
 
     for name, v in c.fqan_map.items():
-        # print(k)
         name = activity_split(name)[1]
-        if v.get('parameters'):
-            for pk, pv in v.parameters.items():
+        parameters = v.get('parameters')
+        if parameters:
+            for pk, pv in parameters.items():
                 enum = get_enum_if_is_enum(name, pk, pv)
 
                 if enum:
