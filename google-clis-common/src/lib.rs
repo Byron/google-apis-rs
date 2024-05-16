@@ -11,9 +11,9 @@ use std::io;
 use std::io::{stdout, Write};
 use std::path::Path;
 use std::str::FromStr;
-use std::string::ToString;
 
 use std::default::Default;
+use std::fmt::Display;
 
 const FIELD_SEP: char = '.';
 
@@ -125,9 +125,9 @@ impl AsRef<str> for CallType {
 #[derive(Clone, Default)]
 pub struct FieldCursor(Vec<String>);
 
-impl ToString for FieldCursor {
-    fn to_string(&self) -> String {
-        self.0.join(".")
+impl Display for FieldCursor {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0.join("."))
     }
 }
 
