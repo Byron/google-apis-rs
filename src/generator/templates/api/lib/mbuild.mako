@@ -581,7 +581,7 @@ match result {
         % endif ## not is_required_property(p)
         % endif is_repeated_property(p):
         % endif ## p.name == 'part' and request_value:
-        % if p.get('repeated', False):
+        % if is_repeated_property(p):
         if ${pname}.len() > 0 {
             for f in ${pname}.iter() {
                 params.push("${p.name}", ${to_string_impl("f")});
@@ -592,8 +592,10 @@ match result {
             params.push("${p.name}", ${to_string_impl("value")});
         }
         % else:
-        params.push("${p.name}", &${to_string_impl(pname)});
+        let param = ${to_string_impl(pname)};
+        params.push("${p.name}", &param);
         % endif
+
         % endfor
 
         params.extend(${paddfields}.iter());

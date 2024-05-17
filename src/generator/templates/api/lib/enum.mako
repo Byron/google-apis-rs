@@ -95,7 +95,7 @@ if not enum_descriptions:
     <% #print(variant_name, '=>', description)
     %>
     % if description:
-        % for line in e.description.splitlines():
+        % for line in description.splitlines():
     /// ${line}
         % endfor
     ///
@@ -138,7 +138,7 @@ impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ${enum_type} {
 % if get_enum_default(e) is not None:
 impl Default for ${enum_type} {
     fn default() -> ${enum_type} {
-        ${enum_type}::${to_enum_variant_name(e.get('default'))}
+        ${enum_type}::${to_enum_variant_name(e.default)}
     }
 }
 % endif

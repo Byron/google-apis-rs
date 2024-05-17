@@ -461,10 +461,11 @@ def to_rust_type_inner(
         return wrap_type(rt)
     try:
         if is_property_enum(t):
-            x = get_enum_type(schema_name, property_name)
-            return wrap_type(x)
-        # prefer format if present
-        rust_type = RUST_TYPE_MAP[t.get("format", t["type"])]
+            rust_type = get_enum_type(schema_name, property_name)
+        else:
+            # prefer format if present
+            rust_type = RUST_TYPE_MAP[t.get("format", t["type"])]
+
         if rust_type == Vec(None):
             return wrap_type(Vec(nested_type(t)))
         if rust_type == HashMap(None, None):
