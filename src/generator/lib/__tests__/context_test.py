@@ -378,8 +378,6 @@ class ContextTest(unittest.TestCase):
         resources = DictObject(self.discovery_doc["resources"])
 
         actual = new_context(schemas, resources).rtc_map
-        with open("actual.json", "w") as aj:
-            json.dump(actual, aj, indent=4)
         self.assertEqual(actual, expected)
 
     def test_schemas(self):
