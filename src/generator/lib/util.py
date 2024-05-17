@@ -489,7 +489,7 @@ def is_nested_type_property(t):
 
 # Return True if the schema is nested
 def is_nested_type(s):
-    return len(s['parents']) > 0
+    return len(s.parents) > 0
 
 
 # convert a rust-type to something that would be taken as input of a function
@@ -510,9 +510,9 @@ def is_pod_property(p):
     return 'format' in p or p.get('type', '') == 'boolean'
 
 
-def _traverse_schema_ids(s: dict, c):
-    ids = [s['id']]
-    used_by = s['used_by'] + s['parents']
+def _traverse_schema_ids(s, c):
+    ids = [s.id]
+    used_by = s.used_by + s.parents
 
     seen = set()  # protect against loops, just to be sure ...
     while used_by:
@@ -523,8 +523,8 @@ def _traverse_schema_ids(s: dict, c):
         ids.append(id)
 
         oid = c.schemas[id]
-        used_by.extend(oid['used_by'])
-        used_by.extend(oid['parents'])
+        used_by.extend(oid.used_by)
+        used_by.extend(oid.parents)
     # end gather usages
     return ids
 
@@ -532,9 +532,9 @@ def _traverse_schema_ids(s: dict, c):
 # Return sorted type names of all markers applicable to the given schema
 # This list is transitive. Thus, if the schema is used as child of someone with a trait, it
 # inherits this trait
-def schema_markers(s: dict, c, transitive=True):
+def schema_markers(s, c, transitive=True):
     res = set()
-    ids = transitive and _traverse_schema_ids(s, c) or [s['id']]
+    ids = transitive and _traverse_schema_ids(s, c) or [s.id]
 
     has_activity = False
     for sid in ids:
@@ -563,7 +563,7 @@ def schema_markers(s: dict, c, transitive=True):
     if is_nested_type(s):
         res.add(NESTED_MARKER_TRAIT)
     # if len(s.used_by) + len(s.parents) > 0:
-    if len(c.sta_map.get(s['id'], dict())) == 0:
+    if len(c.sta_map.get(s.id, dict())) == 0:
         res.add(PART_MARKER_TRAIT)
 
     if not has_activity:
@@ -634,7 +634,7 @@ def _method_params(m, required=None, location=None):
         np['priority'] = prio
         res.append(np)
     # end for each parameter
-    return sorted(res, key=lambda p: (p['priority'], p['name']), reverse=True)
+    return sorted(res, key=lambda p: (p.priority, p.name), reverse=True)
 
 
 def _method_io(type_name, c, m, marker=None):
@@ -672,7 +672,7 @@ def rust_copy_value_s(n, tn, p):
 # convert a schema into a property (for use with rust type generation).
 # n = name of the property
 def schema_to_required_property(s, n):
-    return type(s)({'name': n, TREF: s['id'], 'priority': REQUEST_PRIORITY, 'is_query_param': False})
+    return type(s)({'name': n, TREF: s.id, 'priority': REQUEST_PRIORITY, 'is_query_param': False})
 
 
 def is_required_property(p):
@@ -1138,7 +1138,7 @@ def find_fattest_resource(c):
 def parts_from_params(params):
     part_prop = None
     for p in params:
-        if p['name'] == 'part':
+        if p.name == 'part':
             part_prop = p
             break
     # end for each param
