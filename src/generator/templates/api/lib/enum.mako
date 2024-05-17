@@ -117,9 +117,9 @@ impl AsRef<str> for ${enum_type} {
     }
 }
 
-impl std::convert::TryFrom< &str> for ${enum_type} {
+impl std::convert::TryFrom< &str > for ${enum_type} {
     type Error = ();
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
+    fn try_from(value: &str) -> Result<Self, < ${enum_type} as std::convert::TryFrom < &str > >::Error> {
         match value {
             % for variant in enum_variants:
            "${variant}" => Ok(${enum_type}::${to_enum_variant_name(variant)}),
