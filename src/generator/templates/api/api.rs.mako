@@ -1,8 +1,8 @@
-<%namespace name="lib" file="../lib/lib.mako"/>\
-<%namespace name="util" file="../../../lib/util.mako"/>\
-<%namespace name="rbuild" file="../lib/rbuild.mako"/>\
-<%namespace name="mbuild" file="../lib/mbuild.mako"/>\
-<%namespace name="schema" file="../lib/schema.mako"/>\
+<%namespace name="lib" file="lib/lib.mako"/>\
+<%namespace name="util" file="../../lib/util.mako"/>\
+<%namespace name="rbuild" file="lib/rbuild.mako"/>\
+<%namespace name="mbuild" file="lib/mbuild.mako"/>\
+<%namespace name="schema" file="lib/schema.mako"/>\
 <%
     from generator.lib.util import (new_context, hub_type, hub_type_params_s)
 
