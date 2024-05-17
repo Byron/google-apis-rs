@@ -313,7 +313,7 @@ ${self._setter_fn(resource, method, m, p, part_prop, ThisType, c)}\
         # could also just skip the first element, but ... let's be safe
         if request_value and request_value.id == p.get(TREF):
             continue
-        v = rnd_arg_val_for_type(activity_input_type(schemas, p, parent=resource))
+        v = rnd_arg_val_for_type(activity_input_type(schemas, p, parent=resource), c)
         # we chose to replace random strings with their meaning, as indicated by the name !
         if is_string_value(v):
             v = '"%s"' % p.name
@@ -369,7 +369,7 @@ let mut ${rb_name} = ${request_value_type}::default();
 % endif
 <%
     rtn = trv(spn, sp, request_value.id)
-    assignment = rnd_arg_val_for_type(rtn)
+    assignment = rnd_arg_val_for_type(rtn, c)
     if is_string_value(assignment):
         assignment = assignment + '.to_string()'
     if assignment.endswith('default()'):
