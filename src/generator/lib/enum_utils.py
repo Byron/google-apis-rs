@@ -19,7 +19,7 @@ def get_enum_type(schema_name: str, property_name: str) -> RustType:
     if len(schema_name) == 0:
         schema = ""
     else:
-        schema = remove_invalid_chars_in_ident(singular(schema_name))
+        schema = remove_invalid_chars_in_ident(schema_name)
     name = canonical_type_name(schema
                                + remove_invalid_chars_in_ident(canonical_type_name(property_name))
                                + "Enum")
@@ -80,7 +80,7 @@ def _get_inner_enum(pv: dict):
 
 
 def find_enums_in_context(c: Context) -> list[tuple[str, Any, RustType, Any]]:
-    enums:  dict[tuple, tuple[str, Any, RustType, Any]] = {}
+    enums: dict[RustType, tuple[str, Any, RustType, Any]] = {}
     for name, s in items(c.schemas):
         if UNUSED_TYPE_MARKER in schema_markers(s, c, transitive=True):
             continue
@@ -90,21 +90,30 @@ def find_enums_in_context(c: Context) -> list[tuple[str, Any, RustType, Any]]:
             continue
 
         for pk, pv in items(properties):
-            enum = get_enum_if_is_enum(name, pk, pv)
-            if enum:
-                enums[(name, pk)] = (name, pk, enum, pv)
+            add_to_enums_if_enum(name, pk, pv, enums)
 
     for name, v in items(c.fqan_map):
         name = activity_split(name)[1]
         parameters = v.get('parameters')
         if parameters:
             for pk, pv in items(parameters):
-                enum = get_enum_if_is_enum(name, pk, pv)
-
-                if enum:
-                    enums[(name, pk)] = (name, pk, enum, pv)
+                add_to_enums_if_enum(name, pk, pv, enums)
 
     return list(enums.values())
+
+
+def add_to_enums_if_enum(schema_name, property_name, property_value,
+                         enums: dict[RustType, tuple[str, Any, RustType, Any]]):
+    enum = get_enum_if_is_enum(schema_name, property_name, property_value)
+    if enum:
+        existing_enum = enums.get(enum)
+        if existing_enum:
+            if existing_enum[2] != enum:
+                print('WARNING: duplicate enum entry. ', enum.name, schema_name, property_name, property_value)
+                print('existing enum:                 ', existing_enum[2].name, existing_enum[0], existing_enum[1], existing_enum[3])
+            return
+
+        enums[enum] = (schema_name, property_name, enum, property_value)
 
 
 def to_enum_variant_name(name: str) -> str:
