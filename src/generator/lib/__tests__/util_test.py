@@ -3,7 +3,8 @@
 import unittest
 import json
 
-from generator.lib.util import to_api_version, library_name, re_find_replacements, to_rust_type, singular
+from generator.lib.util import (to_api_version, library_name, re_find_replacements, to_rust_type,
+                                singular, use_automatic_links_in_rust_doc_comment)
 
 from src.generator.lib.util import inflection
 from .test_data.discovery_document import DISCOVERY_DOC
@@ -115,6 +116,21 @@ class UtilsTest(unittest.TestCase):
         rust_type = to_rust_type(schemas, class_name, property_name, property_value, allow_optionals=True)
         self.assertEqual(rust_type, 'Option<Vec<HashMap<String, json::Value>>>')
 
+    def test_url_in_doc(self):
+        s = "This is a documentation with a link to https://goo.gl/TgSFN2 which is a link to some more info"
+        expected = "This is a documentation with a link to <https://goo.gl/TgSFN2> which is a link to some more info"
+        result = use_automatic_links_in_rust_doc_comment(s)
+        self.assertEqual(result, expected)
+        s = "/// Creates multiple new sessions. This API can be used to initialize a session cache on the clients. See https://goo.gl/TgSFN2 for best practices on session cache management."
+        expected = "/// Creates multiple new sessions. This API can be used to initialize a session cache on the clients. See <https://goo.gl/TgSFN2> for best practices on session cache management."
+        result = use_automatic_links_in_rust_doc_comment(s)
+        self.assertEqual(result, expected)
+
+    def test_url_in_doc_ending_with_dot(self):
+        s = "This is a documentation with a link to https://goo.gl/TgSFN2."
+        expected = "This is a documentation with a link to <https://goo.gl/TgSFN2>."
+        result = use_automatic_links_in_rust_doc_comment(s)
+        self.assertEqual(result, expected)
 
 def main():
     unittest.main()

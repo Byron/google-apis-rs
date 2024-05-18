@@ -19,6 +19,8 @@ re_desc_parts = re.compile(
 
 re_find_replacements = re.compile(r"\{[/\+]?\w+\*?\}")
 re_relative_links = re.compile(r"\]\s*\([^h]")
+re_non_hyper_links = re.compile(r"(?<!<)(?:https?|ftp)://[\w/\-?=%.]+\.[\w/\-&?=%+#.]+(?!>)")
+"""a regex that finds all links not surrounded by < and >"""
 
 HTTP_METHODS = set(("OPTIONS", "GET", "POST", "PUT", "DELETE", "HEAD", "TRACE", "CONNECT", "PATCH"))
 
@@ -122,12 +124,23 @@ def custom_sorted(p: List[Mapping[str, Any]]) -> List[Mapping[str, Any]]:
 
 # rust module doc comment filter
 def rust_module_doc_comment(s):
+    s = use_automatic_links_in_rust_doc_comment(s)
     return re_linestart.sub('//! ', s)
 
 
 # rust doc comment filter
 def rust_doc_comment(s):
+    s = use_automatic_links_in_rust_doc_comment(s)
     return re_linestart.sub('/// ', s)
+
+
+def use_automatic_links_in_rust_doc_comment(s: str) -> str:
+    """Surrounds all links in the text with <>."""
+    def replace_links(match):
+        link = match.group()
+        return f"<{link}>"
+
+    return re_non_hyper_links.sub(replace_links, s)
 
 
 # returns true if there is an indication for something that is interpreted as doc comment by rustdoc
@@ -1268,6 +1281,42 @@ def unique(
 
 if __name__ == '__main__':
     raise AssertionError('For import only')
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
  
  
  

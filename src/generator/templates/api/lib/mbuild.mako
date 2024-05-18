@@ -100,10 +100,10 @@ ${part_desc | rust_doc_sanitize(documentationLink), rust_doc_comment}
 at least one of the following scopes to make a valid call, possibly depending on *parts*:
 ///
 % for s in m.scopes:
-/// * *${s}*
+/// * *<${s}>*
 % endfor
 % else:
-the *${m.scopes[0]}* scope to make a valid call.
+the *<${m.scopes[0]}>* scope to make a valid call.
 % endif # len(scopes) > 1
 ///
 /// The default scope will be `${scope_url_to_variant(name, method_default_scope(m), fully_qualified=True)}`.
