@@ -76,9 +76,7 @@ impl Default for Scope {
 // region ${enum_type}
 #[derive(Clone, Copy, Eq, Hash, Debug, PartialEq, Serialize, Deserialize)]
 % if e.get('description'):
-% for line in e.description.splitlines():
-/// ${line}
-% endfor
+${rust_doc_comment(e.description)}
 % endif
 pub enum ${enum_type} {
 <%
@@ -95,10 +93,7 @@ if not enum_descriptions:
     <% #print(variant_name, '=>', description)
     %>
     % if description:
-        % for line in description.splitlines():
-    /// ${line}
-        % endfor
-    ///
+    ${rust_doc_comment(description)}
     % endif\
     /// value:
     /// "${variant_name}"
