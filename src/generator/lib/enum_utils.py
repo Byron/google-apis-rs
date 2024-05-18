@@ -43,18 +43,18 @@ def get_from_enum(enum: dict, key: str) -> list[Any] | None:
     if enum is None:
         return None
 
-    variants = enum.get(key)
-    if variants is not None:
-        return variants
+    element = enum.get(key)
+    if element is not None:
+        return element
 
-    nested_enum = enum.get('items')
-    if nested_enum:
-        return get_from_enum(nested_enum, key)
-    nested_enum = enum.get('additionalProperties')
-    if nested_enum:
-        return get_from_enum(nested_enum, key)
+    nested = get_from_enum(enum.get('items'), key)
+    if nested:
+        return nested
+    nested = get_from_enum(enum.get('additionalProperties'), key)
+    if nested:
+        return nested
 
-    if key != 'default':
+    if key != 'default':  # just a debugging help
         print(f"could not find key '{key}' in enum:", enum)
     return None
 
