@@ -19,7 +19,7 @@ re_desc_parts = re.compile(
 
 re_find_replacements = re.compile(r"\{[/\+]?\w+\*?\}")
 re_relative_links = re.compile(r"\]\s*\([^h]")
-re_non_hyper_links = re.compile(r"(?<!<)(?:https?|ftp)://[\w/\-?=%.]+\.[\w/\-&?=%+#.]+(?!>)")
+# re_non_hyper_links = re.compile(r"(?<!<)(?:https?|ftp)://[\w/\-?=%.]+\.[\w/\-&?=%+#]+(?!>)")
 """a regex that finds all links not surrounded by < and >"""
 
 HTTP_METHODS = set(("OPTIONS", "GET", "POST", "PUT", "DELETE", "HEAD", "TRACE", "CONNECT", "PATCH"))
@@ -140,8 +140,8 @@ def use_automatic_links_in_rust_doc_comment(s: str) -> str:
         link = match.group()
         return f"<{link}>"
 
-    return re_non_hyper_links.sub(replace_links, s)
-
+    # return re_non_hyper_links.sub(replace_links, s)
+    return s
 
 # returns true if there is an indication for something that is interpreted as doc comment by rustdoc
 def has_markdown_codeblock_with_indentation(s):
@@ -1321,4 +1321,4 @@ if __name__ == '__main__':
  
  
  
- 
+
