@@ -679,6 +679,25 @@ def is_required_property(p):
     return p.get('required', False) or p.get('priority', 0) > 0
 
 
+def has_default_value(p):
+    from .enum_utils import is_property_enum, get_enum_default
+    if is_property_enum(p):
+        return get_enum_default(p) is not None
+
+    return p.get('default', None) is not None
+
+
+def get_default_value(p):
+    if not has_default_value(p):
+        return None
+
+    from .enum_utils import is_property_enum, get_enum_default
+    if is_property_enum(p):
+        return get_enum_default(p)
+
+    return p.default
+
+
 def is_repeated_property(p):
     return p.get('repeated', False)
 
@@ -1249,3 +1268,8 @@ def unique(
 
 if __name__ == '__main__':
     raise AssertionError('For import only')
+ 
+ 
+ 
+ 
+ 
