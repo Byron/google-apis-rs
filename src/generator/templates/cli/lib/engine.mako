@@ -5,7 +5,7 @@
                       ADD_SCOPE_FN, TREF, enclose_in, has_default_value, get_default_value)
     from generator.lib.cli import (mangle_subcommand, new_method_context, PARAM_FLAG, STRUCT_FLAG, OUTPUT_FLAG, VALUE_ARG,
                      CONFIG_DIR, SCOPE_FLAG, is_request_value_property, FIELD_SEP, docopt_mode, FILE_ARG, MIME_ARG, OUT_ARG,
-                     call_method_ident, POD_TYPES, opt_value, ident,
+                     call_method_ident, POD_TYPES, opt_value, ident, req_enum_value,
                      KEY_VALUE_ARG, to_cli_schema, SchemaEntry, CTYPE_POD, actual_json_type, CTYPE_MAP, CTYPE_ARRAY,
                      application_secret_path, CONFIG_DIR_FLAG, req_value, MODE_ARG,
                      opt_values, SCOPE_ARG, CONFIG_DIR_ARG, DEFAULT_MIME, field_vec, comma_sep_fields, JSON_TYPE_TO_ENUM_MAP,
@@ -214,7 +214,12 @@ let ${prop_name}: ${prop_type} = arg_from_str(&${opt_value(p.name)}, err, "<${ma
             if p.get('repeated', False):
                 arg_name = opt_values(p.name) + '.map(|&v| v.to_string()).collect::<Vec<String>>()'
             else:
-                arg_name = opt_value(p.name)
+                if is_property_enum(p):
+                    default = get_default_value(p)
+                    arg_name = req_enum_value(p.name, default)
+                    borrow = '&'
+                else:
+                    arg_name = opt_value(p.name)
         call_args.append(borrow + arg_name)
     # end for each required prop
 %>\
@@ -233,7 +238,8 @@ for parg in ${opt_values(VALUE_ARG)} {
     if is_property_enum(p):
         default_value = 'Default::default()'
         value_unwrap = f"&value.and_then(|v|v.try_into().ok()).unwrap_or({default_value})"
-        no_default_enum = True
+        if not has_default_value(p):
+            no_default_enum = True
     else:
         default_value = JSON_TO_RUST_DEFAULT[ptype]
         value_unwrap = f"value.unwrap_or({default_value})"
@@ -243,8 +249,8 @@ for parg in ${opt_values(VALUE_ARG)} {
             if let Some(value) = value.and_then(|v|v.try_into().ok()) {
                 call = call.${mangle_ident(setter_fn_name(p))}(&value);
             } else {
-                /*value was empty but has no default*/
-                todo!("I don't know what would be best in this situation.")
+                /*value was empty or invalid but has no default. We are ignoring it for now,
+                it might throw an error when running the call*/
             }
         % else:
         % if p.name == 'alt':

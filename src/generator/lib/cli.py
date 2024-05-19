@@ -38,10 +38,10 @@ CONFIG_DIR = '~/.google-service-cli'
 
 POD_TYPES = set(('boolean', 'integer', 'number', 'uint32', 'double', 'float', 'int32', 'int64', 'uint64', 'string'))
 
-re_splitters = re.compile(r"%s ([\w\-\.]+)\n(.*?)\n%s" % (SPLIT_START, SPLIT_END), re.MULTILINE|re.DOTALL)
+re_splitters = re.compile(r"%s ([\w\-\.]+)\n(.*?)\n%s" % (SPLIT_START, SPLIT_END), re.MULTILINE | re.DOTALL)
 
 MethodContext = collections.namedtuple('MethodContext', ['m', 'response_schema', 'params', 'request_value',
-                                                         'media_params' ,'required_props', 'optional_props',
+                                                         'media_params', 'required_props', 'optional_props',
                                                          'part_prop'])
 
 CTYPE_POD = 'pod'
@@ -50,33 +50,34 @@ CTYPE_MAP = 'map'
 SchemaEntry = collections.namedtuple('SchemaEntry', ['container_type', 'actual_property', 'property'])
 
 JSON_TYPE_RND_MAP = {'boolean': lambda: str(bool(randint(0, 1))).lower(),
-                     'integer' : lambda: randint(0, 100),
-                     'uint32' : lambda: randint(0, 100),
-                     'uint64' : lambda: randint(0, 65556),
-                     'float' : lambda: random(),
-                     'double' : lambda: random(),
-                     'number' : lambda: random(),
-                     'int32' : lambda: randint(-101, -1),
-                     'int64' : lambda: randint(-101, -1),
+                     'integer': lambda: randint(0, 100),
+                     'uint32': lambda: randint(0, 100),
+                     'uint64': lambda: randint(0, 65556),
+                     'float': lambda: random(),
+                     'double': lambda: random(),
+                     'number': lambda: random(),
+                     'int32': lambda: randint(-101, -1),
+                     'int64': lambda: randint(-101, -1),
                      'string': lambda: '%s' % choice(types.WORDS).lower()}
 
-JSON_TYPE_TO_ENUM_MAP = {'boolean' : 'Boolean',
-                         'integer' : 'Int',
-                         'number'  : 'Float',
-                         'uint32'  : 'Int',
-                         'double'  : 'Float',
-                         'float'   : 'Float',
-                         'int32'   : 'Int',
-                         'any'     : 'String', # TODO: Figure out how to handle it. It's 'interface' in Go ...
-                         'int64'   : 'Int',
-                         'uint64'  : 'Uint',
-                         'string'  : 'String'}
+JSON_TYPE_TO_ENUM_MAP = {'boolean': 'Boolean',
+                         'integer': 'Int',
+                         'number': 'Float',
+                         'uint32': 'Int',
+                         'double': 'Float',
+                         'float': 'Float',
+                         'int32': 'Int',
+                         'any': 'String',  # TODO: Figure out how to handle it. It's 'interface' in Go ...
+                         'int64': 'Int',
+                         'uint64': 'Uint',
+                         'string': 'String'}
 
-CTYPE_TO_ENUM_MAP = {CTYPE_POD:   'Pod',
+CTYPE_TO_ENUM_MAP = {CTYPE_POD: 'Pod',
                      CTYPE_ARRAY: 'Vec',
-                     CTYPE_MAP:   'Map'}
+                     CTYPE_MAP: 'Map'}
 
 assert len(set(JSON_TYPE_RND_MAP.keys()) ^ POD_TYPES) == 0
+
 
 def new_method_context(resource, method, c):
     m = c.fqan_map[util.to_fqan(c.rtc_map[resource], resource, method)]
@@ -89,13 +90,16 @@ def new_method_context(resource, method, c):
     return MethodContext(m, response_schema, params, request_value, media_params,
                          required_props, optional_props, part_prop)
 
+
 def comma_sep_fields(fields):
     return ', '.join('"%s"' % mangle_subcommand(f) for f in sorted(fields))
+
 
 # Returns a string representing a string-vector of mangled names
 # fields is an iterator
 def field_vec(fields):
     return "vec![%s]" % comma_sep_fields(fields)
+
 
 def pretty(n):
     return ' '.join(s.capitalize() for s in mangle_subcommand(n).split('-'))
@@ -109,29 +113,45 @@ def is_request_value_property(mc, p):
 def mangle_subcommand(name):
     return util.camel_to_under(name).replace('_', '-').replace('.', '-')
 
+
 def ident(name):
     return mangle_subcommand(name).replace('-', '_')
+
 
 # Return a required value in Rust, using unwrap()
 def req_value(name):
     return 'opt.value_of("' + mangle_subcommand(name) + '").unwrap()'
 
+
+def req_enum_value(name, default):
+    convert_to_enum = f'.try_into().expect("Invalid required argument: {mangle_subcommand(name)}")'
+    if default is None:
+        return (f'opt.value_of("{mangle_subcommand(name)}").expect("Missing'
+                f' required argument: {mangle_subcommand(name)}"){convert_to_enum}')
+    return f'opt.value_of("{mangle_subcommand(name)}").unwrap_or({default}.as_str()){convert_to_enum}'
+
+
 def opt_value(name, opt='opt', default=''):
     return opt + '.value_of("' + mangle_subcommand(name) + ('").unwrap_or("%s")' % default)
+
 
 def opt_values(name, opt='opt'):
     return opt + '.values_of("' + mangle_subcommand(name) + '").map(|i|i.collect()).unwrap_or(Vec::new()).iter()'
 
+
 def application_secret_path(program_name):
     return program_name + '-secret.json'
+
 
 # Returns identifier for method dealing with options for the given resource-method pair
 def call_method_ident(resource, method):
     return '_%s_%s' % (ident(resource), ident(method))
 
+
 # transform the resource name into a suitable filename to contain the markdown documentation for it
 def subcommand_md_filename(resource, method):
     return mangle_subcommand(resource) + '_' + mangle_subcommand(method) + '.md'
+
 
 def docopt_mode(protocols):
     mode = '|'.join(protocols)
@@ -139,10 +159,12 @@ def docopt_mode(protocols):
         mode = '(%s)' % mode
     return mode
 
+
 # Returns a possibly remapped type, based on its name.
 # Useful to map strings to more suitable types, i.e. counts
 def actual_json_type(name, type):
     return type
+
 
 # return a string representing property `p` suitable for docopt argument parsing
 def to_docopt_arg(p):
@@ -167,6 +189,7 @@ def to_cli_schema(c, schema):
         def set_nested_schema(ns):
             if ns.fields:
                 fd[pn] = ns
+
         # end utility
 
         def dup_property():
@@ -174,10 +197,11 @@ def to_cli_schema(c, schema):
             if 'type' in pc and pc.type == 'string' and 'Count' in pn:
                 pc.type = 'int64'
             return pc
+
         # end
 
         if util.TREF in p:
-            if p[util.TREF] != schema.id: # prevent recursion (in case of self-referential schemas)
+            if p[util.TREF] != schema.id:  # prevent recursion (in case of self-referential schemas)
                 set_nested_schema(to_cli_schema(c, c.schemas[p[util.TREF]]))
         elif p.type == 'array' and 'items' in p and 'type' in p.get('items') and p.get('items').type in POD_TYPES:
             pc = dup_property()
@@ -228,6 +252,7 @@ def field_to_value(f):
     if f.container_type == CTYPE_MAP:
         v = 'key=%s' % v
     return v
+
 
 # split the result along split segments
 def process_template_result(r, output_file: str):
