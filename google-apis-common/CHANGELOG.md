@@ -5,6 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+Various fixes - please see the commit-details.
+
+### Commit Statistics
+
+<csr-read-only-do-not-edit/>
+
+ - 7 commits contributed to the release over the course of 35 calendar days.
+ - 78 days passed between releases.
+ - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
+ - 0 issues like '(#ID)' were seen in commit messages
+
+### Commit Details
+
+<csr-read-only-do-not-edit/>
+
+<details><summary>view details</summary>
+
+ * **Uncategorized**
+    - Merge pull request #493 from serprex/base64v22 ([`ce47a46`](https://github.com/Byron/google-apis-rs/commit/ce47a46ca4e80dfbb2ead94037169bc5257c306e))
+    - 6.0.4 ([`4b23b5a`](https://github.com/Byron/google-apis-rs/commit/4b23b5a0c6b267f0fc1213b2c401bd156abfdb1e))
+    - Base64 0.22, serde_with 3, url 2 ([`0fca3a9`](https://github.com/Byron/google-apis-rs/commit/0fca3a944a27a548a8d21508bfb67ba7828ab94f))
+    - Merge pull request #491 from IvanUkhov/oauth2 ([`6f44ce8`](https://github.com/Byron/google-apis-rs/commit/6f44ce870262de0536879d1fb93f66faa78da95c))
+    - Update yup-oauth2 to version 9 ([`8d47fd5`](https://github.com/Byron/google-apis-rs/commit/8d47fd501085f07cbf99419b527968a612657fc2))
+    - Merge pull request #490 from IvanUkhov/oauth2 ([`764857a`](https://github.com/Byron/google-apis-rs/commit/764857a3cf3092f599cc97a773a69e8f6fb87cb0))
+    - Update yup-oauth2 in google-apis-common ([`ba52472`](https://github.com/Byron/google-apis-rs/commit/ba52472c9f83f89651f735ac0781c45214ee13ae))
+</details>
+
 ## 6.0.3 (2024-03-11)
 
 ### Bug Fixes
@@ -17,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <csr-read-only-do-not-edit/>
 
- - 2 commits contributed to the release.
+ - 3 commits contributed to the release.
  - 1 commit was understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
 
@@ -28,6 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Release google-apis-common v6.0.3 ([`b117649`](https://github.com/Byron/google-apis-rs/commit/b1176493d6d1b08362def61f4b686387c73817ad))
     - Release google-apis-common v6.0.2 ([`5c047b7`](https://github.com/Byron/google-apis-rs/commit/5c047b7e9132269494fcc96b090925cf6d32678c))
     - Update `chrono` dependency version ([`fa7f7b1`](https://github.com/Byron/google-apis-rs/commit/fa7f7b13fb07aa64be95a1d6fc42906f4d14a13c))
 </details>
