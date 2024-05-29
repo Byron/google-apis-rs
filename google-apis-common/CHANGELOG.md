@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 6.0.4 (2024-05-29)
 
 Various fixes - please see the commit-details.
 
@@ -13,7 +13,7 @@ Various fixes - please see the commit-details.
 
 <csr-read-only-do-not-edit/>
 
- - 7 commits contributed to the release over the course of 35 calendar days.
+ - 8 commits contributed to the release over the course of 36 calendar days.
  - 78 days passed between releases.
  - 0 commits were understood as [conventional](https://www.conventionalcommits.org).
  - 0 issues like '(#ID)' were seen in commit messages
@@ -25,6 +25,7 @@ Various fixes - please see the commit-details.
 <details><summary>view details</summary>
 
  * **Uncategorized**
+    - Prepare changelog of `google-apis-common` ([`1c42538`](https://github.com/Byron/google-apis-rs/commit/1c42538333d6fd0cec554c977d9894080829c808))
     - Merge pull request #493 from serprex/base64v22 ([`ce47a46`](https://github.com/Byron/google-apis-rs/commit/ce47a46ca4e80dfbb2ead94037169bc5257c306e))
     - 6.0.4 ([`4b23b5a`](https://github.com/Byron/google-apis-rs/commit/4b23b5a0c6b267f0fc1213b2c401bd156abfdb1e))
     - Base64 0.22, serde_with 3, url 2 ([`0fca3a9`](https://github.com/Byron/google-apis-rs/commit/0fca3a944a27a548a8d21508bfb67ba7828ab94f))
