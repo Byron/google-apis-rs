@@ -1294,13 +1294,11 @@ def string_impl(p):
 
 
 def unique(
-        original: str,
-        desired: str,
-        attempts: int = 0,
-        assigned=None,
+    original: str,
+    desired: str,
+    attempts: int = 0,
+    assigned: dict[str, str] = {},
 ) -> str:
-    if assigned is None:
-        assigned = {}
     if original in assigned:
         return assigned[original]
     candidate = desired + ("" if attempts == 0 else str(attempts))
