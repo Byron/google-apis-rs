@@ -64,8 +64,12 @@ def _get_enum_variants(enum: dict) -> tuple[list[EnumVariant], bool]:
             continue
 
         is_deprecated = is_enum_variant_deprecated(description)
+        deprecation_message = None
+        if is_deprecated:
+            deprecation_message = description
+
         name = to_enum_variant_name(variant, not is_any_variant_deprecated)
-        result.append(EnumVariant(name, variant, description, is_deprecated, description))
+        result.append(EnumVariant(name, variant, description, is_deprecated, deprecation_message))
 
     return result, is_any_variant_deprecated
 
@@ -102,12 +106,13 @@ def get_enum_if_is_enum(k, property_name: str, property_value: dict) -> Enum | N
 
 
 def _get_inner_enum(pv: dict):
-    items = pv.get('items')
-    if items and is_property_enum(items):
-        return items
-    additional = pv.get('additionalProperties')
-    if additional and is_property_enum(additional):
-        return additional
+    nested = pv.get('items')
+    if nested and is_property_enum(nested):
+        return nested
+
+    nested = pv.get('additionalProperties')
+    if nested and is_property_enum(nested):
+        return nested
 
     return None
 
@@ -145,10 +150,13 @@ def add_to_enums_if_enum(schema_name, property_name, property_value,
     if enum:
         existing_enum = enums.get(enum.ty)
         if existing_enum:
-            if existing_enum[2].ty != enum.ty or existing_enum[2].variants != enum.variants:
-                print('WARNING: duplicate enum entry. ', enum.ty, schema_name, property_name, property_value)
+            if existing_enum[2].ty.name != enum.ty.name or existing_enum[2].variants != enum.variants:
+                print('='*80)
+                print('WARNING: duplicate enum entry. ', enum.ty, schema_name, property_name, 'enum: \n\n', enum)
+                print()
                 print('existing enum:                 ', existing_enum[2].ty, existing_enum[0], existing_enum[1],
-                      existing_enum[2])
+                      'enum: \n\n', existing_enum[2])
+                print('=' * 80)
             return
 
         enums[enum.ty] = (schema_name, property_name, enum)

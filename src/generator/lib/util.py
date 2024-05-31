@@ -811,6 +811,11 @@ class EnumVariant:
     deprecated: bool
     deprecation_message: str | None
 
+    def __str__(self):
+        if self.deprecated:
+            return f'({self.name}=>{self.value} (deprecated: {self.deprecation_message}) {self.description})'
+        return f'({self.name}=>{self.value} {self.description})'
+
 
 @dataclass
 class Enum:
@@ -819,6 +824,10 @@ class Enum:
     variants: list[EnumVariant]
     default: EnumVariant | None
     has_deprecated_variants: bool
+
+    def __str__(self):
+        return (f'{self.ty} {self.description} default: {self.default} has deprecated variants: '
+                f'{self.has_deprecated_variants} variants: [{", ".join(map(str, self.variants))}]')
 
 
 @dataclass
