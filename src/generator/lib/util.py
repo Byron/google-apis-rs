@@ -24,14 +24,11 @@ re_relative_links = re.compile(r"\]\s*\([^h]")
 
 HTTP_METHODS = set(("OPTIONS", "GET", "POST", "PUT", "DELETE", "HEAD", "TRACE", "CONNECT", "PATCH"))
 
-
 RESERVED_WORDS = set(('abstract', 'alignof', 'as', 'become', 'box', 'break', 'const', 'continue', 'crate', 'do',
                       'else', 'enum', 'extern', 'false', 'final', 'fn', 'for', 'if', 'impl', 'in', 'let', 'loop',
                       'macro', 'match', 'mod', 'move', 'mut', 'offsetof', 'override', 'priv', 'pub', 'pure', 'ref',
                       'return', 'sizeof', 'static', 'self', 'struct', 'super', 'true', 'trait', 'type', 'typeof',
                       'unsafe', 'unsized', 'use', 'virtual', 'where', 'while', 'yield'))
-
-
 
 TREF = '$ref'
 IO_RESPONSE = 'response'
@@ -99,9 +96,7 @@ data_unit_multipliers = {
     '%': 1,
 }
 
-
 inflection = inflect.engine()
-
 
 HUB_TYPE_PARAMETERS = ('S',)
 
@@ -136,6 +131,7 @@ def rust_doc_comment(s):
 
 def use_automatic_links_in_rust_doc_comment(s: str) -> str:
     """Surrounds all links in the text with <>."""
+
     def replace_links(match):
         link = match.group()
         return f"<{link}>"
@@ -143,9 +139,11 @@ def use_automatic_links_in_rust_doc_comment(s: str) -> str:
     # return re_non_hyper_links.sub(replace_links, s)
     return s
 
+
 # returns true if there is an indication for something that is interpreted as doc comment by rustdoc
 def has_markdown_codeblock_with_indentation(s):
     return re_spaces_after_newline.search(s) != None
+
 
 def preprocess(base_url, s):
     if base_url is None:
@@ -157,15 +155,17 @@ def preprocess(base_url, s):
         stdout=subprocess.PIPE,
         env={"URL_BASE": base_url or ""}
     )
-    
+
     res = p.communicate(s.encode('utf-8'))
     exitcode = p.wait(timeout=1)
     if exitcode != 0:
         raise ValueError(f"Child process exited with non-zero code {exitcode}")
     return res[0].decode('utf-8')
 
+
 def has_relative_links(s):
     return re_relative_links.search(s) is not None
+
 
 # runs the preprocessor in case there is evidence for code blocks using indentation
 def rust_doc_sanitize(base_url):
@@ -174,6 +174,7 @@ def rust_doc_sanitize(base_url):
             return preprocess(base_url, s)
         else:
             return s
+
     return fixer
 
 
@@ -801,13 +802,33 @@ def build_all_params(c, m):
 
 
 @dataclass
+class EnumVariant:
+    name: str
+    """ the rust name of the enum variant """
+    value: str
+    """ the value of the enum variant (which is used for the api) """
+    description: str | None
+    deprecated: bool
+    deprecation_message: str | None
+
+
+@dataclass
+class Enum:
+    ty: RustType
+    description: str | None
+    variants: list[EnumVariant]
+    default: EnumVariant | None
+    has_deprecated_variants: bool
+
+
+@dataclass
 class Context:
     sta_map: Dict[str, Any]
     fqan_map: Dict[str, Any]
     rta_map: Dict[str, Any]
     rtc_map: Dict[str, Any]
     schemas: Dict[str, Any]
-    enums: List[Tuple[str, str, RustType, Dict[str, Any]]]
+    enums: List[Enum]
 
 
 # return a newly build context from the given data
@@ -1221,18 +1242,17 @@ def rnd_arg_val_for_type(tn: str, c: Context = None) -> str:
             return str(RUST_TYPE_RND_MAP[name]())
 
     if c:
-        from .enum_utils import get_enum_variants, to_enum_variant_name
         if tn.startswith("&"):  # sometimes the types get passed as ref which doesn't make too much sense here
             tn = tn[1:]
 
-        for (_, _, enum, values) in c.enums:
-            if tn == enum.name:
-                variants = get_enum_variants(values)
+        for enum in c.enums:
+            if tn == enum.ty:
+                variants = enum.variants
                 if len(variants) > 0:
-                    variant = to_enum_variant_name(variants[0])
+                    variant = variants[0].name
                     return f"&{tn}::{variant}"
 
-                print('Enum has no variants. This is probably not right...', enum, values)
+                print('Enum has no variants. This is probably not right...', enum)
 
     return "&Default::default()"
 
@@ -1281,44 +1301,3 @@ def unique(
 
 if __name__ == '__main__':
     raise AssertionError('For import only')
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-

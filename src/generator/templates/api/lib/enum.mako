@@ -7,9 +7,7 @@
                       REQUEST_MARKER_TRAIT, RESPONSE_MARKER_TRAIT, supports_scopes, to_api_version,
                       to_fqan, METHODS_RESOURCE, ADD_PARAM_MEDIA_EXAMPLE, PROTOCOL_TYPE_INFO, enclose_in,
                       upload_action_fn, METHODS_BUILDER_MARKER_TRAIT, DELEGATE_TYPE,
-                      to_extern_crate_name, rust_doc_sanitize)
-
-    from generator.lib.enum_utils import (to_enum_variant_name, get_enum_variants, get_enum_variants_descriptions, get_enum_default)
+                      to_extern_crate_name, rust_doc_sanitize, escape_rust_string)
 
     def pretty_name(name):
         return ' '.join(split_camelcase_s(name).split('.'))
@@ -72,68 +70,75 @@ impl Default for Scope {
 ## Builds any generic enum for the API
 ###############################################################################################
 ###############################################################################################
-<%def name="new(enum_type, e, c)">\
-// region ${enum_type}
-#[derive(Clone, Copy, Eq, Hash, Debug, PartialEq, Serialize, Deserialize)]
-% if e.get('description'):
-${rust_doc_comment(e.description)}
+<%def name="new(enum, c)">\
+// region ${enum.ty}
+% if enum.has_deprecated_variants:
+#[allow(non_camel_case_types, deprecated)]
 % endif
-pub enum ${enum_type} {
+#[derive(Clone, Copy, Eq, Hash, Debug, PartialEq, Serialize, Deserialize)]
+% if enum.description:
+${rust_doc_comment(enum.description)}
+% endif
+pub enum ${enum.ty} {
 <%
-enum_variants = get_enum_variants(e)
+enum_variants = enum.variants
 if not enum_variants:
-    print('enum had no variants', e)
-    enum_variants = ['NO_VARIANTS_FOUND']
-enum_descriptions = get_enum_variants_descriptions(e)
-if not enum_descriptions:
-    enum_descriptions = ['no description found'] * len(enum_variants)
-
+    print('enum had no variants', enum)
+    enum_variants = []
 %>\
-% for (variant_name,description) in zip(enum_variants, enum_descriptions):
-    <% #print(variant_name, '=>', description)
-    %>
-    % if description:
-    ${rust_doc_comment(description)}
-    % endif\
+% for variant in enum_variants:
+
+    % if variant.description:
+    ${rust_doc_comment(variant.description)}
+    % endif
     /// value:
-    /// "${variant_name}"
-    #[serde(rename="${variant_name}")]
-    ${to_enum_variant_name(variant_name)},
+    /// "${variant.value}"
+    #[serde(rename="${variant.value}")]
+    % if variant.deprecated:
+    #[deprecated(note="${escape_rust_string(variant.deprecation_message)}")]
+    % endif
+    ${variant.name},
 % endfor
 }
 
-impl AsRef<str> for ${enum_type} {
+impl AsRef<str> for ${enum.ty} {
+% if enum.has_deprecated_variants:
+    #[allow(deprecated)]
+% endif
     fn as_ref(&self) -> &str {
         match *self {
             % for variant in enum_variants:
-            ${enum_type}::${to_enum_variant_name(variant)} => "${variant}",
+            ${enum.ty}::${variant.name} => "${escape_rust_string(variant.value)}",
             % endfor
         }
     }
 }
 
-impl ::std::convert::TryFrom< &str > for ${enum_type} {
+impl ::std::convert::TryFrom< &str > for ${enum.ty} {
     type Error = ();
-    fn try_from(value: &str) -> ::std::result::Result<Self, < ${enum_type} as ::std::convert::TryFrom < &str > >::Error> {
+% if enum.has_deprecated_variants:
+    #[allow(deprecated)]
+% endif
+    fn try_from(value: &str) -> ::std::result::Result<Self, < ${enum.ty} as ::std::convert::TryFrom < &str > >::Error> {
         match value {
             % for variant in enum_variants:
-           "${variant}" => ::std::result::Result::Ok(${enum_type}::${to_enum_variant_name(variant)}),
+           "${variant.value}" => ::std::result::Result::Ok(${enum.ty}::${variant.name}),
             % endfor
-            _=> ::std::result::Result::Err(()),
+            _ => ::std::result::Result::Err(()),
         }
     }
 }
 
-impl<'a> Into<::std::borrow::Cow<'a, str>> for &'a ${enum_type} {
-    fn into(self) -> ::std::borrow::Cow<'a, str> {
-        self.as_ref().into()
+impl<'a> From < &'a ${enum.ty} > for ::std::borrow::Cow< 'a, str > {
+    fn from(val: &'a ${enum.ty}) -> Self {
+        val.as_ref().into()
     }
 }
 
-% if get_enum_default(e) is not None:
-impl ::core::default::Default for ${enum_type} {
-    fn default() -> ${enum_type} {
-        ${enum_type}::${to_enum_variant_name(e.default)}
+% if enum.default is not None:
+impl ::core::default::Default for ${enum.ty} {
+    fn default() -> ${enum.ty} {
+        ${enum.ty}::${enum.default.name}
     }
 }
 % endif

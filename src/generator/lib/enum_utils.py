@@ -2,7 +2,21 @@ from typing import Any
 from .rust_type import RustType
 from .types import Base
 from .util import Context, UNUSED_TYPE_MARKER, schema_markers, canonical_type_name, remove_invalid_chars_in_ident, \
-    singular, activity_split, items
+    activity_split, items, Enum, EnumVariant
+
+
+def get_enum_from_dict(name: RustType, s: dict) -> Enum:
+    description: str | None = get_from_enum(s, 'description')
+    (variants, is_any_variant_deprecated) = _get_enum_variants(s)
+    default: EnumVariant | str | None = get_enum_default(s)
+    default_variant: EnumVariant | None = None
+    if default is not None:
+        for variant in variants:
+            if variant.name == default:
+                default_variant = variant
+                break
+
+    return Enum(name, description, variants, default_variant, is_any_variant_deprecated)
 
 
 def is_property_enum(s: dict) -> bool:
@@ -27,12 +41,33 @@ def get_enum_type(schema_name: str, property_name: str) -> RustType:
     return Base(name)
 
 
-def get_enum_variants(enum: dict) -> list[str]:
-    return get_from_enum(enum, 'enum')
+def _get_enum_variants(enum: dict) -> tuple[list[EnumVariant], bool]:
+    variants = get_from_enum(enum, 'enum')
+    descriptions = get_from_enum(enum, 'enumDescriptions')
+    if not descriptions:
+        descriptions = variants
 
+    result = []
+    is_any_variant_deprecated = False
+    for variant in descriptions:
+        if is_enum_variant_deprecated(variant):
+            is_any_variant_deprecated = True
+            break
 
-def get_enum_variants_descriptions(enum: dict) -> list[str]:
-    return get_from_enum(enum, 'enumDescriptions')
+    for i in range(len(variants)):
+        variant = variants[i]
+        description = None
+        if descriptions:
+            description = descriptions[i]
+
+        if variant is None:
+            continue
+
+        is_deprecated = is_enum_variant_deprecated(description)
+        name = to_enum_variant_name(variant, not is_any_variant_deprecated)
+        result.append(EnumVariant(name, variant, description, is_deprecated, description))
+
+    return result, is_any_variant_deprecated
 
 
 def get_enum_default(enum: dict) -> str | None:
@@ -54,16 +89,14 @@ def get_from_enum(enum: dict, key: str) -> list[Any] | None:
     if nested:
         return nested
 
-    if key != 'default':  # just a debugging help
-        print(f"could not find key '{key}' in enum:", enum)
     return None
 
 
-def get_enum_if_is_enum(k, property_name: str, property_value: dict) -> RustType | None:
+def get_enum_if_is_enum(k, property_name: str, property_value: dict) -> Enum | None:
     if property_value is None:
         return None
     if is_property_enum(property_value):
-        return get_enum_type(k, property_name)
+        return get_enum_from_dict(get_enum_type(k, property_name), property_value)
 
     return get_enum_if_is_enum(k, property_name, _get_inner_enum(property_value))
 
@@ -79,8 +112,8 @@ def _get_inner_enum(pv: dict):
     return None
 
 
-def find_enums_in_context(c: Context) -> list[tuple[str, Any, RustType, Any]]:
-    enums: dict[RustType, tuple[str, Any, RustType, Any]] = {}
+def find_enums_in_context(c: Context) -> list[Enum]:
+    enums: dict[RustType, tuple[str, Any, Enum]] = {}
     for name, s in items(c.schemas):
         if UNUSED_TYPE_MARKER in schema_markers(s, c, transitive=True):
             continue
@@ -99,24 +132,42 @@ def find_enums_in_context(c: Context) -> list[tuple[str, Any, RustType, Any]]:
             for pk, pv in items(parameters):
                 add_to_enums_if_enum(name, pk, pv, enums)
 
-    return list(enums.values())
+    result = []
+    for enum in enums.values():
+        result.append(enum[2])
+
+    return result
 
 
 def add_to_enums_if_enum(schema_name, property_name, property_value,
-                         enums: dict[RustType, tuple[str, Any, RustType, Any]]):
-    enum = get_enum_if_is_enum(schema_name, property_name, property_value)
+                         enums: dict[RustType, tuple[str, Any, Enum]]):
+    enum: Enum | None = get_enum_if_is_enum(schema_name, property_name, property_value)
     if enum:
-        existing_enum = enums.get(enum)
+        existing_enum = enums.get(enum.ty)
         if existing_enum:
-            if existing_enum[2] != enum:
-                print('WARNING: duplicate enum entry. ', enum.name, schema_name, property_name, property_value)
-                print('existing enum:                 ', existing_enum[2].name, existing_enum[0], existing_enum[1], existing_enum[3])
+            if existing_enum[2].ty != enum.ty or existing_enum[2].variants != enum.variants:
+                print('WARNING: duplicate enum entry. ', enum.ty, schema_name, property_name, property_value)
+                print('existing enum:                 ', existing_enum[2].ty, existing_enum[0], existing_enum[1],
+                      existing_enum[2])
             return
 
-        enums[enum] = (schema_name, property_name, enum, property_value)
+        enums[enum.ty] = (schema_name, property_name, enum)
 
 
-def to_enum_variant_name(name: str) -> str:
-    c_name = canonical_type_name(name)
-    c_name = remove_invalid_chars_in_ident(c_name)
-    return c_name
+def to_enum_variant_name(name: str, make_camel_case: bool = True) -> str:
+    if make_camel_case:
+        name = canonical_type_name(name)
+
+    name = remove_invalid_chars_in_ident(name)
+    return name
+
+
+def is_enum_variant_deprecated(description: str | None) -> bool:
+    if description is None:
+        return False
+
+    s = description.lower()
+    if 'deprecated' in s:
+        return True
+
+    return False

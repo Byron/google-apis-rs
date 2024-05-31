@@ -6,7 +6,6 @@
 <%namespace name="schema" file="../lib/schema.mako"/>\
 <%
     from generator.lib.util import (new_context, hub_type, hub_type_params_s)
-    from generator.lib.enum_utils import (find_enums_in_context)
 
     c = new_context(schemas, resources)
     hub_type = hub_type(c.schemas, util.canonical_name())
@@ -18,7 +17,6 @@
 use super::*;
 
 
-
-% for schema_name,property_name,enum_type, e in c.enums:
-${enum.new(enum_type, e, c)}
+% for e in c.enums:
+${enum.new(e, c)}
 % endfor
