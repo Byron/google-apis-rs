@@ -112,26 +112,26 @@ impl AsRef<str> for ${enum_type} {
     }
 }
 
-impl std::convert::TryFrom< &str > for ${enum_type} {
+impl ::std::convert::TryFrom< &str > for ${enum_type} {
     type Error = ();
-    fn try_from(value: &str) -> Result<Self, < ${enum_type} as std::convert::TryFrom < &str > >::Error> {
+    fn try_from(value: &str) -> ::std::result::Result<Self, < ${enum_type} as ::std::convert::TryFrom < &str > >::Error> {
         match value {
             % for variant in enum_variants:
-           "${variant}" => Ok(${enum_type}::${to_enum_variant_name(variant)}),
+           "${variant}" => ::std::result::Result::Ok(${enum_type}::${to_enum_variant_name(variant)}),
             % endfor
-            _=> Err(()),
+            _=> ::std::result::Result::Err(()),
         }
     }
 }
 
-impl<'a> Into<std::borrow::Cow<'a, str>> for &'a ${enum_type} {
-    fn into(self) -> std::borrow::Cow<'a, str> {
+impl<'a> Into<::std::borrow::Cow<'a, str>> for &'a ${enum_type} {
+    fn into(self) -> ::std::borrow::Cow<'a, str> {
         self.as_ref().into()
     }
 }
 
 % if get_enum_default(e) is not None:
-impl Default for ${enum_type} {
+impl ::core::default::Default for ${enum_type} {
     fn default() -> ${enum_type} {
         ${enum_type}::${to_enum_variant_name(e.default)}
     }
