@@ -22,13 +22,13 @@ re_relative_links = re.compile(r"\]\s*\([^h]")
 # re_non_hyper_links = re.compile(r"(?<!<)(?:https?|ftp)://[\w/\-?=%.]+\.[\w/\-&?=%+#]+(?!>)")
 """a regex that finds all links not surrounded by < and >"""
 
-HTTP_METHODS = set(("OPTIONS", "GET", "POST", "PUT", "DELETE", "HEAD", "TRACE", "CONNECT", "PATCH"))
+HTTP_METHODS = {"OPTIONS", "GET", "POST", "PUT", "DELETE", "HEAD", "TRACE", "CONNECT", "PATCH"}
 
-RESERVED_WORDS = set(('abstract', 'alignof', 'as', 'become', 'box', 'break', 'const', 'continue', 'crate', 'do',
-                      'else', 'enum', 'extern', 'false', 'final', 'fn', 'for', 'if', 'impl', 'in', 'let', 'loop',
-                      'macro', 'match', 'mod', 'move', 'mut', 'offsetof', 'override', 'priv', 'pub', 'pure', 'ref',
-                      'return', 'sizeof', 'static', 'self', 'struct', 'super', 'true', 'trait', 'type', 'typeof',
-                      'unsafe', 'unsized', 'use', 'virtual', 'where', 'while', 'yield'))
+RESERVED_WORDS = {'abstract', 'alignof', 'as', 'become', 'box', 'break', 'const', 'continue', 'crate', 'do', 'else',
+                  'enum', 'extern', 'false', 'final', 'fn', 'for', 'if', 'impl', 'in', 'let', 'loop', 'macro', 'match',
+                  'mod', 'move', 'mut', 'offsetof', 'override', 'priv', 'pub', 'pure', 'ref', 'return', 'sizeof',
+                  'static', 'self', 'struct', 'super', 'true', 'trait', 'type', 'typeof', 'unsafe', 'unsized', 'use',
+                  'virtual', 'where', 'while', 'yield'}
 
 TREF = '$ref'
 IO_RESPONSE = 'response'
@@ -831,7 +831,7 @@ class Context:
     enums: List[Enum]
 
 
-# return a newly build context from the given data
+# return a newly built context from the given data
 def new_context(schemas: Dict[str, Dict[str, Any]], resources: Dict[str, Any]) -> Context:
     # Returns (A, B) where
     # A: { SchemaTypeName -> { fqan -> ['request'|'response', ...]}
@@ -1285,11 +1285,13 @@ def string_impl(p):
 
 
 def unique(
-    original: str,
-    desired: str,
-    attempts: int = 0,
-    assigned: dict[str, str] = {},
+        original: str,
+        desired: str,
+        attempts: int = 0,
+        assigned=None,
 ) -> str:
+    if assigned is None:
+        assigned = {}
     if original in assigned:
         return assigned[original]
     candidate = desired + ("" if attempts == 0 else str(attempts))
