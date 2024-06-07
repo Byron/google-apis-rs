@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *compute* crate version *5.0.4+20240218*, where *20240218* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+//! This documentation was generated from *compute* crate version *5.0.5+20240407*, where *20240407* is the exact revision of the *compute:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 //! 
 //! Everything else about the *compute* *v1* API can be found at the
 //! [official documentation site](https://cloud.google.com/compute/).
@@ -55,10 +55,14 @@
 //!  * [*get*](api::ImageFamilyViewGetCall)
 //! * [images](api::Image)
 //!  * [*delete*](api::ImageDeleteCall), [*deprecate*](api::ImageDeprecateCall), [*get*](api::ImageGetCall), [*get from family*](api::ImageGetFromFamilyCall), [*get iam policy*](api::ImageGetIamPolicyCall), [*insert*](api::ImageInsertCall), [*list*](api::ImageListCall), [*patch*](api::ImagePatchCall), [*set iam policy*](api::ImageSetIamPolicyCall), [*set labels*](api::ImageSetLabelCall) and [*test iam permissions*](api::ImageTestIamPermissionCall)
+//! * [instance group manager resize requests](api::InstanceGroupManagerResizeRequest)
+//!  * [*cancel*](api::InstanceGroupManagerResizeRequestCancelCall), [*delete*](api::InstanceGroupManagerResizeRequestDeleteCall), [*get*](api::InstanceGroupManagerResizeRequestGetCall), [*insert*](api::InstanceGroupManagerResizeRequestInsertCall) and [*list*](api::InstanceGroupManagerResizeRequestListCall)
 //! * [instance group managers](api::InstanceGroupManager)
 //!  * [*abandon instances*](api::InstanceGroupManagerAbandonInstanceCall), [*aggregated list*](api::InstanceGroupManagerAggregatedListCall), [*apply updates to instances*](api::InstanceGroupManagerApplyUpdatesToInstanceCall), [*create instances*](api::InstanceGroupManagerCreateInstanceCall), [*delete*](api::InstanceGroupManagerDeleteCall), [*delete instances*](api::InstanceGroupManagerDeleteInstanceCall), [*delete per instance configs*](api::InstanceGroupManagerDeletePerInstanceConfigCall), [*get*](api::InstanceGroupManagerGetCall), [*insert*](api::InstanceGroupManagerInsertCall), [*list*](api::InstanceGroupManagerListCall), [*list errors*](api::InstanceGroupManagerListErrorCall), [*list managed instances*](api::InstanceGroupManagerListManagedInstanceCall), [*list per instance configs*](api::InstanceGroupManagerListPerInstanceConfigCall), [*patch*](api::InstanceGroupManagerPatchCall), [*patch per instance configs*](api::InstanceGroupManagerPatchPerInstanceConfigCall), [*recreate instances*](api::InstanceGroupManagerRecreateInstanceCall), [*resize*](api::InstanceGroupManagerResizeCall), [*set instance template*](api::InstanceGroupManagerSetInstanceTemplateCall), [*set target pools*](api::InstanceGroupManagerSetTargetPoolCall) and [*update per instance configs*](api::InstanceGroupManagerUpdatePerInstanceConfigCall)
 //! * [instance groups](api::InstanceGroup)
 //!  * [*add instances*](api::InstanceGroupAddInstanceCall), [*aggregated list*](api::InstanceGroupAggregatedListCall), [*delete*](api::InstanceGroupDeleteCall), [*get*](api::InstanceGroupGetCall), [*insert*](api::InstanceGroupInsertCall), [*list*](api::InstanceGroupListCall), [*list instances*](api::InstanceGroupListInstanceCall), [*remove instances*](api::InstanceGroupRemoveInstanceCall) and [*set named ports*](api::InstanceGroupSetNamedPortCall)
+//! * instance settings
+//!  * [*get*](api::InstanceSettingGetCall) and [*patch*](api::InstanceSettingPatchCall)
 //! * [instance templates](api::InstanceTemplate)
 //!  * [*aggregated list*](api::InstanceTemplateAggregatedListCall), [*delete*](api::InstanceTemplateDeleteCall), [*get*](api::InstanceTemplateGetCall), [*get iam policy*](api::InstanceTemplateGetIamPolicyCall), [*insert*](api::InstanceTemplateInsertCall), [*list*](api::InstanceTemplateListCall), [*set iam policy*](api::InstanceTemplateSetIamPolicyCall) and [*test iam permissions*](api::InstanceTemplateTestIamPermissionCall)
 //! * [instances](api::Instance)
@@ -175,6 +179,10 @@
 //!  * [*aggregated list*](api::SslCertificateAggregatedListCall), [*delete*](api::SslCertificateDeleteCall), [*get*](api::SslCertificateGetCall), [*insert*](api::SslCertificateInsertCall) and [*list*](api::SslCertificateListCall)
 //! * [ssl policies](api::SslPolicy)
 //!  * [*aggregated list*](api::SslPolicyAggregatedListCall), [*delete*](api::SslPolicyDeleteCall), [*get*](api::SslPolicyGetCall), [*insert*](api::SslPolicyInsertCall), [*list*](api::SslPolicyListCall), [*list available features*](api::SslPolicyListAvailableFeatureCall) and [*patch*](api::SslPolicyPatchCall)
+//! * [storage pool types](api::StoragePoolType)
+//!  * [*aggregated list*](api::StoragePoolTypeAggregatedListCall), [*get*](api::StoragePoolTypeGetCall) and [*list*](api::StoragePoolTypeListCall)
+//! * [storage pools](api::StoragePool)
+//!  * [*aggregated list*](api::StoragePoolAggregatedListCall), [*delete*](api::StoragePoolDeleteCall), [*get*](api::StoragePoolGetCall), [*get iam policy*](api::StoragePoolGetIamPolicyCall), [*insert*](api::StoragePoolInsertCall), [*list*](api::StoragePoolListCall), [*list disks*](api::StoragePoolListDiskCall), [*set iam policy*](api::StoragePoolSetIamPolicyCall), [*test iam permissions*](api::StoragePoolTestIamPermissionCall) and [*update*](api::StoragePoolUpdateCall)
 //! * [subnetworks](api::Subnetwork)
 //!  * [*aggregated list*](api::SubnetworkAggregatedListCall), [*delete*](api::SubnetworkDeleteCall), [*expand ip cidr range*](api::SubnetworkExpandIpCidrRangeCall), [*get*](api::SubnetworkGetCall), [*get iam policy*](api::SubnetworkGetIamPolicyCall), [*insert*](api::SubnetworkInsertCall), [*list*](api::SubnetworkListCall), [*list usable*](api::SubnetworkListUsableCall), [*patch*](api::SubnetworkPatchCall), [*set iam policy*](api::SubnetworkSetIamPolicyCall), [*set private ip google access*](api::SubnetworkSetPrivateIpGoogleAccesCall) and [*test iam permissions*](api::SubnetworkTestIamPermissionCall)
 //! * [target grpc proxies](api::TargetGrpcProxy)
@@ -330,6 +338,9 @@
 //! let r = hub.images().insert(...).doit().await
 //! let r = hub.images().patch(...).doit().await
 //! let r = hub.images().set_labels(...).doit().await
+//! let r = hub.instance_group_manager_resize_requests().cancel(...).doit().await
+//! let r = hub.instance_group_manager_resize_requests().delete(...).doit().await
+//! let r = hub.instance_group_manager_resize_requests().insert(...).doit().await
 //! let r = hub.instance_group_managers().abandon_instances(...).doit().await
 //! let r = hub.instance_group_managers().apply_updates_to_instances(...).doit().await
 //! let r = hub.instance_group_managers().create_instances(...).doit().await
@@ -349,6 +360,7 @@
 //! let r = hub.instance_groups().insert(...).doit().await
 //! let r = hub.instance_groups().remove_instances(...).doit().await
 //! let r = hub.instance_groups().set_named_ports(...).doit().await
+//! let r = hub.instance_settings().patch(...).doit().await
 //! let r = hub.instance_templates().delete(...).doit().await
 //! let r = hub.instance_templates().insert(...).doit().await
 //! let r = hub.instances().add_access_config(...).doit().await
@@ -584,6 +596,9 @@
 //! let r = hub.ssl_policies().delete(...).doit().await
 //! let r = hub.ssl_policies().insert(...).doit().await
 //! let r = hub.ssl_policies().patch(...).doit().await
+//! let r = hub.storage_pools().delete(...).doit().await
+//! let r = hub.storage_pools().insert(...).doit().await
+//! let r = hub.storage_pools().update(...).doit().await
 //! let r = hub.subnetworks().delete(...).doit().await
 //! let r = hub.subnetworks().expand_ip_cidr_range(...).doit().await
 //! let r = hub.subnetworks().insert(...).doit().await
@@ -686,7 +701,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = Compute::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! let mut hub = Compute::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 //! // As the method needs a request, you would usually fill it with the desired information
 //! // into the respective structure. Some of the parts shown here might not be applicable !
 //! // Values shown here are possibly random and not representative !
@@ -696,7 +711,7 @@
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
 //! let result = hub.disks().update(req, "project", "zone", "disk")
-//!              .update_mask(&Default::default())
+//!              .update_mask(FieldMask::new::<&str>(&[]))
 //!              .request_id("amet.")
 //!              .add_paths("takimata")
 //!              .doit().await;
