@@ -172,7 +172,7 @@ pub mod standard_base64 {
             let s: Cow<str> = Deserialize::deserialize(deserializer)?;
             match base64::prelude::BASE64_STANDARD.decode(s.as_ref()) {
                 Ok(decoded) => Ok(decoded),
-                Err(first_err) => match general_purpose::URL_SAFE.decode(s.as_ref()) {
+                Err(first_err) => match base64::prelude::BASE64_URL_SAFE.decode(s.as_ref()) {
                     Ok(decoded) => Ok(decoded),
                     Err(_) => Err(serde::de::Error::custom(first_err))
                 }
@@ -208,9 +208,9 @@ pub mod urlsafe_base64 {
             D: Deserializer<'de>,
         {
             let s: Cow<str> = Deserialize::deserialize(deserializer)?;
-            match base64::prelude::URL_SAFE.decode(s.as_ref()) {
+            match base64::prelude::BASE64_URL_SAFE.decode(s.as_ref()) {
                 Ok(decoded) => Ok(decoded),
-                Err(first_err) => match general_purpose::URL_STANDARD.decode(s.as_ref()) {
+                Err(first_err) => match base64::prelude::BASE64_STANDARD.decode(s.as_ref()) {
                     Ok(decoded) => Ok(decoded),
                     Err(_) => Err(serde::de::Error::custom(first_err))
                 }
