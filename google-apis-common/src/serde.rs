@@ -356,11 +356,25 @@ mod test {
     }
 
     #[test]
+    fn urlsafe_base64_de_standard_success_cases() {
+        let wrapper: Base64URLSafeWrapper =  // Expect URL-safe base64 accepts standard encoding
+            serde_json::from_reader(r#"{"bytes": "REE/P0V+Nz4oIWtH"}"#.as_bytes()).unwrap();
+        assert_eq!(Some(b"DA??E~7>(!kG".as_slice()), wrapper.bytes.as_deref());
+    }
+
+    #[test]
     fn urlsafe_base64_de_failure_cases() {
         assert!(
-            serde_json::from_str::<Base64URLSafeWrapper>(r#"{"bytes": "aGVsbG8gd29ybG+Q"}"#)
+            serde_json::from_str::<Base64URLSafeWrapper>(r#"{"bytes": "aGVsbG8gd29ybG&Q"}"#)
                 .is_err()
         );
+    }
+
+    #[test]
+    fn standard_base64_de_urlsafe_success_cases() {
+        let wrapper: Base64URLSafeWrapper =  // Expect standard base64 accepts url-safe encoding
+            serde_json::from_reader(r#"{"bytes": "REE_P0V-Nz4oIWtH"}"#.as_bytes()).unwrap();
+        assert_eq!(Some(b"DA??E~7>(!kG".as_slice()), wrapper.bytes.as_deref());
     }
 
     #[test]
