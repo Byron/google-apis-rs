@@ -26,7 +26,7 @@ chrono = { version = "0.4.35", default-features = false, features = ["clock", "s
 url = "2.0"
 percent-encoding = "2.0"
 
-yup-oauth2 = { version = "9", optional = true }
+yup-oauth2 = { version = "10", optional = true }
 itertools = "^ 0.12"
 hyper = { version = "^ 0.14", features = ["client", "http2"] }
 http = "^0.2"
