@@ -27,7 +27,6 @@ cargo:
   is_executable: YES
   doc_base_url: http://byron.github.io/google-apis-rs
   dependencies:
-    - strsim = "^0.5"
     - clap = "^2.0"
     - http = "^0.2"
     - hyper = { version = "0.14", features = ["full"] }
