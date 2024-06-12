@@ -410,7 +410,7 @@ def to_serde_type(
         allow_optionals=True,
         _is_recursive=False
 ) -> Tuple[RustType, bool]:
-    return to_rust_type_inner(schemas, schema_name, property_name, t, allow_optionals, _is_recursive).serde_as()
+    return to_rust_type_inner(schemas, schema_name, property_name, t, allow_optionals, _is_recursive).serde_as(t.get('description', 'no description'))
 
 
 def to_rust_type_inner(
