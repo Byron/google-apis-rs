@@ -32,7 +32,7 @@ hyper-rustls = "0.25.0"
 mime = "^ 0.3.0"
 serde = { version = "^ 1.0", features = ["derive"] }
 serde_json = "^ 1.0"
-itertools = "^ 0.10"
+itertools = "0.13"
 % if cargo.get('is_executable', False):
 google-clis-common = { path = "../../google-clis-common", version = "6.0" }
 % else:
