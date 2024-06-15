@@ -31,7 +31,7 @@ hyper-rustls = "0.25.0"
 ## Must match the one hyper uses, otherwise there are duplicate similarly named `Mime` structs
 mime = "^ 0.3.0"
 serde = { version = "^ 1.0", features = ["derive"] }
-utoipa = { version = "4.2", features = ["axum_extras", "actix_extras", "uuid", "chrono", "url"] }
+utoipa = { version = "^4.2", features = ["axum_extras", "uuid", "chrono", "url"] }
 serde_json = "^ 1.0"
 itertools = "0.13"
 % if cargo.get('is_executable', False):
