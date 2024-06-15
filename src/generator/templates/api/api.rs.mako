@@ -30,6 +30,7 @@ use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::time::sleep;
 use tower_service;
 use serde::{Serialize, Deserialize};
+use utoipa::ToSchema;
 
 use crate::{client, client::GetToken, client::serde_with};
 

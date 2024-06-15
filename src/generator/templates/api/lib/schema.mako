@@ -65,7 +65,7 @@ ${struct} { _never_set: Option<bool> }
     # We always need Serialization support, as others might want to serialize the response, even though we will 
     # only deserialize it.
     # And since we don't know what others want to do, we implement Deserialize as well by default ... 
-    traits = ['Clone', 'Debug', 'Serialize', 'Deserialize']
+    traits = ['Clone', 'Debug', 'Serialize', 'Deserialize', 'ToSchema']
 
     # default only works for structs, and 'variant' will be an enum
     if 'variant' not in s:
