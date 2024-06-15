@@ -1199,7 +1199,7 @@ def unique(
     original: str,
     desired: str,
     attempts: int = 0,
-    assigned: dict[str, str] = {},
+    assigned: Dict[str, str] = {},
 ) -> str:
     if original in assigned:
         return assigned[original]
