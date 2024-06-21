@@ -65,7 +65,7 @@ ${struct} { _never_set: Option<bool> }
     # We always need Serialization support, as others might want to serialize the response, even though we will 
     # only deserialize it.
     # And since we don't know what others want to do, we implement Deserialize as well by default ... 
-    traits = ['Clone', 'Debug', 'Serialize', 'Deserialize', 'ToSchema']
+    traits = ['Clone', 'Debug', 'Serialize', 'Deserialize']
 
     # default only works for structs, and 'variant' will be an enum
     if 'variant' not in s:
@@ -83,6 +83,7 @@ ${struct} { _never_set: Option<bool> }
 <%block filter="rust_doc_sanitize(documentationLink), rust_doc_comment">\
 ${doc(s, c)}\
 </%block>
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(${', '.join(traits)})]
 % if s.type == 'object':
