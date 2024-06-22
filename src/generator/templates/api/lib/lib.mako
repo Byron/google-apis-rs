@@ -235,6 +235,13 @@ Arguments will always be copied or cloned into the builder, to make them indepen
 [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 [google-go-api]: https://github.com/google/google-api-go-client
+
+${'##'} Cargo Features
+
+* `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+generated `openapi` spec would be invalid.
+
 </%def>
 
 ## Sets up a hub ready for use. You must wrap it into a test function for it to work
@@ -307,6 +314,7 @@ ${self.test_hub(hub_type(c.schemas, util.canonical_name()))}
 </%block>
 % endif
 </%def>
+
 
 ###############################################################################################
 ###############################################################################################
