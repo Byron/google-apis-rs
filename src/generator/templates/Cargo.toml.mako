@@ -62,5 +62,5 @@ version = "${util.crate_version()}"
 [features]
 yup-oauth2 = ["google-apis-common/yup-oauth2"]
 default = ["yup-oauth2"]
-utoipa = ["dep:utoipa", "utoipa/url"]
+utoipa = ["dep:utoipa"]
 % endif
