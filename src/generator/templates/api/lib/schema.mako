@@ -83,6 +83,7 @@ ${struct} { _never_set: Option<bool> }
 <%block filter="rust_doc_sanitize(documentationLink), rust_doc_comment">\
 ${doc(s, c)}\
 </%block>
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(${', '.join(traits)})]
 % if s.type == 'object':
