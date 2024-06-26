@@ -4,6 +4,8 @@ api:
     # recursive type
     - analyticsadmin
     # resursive type
+    - bigtableadmin
+    # resursive type
     - bigquery
     # redefinition of `Scope`
     - binaryauthorization
