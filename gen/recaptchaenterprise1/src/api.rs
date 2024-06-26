@@ -77,7 +77,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -87,7 +87,7 @@ impl Default for Scope {
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().keys_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// 
 /// match result {
@@ -126,7 +126,7 @@ impl<'a, S> RecaptchaEnterprise<S> {
         RecaptchaEnterprise {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://recaptchaenterprise.googleapis.com/".to_string(),
             _root_url: "https://recaptchaenterprise.googleapis.com/".to_string(),
         }
@@ -137,7 +137,7 @@ impl<'a, S> RecaptchaEnterprise<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -169,6 +169,7 @@ impl<'a, S> RecaptchaEnterprise<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1AccountDefenderAssessment {
@@ -184,6 +185,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1AccountDefenderAssessment 
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1AccountVerificationInfo {
@@ -210,6 +212,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1AccountVerificationInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1AndroidKeySettings {
@@ -238,6 +241,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1AndroidKeySettings {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [assessments annotate projects](ProjectAssessmentAnnotateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1AnnotateAssessmentRequest {
@@ -273,6 +277,7 @@ impl client::RequestValue for GoogleCloudRecaptchaenterpriseV1AnnotateAssessment
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [assessments annotate projects](ProjectAssessmentAnnotateCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1AnnotateAssessmentResponse { _never_set: Option<bool> }
@@ -284,6 +289,7 @@ impl client::ResponseResult for GoogleCloudRecaptchaenterpriseV1AnnotateAssessme
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1AppleDeveloperId {
@@ -312,6 +318,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1AppleDeveloperId {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [assessments create projects](ProjectAssessmentCreateCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1Assessment {
@@ -341,6 +348,10 @@ pub struct GoogleCloudRecaptchaenterpriseV1Assessment {
     /// Output only. Identifier. The resource name for the Assessment in the format `projects/{project}/assessments/{assessment}`.
     
     pub name: Option<String>,
+    /// Output only. Assessment returned when a site key, a token, and a phone number as `user_id` are provided. Account defender and SMS toll fraud protection need to be enabled.
+    #[serde(rename="phoneFraudAssessment")]
+    
+    pub phone_fraud_assessment: Option<GoogleCloudRecaptchaenterpriseV1PhoneFraudAssessment>,
     /// Optional. The private password leak verification field contains the parameters that are used to to check for leaks privately without sharing user credentials.
     #[serde(rename="privatePasswordLeakVerification")]
     
@@ -363,6 +374,7 @@ impl client::ResponseResult for GoogleCloudRecaptchaenterpriseV1Assessment {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1ChallengeMetrics {
@@ -395,6 +407,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1ChallengeMetrics {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1EndpointVerificationInfo {
@@ -423,6 +436,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1EndpointVerificationInfo {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1Event {
@@ -437,6 +451,10 @@ pub struct GoogleCloudRecaptchaenterpriseV1Event {
     #[serde(rename="firewallPolicyEvaluation")]
     
     pub firewall_policy_evaluation: Option<bool>,
+    /// Optional. The Fraud Prevention setting for this assessment.
+    #[serde(rename="fraudPrevention")]
+    
+    pub fraud_prevention: Option<String>,
     /// Optional. Deprecated: use `user_info.account_id` instead. Unique stable hashed user identifier for the request. The identifier must be hashed using hmac-sha256 with stable secret.
     #[serde(rename="hashedAccountId")]
     
@@ -488,6 +506,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1Event {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FirewallAction {
@@ -520,6 +539,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1FirewallAction {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FirewallActionAllowAction { _never_set: Option<bool> }
@@ -531,6 +551,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1FirewallActionAllowAction 
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FirewallActionBlockAction { _never_set: Option<bool> }
@@ -542,6 +563,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1FirewallActionBlockAction 
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FirewallActionIncludeRecaptchaScriptAction { _never_set: Option<bool> }
@@ -553,6 +575,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1FirewallActionIncludeRecap
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FirewallActionRedirectAction { _never_set: Option<bool> }
@@ -564,6 +587,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1FirewallActionRedirectActi
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FirewallActionSetHeaderAction {
@@ -582,6 +606,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1FirewallActionSetHeaderAct
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FirewallActionSubstituteAction {
@@ -603,6 +628,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1FirewallActionSubstituteAc
 /// * [firewallpolicies create projects](ProjectFirewallpolicyCreateCall) (request|response)
 /// * [firewallpolicies get projects](ProjectFirewallpolicyGetCall) (response)
 /// * [firewallpolicies patch projects](ProjectFirewallpolicyPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FirewallPolicy {
@@ -631,6 +657,7 @@ impl client::ResponseResult for GoogleCloudRecaptchaenterpriseV1FirewallPolicy {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FirewallPolicyAssessment {
@@ -650,6 +677,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1FirewallPolicyAssessment {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessment {
@@ -678,6 +706,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessment 
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentBehavioralTrustVerdict {
@@ -693,6 +722,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentB
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentCardTestingVerdict {
@@ -708,6 +738,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentC
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentStolenInstrumentVerdict {
@@ -723,6 +754,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1FraudPreventionAssessmentS
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FraudSignals {
@@ -743,6 +775,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1FraudSignals {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FraudSignalsCardSignals {
@@ -759,6 +792,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1FraudSignalsCardSignals {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1FraudSignalsUserSignals {
@@ -779,6 +813,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1FraudSignalsUserSignals {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1IOSKeySettings {
@@ -810,6 +845,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1IOSKeySettings {}
 /// * [keys get projects](ProjectKeyGetCall) (response)
 /// * [keys migrate projects](ProjectKeyMigrateCall) (response)
 /// * [keys patch projects](ProjectKeyPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1Key {
@@ -853,7 +889,7 @@ impl client::RequestValue for GoogleCloudRecaptchaenterpriseV1Key {}
 impl client::ResponseResult for GoogleCloudRecaptchaenterpriseV1Key {}
 
 
-/// Response to request to list firewall policies belonging to a key.
+/// Response to request to list firewall policies belonging to a project.
 /// 
 /// # Activities
 /// 
@@ -861,6 +897,7 @@ impl client::ResponseResult for GoogleCloudRecaptchaenterpriseV1Key {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [firewallpolicies list projects](ProjectFirewallpolicyListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1ListFirewallPoliciesResponse {
@@ -885,6 +922,7 @@ impl client::ResponseResult for GoogleCloudRecaptchaenterpriseV1ListFirewallPoli
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [keys list projects](ProjectKeyListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1ListKeysResponse {
@@ -908,6 +946,7 @@ impl client::ResponseResult for GoogleCloudRecaptchaenterpriseV1ListKeysResponse
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [relatedaccountgroups memberships list projects](ProjectRelatedaccountgroupMembershipListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1ListRelatedAccountGroupMembershipsResponse {
@@ -932,6 +971,7 @@ impl client::ResponseResult for GoogleCloudRecaptchaenterpriseV1ListRelatedAccou
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [relatedaccountgroups list projects](ProjectRelatedaccountgroupListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1ListRelatedAccountGroupsResponse {
@@ -956,6 +996,7 @@ impl client::ResponseResult for GoogleCloudRecaptchaenterpriseV1ListRelatedAccou
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [keys get metrics projects](ProjectKeyGetMetricCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1Metrics {
@@ -987,6 +1028,7 @@ impl client::ResponseResult for GoogleCloudRecaptchaenterpriseV1Metrics {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [keys migrate projects](ProjectKeyMigrateCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1MigrateKeyRequest {
@@ -999,10 +1041,28 @@ pub struct GoogleCloudRecaptchaenterpriseV1MigrateKeyRequest {
 impl client::RequestValue for GoogleCloudRecaptchaenterpriseV1MigrateKeyRequest {}
 
 
+/// Assessment for Phone Fraud
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudRecaptchaenterpriseV1PhoneFraudAssessment {
+    /// Output only. Assessment of this phone event for risk of SMS toll fraud.
+    #[serde(rename="smsTollFraudVerdict")]
+    
+    pub sms_toll_fraud_verdict: Option<GoogleCloudRecaptchaenterpriseV1SmsTollFraudVerdict>,
+}
+
+impl client::Part for GoogleCloudRecaptchaenterpriseV1PhoneFraudAssessment {}
+
+
 /// Private password leak verification info.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1PrivatePasswordLeakVerification {
@@ -1035,6 +1095,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1PrivatePasswordLeakVerific
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1RelatedAccountGroup {
@@ -1050,6 +1111,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1RelatedAccountGroup {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1RelatedAccountGroupMembership {
@@ -1078,6 +1140,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1RelatedAccountGroupMembers
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [firewallpolicies reorder projects](ProjectFirewallpolicyReorderCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1ReorderFirewallPoliciesRequest {
@@ -1097,6 +1160,7 @@ impl client::RequestValue for GoogleCloudRecaptchaenterpriseV1ReorderFirewallPol
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [firewallpolicies reorder projects](ProjectFirewallpolicyReorderCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1ReorderFirewallPoliciesResponse { _never_set: Option<bool> }
@@ -1112,6 +1176,7 @@ impl client::ResponseResult for GoogleCloudRecaptchaenterpriseV1ReorderFirewallP
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [keys retrieve legacy secret key projects](ProjectKeyRetrieveLegacySecretKeyCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1RetrieveLegacySecretKeyResponse {
@@ -1128,6 +1193,7 @@ impl client::ResponseResult for GoogleCloudRecaptchaenterpriseV1RetrieveLegacySe
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1RiskAnalysis {
@@ -1150,6 +1216,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1RiskAnalysis {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1ScoreDistribution {
@@ -1167,6 +1234,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1ScoreDistribution {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1ScoreMetrics {
@@ -1191,6 +1259,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1ScoreMetrics {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [relatedaccountgroupmemberships search projects](ProjectRelatedaccountgroupmembershipSearchCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1SearchRelatedAccountGroupMembershipsRequest {
@@ -1224,6 +1293,7 @@ impl client::RequestValue for GoogleCloudRecaptchaenterpriseV1SearchRelatedAccou
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [relatedaccountgroupmemberships search projects](ProjectRelatedaccountgroupmembershipSearchCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1SearchRelatedAccountGroupMembershipsResponse {
@@ -1240,10 +1310,30 @@ pub struct GoogleCloudRecaptchaenterpriseV1SearchRelatedAccountGroupMembershipsR
 impl client::ResponseResult for GoogleCloudRecaptchaenterpriseV1SearchRelatedAccountGroupMembershipsResponse {}
 
 
+/// Information about SMS toll fraud.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleCloudRecaptchaenterpriseV1SmsTollFraudVerdict {
+    /// Output only. Reasons contributing to the SMS toll fraud verdict.
+    
+    pub reasons: Option<Vec<String>>,
+    /// Output only. Probability of an SMS event being fraudulent. Values are from 0.0 (lowest) to 1.0 (highest).
+    
+    pub risk: Option<f32>,
+}
+
+impl client::Part for GoogleCloudRecaptchaenterpriseV1SmsTollFraudVerdict {}
+
+
 /// Options for user acceptance testing.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1TestingOptions {
@@ -1264,6 +1354,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1TestingOptions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1TokenProperties {
@@ -1301,6 +1392,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1TokenProperties {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1TransactionData {
@@ -1361,6 +1453,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1TransactionData {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1TransactionDataAddress {
@@ -1394,6 +1487,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1TransactionDataAddress {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1TransactionDataGatewayInfo {
@@ -1421,6 +1515,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1TransactionDataGatewayInfo
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1TransactionDataItem {
@@ -1447,6 +1542,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1TransactionDataItem {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1TransactionDataUser {
@@ -1483,6 +1579,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1TransactionDataUser {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1TransactionEvent {
@@ -1509,6 +1606,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1TransactionEvent {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1UserId {
@@ -1531,6 +1629,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1UserId {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1UserInfo {
@@ -1555,6 +1654,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1UserInfo {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1WafSettings {
@@ -1575,6 +1675,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1WafSettings {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleCloudRecaptchaenterpriseV1WebKeySettings {
@@ -1612,6 +1713,7 @@ impl client::Part for GoogleCloudRecaptchaenterpriseV1WebKeySettings {}
 /// 
 /// * [firewallpolicies delete projects](ProjectFirewallpolicyDeleteCall) (response)
 /// * [keys delete projects](ProjectKeyDeleteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleProtobufEmpty { _never_set: Option<bool> }
@@ -1623,6 +1725,7 @@ impl client::ResponseResult for GoogleProtobufEmpty {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleRpcStatus {
@@ -1666,7 +1769,7 @@ impl client::Part for GoogleRpcStatus {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `assessments_annotate(...)`, `assessments_create(...)`, `firewallpolicies_create(...)`, `firewallpolicies_delete(...)`, `firewallpolicies_get(...)`, `firewallpolicies_list(...)`, `firewallpolicies_patch(...)`, `firewallpolicies_reorder(...)`, `keys_create(...)`, `keys_delete(...)`, `keys_get(...)`, `keys_get_metrics(...)`, `keys_list(...)`, `keys_migrate(...)`, `keys_patch(...)`, `keys_retrieve_legacy_secret_key(...)`, `relatedaccountgroupmemberships_search(...)`, `relatedaccountgroups_list(...)` and `relatedaccountgroups_memberships_list(...)`
 /// // to build up your call.
@@ -2066,7 +2169,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2358,7 +2461,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2650,7 +2753,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2941,7 +3044,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3039,6 +3142,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -3203,7 +3307,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3301,6 +3405,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -3465,7 +3570,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3573,6 +3678,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -3752,7 +3858,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3762,7 +3868,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().firewallpolicies_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -4056,7 +4162,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4348,7 +4454,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4639,7 +4745,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4737,6 +4843,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4901,7 +5008,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4999,6 +5106,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5163,7 +5271,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5261,6 +5369,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5425,7 +5534,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -5533,6 +5642,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5712,7 +5822,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6004,7 +6114,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6014,7 +6124,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.projects().keys_patch(req, "name")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -6307,7 +6417,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6405,6 +6515,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6569,7 +6680,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -6860,7 +6971,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6968,6 +7079,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -7146,7 +7258,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = RecaptchaEnterprise::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -7254,6 +7366,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await

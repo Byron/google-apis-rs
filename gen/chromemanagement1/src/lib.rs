@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *Chrome Management* crate version *5.0.4+20240303*, where *20240303* is the exact revision of the *chromemanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+//! This documentation was generated from *Chrome Management* crate version *5.0.5+20240624*, where *20240624* is the exact revision of the *chromemanagement:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 //! 
 //! Everything else about the *Chrome Management* *v1* API can be found at the
 //! [official documentation site](http://developers.google.com/chrome/management/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](ChromeManagement) ... 
 //! 
 //! * customers
-//!  * [*apps android get*](api::CustomerAppAndroidGetCall), [*apps chrome get*](api::CustomerAppChromeGetCall), [*apps count chrome app requests*](api::CustomerAppCountChromeAppRequestCall), [*apps web get*](api::CustomerAppWebGetCall), [*reports count chrome browsers needing attention*](api::CustomerReportCountChromeBrowsersNeedingAttentionCall), [*reports count chrome devices reaching auto expiration date*](api::CustomerReportCountChromeDevicesReachingAutoExpirationDateCall), [*reports count chrome devices that need attention*](api::CustomerReportCountChromeDevicesThatNeedAttentionCall), [*reports count chrome hardware fleet devices*](api::CustomerReportCountChromeHardwareFleetDeviceCall), [*reports count chrome versions*](api::CustomerReportCountChromeVersionCall), [*reports count installed apps*](api::CustomerReportCountInstalledAppCall), [*reports count print jobs by printer*](api::CustomerReportCountPrintJobsByPrinterCall), [*reports count print jobs by user*](api::CustomerReportCountPrintJobsByUserCall), [*reports enumerate print jobs*](api::CustomerReportEnumeratePrintJobCall), [*reports find installed app devices*](api::CustomerReportFindInstalledAppDeviceCall), [*telemetry devices get*](api::CustomerTelemetryDeviceGetCall), [*telemetry devices list*](api::CustomerTelemetryDeviceListCall), [*telemetry events list*](api::CustomerTelemetryEventListCall), [*telemetry notification configs create*](api::CustomerTelemetryNotificationConfigCreateCall), [*telemetry notification configs delete*](api::CustomerTelemetryNotificationConfigDeleteCall), [*telemetry notification configs list*](api::CustomerTelemetryNotificationConfigListCall), [*telemetry users get*](api::CustomerTelemetryUserGetCall) and [*telemetry users list*](api::CustomerTelemetryUserListCall)
+//!  * [*apps android get*](api::CustomerAppAndroidGetCall), [*apps chrome get*](api::CustomerAppChromeGetCall), [*apps count chrome app requests*](api::CustomerAppCountChromeAppRequestCall), [*apps fetch devices requesting extension*](api::CustomerAppFetchDevicesRequestingExtensionCall), [*apps fetch users requesting extension*](api::CustomerAppFetchUsersRequestingExtensionCall), [*apps web get*](api::CustomerAppWebGetCall), [*reports count chrome browsers needing attention*](api::CustomerReportCountChromeBrowsersNeedingAttentionCall), [*reports count chrome crash events*](api::CustomerReportCountChromeCrashEventCall), [*reports count chrome devices reaching auto expiration date*](api::CustomerReportCountChromeDevicesReachingAutoExpirationDateCall), [*reports count chrome devices that need attention*](api::CustomerReportCountChromeDevicesThatNeedAttentionCall), [*reports count chrome hardware fleet devices*](api::CustomerReportCountChromeHardwareFleetDeviceCall), [*reports count chrome versions*](api::CustomerReportCountChromeVersionCall), [*reports count installed apps*](api::CustomerReportCountInstalledAppCall), [*reports count print jobs by printer*](api::CustomerReportCountPrintJobsByPrinterCall), [*reports count print jobs by user*](api::CustomerReportCountPrintJobsByUserCall), [*reports enumerate print jobs*](api::CustomerReportEnumeratePrintJobCall), [*reports find installed app devices*](api::CustomerReportFindInstalledAppDeviceCall), [*telemetry devices get*](api::CustomerTelemetryDeviceGetCall), [*telemetry devices list*](api::CustomerTelemetryDeviceListCall), [*telemetry events list*](api::CustomerTelemetryEventListCall), [*telemetry notification configs create*](api::CustomerTelemetryNotificationConfigCreateCall), [*telemetry notification configs delete*](api::CustomerTelemetryNotificationConfigDeleteCall), [*telemetry notification configs list*](api::CustomerTelemetryNotificationConfigListCall), [*telemetry users get*](api::CustomerTelemetryUserGetCall) and [*telemetry users list*](api::CustomerTelemetryUserListCall)
 //! 
 //! 
 //! 
@@ -93,7 +93,7 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! let mut hub = ChromeManagement::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
@@ -170,6 +170,13 @@
 //! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
+//! 
+//! ## Cargo Features
+//! 
+//! * `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+//! the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+//! generated `openapi` spec would be invalid.
+//! 
 //! 
 //! 
 

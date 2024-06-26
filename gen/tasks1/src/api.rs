@@ -80,7 +80,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -133,7 +133,7 @@ impl<'a, S> TasksHub<S> {
         TasksHub {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://tasks.googleapis.com/".to_string(),
             _root_url: "https://tasks.googleapis.com/".to_string(),
         }
@@ -147,7 +147,7 @@ impl<'a, S> TasksHub<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -190,6 +190,7 @@ impl<'a, S> TasksHub<S> {
 /// * [move tasks](TaskMoveCall) (response)
 /// * [patch tasks](TaskPatchCall) (request|response)
 /// * [update tasks](TaskUpdateCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Task {
@@ -211,34 +212,38 @@ pub struct Task {
     /// Task identifier.
     
     pub id: Option<String>,
-    /// Type of the resource. This is always "tasks#task".
+    /// Output only. Type of the resource. This is always "tasks#task".
     
     pub kind: Option<String>,
-    /// Collection of links. This collection is read-only.
+    /// Output only. Collection of links. This collection is read-only.
     
     pub links: Option<Vec<TaskLinks>>,
-    /// Notes describing the task. Optional.
+    /// Notes describing the task. Optional. Maximum length allowed: 8192 characters.
     
     pub notes: Option<String>,
-    /// Parent task identifier. This field is omitted if it is a top-level task. This field is read-only. Use the "move" method to move the task under a different parent or to the top level.
+    /// Output only. Parent task identifier. This field is omitted if it is a top-level task. This field is read-only. Use the "move" method to move the task under a different parent or to the top level.
     
     pub parent: Option<String>,
-    /// String indicating the position of the task among its sibling tasks under the same parent task or at the top level. If this string is greater than another task's corresponding position string according to lexicographical ordering, the task is positioned after the other task under the same parent task (or at the top level). This field is read-only. Use the "move" method to move the task to another position.
+    /// Output only. String indicating the position of the task among its sibling tasks under the same parent task or at the top level. If this string is greater than another task's corresponding position string according to lexicographical ordering, the task is positioned after the other task under the same parent task (or at the top level). Use the "move" method to move the task to another position.
     
     pub position: Option<String>,
-    /// URL pointing to this task. Used to retrieve, update, or delete this task.
+    /// Output only. URL pointing to this task. Used to retrieve, update, or delete this task.
     #[serde(rename="selfLink")]
     
     pub self_link: Option<String>,
     /// Status of the task. This is either "needsAction" or "completed".
     
     pub status: Option<String>,
-    /// Title of the task.
+    /// Title of the task. Maximum length allowed: 1024 characters.
     
     pub title: Option<String>,
-    /// Last modification time of the task (as a RFC 3339 timestamp).
+    /// Output only. Last modification time of the task (as a RFC 3339 timestamp).
     
     pub updated: Option<String>,
+    /// Output only. An absolute link to the task in the Google Tasks Web UI.
+    #[serde(rename="webViewLink")]
+    
+    pub web_view_link: Option<String>,
 }
 
 impl client::RequestValue for Task {}
@@ -257,6 +262,7 @@ impl client::ResponseResult for Task {}
 /// * [insert tasklists](TasklistInsertCall) (request|response)
 /// * [patch tasklists](TasklistPatchCall) (request|response)
 /// * [update tasklists](TasklistUpdateCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TaskList {
@@ -266,17 +272,17 @@ pub struct TaskList {
     /// Task list identifier.
     
     pub id: Option<String>,
-    /// Type of the resource. This is always "tasks#taskList".
+    /// Output only. Type of the resource. This is always "tasks#taskList".
     
     pub kind: Option<String>,
-    /// URL pointing to this task list. Used to retrieve, update, or delete this task list.
+    /// Output only. URL pointing to this task list. Used to retrieve, update, or delete this task list.
     #[serde(rename="selfLink")]
     
     pub self_link: Option<String>,
-    /// Title of the task list.
+    /// Title of the task list. Maximum length allowed: 1024 characters.
     
     pub title: Option<String>,
-    /// Last modification time of the task list (as a RFC 3339 timestamp).
+    /// Output only. Last modification time of the task list (as a RFC 3339 timestamp).
     
     pub updated: Option<String>,
 }
@@ -294,6 +300,7 @@ impl client::ResponseResult for TaskList {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list tasklists](TasklistListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TaskLists {
@@ -323,6 +330,7 @@ impl client::ResponseResult for TaskLists {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list tasks](TaskListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Tasks {
@@ -344,10 +352,11 @@ pub struct Tasks {
 impl client::ResponseResult for Tasks {}
 
 
-/// Collection of links. This collection is read-only.
+/// Output only. Collection of links. This collection is read-only.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TaskLinks {
@@ -393,7 +402,7 @@ impl client::Part for TaskLinks {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
@@ -446,7 +455,7 @@ impl<'a, S> TasklistMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new task list and adds it to the authenticated user's task lists.
+    /// Creates a new task list and adds it to the authenticated user's task lists. A user can have up to 2000 lists at a time.
     /// 
     /// # Arguments
     ///
@@ -463,7 +472,7 @@ impl<'a, S> TasklistMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns all the authenticated user's task lists.
+    /// Returns all the authenticated user's task lists. A user can have up to 2000 lists at a time.
     pub fn list(&self) -> TasklistListCall<'a, S> {
         TasklistListCall {
             hub: self.hub,
@@ -537,7 +546,7 @@ impl<'a, S> TasklistMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `clear(...)`, `delete(...)`, `get(...)`, `insert(...)`, `list(...)`, `move_(...)`, `patch(...)` and `update(...)`
 /// // to build up your call.
@@ -611,7 +620,7 @@ impl<'a, S> TaskMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Creates a new task on the specified task list.
+    /// Creates a new task on the specified task list. A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time.
     /// 
     /// # Arguments
     ///
@@ -632,7 +641,7 @@ impl<'a, S> TaskMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Returns all tasks in the specified task list.
+    /// Returns all tasks in the specified task list. A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time.
     /// 
     /// # Arguments
     ///
@@ -659,7 +668,7 @@ impl<'a, S> TaskMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
-    /// Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks.
+    /// Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks. A user can have up to 2,000 subtasks per task.
     /// 
     /// # Arguments
     ///
@@ -751,7 +760,7 @@ impl<'a, S> TaskMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -848,6 +857,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -1002,7 +1012,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1100,6 +1110,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -1242,7 +1253,7 @@ where
 }
 
 
-/// Creates a new task list and adds it to the authenticated user's task lists.
+/// Creates a new task list and adds it to the authenticated user's task lists. A user can have up to 2000 lists at a time.
 ///
 /// A builder for the *insert* method supported by a *tasklist* resource.
 /// It is not used directly, but through a [`TasklistMethods`] instance.
@@ -1265,7 +1276,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -1515,7 +1526,7 @@ where
 }
 
 
-/// Returns all the authenticated user's task lists.
+/// Returns all the authenticated user's task lists. A user can have up to 2000 lists at a time.
 ///
 /// A builder for the *list* method supported by a *tasklist* resource.
 /// It is not used directly, but through a [`TasklistMethods`] instance.
@@ -1537,7 +1548,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -1636,6 +1647,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -1805,7 +1817,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2097,7 +2109,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -2388,7 +2400,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2485,6 +2497,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -2639,7 +2652,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -2738,6 +2751,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -2902,7 +2916,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3002,6 +3016,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -3154,7 +3169,7 @@ where
 }
 
 
-/// Creates a new task on the specified task list.
+/// Creates a new task on the specified task list. A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time.
 ///
 /// A builder for the *insert* method supported by a *task* resource.
 /// It is not used directly, but through a [`TaskMethods`] instance.
@@ -3177,7 +3192,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3470,7 +3485,7 @@ where
 }
 
 
-/// Returns all tasks in the specified task list.
+/// Returns all tasks in the specified task list. A user can have up to 20,000 non-hidden tasks per list and up to 100,000 tasks in total at a time.
 ///
 /// A builder for the *list* method supported by a *task* resource.
 /// It is not used directly, but through a [`TaskMethods`] instance.
@@ -3492,7 +3507,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3640,6 +3655,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -3852,7 +3868,7 @@ where
 }
 
 
-/// Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks.
+/// Moves the specified task to another position in the task list. This can include putting it as a child task under a new parent and/or move it to a different position among its sibling tasks. A user can have up to 2,000 subtasks per task.
 ///
 /// A builder for the *move* method supported by a *task* resource.
 /// It is not used directly, but through a [`TaskMethods`] instance.
@@ -3874,7 +3890,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3984,6 +4000,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4173,7 +4190,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4477,7 +4494,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = TasksHub::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !

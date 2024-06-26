@@ -143,6 +143,7 @@ impl Default for Scope {
 /// extern crate hyper;
 /// extern crate hyper_rustls;
 /// extern crate google_classroom1 as classroom1;
+/// use classroom1::api::AddOnAttachmentStudentSubmission;
 /// use classroom1::{Result, Error};
 /// # async fn dox() {
 /// use std::default::Default;
@@ -160,16 +161,18 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddOnAttachmentStudentSubmission::default();
+/// 
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
-/// let result = hub.courses().course_work_student_submissions_list("courseId", "courseWorkId")
-///              .user_id("eos")
-///              .add_states("dolor")
-///              .page_token("ea")
-///              .page_size(-55)
-///              .late("invidunt")
+/// let result = hub.courses().course_work_add_on_attachments_student_submissions_patch(req, "courseId", "itemId", "attachmentId", "submissionId")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .post_id("Lorem")
 ///              .doit().await;
 /// 
 /// match result {
@@ -208,7 +211,7 @@ impl<'a, S> Classroom<S> {
         Classroom {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://classroom.googleapis.com/".to_string(),
             _root_url: "https://classroom.googleapis.com/".to_string(),
         }
@@ -228,7 +231,7 @@ impl<'a, S> Classroom<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -256,6 +259,154 @@ impl<'a, S> Classroom<S> {
 // ############
 // SCHEMAS ###
 // ##########
+/// An add-on attachment on a post.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [announcements add on attachments create courses](CourseAnnouncementAddOnAttachmentCreateCall) (request|response)
+/// * [announcements add on attachments get courses](CourseAnnouncementAddOnAttachmentGetCall) (response)
+/// * [announcements add on attachments patch courses](CourseAnnouncementAddOnAttachmentPatchCall) (request|response)
+/// * [course work add on attachments create courses](CourseCourseWorkAddOnAttachmentCreateCall) (request|response)
+/// * [course work add on attachments get courses](CourseCourseWorkAddOnAttachmentGetCall) (response)
+/// * [course work add on attachments patch courses](CourseCourseWorkAddOnAttachmentPatchCall) (request|response)
+/// * [course work materials add on attachments create courses](CourseCourseWorkMaterialAddOnAttachmentCreateCall) (request|response)
+/// * [course work materials add on attachments get courses](CourseCourseWorkMaterialAddOnAttachmentGetCall) (response)
+/// * [course work materials add on attachments patch courses](CourseCourseWorkMaterialAddOnAttachmentPatchCall) (request|response)
+/// * [posts add on attachments create courses](CoursePostAddOnAttachmentCreateCall) (request|response)
+/// * [posts add on attachments get courses](CoursePostAddOnAttachmentGetCall) (response)
+/// * [posts add on attachments patch courses](CoursePostAddOnAttachmentPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AddOnAttachment {
+    /// Output only. Identifiers of attachments that were previous copies of this attachment. If the attachment was previously copied by virtue of its parent post being copied, this enumerates the identifiers of attachments that were its previous copies in ascending chronological order of copy.
+    #[serde(rename="copyHistory")]
+    
+    pub copy_history: Option<Vec<CopyHistory>>,
+    /// Immutable. Identifier of the course.
+    #[serde(rename="courseId")]
+    
+    pub course_id: Option<String>,
+    /// Date, in UTC, that work on this attachment is due. This must be specified if `due_time` is specified.
+    #[serde(rename="dueDate")]
+    
+    pub due_date: Option<Date>,
+    /// Time of day, in UTC, that work on this attachment is due. This must be specified if `due_date` is specified.
+    #[serde(rename="dueTime")]
+    
+    pub due_time: Option<TimeOfDay>,
+    /// Immutable. Classroom-assigned identifier for this attachment, unique per post.
+    
+    pub id: Option<String>,
+    /// Immutable. Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. Unique per course.
+    #[serde(rename="itemId")]
+    
+    pub item_id: Option<String>,
+    /// Maximum grade for this attachment. Can only be set if `studentWorkReviewUri` is set. Set to a non-zero value to indicate that the attachment supports grade passback. If set, this must be a non-negative integer value. When set to zero, the attachment will not support grade passback.
+    #[serde(rename="maxPoints")]
+    
+    pub max_points: Option<f64>,
+    /// Immutable. Deprecated, use item_id instead.
+    #[serde(rename="postId")]
+    
+    pub post_id: Option<String>,
+    /// Required. URI to show the student view of the attachment. The URI will be opened in an iframe with the `courseId`, `postId`, and `attachmentId` query parameters set.
+    #[serde(rename="studentViewUri")]
+    
+    pub student_view_uri: Option<EmbedUri>,
+    /// URI for the teacher to see student work on the attachment, if applicable. The URI will be opened in an iframe with the `courseId`, `postId`, `attachmentId`, and `submissionId` query parameters set. This is the same `submissionId` returned by google.classroom.AddOns.GetAddOnContext when a student views the attachment. If the URI is omitted or removed, `max_points` will also be discarded.
+    #[serde(rename="studentWorkReviewUri")]
+    
+    pub student_work_review_uri: Option<EmbedUri>,
+    /// Required. URI to show the teacher view of the attachment. The URI will be opened in an iframe with the `courseId`, `postId`, and `attachmentId` query parameters set.
+    #[serde(rename="teacherViewUri")]
+    
+    pub teacher_view_uri: Option<EmbedUri>,
+    /// Required. Title of this attachment. The title must be between 1 and 1000 characters.
+    
+    pub title: Option<String>,
+}
+
+impl client::RequestValue for AddOnAttachment {}
+impl client::ResponseResult for AddOnAttachment {}
+
+
+/// Payload for grade update requests.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [course work add on attachments student submissions get courses](CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall) (response)
+/// * [course work add on attachments student submissions patch courses](CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall) (request|response)
+/// * [posts add on attachments student submissions get courses](CoursePostAddOnAttachmentStudentSubmissionGetCall) (response)
+/// * [posts add on attachments student submissions patch courses](CoursePostAddOnAttachmentStudentSubmissionPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AddOnAttachmentStudentSubmission {
+    /// Student grade on this attachment. If unset, no grade was set.
+    #[serde(rename="pointsEarned")]
+    
+    pub points_earned: Option<f64>,
+    /// Submission state of add-on attachment's parent post (i.e. assignment).
+    #[serde(rename="postSubmissionState")]
+    
+    pub post_submission_state: Option<String>,
+}
+
+impl client::RequestValue for AddOnAttachmentStudentSubmission {}
+impl client::ResponseResult for AddOnAttachmentStudentSubmission {}
+
+
+/// Attachment-relevant metadata for Classroom add-ons in the context of a specific post.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [announcements get add on context courses](CourseAnnouncementGetAddOnContextCall) (response)
+/// * [course work get add on context courses](CourseCourseWorkGetAddOnContextCall) (response)
+/// * [course work materials get add on context courses](CourseCourseWorkMaterialGetAddOnContextCall) (response)
+/// * [posts get add on context courses](CoursePostGetAddOnContextCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct AddOnContext {
+    /// Immutable. Identifier of the course.
+    #[serde(rename="courseId")]
+    
+    pub course_id: Option<String>,
+    /// Immutable. Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached.
+    #[serde(rename="itemId")]
+    
+    pub item_id: Option<String>,
+    /// Immutable. Deprecated, use item_id instead.
+    #[serde(rename="postId")]
+    
+    pub post_id: Option<String>,
+    /// Add-on context corresponding to the requesting user's role as a student. Its presence implies that the requesting user is a student in the course.
+    #[serde(rename="studentContext")]
+    
+    pub student_context: Option<StudentContext>,
+    /// Optional. Whether the post allows the teacher to see student work and passback grades.
+    #[serde(rename="supportsStudentWork")]
+    
+    pub supports_student_work: Option<bool>,
+    /// Add-on context corresponding to the requesting user's role as a teacher. Its presence implies that the requesting user is a teacher in the course.
+    #[serde(rename="teacherContext")]
+    
+    pub teacher_context: Option<TeacherContext>,
+}
+
+impl client::ResponseResult for AddOnContext {}
+
+
 /// Announcement created by a teacher for students of the course
 /// 
 /// # Activities
@@ -267,6 +418,7 @@ impl<'a, S> Classroom<S> {
 /// * [announcements get courses](CourseAnnouncementGetCall) (response)
 /// * [announcements modify assignees courses](CourseAnnouncementModifyAssigneeCall) (response)
 /// * [announcements patch courses](CourseAnnouncementPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Announcement {
@@ -324,6 +476,7 @@ impl client::ResponseResult for Announcement {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Assignment {
@@ -340,6 +493,7 @@ impl client::Part for Assignment {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct AssignmentSubmission {
@@ -355,6 +509,7 @@ impl client::Part for AssignmentSubmission {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Attachment {
@@ -381,6 +536,7 @@ impl client::Part for Attachment {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CloudPubsubTopic {
@@ -393,6 +549,35 @@ pub struct CloudPubsubTopic {
 impl client::Part for CloudPubsubTopic {}
 
 
+/// Identifier of a previous copy of a given attachment.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct CopyHistory {
+    /// Immutable. Identifier of the attachment.
+    #[serde(rename="attachmentId")]
+    
+    pub attachment_id: Option<String>,
+    /// Immutable. Identifier of the course.
+    #[serde(rename="courseId")]
+    
+    pub course_id: Option<String>,
+    /// Immutable. Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached.
+    #[serde(rename="itemId")]
+    
+    pub item_id: Option<String>,
+    /// Immutable. Deprecated, use item_id instead.
+    #[serde(rename="postId")]
+    
+    pub post_id: Option<String>,
+}
+
+impl client::Part for CopyHistory {}
+
+
 /// A Course in Classroom.
 /// 
 /// # Activities
@@ -403,12 +588,25 @@ impl client::Part for CloudPubsubTopic {}
 /// * [aliases create courses](CourseAliasCreateCall) (none)
 /// * [aliases delete courses](CourseAliasDeleteCall) (none)
 /// * [aliases list courses](CourseAliasListCall) (none)
+/// * [announcements add on attachments create courses](CourseAnnouncementAddOnAttachmentCreateCall) (none)
+/// * [announcements add on attachments delete courses](CourseAnnouncementAddOnAttachmentDeleteCall) (none)
+/// * [announcements add on attachments get courses](CourseAnnouncementAddOnAttachmentGetCall) (none)
+/// * [announcements add on attachments list courses](CourseAnnouncementAddOnAttachmentListCall) (none)
+/// * [announcements add on attachments patch courses](CourseAnnouncementAddOnAttachmentPatchCall) (none)
 /// * [announcements create courses](CourseAnnouncementCreateCall) (none)
 /// * [announcements delete courses](CourseAnnouncementDeleteCall) (none)
 /// * [announcements get courses](CourseAnnouncementGetCall) (none)
+/// * [announcements get add on context courses](CourseAnnouncementGetAddOnContextCall) (none)
 /// * [announcements list courses](CourseAnnouncementListCall) (none)
 /// * [announcements modify assignees courses](CourseAnnouncementModifyAssigneeCall) (none)
 /// * [announcements patch courses](CourseAnnouncementPatchCall) (none)
+/// * [course work add on attachments student submissions get courses](CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall) (none)
+/// * [course work add on attachments student submissions patch courses](CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall) (none)
+/// * [course work add on attachments create courses](CourseCourseWorkAddOnAttachmentCreateCall) (none)
+/// * [course work add on attachments delete courses](CourseCourseWorkAddOnAttachmentDeleteCall) (none)
+/// * [course work add on attachments get courses](CourseCourseWorkAddOnAttachmentGetCall) (none)
+/// * [course work add on attachments list courses](CourseCourseWorkAddOnAttachmentListCall) (none)
+/// * [course work add on attachments patch courses](CourseCourseWorkAddOnAttachmentPatchCall) (none)
 /// * [course work student submissions get courses](CourseCourseWorkStudentSubmissionGetCall) (none)
 /// * [course work student submissions list courses](CourseCourseWorkStudentSubmissionListCall) (none)
 /// * [course work student submissions modify attachments courses](CourseCourseWorkStudentSubmissionModifyAttachmentCall) (none)
@@ -419,14 +617,29 @@ impl client::Part for CloudPubsubTopic {}
 /// * [course work create courses](CourseCourseWorkCreateCall) (none)
 /// * [course work delete courses](CourseCourseWorkDeleteCall) (none)
 /// * [course work get courses](CourseCourseWorkGetCall) (none)
+/// * [course work get add on context courses](CourseCourseWorkGetAddOnContextCall) (none)
 /// * [course work list courses](CourseCourseWorkListCall) (none)
 /// * [course work modify assignees courses](CourseCourseWorkModifyAssigneeCall) (none)
 /// * [course work patch courses](CourseCourseWorkPatchCall) (none)
+/// * [course work materials add on attachments create courses](CourseCourseWorkMaterialAddOnAttachmentCreateCall) (none)
+/// * [course work materials add on attachments delete courses](CourseCourseWorkMaterialAddOnAttachmentDeleteCall) (none)
+/// * [course work materials add on attachments get courses](CourseCourseWorkMaterialAddOnAttachmentGetCall) (none)
+/// * [course work materials add on attachments list courses](CourseCourseWorkMaterialAddOnAttachmentListCall) (none)
+/// * [course work materials add on attachments patch courses](CourseCourseWorkMaterialAddOnAttachmentPatchCall) (none)
 /// * [course work materials create courses](CourseCourseWorkMaterialCreateCall) (none)
 /// * [course work materials delete courses](CourseCourseWorkMaterialDeleteCall) (none)
 /// * [course work materials get courses](CourseCourseWorkMaterialGetCall) (none)
+/// * [course work materials get add on context courses](CourseCourseWorkMaterialGetAddOnContextCall) (none)
 /// * [course work materials list courses](CourseCourseWorkMaterialListCall) (none)
 /// * [course work materials patch courses](CourseCourseWorkMaterialPatchCall) (none)
+/// * [posts add on attachments student submissions get courses](CoursePostAddOnAttachmentStudentSubmissionGetCall) (none)
+/// * [posts add on attachments student submissions patch courses](CoursePostAddOnAttachmentStudentSubmissionPatchCall) (none)
+/// * [posts add on attachments create courses](CoursePostAddOnAttachmentCreateCall) (none)
+/// * [posts add on attachments delete courses](CoursePostAddOnAttachmentDeleteCall) (none)
+/// * [posts add on attachments get courses](CoursePostAddOnAttachmentGetCall) (none)
+/// * [posts add on attachments list courses](CoursePostAddOnAttachmentListCall) (none)
+/// * [posts add on attachments patch courses](CoursePostAddOnAttachmentPatchCall) (none)
+/// * [posts get add on context courses](CoursePostGetAddOnContextCall) (none)
 /// * [students create courses](CourseStudentCreateCall) (none)
 /// * [students delete courses](CourseStudentDeleteCall) (none)
 /// * [students get courses](CourseStudentGetCall) (none)
@@ -446,6 +659,7 @@ impl client::Part for CloudPubsubTopic {}
 /// * [list courses](CourseListCall) (none)
 /// * [patch courses](CoursePatchCall) (request|response)
 /// * [update courses](CourseUpdateCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Course {
@@ -535,6 +749,7 @@ impl client::ResponseResult for Course {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [aliases create courses](CourseAliasCreateCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CourseAlias {
@@ -551,6 +766,7 @@ impl client::ResponseResult for CourseAlias {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CourseMaterial {
@@ -577,6 +793,7 @@ impl client::Part for CourseMaterial {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CourseMaterialSet {
@@ -595,6 +812,7 @@ impl client::Part for CourseMaterialSet {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CourseRosterChangesInfo {
@@ -618,6 +836,7 @@ impl client::Part for CourseRosterChangesInfo {}
 /// * [course work get courses](CourseCourseWorkGetCall) (response)
 /// * [course work modify assignees courses](CourseCourseWorkModifyAssigneeCall) (response)
 /// * [course work patch courses](CourseCourseWorkPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CourseWork {
@@ -717,6 +936,7 @@ impl client::ResponseResult for CourseWork {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CourseWorkChangesInfo {
@@ -739,6 +959,7 @@ impl client::Part for CourseWorkChangesInfo {}
 /// * [course work materials create courses](CourseCourseWorkMaterialCreateCall) (request|response)
 /// * [course work materials get courses](CourseCourseWorkMaterialGetCall) (response)
 /// * [course work materials patch courses](CourseCourseWorkMaterialPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct CourseWorkMaterial {
@@ -803,6 +1024,7 @@ impl client::ResponseResult for CourseWorkMaterial {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Date {
@@ -824,6 +1046,7 @@ impl client::Part for Date {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DriveFile {
@@ -850,6 +1073,7 @@ impl client::Part for DriveFile {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct DriveFolder {
@@ -868,6 +1092,22 @@ pub struct DriveFolder {
 impl client::Part for DriveFolder {}
 
 
+/// URI to be iframed after being populated with query parameters.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct EmbedUri {
+    /// Required. URI to be iframed after being populated with query parameters. This must be a valid UTF-8 string containing between 1 and 1800 characters.
+    
+    pub uri: Option<String>,
+}
+
+impl client::Part for EmbedUri {}
+
+
 /// A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }
 /// 
 /// # Activities
@@ -876,12 +1116,16 @@ impl client::Part for DriveFolder {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [aliases delete courses](CourseAliasDeleteCall) (response)
+/// * [announcements add on attachments delete courses](CourseAnnouncementAddOnAttachmentDeleteCall) (response)
 /// * [announcements delete courses](CourseAnnouncementDeleteCall) (response)
+/// * [course work add on attachments delete courses](CourseCourseWorkAddOnAttachmentDeleteCall) (response)
 /// * [course work student submissions reclaim courses](CourseCourseWorkStudentSubmissionReclaimCall) (response)
 /// * [course work student submissions return courses](CourseCourseWorkStudentSubmissionReturnCall) (response)
 /// * [course work student submissions turn in courses](CourseCourseWorkStudentSubmissionTurnInCall) (response)
 /// * [course work delete courses](CourseCourseWorkDeleteCall) (response)
+/// * [course work materials add on attachments delete courses](CourseCourseWorkMaterialAddOnAttachmentDeleteCall) (response)
 /// * [course work materials delete courses](CourseCourseWorkMaterialDeleteCall) (response)
+/// * [posts add on attachments delete courses](CoursePostAddOnAttachmentDeleteCall) (response)
 /// * [students delete courses](CourseStudentDeleteCall) (response)
 /// * [teachers delete courses](CourseTeacherDeleteCall) (response)
 /// * [topics delete courses](CourseTopicDeleteCall) (response)
@@ -890,6 +1134,7 @@ impl client::Part for DriveFolder {}
 /// * [delete invitations](InvitationDeleteCall) (response)
 /// * [delete registrations](RegistrationDeleteCall) (response)
 /// * [guardians delete user profiles](UserProfileGuardianDeleteCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Empty { _never_set: Option<bool> }
@@ -901,6 +1146,7 @@ impl client::ResponseResult for Empty {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Feed {
@@ -925,6 +1171,7 @@ impl client::Part for Feed {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Form {
@@ -952,6 +1199,7 @@ impl client::Part for Form {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GlobalPermission {
@@ -967,6 +1215,7 @@ impl client::Part for GlobalPermission {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GradeCategory {
@@ -992,6 +1241,7 @@ impl client::Part for GradeCategory {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GradeHistory {
@@ -1024,6 +1274,7 @@ impl client::Part for GradeHistory {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GradebookSettings {
@@ -1052,6 +1303,7 @@ impl client::Part for GradebookSettings {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [guardians get user profiles](UserProfileGuardianGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Guardian {
@@ -1086,6 +1338,7 @@ impl client::ResponseResult for Guardian {}
 /// * [guardian invitations create user profiles](UserProfileGuardianInvitationCreateCall) (request|response)
 /// * [guardian invitations get user profiles](UserProfileGuardianInvitationGetCall) (response)
 /// * [guardian invitations patch user profiles](UserProfileGuardianInvitationPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GuardianInvitation {
@@ -1118,6 +1371,7 @@ impl client::ResponseResult for GuardianInvitation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct IndividualStudentsOptions {
@@ -1142,6 +1396,7 @@ impl client::Part for IndividualStudentsOptions {}
 /// * [delete invitations](InvitationDeleteCall) (none)
 /// * [get invitations](InvitationGetCall) (response)
 /// * [list invitations](InvitationListCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Invitation {
@@ -1170,6 +1425,7 @@ impl client::ResponseResult for Invitation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Link {
@@ -1188,6 +1444,34 @@ pub struct Link {
 impl client::Part for Link {}
 
 
+/// Response when listing add-on attachments.
+/// 
+/// # Activities
+/// 
+/// This type is used in activities, which are methods you may call on this type or where this type is involved in. 
+/// The list links the activity name, along with information about where it is used (one of *request* and *response*).
+/// 
+/// * [announcements add on attachments list courses](CourseAnnouncementAddOnAttachmentListCall) (response)
+/// * [course work add on attachments list courses](CourseCourseWorkAddOnAttachmentListCall) (response)
+/// * [course work materials add on attachments list courses](CourseCourseWorkMaterialAddOnAttachmentListCall) (response)
+/// * [posts add on attachments list courses](CoursePostAddOnAttachmentListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct ListAddOnAttachmentsResponse {
+    /// Attachments under the given post.
+    #[serde(rename="addOnAttachments")]
+    
+    pub add_on_attachments: Option<Vec<AddOnAttachment>>,
+    /// A token, which can be sent as `pageToken` to retrieve the next page. If this field is omitted, there are no subsequent pages.
+    #[serde(rename="nextPageToken")]
+    
+    pub next_page_token: Option<String>,
+}
+
+impl client::ResponseResult for ListAddOnAttachmentsResponse {}
+
+
 /// Response when listing course work.
 /// 
 /// # Activities
@@ -1196,6 +1480,7 @@ impl client::Part for Link {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [announcements list courses](CourseAnnouncementListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListAnnouncementsResponse {
@@ -1219,6 +1504,7 @@ impl client::ResponseResult for ListAnnouncementsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [aliases list courses](CourseAliasListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListCourseAliasesResponse {
@@ -1242,6 +1528,7 @@ impl client::ResponseResult for ListCourseAliasesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [course work materials list courses](CourseCourseWorkMaterialListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListCourseWorkMaterialResponse {
@@ -1266,6 +1553,7 @@ impl client::ResponseResult for ListCourseWorkMaterialResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [course work list courses](CourseCourseWorkListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListCourseWorkResponse {
@@ -1290,6 +1578,7 @@ impl client::ResponseResult for ListCourseWorkResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list courses](CourseListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListCoursesResponse {
@@ -1313,6 +1602,7 @@ impl client::ResponseResult for ListCoursesResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [guardian invitations list user profiles](UserProfileGuardianInvitationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListGuardianInvitationsResponse {
@@ -1337,6 +1627,7 @@ impl client::ResponseResult for ListGuardianInvitationsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [guardians list user profiles](UserProfileGuardianListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListGuardiansResponse {
@@ -1360,6 +1651,7 @@ impl client::ResponseResult for ListGuardiansResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [list invitations](InvitationListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListInvitationsResponse {
@@ -1383,6 +1675,7 @@ impl client::ResponseResult for ListInvitationsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [course work student submissions list courses](CourseCourseWorkStudentSubmissionListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListStudentSubmissionsResponse {
@@ -1407,6 +1700,7 @@ impl client::ResponseResult for ListStudentSubmissionsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [students list courses](CourseStudentListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListStudentsResponse {
@@ -1430,6 +1724,7 @@ impl client::ResponseResult for ListStudentsResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [teachers list courses](CourseTeacherListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListTeachersResponse {
@@ -1453,6 +1748,7 @@ impl client::ResponseResult for ListTeachersResponse {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [topics list courses](CourseTopicListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ListTopicResponse {
@@ -1472,6 +1768,7 @@ impl client::ResponseResult for ListTopicResponse {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Material {
@@ -1502,6 +1799,7 @@ impl client::Part for Material {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [announcements modify assignees courses](CourseAnnouncementModifyAssigneeCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModifyAnnouncementAssigneesRequest {
@@ -1526,6 +1824,7 @@ impl client::RequestValue for ModifyAnnouncementAssigneesRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [course work student submissions modify attachments courses](CourseCourseWorkStudentSubmissionModifyAttachmentCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModifyAttachmentsRequest {
@@ -1546,6 +1845,7 @@ impl client::RequestValue for ModifyAttachmentsRequest {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [course work modify assignees courses](CourseCourseWorkModifyAssigneeCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModifyCourseWorkAssigneesRequest {
@@ -1566,6 +1866,7 @@ impl client::RequestValue for ModifyCourseWorkAssigneesRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ModifyIndividualStudentsOptions {
@@ -1586,6 +1887,7 @@ impl client::Part for ModifyIndividualStudentsOptions {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MultipleChoiceQuestion {
@@ -1601,6 +1903,7 @@ impl client::Part for MultipleChoiceQuestion {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct MultipleChoiceSubmission {
@@ -1616,6 +1919,7 @@ impl client::Part for MultipleChoiceSubmission {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Name {
@@ -1644,6 +1948,7 @@ impl client::Part for Name {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [course work student submissions reclaim courses](CourseCourseWorkStudentSubmissionReclaimCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReclaimStudentSubmissionRequest { _never_set: Option<bool> }
@@ -1660,6 +1965,7 @@ impl client::RequestValue for ReclaimStudentSubmissionRequest {}
 /// 
 /// * [create registrations](RegistrationCreateCall) (request|response)
 /// * [delete registrations](RegistrationDeleteCall) (none)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Registration {
@@ -1693,6 +1999,7 @@ impl client::ResponseResult for Registration {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [course work student submissions return courses](CourseCourseWorkStudentSubmissionReturnCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ReturnStudentSubmissionRequest { _never_set: Option<bool> }
@@ -1704,6 +2011,7 @@ impl client::RequestValue for ReturnStudentSubmissionRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SharedDriveFile {
@@ -1724,6 +2032,7 @@ impl client::Part for SharedDriveFile {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ShortAnswerSubmission {
@@ -1739,6 +2048,7 @@ impl client::Part for ShortAnswerSubmission {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StateHistory {
@@ -1767,6 +2077,7 @@ impl client::Part for StateHistory {}
 /// 
 /// * [students create courses](CourseStudentCreateCall) (request|response)
 /// * [students get courses](CourseStudentGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Student {
@@ -1791,6 +2102,23 @@ impl client::RequestValue for Student {}
 impl client::ResponseResult for Student {}
 
 
+/// Role-specific context if the requesting user is a student.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct StudentContext {
+    /// Requesting user's submission id to be used for grade passback and to identify the student when showing student work to the teacher. This is set exactly when `supportsStudentWork` is `true`.
+    #[serde(rename="submissionId")]
+    
+    pub submission_id: Option<String>,
+}
+
+impl client::Part for StudentContext {}
+
+
 /// Student submission for course work. `StudentSubmission` items are generated when a `CourseWork` item is created. Student submissions that have never been accessed (i.e. with `state` = NEW) may not have a creation time or update time.
 /// 
 /// # Activities
@@ -1801,6 +2129,7 @@ impl client::ResponseResult for Student {}
 /// * [course work student submissions get courses](CourseCourseWorkStudentSubmissionGetCall) (response)
 /// * [course work student submissions modify attachments courses](CourseCourseWorkStudentSubmissionModifyAttachmentCall) (response)
 /// * [course work student submissions patch courses](CourseCourseWorkStudentSubmissionPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct StudentSubmission {
@@ -1879,6 +2208,7 @@ impl client::ResponseResult for StudentSubmission {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SubmissionHistory {
@@ -1904,6 +2234,7 @@ impl client::Part for SubmissionHistory {}
 /// 
 /// * [teachers create courses](CourseTeacherCreateCall) (request|response)
 /// * [teachers get courses](CourseTeacherGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Teacher {
@@ -1924,10 +2255,23 @@ impl client::RequestValue for Teacher {}
 impl client::ResponseResult for Teacher {}
 
 
+/// Role-specific context if the requesting user is a teacher.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct TeacherContext { _never_set: Option<bool> }
+
+impl client::Part for TeacherContext {}
+
+
 /// Represents a time of day. The date and time zone are either not significant or are specified elsewhere. An API may choose to allow leap seconds. Related types are google.type.Date and `google.protobuf.Timestamp`.
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TimeOfDay {
@@ -1958,6 +2302,7 @@ impl client::Part for TimeOfDay {}
 /// * [topics create courses](CourseTopicCreateCall) (request|response)
 /// * [topics get courses](CourseTopicGetCall) (response)
 /// * [topics patch courses](CourseTopicPatchCall) (request|response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Topic {
@@ -1990,6 +2335,7 @@ impl client::ResponseResult for Topic {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [course work student submissions turn in courses](CourseCourseWorkStudentSubmissionTurnInCall) (request)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct TurnInStudentSubmissionRequest { _never_set: Option<bool> }
@@ -2012,6 +2358,7 @@ impl client::RequestValue for TurnInStudentSubmissionRequest {}
 /// * [guardians get user profiles](UserProfileGuardianGetCall) (none)
 /// * [guardians list user profiles](UserProfileGuardianListCall) (none)
 /// * [get user profiles](UserProfileGetCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct UserProfile {
@@ -2046,6 +2393,7 @@ impl client::ResponseResult for UserProfile {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct YouTubeVideo {
@@ -2094,9 +2442,9 @@ impl client::Part for YouTubeVideo {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
-/// // like `aliases_create(...)`, `aliases_delete(...)`, `aliases_list(...)`, `announcements_create(...)`, `announcements_delete(...)`, `announcements_get(...)`, `announcements_list(...)`, `announcements_modify_assignees(...)`, `announcements_patch(...)`, `course_work_create(...)`, `course_work_delete(...)`, `course_work_get(...)`, `course_work_list(...)`, `course_work_materials_create(...)`, `course_work_materials_delete(...)`, `course_work_materials_get(...)`, `course_work_materials_list(...)`, `course_work_materials_patch(...)`, `course_work_modify_assignees(...)`, `course_work_patch(...)`, `course_work_student_submissions_get(...)`, `course_work_student_submissions_list(...)`, `course_work_student_submissions_modify_attachments(...)`, `course_work_student_submissions_patch(...)`, `course_work_student_submissions_reclaim(...)`, `course_work_student_submissions_return(...)`, `course_work_student_submissions_turn_in(...)`, `create(...)`, `delete(...)`, `get(...)`, `list(...)`, `patch(...)`, `students_create(...)`, `students_delete(...)`, `students_get(...)`, `students_list(...)`, `teachers_create(...)`, `teachers_delete(...)`, `teachers_get(...)`, `teachers_list(...)`, `topics_create(...)`, `topics_delete(...)`, `topics_get(...)`, `topics_list(...)`, `topics_patch(...)` and `update(...)`
+/// // like `aliases_create(...)`, `aliases_delete(...)`, `aliases_list(...)`, `announcements_add_on_attachments_create(...)`, `announcements_add_on_attachments_delete(...)`, `announcements_add_on_attachments_get(...)`, `announcements_add_on_attachments_list(...)`, `announcements_add_on_attachments_patch(...)`, `announcements_create(...)`, `announcements_delete(...)`, `announcements_get(...)`, `announcements_get_add_on_context(...)`, `announcements_list(...)`, `announcements_modify_assignees(...)`, `announcements_patch(...)`, `course_work_add_on_attachments_create(...)`, `course_work_add_on_attachments_delete(...)`, `course_work_add_on_attachments_get(...)`, `course_work_add_on_attachments_list(...)`, `course_work_add_on_attachments_patch(...)`, `course_work_add_on_attachments_student_submissions_get(...)`, `course_work_add_on_attachments_student_submissions_patch(...)`, `course_work_create(...)`, `course_work_delete(...)`, `course_work_get(...)`, `course_work_get_add_on_context(...)`, `course_work_list(...)`, `course_work_materials_add_on_attachments_create(...)`, `course_work_materials_add_on_attachments_delete(...)`, `course_work_materials_add_on_attachments_get(...)`, `course_work_materials_add_on_attachments_list(...)`, `course_work_materials_add_on_attachments_patch(...)`, `course_work_materials_create(...)`, `course_work_materials_delete(...)`, `course_work_materials_get(...)`, `course_work_materials_get_add_on_context(...)`, `course_work_materials_list(...)`, `course_work_materials_patch(...)`, `course_work_modify_assignees(...)`, `course_work_patch(...)`, `course_work_student_submissions_get(...)`, `course_work_student_submissions_list(...)`, `course_work_student_submissions_modify_attachments(...)`, `course_work_student_submissions_patch(...)`, `course_work_student_submissions_reclaim(...)`, `course_work_student_submissions_return(...)`, `course_work_student_submissions_turn_in(...)`, `create(...)`, `delete(...)`, `get(...)`, `list(...)`, `patch(...)`, `posts_add_on_attachments_create(...)`, `posts_add_on_attachments_delete(...)`, `posts_add_on_attachments_get(...)`, `posts_add_on_attachments_list(...)`, `posts_add_on_attachments_patch(...)`, `posts_add_on_attachments_student_submissions_get(...)`, `posts_add_on_attachments_student_submissions_patch(...)`, `posts_get_add_on_context(...)`, `students_create(...)`, `students_delete(...)`, `students_get(...)`, `students_list(...)`, `teachers_create(...)`, `teachers_delete(...)`, `teachers_get(...)`, `teachers_list(...)`, `topics_create(...)`, `topics_delete(...)`, `topics_get(...)`, `topics_list(...)`, `topics_patch(...)` and `update(...)`
 /// // to build up your call.
 /// let rb = hub.courses();
 /// # }
@@ -2170,6 +2518,115 @@ impl<'a, S> CourseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Creates an add-on attachment under a post. Requires the add-on to have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id.
+    pub fn announcements_add_on_attachments_create(&self, request: AddOnAttachment, course_id: &str, item_id: &str) -> CourseAnnouncementAddOnAttachmentCreateCall<'a, S> {
+        CourseAnnouncementAddOnAttachmentCreateCall {
+            hub: self.hub,
+            _request: request,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _post_id: Default::default(),
+            _add_on_token: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    pub fn announcements_add_on_attachments_delete(&self, course_id: &str, item_id: &str, attachment_id: &str) -> CourseAnnouncementAddOnAttachmentDeleteCall<'a, S> {
+        CourseAnnouncementAddOnAttachmentDeleteCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _post_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    pub fn announcements_add_on_attachments_get(&self, course_id: &str, item_id: &str, attachment_id: &str) -> CourseAnnouncementAddOnAttachmentGetCall<'a, S> {
+        CourseAnnouncementAddOnAttachmentGetCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _post_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id.
+    pub fn announcements_add_on_attachments_list(&self, course_id: &str, item_id: &str) -> CourseAnnouncementAddOnAttachmentListCall<'a, S> {
+        CourseAnnouncementAddOnAttachmentListCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _post_id: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the post under which the attachment is attached.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    pub fn announcements_add_on_attachments_patch(&self, request: AddOnAttachment, course_id: &str, item_id: &str, attachment_id: &str) -> CourseAnnouncementAddOnAttachmentPatchCall<'a, S> {
+        CourseAnnouncementAddOnAttachmentPatchCall {
+            hub: self.hub,
+            _request: request,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _update_mask: Default::default(),
+            _post_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Creates an announcement. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course, create announcements in the requested course, share a Drive attachment, or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist. * `FAILED_PRECONDITION` for the following request error: * AttachmentNotVisible
     /// 
     /// # Arguments
@@ -2222,6 +2679,27 @@ impl<'a, S> CourseMethods<'a, S> {
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    pub fn announcements_get_add_on_context(&self, course_id: &str, item_id: &str) -> CourseAnnouncementGetAddOnContextCall<'a, S> {
+        CourseAnnouncementGetAddOnContextCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _post_id: Default::default(),
+            _attachment_id: Default::default(),
+            _add_on_token: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -2286,6 +2764,165 @@ impl<'a, S> CourseMethods<'a, S> {
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a student submission for an add-on attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    /// * `submissionId` - Required. Identifier of the student’s submission.
+    pub fn course_work_add_on_attachments_student_submissions_get(&self, course_id: &str, item_id: &str, attachment_id: &str, submission_id: &str) -> CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _submission_id: submission_id.to_string(),
+            _post_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates data associated with an add-on attachment submission. Requires the add-on to have been the original creator of the attachment and the attachment to have a positive `max_points` value set. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    /// * `submissionId` - Required. Identifier of the student's submission.
+    pub fn course_work_add_on_attachments_student_submissions_patch(&self, request: AddOnAttachmentStudentSubmission, course_id: &str, item_id: &str, attachment_id: &str, submission_id: &str) -> CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall {
+            hub: self.hub,
+            _request: request,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _submission_id: submission_id.to_string(),
+            _update_mask: Default::default(),
+            _post_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates an add-on attachment under a post. Requires the add-on to have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id.
+    pub fn course_work_add_on_attachments_create(&self, request: AddOnAttachment, course_id: &str, item_id: &str) -> CourseCourseWorkAddOnAttachmentCreateCall<'a, S> {
+        CourseCourseWorkAddOnAttachmentCreateCall {
+            hub: self.hub,
+            _request: request,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _post_id: Default::default(),
+            _add_on_token: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    pub fn course_work_add_on_attachments_delete(&self, course_id: &str, item_id: &str, attachment_id: &str) -> CourseCourseWorkAddOnAttachmentDeleteCall<'a, S> {
+        CourseCourseWorkAddOnAttachmentDeleteCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _post_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    pub fn course_work_add_on_attachments_get(&self, course_id: &str, item_id: &str, attachment_id: &str) -> CourseCourseWorkAddOnAttachmentGetCall<'a, S> {
+        CourseCourseWorkAddOnAttachmentGetCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _post_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id.
+    pub fn course_work_add_on_attachments_list(&self, course_id: &str, item_id: &str) -> CourseCourseWorkAddOnAttachmentListCall<'a, S> {
+        CourseCourseWorkAddOnAttachmentListCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _post_id: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the post under which the attachment is attached.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    pub fn course_work_add_on_attachments_patch(&self, request: AddOnAttachment, course_id: &str, item_id: &str, attachment_id: &str) -> CourseCourseWorkAddOnAttachmentPatchCall<'a, S> {
+        CourseCourseWorkAddOnAttachmentPatchCall {
+            hub: self.hub,
+            _request: request,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _update_mask: Default::default(),
+            _post_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -2509,6 +3146,27 @@ impl<'a, S> CourseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    pub fn course_work_get_add_on_context(&self, course_id: &str, item_id: &str) -> CourseCourseWorkGetAddOnContextCall<'a, S> {
+        CourseCourseWorkGetAddOnContextCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _post_id: Default::default(),
+            _attachment_id: Default::default(),
+            _add_on_token: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Returns a list of course work that the requester is permitted to view. Course students may only view `PUBLISHED` course work. Course teachers and domain administrators may view all course work. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist.
     /// 
     /// # Arguments
@@ -2573,6 +3231,115 @@ impl<'a, S> CourseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Creates an add-on attachment under a post. Requires the add-on to have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id.
+    pub fn course_work_materials_add_on_attachments_create(&self, request: AddOnAttachment, course_id: &str, item_id: &str) -> CourseCourseWorkMaterialAddOnAttachmentCreateCall<'a, S> {
+        CourseCourseWorkMaterialAddOnAttachmentCreateCall {
+            hub: self.hub,
+            _request: request,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _post_id: Default::default(),
+            _add_on_token: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    pub fn course_work_materials_add_on_attachments_delete(&self, course_id: &str, item_id: &str, attachment_id: &str) -> CourseCourseWorkMaterialAddOnAttachmentDeleteCall<'a, S> {
+        CourseCourseWorkMaterialAddOnAttachmentDeleteCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _post_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    pub fn course_work_materials_add_on_attachments_get(&self, course_id: &str, item_id: &str, attachment_id: &str) -> CourseCourseWorkMaterialAddOnAttachmentGetCall<'a, S> {
+        CourseCourseWorkMaterialAddOnAttachmentGetCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _post_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id.
+    pub fn course_work_materials_add_on_attachments_list(&self, course_id: &str, item_id: &str) -> CourseCourseWorkMaterialAddOnAttachmentListCall<'a, S> {
+        CourseCourseWorkMaterialAddOnAttachmentListCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _post_id: Default::default(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the post under which the attachment is attached.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    pub fn course_work_materials_add_on_attachments_patch(&self, request: AddOnAttachment, course_id: &str, item_id: &str, attachment_id: &str) -> CourseCourseWorkMaterialAddOnAttachmentPatchCall<'a, S> {
+        CourseCourseWorkMaterialAddOnAttachmentPatchCall {
+            hub: self.hub,
+            _request: request,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _update_mask: Default::default(),
+            _post_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Creates a course work material. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course, create course work material in the requested course, share a Drive attachment, or for access errors. * `INVALID_ARGUMENT` if the request is malformed or if more than 20 * materials are provided. * `NOT_FOUND` if the requested course does not exist. * `FAILED_PRECONDITION` for the following request error: * AttachmentNotVisible
     /// 
     /// # Arguments
@@ -2630,6 +3397,27 @@ impl<'a, S> CourseMethods<'a, S> {
     
     /// Create a builder to help you perform the following task:
     ///
+    /// Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `itemId` - Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    pub fn course_work_materials_get_add_on_context(&self, course_id: &str, item_id: &str) -> CourseCourseWorkMaterialGetAddOnContextCall<'a, S> {
+        CourseCourseWorkMaterialGetAddOnContextCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _item_id: item_id.to_string(),
+            _post_id: Default::default(),
+            _attachment_id: Default::default(),
+            _add_on_token: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
     /// Returns a list of course work material that the requester is permitted to view. Course students may only view `PUBLISHED` course work material. Course teachers and domain administrators may view all course work material. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist.
     /// 
     /// # Arguments
@@ -2670,6 +3458,186 @@ impl<'a, S> CourseMethods<'a, S> {
             _delegate: Default::default(),
             _additional_params: Default::default(),
             _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns a student submission for an add-on attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `postId` - Optional. Deprecated, use item_id instead.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    /// * `submissionId` - Required. Identifier of the student’s submission.
+    pub fn posts_add_on_attachments_student_submissions_get(&self, course_id: &str, post_id: &str, attachment_id: &str, submission_id: &str) -> CoursePostAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        CoursePostAddOnAttachmentStudentSubmissionGetCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _post_id: post_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _submission_id: submission_id.to_string(),
+            _item_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+            _scopes: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates data associated with an add-on attachment submission. Requires the add-on to have been the original creator of the attachment and the attachment to have a positive `max_points` value set. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `postId` - Optional. Deprecated, use item_id instead.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    /// * `submissionId` - Required. Identifier of the student's submission.
+    pub fn posts_add_on_attachments_student_submissions_patch(&self, request: AddOnAttachmentStudentSubmission, course_id: &str, post_id: &str, attachment_id: &str, submission_id: &str) -> CoursePostAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        CoursePostAddOnAttachmentStudentSubmissionPatchCall {
+            hub: self.hub,
+            _request: request,
+            _course_id: course_id.to_string(),
+            _post_id: post_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _submission_id: submission_id.to_string(),
+            _update_mask: Default::default(),
+            _item_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Creates an add-on attachment under a post. Requires the add-on to have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `postId` - Optional. Deprecated, use item_id instead.
+    pub fn posts_add_on_attachments_create(&self, request: AddOnAttachment, course_id: &str, post_id: &str) -> CoursePostAddOnAttachmentCreateCall<'a, S> {
+        CoursePostAddOnAttachmentCreateCall {
+            hub: self.hub,
+            _request: request,
+            _course_id: course_id.to_string(),
+            _post_id: post_id.to_string(),
+            _item_id: Default::default(),
+            _add_on_token: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `postId` - Optional. Deprecated, use item_id instead.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    pub fn posts_add_on_attachments_delete(&self, course_id: &str, post_id: &str, attachment_id: &str) -> CoursePostAddOnAttachmentDeleteCall<'a, S> {
+        CoursePostAddOnAttachmentDeleteCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _post_id: post_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _item_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `postId` - Optional. Deprecated, use item_id instead.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    pub fn posts_add_on_attachments_get(&self, course_id: &str, post_id: &str, attachment_id: &str) -> CoursePostAddOnAttachmentGetCall<'a, S> {
+        CoursePostAddOnAttachmentGetCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _post_id: post_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _item_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `postId` - Optional. Identifier of the post under the course whose attachments to enumerate. Deprecated, use item_id instead.
+    pub fn posts_add_on_attachments_list(&self, course_id: &str, post_id: &str) -> CoursePostAddOnAttachmentListCall<'a, S> {
+        CoursePostAddOnAttachmentListCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _post_id: post_id.to_string(),
+            _page_token: Default::default(),
+            _page_size: Default::default(),
+            _item_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `request` - No description provided.
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `postId` - Required. Identifier of the post under which the attachment is attached.
+    /// * `attachmentId` - Required. Identifier of the attachment.
+    pub fn posts_add_on_attachments_patch(&self, request: AddOnAttachment, course_id: &str, post_id: &str, attachment_id: &str) -> CoursePostAddOnAttachmentPatchCall<'a, S> {
+        CoursePostAddOnAttachmentPatchCall {
+            hub: self.hub,
+            _request: request,
+            _course_id: course_id.to_string(),
+            _post_id: post_id.to_string(),
+            _attachment_id: attachment_id.to_string(),
+            _update_mask: Default::default(),
+            _item_id: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
+        }
+    }
+    
+    /// Create a builder to help you perform the following task:
+    ///
+    /// Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+    /// 
+    /// # Arguments
+    ///
+    /// * `courseId` - Required. Identifier of the course.
+    /// * `postId` - Optional. Deprecated, use item_id instead.
+    pub fn posts_get_add_on_context(&self, course_id: &str, post_id: &str) -> CoursePostGetAddOnContextCall<'a, S> {
+        CoursePostGetAddOnContextCall {
+            hub: self.hub,
+            _course_id: course_id.to_string(),
+            _post_id: post_id.to_string(),
+            _item_id: Default::default(),
+            _attachment_id: Default::default(),
+            _add_on_token: Default::default(),
+            _delegate: Default::default(),
+            _additional_params: Default::default(),
         }
     }
     
@@ -3055,7 +4023,7 @@ impl<'a, S> CourseMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `accept(...)`, `create(...)`, `delete(...)`, `get(...)` and `list(...)`
 /// // to build up your call.
@@ -3180,7 +4148,7 @@ impl<'a, S> InvitationMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `create(...)` and `delete(...)`
 /// // to build up your call.
@@ -3255,7 +4223,7 @@ impl<'a, S> RegistrationMethods<'a, S> {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `get(...)`, `guardian_invitations_create(...)`, `guardian_invitations_get(...)`, `guardian_invitations_list(...)`, `guardian_invitations_patch(...)`, `guardians_delete(...)`, `guardians_get(...)` and `guardians_list(...)`
 /// // to build up your call.
@@ -3460,7 +4428,7 @@ impl<'a, S> UserProfileMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -3751,7 +4719,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -3851,6 +4819,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4025,13 +4994,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().aliases_list("courseId")
-///              .page_token("ut")
-///              .page_size(-12)
+///              .page_token("ipsum")
+///              .page_size(-88)
 ///              .doit().await;
 /// # }
 /// ```
@@ -4133,6 +5102,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4289,6 +5259,1358 @@ where
 }
 
 
+/// Creates an add-on attachment under a post. Requires the add-on to have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *announcements.addOnAttachments.create* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// use classroom1::api::AddOnAttachment;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddOnAttachment::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().announcements_add_on_attachments_create(req, "courseId", "itemId")
+///              .post_id("ipsum")
+///              .add_on_token("sed")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseAnnouncementAddOnAttachmentCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _request: AddOnAttachment,
+    _course_id: String,
+    _item_id: String,
+    _post_id: Option<String>,
+    _add_on_token: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseAnnouncementAddOnAttachmentCreateCall<'a, S> {}
+
+impl<'a, S> CourseAnnouncementAddOnAttachmentCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.announcements.addOnAttachments.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "courseId", "itemId", "postId", "addOnToken"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+        if let Some(value) = self._add_on_token.as_ref() {
+            params.push("addOnToken", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/announcements/{itemId}/addOnAttachments";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddOnAttachment) -> CourseAnnouncementAddOnAttachmentCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentCreateCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentCreateCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentCreateCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Token that authorizes the request. The token is passed as a query parameter when the user is redirected from Classroom to the add-on's URL. This authorization token is required for in-Classroom attachment creation but optional for partner-first attachment creation. Returns an error if not provided for partner-first attachment creation and the developer projects that created the attachment and its parent stream item do not match.
+    ///
+    /// Sets the *add on token* query property to the given value.
+    pub fn add_on_token(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentCreateCall<'a, S> {
+        self._add_on_token = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementAddOnAttachmentCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementAddOnAttachmentCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *announcements.addOnAttachments.delete* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().announcements_add_on_attachments_delete("courseId", "itemId", "attachmentId")
+///              .post_id("est")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseAnnouncementAddOnAttachmentDeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _item_id: String,
+    _attachment_id: String,
+    _post_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseAnnouncementAddOnAttachmentDeleteCall<'a, S> {}
+
+impl<'a, S> CourseAnnouncementAddOnAttachmentDeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.announcements.addOnAttachments.delete",
+                               http_method: hyper::Method::DELETE });
+
+        for &field in ["alt", "courseId", "itemId", "attachmentId", "postId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        params.push("attachmentId", self._attachment_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/announcements/{itemId}/addOnAttachments/{attachmentId}";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId"), ("{attachmentId}", "attachmentId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["attachmentId", "itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentDeleteCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentDeleteCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentDeleteCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentDeleteCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementAddOnAttachmentDeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementAddOnAttachmentDeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *announcements.addOnAttachments.get* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().announcements_add_on_attachments_get("courseId", "itemId", "attachmentId")
+///              .post_id("gubergren")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseAnnouncementAddOnAttachmentGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _item_id: String,
+    _attachment_id: String,
+    _post_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseAnnouncementAddOnAttachmentGetCall<'a, S> {}
+
+impl<'a, S> CourseAnnouncementAddOnAttachmentGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.announcements.addOnAttachments.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "courseId", "itemId", "attachmentId", "postId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        params.push("attachmentId", self._attachment_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/announcements/{itemId}/addOnAttachments/{attachmentId}";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId"), ("{attachmentId}", "attachmentId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["attachmentId", "itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentGetCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentGetCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentGetCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentGetCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementAddOnAttachmentGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementAddOnAttachmentGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *announcements.addOnAttachments.list* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().announcements_add_on_attachments_list("courseId", "itemId")
+///              .post_id("Lorem")
+///              .page_token("eos")
+///              .page_size(-86)
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseAnnouncementAddOnAttachmentListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _item_id: String,
+    _post_id: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseAnnouncementAddOnAttachmentListCall<'a, S> {}
+
+impl<'a, S> CourseAnnouncementAddOnAttachmentListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListAddOnAttachmentsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.announcements.addOnAttachments.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "courseId", "itemId", "postId", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/announcements/{itemId}/addOnAttachments";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentListCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentListCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Optional. Identifier of the post under the course whose attachments to enumerate. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentListCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// A page token, received from a previous `ListAddOnAttachments` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListAddOnAttachments` must match the call that provided the page token.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of attachments to return. The service may return fewer than this value. If unspecified, at most 20 attachments will be returned. The maximum value is 20; values above 20 will be coerced to 20.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> CourseAnnouncementAddOnAttachmentListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementAddOnAttachmentListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementAddOnAttachmentListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *announcements.addOnAttachments.patch* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// use classroom1::api::AddOnAttachment;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddOnAttachment::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().announcements_add_on_attachments_patch(req, "courseId", "itemId", "attachmentId")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .post_id("no")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseAnnouncementAddOnAttachmentPatchCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _request: AddOnAttachment,
+    _course_id: String,
+    _item_id: String,
+    _attachment_id: String,
+    _update_mask: Option<client::FieldMask>,
+    _post_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseAnnouncementAddOnAttachmentPatchCall<'a, S> {}
+
+impl<'a, S> CourseAnnouncementAddOnAttachmentPatchCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.announcements.addOnAttachments.patch",
+                               http_method: hyper::Method::PATCH });
+
+        for &field in ["alt", "courseId", "itemId", "attachmentId", "updateMask", "postId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        params.push("attachmentId", self._attachment_id);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/announcements/{itemId}/addOnAttachments/{attachmentId}";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId"), ("{attachmentId}", "attachmentId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["attachmentId", "itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddOnAttachment) -> CourseAnnouncementAddOnAttachmentPatchCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentPatchCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the post under which the attachment is attached.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentPatchCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentPatchCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Required. Mask that identifies which fields on the attachment to update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the `AddOnAttachment` object. If a field that does not support empty values is included in the update mask and not set in the `AddOnAttachment` object, an `INVALID_ARGUMENT` error is returned. The following fields may be specified by teachers: * `title` * `teacher_view_uri` * `student_view_uri` * `student_work_review_uri` * `due_date` * `due_time` * `max_points`
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> CourseAnnouncementAddOnAttachmentPatchCall<'a, S> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// Required. Identifier of the post under which the attachment is attached.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseAnnouncementAddOnAttachmentPatchCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementAddOnAttachmentPatchCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementAddOnAttachmentPatchCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
 /// Creates an announcement. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course, create announcements in the requested course, share a Drive attachment, or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist. * `FAILED_PRECONDITION` for the following request error: * AttachmentNotVisible
 ///
 /// A builder for the *announcements.create* method supported by a *course* resource.
@@ -4312,7 +6634,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -4603,7 +6925,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4703,6 +7025,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -4877,7 +7200,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -4977,6 +7300,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5129,6 +7453,272 @@ where
 }
 
 
+/// Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *announcements.getAddOnContext* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().announcements_get_add_on_context("courseId", "itemId")
+///              .post_id("erat")
+///              .attachment_id("sed")
+///              .add_on_token("duo")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseAnnouncementGetAddOnContextCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _item_id: String,
+    _post_id: Option<String>,
+    _attachment_id: Option<String>,
+    _add_on_token: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseAnnouncementGetAddOnContextCall<'a, S> {}
+
+impl<'a, S> CourseAnnouncementGetAddOnContextCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnContext)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.announcements.getAddOnContext",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "courseId", "itemId", "postId", "attachmentId", "addOnToken"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+        if let Some(value) = self._attachment_id.as_ref() {
+            params.push("attachmentId", value);
+        }
+        if let Some(value) = self._add_on_token.as_ref() {
+            params.push("addOnToken", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/announcements/{itemId}/addOnContext";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseAnnouncementGetAddOnContextCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseAnnouncementGetAddOnContextCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseAnnouncementGetAddOnContextCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The identifier of the attachment. This field is required for student users and optional for teacher users. If not provided in the student case, an error is returned.
+    ///
+    /// Sets the *attachment id* query property to the given value.
+    pub fn attachment_id(mut self, new_value: &str) -> CourseAnnouncementGetAddOnContextCall<'a, S> {
+        self._attachment_id = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Token that authorizes the request. The token is passed as a query parameter when the user is redirected from Classroom to the add-on's URL. The authorization token is required when neither of the following is true: * The add-on has attachments on the post. * The developer project issuing the request is the same project that created the post.
+    ///
+    /// Sets the *add on token* query property to the given value.
+    pub fn add_on_token(mut self, new_value: &str) -> CourseAnnouncementGetAddOnContextCall<'a, S> {
+        self._add_on_token = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseAnnouncementGetAddOnContextCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseAnnouncementGetAddOnContextCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
 /// Returns a list of announcements that the requester is permitted to view. Course students may only view `PUBLISHED` announcements. Course teachers and domain administrators may view all announcements. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist.
 ///
 /// A builder for the *announcements.list* method supported by a *course* resource.
@@ -5151,15 +7741,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().announcements_list("courseId")
-///              .page_token("ea")
-///              .page_size(-99)
-///              .order_by("Lorem")
-///              .add_announcement_states("eos")
+///              .page_token("et")
+///              .page_size(-28)
+///              .order_by("amet.")
+///              .add_announcement_states("consetetur")
 ///              .doit().await;
 /// # }
 /// ```
@@ -5271,6 +7861,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -5465,7 +8056,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5769,7 +8360,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -5779,7 +8370,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().announcements_patch(req, "courseId", "id")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -6062,6 +8653,1976 @@ where
 }
 
 
+/// Returns a student submission for an add-on attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *courseWork.addOnAttachments.studentSubmissions.get* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_add_on_attachments_student_submissions_get("courseId", "itemId", "attachmentId", "submissionId")
+///              .post_id("vero")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _item_id: String,
+    _attachment_id: String,
+    _submission_id: String,
+    _post_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall<'a, S> {}
+
+impl<'a, S> CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachmentStudentSubmission)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.courseWork.addOnAttachments.studentSubmissions.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "courseId", "itemId", "attachmentId", "submissionId", "postId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        params.push("attachmentId", self._attachment_id);
+        params.push("submissionId", self._submission_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{itemId}/addOnAttachments/{attachmentId}/studentSubmissions/{submissionId}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::StudentSubmissionStudentReadonly.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId"), ("{attachmentId}", "attachmentId"), ("{submissionId}", "submissionId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["submissionId", "attachmentId", "itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the student’s submission.
+    ///
+    /// Sets the *submission id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn submission_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        self._submission_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::StudentSubmissionStudentReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Updates data associated with an add-on attachment submission. Requires the add-on to have been the original creator of the attachment and the attachment to have a positive `max_points` value set. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *courseWork.addOnAttachments.studentSubmissions.patch* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// use classroom1::api::AddOnAttachmentStudentSubmission;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddOnAttachmentStudentSubmission::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_add_on_attachments_student_submissions_patch(req, "courseId", "itemId", "attachmentId", "submissionId")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .post_id("elitr")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _request: AddOnAttachmentStudentSubmission,
+    _course_id: String,
+    _item_id: String,
+    _attachment_id: String,
+    _submission_id: String,
+    _update_mask: Option<client::FieldMask>,
+    _post_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall<'a, S> {}
+
+impl<'a, S> CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachmentStudentSubmission)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.courseWork.addOnAttachments.studentSubmissions.patch",
+                               http_method: hyper::Method::PATCH });
+
+        for &field in ["alt", "courseId", "itemId", "attachmentId", "submissionId", "updateMask", "postId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(9 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        params.push("attachmentId", self._attachment_id);
+        params.push("submissionId", self._submission_id);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{itemId}/addOnAttachments/{attachmentId}/studentSubmissions/{submissionId}";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId"), ("{attachmentId}", "attachmentId"), ("{submissionId}", "submissionId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["submissionId", "attachmentId", "itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddOnAttachmentStudentSubmission) -> CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the student's submission.
+    ///
+    /// Sets the *submission id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn submission_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._submission_id = new_value.to_string();
+        self
+    }
+    /// Required. Mask that identifies which fields on the attachment to update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the `AddOnAttachmentStudentSubmission` object. The following fields may be specified by teachers: * `points_earned`
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Creates an add-on attachment under a post. Requires the add-on to have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *courseWork.addOnAttachments.create* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// use classroom1::api::AddOnAttachment;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddOnAttachment::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_add_on_attachments_create(req, "courseId", "itemId")
+///              .post_id("no")
+///              .add_on_token("ipsum")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseCourseWorkAddOnAttachmentCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _request: AddOnAttachment,
+    _course_id: String,
+    _item_id: String,
+    _post_id: Option<String>,
+    _add_on_token: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseCourseWorkAddOnAttachmentCreateCall<'a, S> {}
+
+impl<'a, S> CourseCourseWorkAddOnAttachmentCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.courseWork.addOnAttachments.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "courseId", "itemId", "postId", "addOnToken"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+        if let Some(value) = self._add_on_token.as_ref() {
+            params.push("addOnToken", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{itemId}/addOnAttachments";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddOnAttachment) -> CourseCourseWorkAddOnAttachmentCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentCreateCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentCreateCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentCreateCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Token that authorizes the request. The token is passed as a query parameter when the user is redirected from Classroom to the add-on's URL. This authorization token is required for in-Classroom attachment creation but optional for partner-first attachment creation. Returns an error if not provided for partner-first attachment creation and the developer projects that created the attachment and its parent stream item do not match.
+    ///
+    /// Sets the *add on token* query property to the given value.
+    pub fn add_on_token(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentCreateCall<'a, S> {
+        self._add_on_token = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkAddOnAttachmentCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkAddOnAttachmentCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *courseWork.addOnAttachments.delete* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_add_on_attachments_delete("courseId", "itemId", "attachmentId")
+///              .post_id("voluptua.")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseCourseWorkAddOnAttachmentDeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _item_id: String,
+    _attachment_id: String,
+    _post_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseCourseWorkAddOnAttachmentDeleteCall<'a, S> {}
+
+impl<'a, S> CourseCourseWorkAddOnAttachmentDeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.courseWork.addOnAttachments.delete",
+                               http_method: hyper::Method::DELETE });
+
+        for &field in ["alt", "courseId", "itemId", "attachmentId", "postId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        params.push("attachmentId", self._attachment_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{itemId}/addOnAttachments/{attachmentId}";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId"), ("{attachmentId}", "attachmentId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["attachmentId", "itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentDeleteCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentDeleteCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentDeleteCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentDeleteCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkAddOnAttachmentDeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkAddOnAttachmentDeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *courseWork.addOnAttachments.get* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_add_on_attachments_get("courseId", "itemId", "attachmentId")
+///              .post_id("amet.")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseCourseWorkAddOnAttachmentGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _item_id: String,
+    _attachment_id: String,
+    _post_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseCourseWorkAddOnAttachmentGetCall<'a, S> {}
+
+impl<'a, S> CourseCourseWorkAddOnAttachmentGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.courseWork.addOnAttachments.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "courseId", "itemId", "attachmentId", "postId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        params.push("attachmentId", self._attachment_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{itemId}/addOnAttachments/{attachmentId}";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId"), ("{attachmentId}", "attachmentId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["attachmentId", "itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentGetCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentGetCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentGetCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentGetCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkAddOnAttachmentGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkAddOnAttachmentGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *courseWork.addOnAttachments.list* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_add_on_attachments_list("courseId", "itemId")
+///              .post_id("dolores")
+///              .page_token("gubergren")
+///              .page_size(-74)
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseCourseWorkAddOnAttachmentListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _item_id: String,
+    _post_id: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseCourseWorkAddOnAttachmentListCall<'a, S> {}
+
+impl<'a, S> CourseCourseWorkAddOnAttachmentListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListAddOnAttachmentsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.courseWork.addOnAttachments.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "courseId", "itemId", "postId", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{itemId}/addOnAttachments";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentListCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentListCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Optional. Identifier of the post under the course whose attachments to enumerate. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentListCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// A page token, received from a previous `ListAddOnAttachments` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListAddOnAttachments` must match the call that provided the page token.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of attachments to return. The service may return fewer than this value. If unspecified, at most 20 attachments will be returned. The maximum value is 20; values above 20 will be coerced to 20.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> CourseCourseWorkAddOnAttachmentListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkAddOnAttachmentListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkAddOnAttachmentListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *courseWork.addOnAttachments.patch* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// use classroom1::api::AddOnAttachment;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddOnAttachment::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_add_on_attachments_patch(req, "courseId", "itemId", "attachmentId")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .post_id("dolore")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseCourseWorkAddOnAttachmentPatchCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _request: AddOnAttachment,
+    _course_id: String,
+    _item_id: String,
+    _attachment_id: String,
+    _update_mask: Option<client::FieldMask>,
+    _post_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseCourseWorkAddOnAttachmentPatchCall<'a, S> {}
+
+impl<'a, S> CourseCourseWorkAddOnAttachmentPatchCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.courseWork.addOnAttachments.patch",
+                               http_method: hyper::Method::PATCH });
+
+        for &field in ["alt", "courseId", "itemId", "attachmentId", "updateMask", "postId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        params.push("attachmentId", self._attachment_id);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{itemId}/addOnAttachments/{attachmentId}";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId"), ("{attachmentId}", "attachmentId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["attachmentId", "itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddOnAttachment) -> CourseCourseWorkAddOnAttachmentPatchCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentPatchCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the post under which the attachment is attached.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentPatchCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentPatchCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Required. Mask that identifies which fields on the attachment to update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the `AddOnAttachment` object. If a field that does not support empty values is included in the update mask and not set in the `AddOnAttachment` object, an `INVALID_ARGUMENT` error is returned. The following fields may be specified by teachers: * `title` * `teacher_view_uri` * `student_view_uri` * `student_work_review_uri` * `due_date` * `due_time` * `max_points`
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> CourseCourseWorkAddOnAttachmentPatchCall<'a, S> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// Required. Identifier of the post under which the attachment is attached.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseCourseWorkAddOnAttachmentPatchCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkAddOnAttachmentPatchCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkAddOnAttachmentPatchCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
 /// Returns a student submission. * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course, course work, or student submission or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course, course work, or student submission does not exist.
 ///
 /// A builder for the *courseWork.studentSubmissions.get* method supported by a *course* resource.
@@ -6084,7 +10645,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -6186,6 +10747,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6370,16 +10932,16 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().course_work_student_submissions_list("courseId", "courseWorkId")
-///              .user_id("et")
-///              .add_states("et")
-///              .page_token("vero")
-///              .page_size(-31)
-///              .late("sed")
+///              .user_id("Lorem")
+///              .add_states("invidunt")
+///              .page_token("no")
+///              .page_size(-7)
+///              .late("At")
 ///              .doit().await;
 /// # }
 /// ```
@@ -6497,6 +11059,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -6708,7 +11271,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7024,7 +11587,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7034,7 +11597,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().course_work_student_submissions_patch(req, "courseId", "courseWorkId", "id")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -7352,7 +11915,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7668,7 +12231,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -7984,7 +12547,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8300,7 +12863,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -8591,7 +13154,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8691,6 +13254,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -8865,7 +13429,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -8965,6 +13529,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -9117,6 +13682,272 @@ where
 }
 
 
+/// Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *courseWork.getAddOnContext* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_get_add_on_context("courseId", "itemId")
+///              .post_id("At")
+///              .attachment_id("sadipscing")
+///              .add_on_token("aliquyam")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseCourseWorkGetAddOnContextCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _item_id: String,
+    _post_id: Option<String>,
+    _attachment_id: Option<String>,
+    _add_on_token: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseCourseWorkGetAddOnContextCall<'a, S> {}
+
+impl<'a, S> CourseCourseWorkGetAddOnContextCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnContext)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.courseWork.getAddOnContext",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "courseId", "itemId", "postId", "attachmentId", "addOnToken"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+        if let Some(value) = self._attachment_id.as_ref() {
+            params.push("attachmentId", value);
+        }
+        if let Some(value) = self._add_on_token.as_ref() {
+            params.push("addOnToken", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWork/{itemId}/addOnContext";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkGetAddOnContextCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseCourseWorkGetAddOnContextCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseCourseWorkGetAddOnContextCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The identifier of the attachment. This field is required for student users and optional for teacher users. If not provided in the student case, an error is returned.
+    ///
+    /// Sets the *attachment id* query property to the given value.
+    pub fn attachment_id(mut self, new_value: &str) -> CourseCourseWorkGetAddOnContextCall<'a, S> {
+        self._attachment_id = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Token that authorizes the request. The token is passed as a query parameter when the user is redirected from Classroom to the add-on's URL. The authorization token is required when neither of the following is true: * The add-on has attachments on the post. * The developer project issuing the request is the same project that created the post.
+    ///
+    /// Sets the *add on token* query property to the given value.
+    pub fn add_on_token(mut self, new_value: &str) -> CourseCourseWorkGetAddOnContextCall<'a, S> {
+        self._add_on_token = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkGetAddOnContextCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkGetAddOnContextCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
 /// Returns a list of course work that the requester is permitted to view. Course students may only view `PUBLISHED` course work. Course teachers and domain administrators may view all course work. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist.
 ///
 /// A builder for the *courseWork.list* method supported by a *course* resource.
@@ -9139,15 +13970,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().course_work_list("courseId")
-///              .page_token("diam")
-///              .page_size(-61)
-///              .order_by("ipsum")
-///              .add_course_work_states("accusam")
+///              .page_token("sadipscing")
+///              .page_size(-31)
+///              .order_by("aliquyam")
+///              .add_course_work_states("amet")
 ///              .doit().await;
 /// # }
 /// ```
@@ -9259,6 +14090,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -9453,7 +14285,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9757,7 +14589,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -9767,7 +14599,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().course_work_patch(req, "courseId", "id")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -10050,6 +14882,1358 @@ where
 }
 
 
+/// Creates an add-on attachment under a post. Requires the add-on to have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *courseWorkMaterials.addOnAttachments.create* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// use classroom1::api::AddOnAttachment;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddOnAttachment::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_materials_add_on_attachments_create(req, "courseId", "itemId")
+///              .post_id("est")
+///              .add_on_token("aliquyam")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseCourseWorkMaterialAddOnAttachmentCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _request: AddOnAttachment,
+    _course_id: String,
+    _item_id: String,
+    _post_id: Option<String>,
+    _add_on_token: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseCourseWorkMaterialAddOnAttachmentCreateCall<'a, S> {}
+
+impl<'a, S> CourseCourseWorkMaterialAddOnAttachmentCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.courseWorkMaterials.addOnAttachments.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "courseId", "itemId", "postId", "addOnToken"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+        if let Some(value) = self._add_on_token.as_ref() {
+            params.push("addOnToken", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWorkMaterials/{itemId}/addOnAttachments";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddOnAttachment) -> CourseCourseWorkMaterialAddOnAttachmentCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentCreateCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentCreateCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentCreateCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Token that authorizes the request. The token is passed as a query parameter when the user is redirected from Classroom to the add-on's URL. This authorization token is required for in-Classroom attachment creation but optional for partner-first attachment creation. Returns an error if not provided for partner-first attachment creation and the developer projects that created the attachment and its parent stream item do not match.
+    ///
+    /// Sets the *add on token* query property to the given value.
+    pub fn add_on_token(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentCreateCall<'a, S> {
+        self._add_on_token = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialAddOnAttachmentCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialAddOnAttachmentCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *courseWorkMaterials.addOnAttachments.delete* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_materials_add_on_attachments_delete("courseId", "itemId", "attachmentId")
+///              .post_id("est")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseCourseWorkMaterialAddOnAttachmentDeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _item_id: String,
+    _attachment_id: String,
+    _post_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseCourseWorkMaterialAddOnAttachmentDeleteCall<'a, S> {}
+
+impl<'a, S> CourseCourseWorkMaterialAddOnAttachmentDeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.courseWorkMaterials.addOnAttachments.delete",
+                               http_method: hyper::Method::DELETE });
+
+        for &field in ["alt", "courseId", "itemId", "attachmentId", "postId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        params.push("attachmentId", self._attachment_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWorkMaterials/{itemId}/addOnAttachments/{attachmentId}";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId"), ("{attachmentId}", "attachmentId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["attachmentId", "itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentDeleteCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentDeleteCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentDeleteCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentDeleteCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialAddOnAttachmentDeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialAddOnAttachmentDeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *courseWorkMaterials.addOnAttachments.get* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_materials_add_on_attachments_get("courseId", "itemId", "attachmentId")
+///              .post_id("Lorem")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseCourseWorkMaterialAddOnAttachmentGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _item_id: String,
+    _attachment_id: String,
+    _post_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseCourseWorkMaterialAddOnAttachmentGetCall<'a, S> {}
+
+impl<'a, S> CourseCourseWorkMaterialAddOnAttachmentGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.courseWorkMaterials.addOnAttachments.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "courseId", "itemId", "attachmentId", "postId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        params.push("attachmentId", self._attachment_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWorkMaterials/{itemId}/addOnAttachments/{attachmentId}";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId"), ("{attachmentId}", "attachmentId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["attachmentId", "itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentGetCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentGetCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentGetCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentGetCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialAddOnAttachmentGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialAddOnAttachmentGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *courseWorkMaterials.addOnAttachments.list* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_materials_add_on_attachments_list("courseId", "itemId")
+///              .post_id("dolores")
+///              .page_token("eos")
+///              .page_size(-68)
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseCourseWorkMaterialAddOnAttachmentListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _item_id: String,
+    _post_id: Option<String>,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseCourseWorkMaterialAddOnAttachmentListCall<'a, S> {}
+
+impl<'a, S> CourseCourseWorkMaterialAddOnAttachmentListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListAddOnAttachmentsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.courseWorkMaterials.addOnAttachments.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "courseId", "itemId", "postId", "pageToken", "pageSize"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWorkMaterials/{itemId}/addOnAttachments";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentListCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentListCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Optional. Identifier of the post under the course whose attachments to enumerate. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentListCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// A page token, received from a previous `ListAddOnAttachments` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListAddOnAttachments` must match the call that provided the page token.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of attachments to return. The service may return fewer than this value. If unspecified, at most 20 attachments will be returned. The maximum value is 20; values above 20 will be coerced to 20.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> CourseCourseWorkMaterialAddOnAttachmentListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialAddOnAttachmentListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialAddOnAttachmentListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *courseWorkMaterials.addOnAttachments.patch* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// use classroom1::api::AddOnAttachment;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddOnAttachment::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_materials_add_on_attachments_patch(req, "courseId", "itemId", "attachmentId")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .post_id("dolore")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseCourseWorkMaterialAddOnAttachmentPatchCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _request: AddOnAttachment,
+    _course_id: String,
+    _item_id: String,
+    _attachment_id: String,
+    _update_mask: Option<client::FieldMask>,
+    _post_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseCourseWorkMaterialAddOnAttachmentPatchCall<'a, S> {}
+
+impl<'a, S> CourseCourseWorkMaterialAddOnAttachmentPatchCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.courseWorkMaterials.addOnAttachments.patch",
+                               http_method: hyper::Method::PATCH });
+
+        for &field in ["alt", "courseId", "itemId", "attachmentId", "updateMask", "postId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        params.push("attachmentId", self._attachment_id);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWorkMaterials/{itemId}/addOnAttachments/{attachmentId}";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId"), ("{attachmentId}", "attachmentId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["attachmentId", "itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddOnAttachment) -> CourseCourseWorkMaterialAddOnAttachmentPatchCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentPatchCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the post under which the attachment is attached.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentPatchCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentPatchCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Required. Mask that identifies which fields on the attachment to update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the `AddOnAttachment` object. If a field that does not support empty values is included in the update mask and not set in the `AddOnAttachment` object, an `INVALID_ARGUMENT` error is returned. The following fields may be specified by teachers: * `title` * `teacher_view_uri` * `student_view_uri` * `student_work_review_uri` * `due_date` * `due_time` * `max_points`
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> CourseCourseWorkMaterialAddOnAttachmentPatchCall<'a, S> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// Required. Identifier of the post under which the attachment is attached.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseCourseWorkMaterialAddOnAttachmentPatchCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialAddOnAttachmentPatchCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialAddOnAttachmentPatchCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
 /// Creates a course work material. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course, create course work material in the requested course, share a Drive attachment, or for access errors. * `INVALID_ARGUMENT` if the request is malformed or if more than 20 * materials are provided. * `NOT_FOUND` if the requested course does not exist. * `FAILED_PRECONDITION` for the following request error: * AttachmentNotVisible
 ///
 /// A builder for the *courseWorkMaterials.create* method supported by a *course* resource.
@@ -10073,7 +16257,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -10364,7 +16548,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10464,6 +16648,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -10638,7 +16823,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -10738,6 +16923,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -10890,6 +17076,272 @@ where
 }
 
 
+/// Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *courseWorkMaterials.getAddOnContext* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().course_work_materials_get_add_on_context("courseId", "itemId")
+///              .post_id("accusam")
+///              .attachment_id("sea")
+///              .add_on_token("takimata")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CourseCourseWorkMaterialGetAddOnContextCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _item_id: String,
+    _post_id: Option<String>,
+    _attachment_id: Option<String>,
+    _add_on_token: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CourseCourseWorkMaterialGetAddOnContextCall<'a, S> {}
+
+impl<'a, S> CourseCourseWorkMaterialGetAddOnContextCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnContext)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.courseWorkMaterials.getAddOnContext",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "courseId", "itemId", "postId", "attachmentId", "addOnToken"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("itemId", self._item_id);
+        if let Some(value) = self._post_id.as_ref() {
+            params.push("postId", value);
+        }
+        if let Some(value) = self._attachment_id.as_ref() {
+            params.push("attachmentId", value);
+        }
+        if let Some(value) = self._add_on_token.as_ref() {
+            params.push("addOnToken", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/courseWorkMaterials/{itemId}/addOnContext";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{itemId}", "itemId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["itemId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CourseCourseWorkMaterialGetAddOnContextCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn item_id(mut self, new_value: &str) -> CourseCourseWorkMaterialGetAddOnContextCall<'a, S> {
+        self._item_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* query property to the given value.
+    pub fn post_id(mut self, new_value: &str) -> CourseCourseWorkMaterialGetAddOnContextCall<'a, S> {
+        self._post_id = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The identifier of the attachment. This field is required for student users and optional for teacher users. If not provided in the student case, an error is returned.
+    ///
+    /// Sets the *attachment id* query property to the given value.
+    pub fn attachment_id(mut self, new_value: &str) -> CourseCourseWorkMaterialGetAddOnContextCall<'a, S> {
+        self._attachment_id = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Token that authorizes the request. The token is passed as a query parameter when the user is redirected from Classroom to the add-on's URL. The authorization token is required when neither of the following is true: * The add-on has attachments on the post. * The developer project issuing the request is the same project that created the post.
+    ///
+    /// Sets the *add on token* query property to the given value.
+    pub fn add_on_token(mut self, new_value: &str) -> CourseCourseWorkMaterialGetAddOnContextCall<'a, S> {
+        self._add_on_token = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CourseCourseWorkMaterialGetAddOnContextCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CourseCourseWorkMaterialGetAddOnContextCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
 /// Returns a list of course work material that the requester is permitted to view. Course students may only view `PUBLISHED` course work material. Course teachers and domain administrators may view all course work material. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to access the requested course or for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if the requested course does not exist.
 ///
 /// A builder for the *courseWorkMaterials.list* method supported by a *course* resource.
@@ -10912,17 +17364,17 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().course_work_materials_list("courseId")
-///              .page_token("gubergren")
-///              .page_size(-74)
-///              .order_by("accusam")
-///              .material_link("voluptua.")
-///              .material_drive_id("dolore")
-///              .add_course_work_material_states("dolore")
+///              .page_token("et")
+///              .page_size(-77)
+///              .order_by("dolor")
+///              .material_link("et")
+///              .material_drive_id("sit")
+///              .add_course_work_material_states("erat")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11042,6 +17494,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -11250,7 +17703,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11260,7 +17713,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().course_work_materials_patch(req, "courseId", "id")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -11543,6 +17996,2242 @@ where
 }
 
 
+/// Returns a student submission for an add-on attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *posts.addOnAttachments.studentSubmissions.get* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().posts_add_on_attachments_student_submissions_get("courseId", "postId", "attachmentId", "submissionId")
+///              .item_id("consetetur")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CoursePostAddOnAttachmentStudentSubmissionGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _post_id: String,
+    _attachment_id: String,
+    _submission_id: String,
+    _item_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+    _scopes: BTreeSet<String>
+}
+
+impl<'a, S> client::CallBuilder for CoursePostAddOnAttachmentStudentSubmissionGetCall<'a, S> {}
+
+impl<'a, S> CoursePostAddOnAttachmentStudentSubmissionGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachmentStudentSubmission)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.posts.addOnAttachments.studentSubmissions.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "courseId", "postId", "attachmentId", "submissionId", "itemId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("postId", self._post_id);
+        params.push("attachmentId", self._attachment_id);
+        params.push("submissionId", self._submission_id);
+        if let Some(value) = self._item_id.as_ref() {
+            params.push("itemId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/posts/{postId}/addOnAttachments/{attachmentId}/studentSubmissions/{submissionId}";
+        if self._scopes.is_empty() {
+            self._scopes.insert(Scope::StudentSubmissionStudentReadonly.as_ref().to_string());
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{postId}", "postId"), ("{attachmentId}", "attachmentId"), ("{submissionId}", "submissionId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["submissionId", "attachmentId", "postId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let token = match self.hub.auth.get_token(&self._scopes.iter().map(String::as_str).collect::<Vec<_>>()[..]).await {
+                Ok(token) => token,
+                Err(e) => {
+                    match dlg.token(e) {
+                        Ok(token) => token,
+                        Err(e) => {
+                            dlg.finished(false);
+                            return Err(client::Error::MissingToken(e));
+                        }
+                    }
+                }
+            };
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+                if let Some(token) = token.as_ref() {
+                    req_builder = req_builder.header(AUTHORIZATION, format!("Bearer {}", token));
+                }
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn post_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        self._post_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the student’s submission.
+    ///
+    /// Sets the *submission id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn submission_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        self._submission_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* query property to the given value.
+    pub fn item_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        self._item_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CoursePostAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CoursePostAddOnAttachmentStudentSubmissionGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+    /// Identifies the authorization scope for the method you are building.
+    ///
+    /// Use this method to actively specify which scope should be used, instead of the default [`Scope`] variant
+    /// [`Scope::StudentSubmissionStudentReadonly`].
+    ///
+    /// The `scope` will be added to a set of scopes. This is important as one can maintain access
+    /// tokens for more than one scope.
+    ///
+    /// Usually there is more than one suitable scope to authorize an operation, some of which may
+    /// encompass more rights than others. For example, for listing resources, a *read-only* scope will be
+    /// sufficient, a read-write scope will do as well.
+    pub fn add_scope<St>(mut self, scope: St) -> CoursePostAddOnAttachmentStudentSubmissionGetCall<'a, S>
+                                                        where St: AsRef<str> {
+        self._scopes.insert(String::from(scope.as_ref()));
+        self
+    }
+    /// Identifies the authorization scope(s) for the method you are building.
+    ///
+    /// See [`Self::add_scope()`] for details.
+    pub fn add_scopes<I, St>(mut self, scopes: I) -> CoursePostAddOnAttachmentStudentSubmissionGetCall<'a, S>
+                                                        where I: IntoIterator<Item = St>,
+                                                         St: AsRef<str> {
+        self._scopes
+            .extend(scopes.into_iter().map(|s| String::from(s.as_ref())));
+        self
+    }
+
+    /// Removes all scopes, and no default scope will be used either.
+    /// In this case, you have to specify your API-key using the `key` parameter (see [`Self::param()`]
+    /// for details).
+    pub fn clear_scopes(mut self) -> CoursePostAddOnAttachmentStudentSubmissionGetCall<'a, S> {
+        self._scopes.clear();
+        self
+    }
+}
+
+
+/// Updates data associated with an add-on attachment submission. Requires the add-on to have been the original creator of the attachment and the attachment to have a positive `max_points` value set. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *posts.addOnAttachments.studentSubmissions.patch* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// use classroom1::api::AddOnAttachmentStudentSubmission;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddOnAttachmentStudentSubmission::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().posts_add_on_attachments_student_submissions_patch(req, "courseId", "postId", "attachmentId", "submissionId")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .item_id("dolores")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CoursePostAddOnAttachmentStudentSubmissionPatchCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _request: AddOnAttachmentStudentSubmission,
+    _course_id: String,
+    _post_id: String,
+    _attachment_id: String,
+    _submission_id: String,
+    _update_mask: Option<client::FieldMask>,
+    _item_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CoursePostAddOnAttachmentStudentSubmissionPatchCall<'a, S> {}
+
+impl<'a, S> CoursePostAddOnAttachmentStudentSubmissionPatchCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachmentStudentSubmission)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.posts.addOnAttachments.studentSubmissions.patch",
+                               http_method: hyper::Method::PATCH });
+
+        for &field in ["alt", "courseId", "postId", "attachmentId", "submissionId", "updateMask", "itemId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(9 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("postId", self._post_id);
+        params.push("attachmentId", self._attachment_id);
+        params.push("submissionId", self._submission_id);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+        if let Some(value) = self._item_id.as_ref() {
+            params.push("itemId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/posts/{postId}/addOnAttachments/{attachmentId}/studentSubmissions/{submissionId}";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{postId}", "postId"), ("{attachmentId}", "attachmentId"), ("{submissionId}", "submissionId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["submissionId", "attachmentId", "postId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddOnAttachmentStudentSubmission) -> CoursePostAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn post_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._post_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the student's submission.
+    ///
+    /// Sets the *submission id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn submission_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._submission_id = new_value.to_string();
+        self
+    }
+    /// Required. Mask that identifies which fields on the attachment to update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the `AddOnAttachmentStudentSubmission` object. The following fields may be specified by teachers: * `points_earned`
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> CoursePostAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* query property to the given value.
+    pub fn item_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._item_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CoursePostAddOnAttachmentStudentSubmissionPatchCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CoursePostAddOnAttachmentStudentSubmissionPatchCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Creates an add-on attachment under a post. Requires the add-on to have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *posts.addOnAttachments.create* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// use classroom1::api::AddOnAttachment;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddOnAttachment::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().posts_add_on_attachments_create(req, "courseId", "postId")
+///              .item_id("dolor")
+///              .add_on_token("aliquyam")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CoursePostAddOnAttachmentCreateCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _request: AddOnAttachment,
+    _course_id: String,
+    _post_id: String,
+    _item_id: Option<String>,
+    _add_on_token: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CoursePostAddOnAttachmentCreateCall<'a, S> {}
+
+impl<'a, S> CoursePostAddOnAttachmentCreateCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.posts.addOnAttachments.create",
+                               http_method: hyper::Method::POST });
+
+        for &field in ["alt", "courseId", "postId", "itemId", "addOnToken"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("postId", self._post_id);
+        if let Some(value) = self._item_id.as_ref() {
+            params.push("itemId", value);
+        }
+        if let Some(value) = self._add_on_token.as_ref() {
+            params.push("addOnToken", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/posts/{postId}/addOnAttachments";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{postId}", "postId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["postId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::POST)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddOnAttachment) -> CoursePostAddOnAttachmentCreateCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentCreateCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn post_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentCreateCall<'a, S> {
+        self._post_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which to create the attachment. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* query property to the given value.
+    pub fn item_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentCreateCall<'a, S> {
+        self._item_id = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Token that authorizes the request. The token is passed as a query parameter when the user is redirected from Classroom to the add-on's URL. This authorization token is required for in-Classroom attachment creation but optional for partner-first attachment creation. Returns an error if not provided for partner-first attachment creation and the developer projects that created the attachment and its parent stream item do not match.
+    ///
+    /// Sets the *add on token* query property to the given value.
+    pub fn add_on_token(mut self, new_value: &str) -> CoursePostAddOnAttachmentCreateCall<'a, S> {
+        self._add_on_token = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CoursePostAddOnAttachmentCreateCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CoursePostAddOnAttachmentCreateCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Deletes an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *posts.addOnAttachments.delete* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().posts_add_on_attachments_delete("courseId", "postId", "attachmentId")
+///              .item_id("Lorem")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CoursePostAddOnAttachmentDeleteCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _post_id: String,
+    _attachment_id: String,
+    _item_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CoursePostAddOnAttachmentDeleteCall<'a, S> {}
+
+impl<'a, S> CoursePostAddOnAttachmentDeleteCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, Empty)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.posts.addOnAttachments.delete",
+                               http_method: hyper::Method::DELETE });
+
+        for &field in ["alt", "courseId", "postId", "attachmentId", "itemId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("postId", self._post_id);
+        params.push("attachmentId", self._attachment_id);
+        if let Some(value) = self._item_id.as_ref() {
+            params.push("itemId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/posts/{postId}/addOnAttachments/{attachmentId}";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{postId}", "postId"), ("{attachmentId}", "attachmentId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["attachmentId", "postId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::DELETE)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentDeleteCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn post_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentDeleteCall<'a, S> {
+        self._post_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentDeleteCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* query property to the given value.
+    pub fn item_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentDeleteCall<'a, S> {
+        self._item_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CoursePostAddOnAttachmentDeleteCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CoursePostAddOnAttachmentDeleteCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Returns an add-on attachment. Requires the add-on requesting the attachment to be the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *posts.addOnAttachments.get* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().posts_add_on_attachments_get("courseId", "postId", "attachmentId")
+///              .item_id("At")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CoursePostAddOnAttachmentGetCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _post_id: String,
+    _attachment_id: String,
+    _item_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CoursePostAddOnAttachmentGetCall<'a, S> {}
+
+impl<'a, S> CoursePostAddOnAttachmentGetCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.posts.addOnAttachments.get",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "courseId", "postId", "attachmentId", "itemId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(6 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("postId", self._post_id);
+        params.push("attachmentId", self._attachment_id);
+        if let Some(value) = self._item_id.as_ref() {
+            params.push("itemId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/posts/{postId}/addOnAttachments/{attachmentId}";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{postId}", "postId"), ("{attachmentId}", "attachmentId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["attachmentId", "postId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentGetCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn post_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentGetCall<'a, S> {
+        self._post_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentGetCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* query property to the given value.
+    pub fn item_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentGetCall<'a, S> {
+        self._item_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CoursePostAddOnAttachmentGetCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CoursePostAddOnAttachmentGetCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Returns all attachments created by an add-on under the post. Requires the add-on to have active attachments on the post or have permission to create new attachments on the post. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *posts.addOnAttachments.list* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().posts_add_on_attachments_list("courseId", "postId")
+///              .page_token("sit")
+///              .page_size(-83)
+///              .item_id("et")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CoursePostAddOnAttachmentListCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _post_id: String,
+    _page_token: Option<String>,
+    _page_size: Option<i32>,
+    _item_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CoursePostAddOnAttachmentListCall<'a, S> {}
+
+impl<'a, S> CoursePostAddOnAttachmentListCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, ListAddOnAttachmentsResponse)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.posts.addOnAttachments.list",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "courseId", "postId", "pageToken", "pageSize", "itemId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("postId", self._post_id);
+        if let Some(value) = self._page_token.as_ref() {
+            params.push("pageToken", value);
+        }
+        if let Some(value) = self._page_size.as_ref() {
+            params.push("pageSize", value.to_string());
+        }
+        if let Some(value) = self._item_id.as_ref() {
+            params.push("itemId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/posts/{postId}/addOnAttachments";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{postId}", "postId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["postId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentListCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Optional. Identifier of the post under the course whose attachments to enumerate. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn post_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentListCall<'a, S> {
+        self._post_id = new_value.to_string();
+        self
+    }
+    /// A page token, received from a previous `ListAddOnAttachments` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListAddOnAttachments` must match the call that provided the page token.
+    ///
+    /// Sets the *page token* query property to the given value.
+    pub fn page_token(mut self, new_value: &str) -> CoursePostAddOnAttachmentListCall<'a, S> {
+        self._page_token = Some(new_value.to_string());
+        self
+    }
+    /// The maximum number of attachments to return. The service may return fewer than this value. If unspecified, at most 20 attachments will be returned. The maximum value is 20; values above 20 will be coerced to 20.
+    ///
+    /// Sets the *page size* query property to the given value.
+    pub fn page_size(mut self, new_value: i32) -> CoursePostAddOnAttachmentListCall<'a, S> {
+        self._page_size = Some(new_value);
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial whose attachments should be enumerated. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* query property to the given value.
+    pub fn item_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentListCall<'a, S> {
+        self._item_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CoursePostAddOnAttachmentListCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CoursePostAddOnAttachmentListCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Updates an add-on attachment. Requires the add-on to have been the original creator of the attachment. This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *posts.addOnAttachments.patch* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// use classroom1::api::AddOnAttachment;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // As the method needs a request, you would usually fill it with the desired information
+/// // into the respective structure. Some of the parts shown here might not be applicable !
+/// // Values shown here are possibly random and not representative !
+/// let mut req = AddOnAttachment::default();
+/// 
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().posts_add_on_attachments_patch(req, "courseId", "postId", "attachmentId")
+///              .update_mask(FieldMask::new::<&str>(&[]))
+///              .item_id("justo")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CoursePostAddOnAttachmentPatchCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _request: AddOnAttachment,
+    _course_id: String,
+    _post_id: String,
+    _attachment_id: String,
+    _update_mask: Option<client::FieldMask>,
+    _item_id: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CoursePostAddOnAttachmentPatchCall<'a, S> {}
+
+impl<'a, S> CoursePostAddOnAttachmentPatchCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnAttachment)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.posts.addOnAttachments.patch",
+                               http_method: hyper::Method::PATCH });
+
+        for &field in ["alt", "courseId", "postId", "attachmentId", "updateMask", "itemId"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(8 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("postId", self._post_id);
+        params.push("attachmentId", self._attachment_id);
+        if let Some(value) = self._update_mask.as_ref() {
+            params.push("updateMask", value.to_string());
+        }
+        if let Some(value) = self._item_id.as_ref() {
+            params.push("itemId", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/posts/{postId}/addOnAttachments/{attachmentId}";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{postId}", "postId"), ("{attachmentId}", "attachmentId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["attachmentId", "postId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+        let mut json_mime_type = mime::APPLICATION_JSON;
+        let mut request_value_reader =
+            {
+                let mut value = json::value::to_value(&self._request).expect("serde to work");
+                client::remove_json_null_values(&mut value);
+                let mut dst = io::Cursor::new(Vec::with_capacity(128));
+                json::to_writer(&mut dst, &value).unwrap();
+                dst
+            };
+        let request_size = request_value_reader.seek(io::SeekFrom::End(0)).unwrap();
+        request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+
+
+        loop {
+            request_value_reader.seek(io::SeekFrom::Start(0)).unwrap();
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::PATCH)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_TYPE, json_mime_type.to_string())
+                        .header(CONTENT_LENGTH, request_size as u64)
+                        .body(hyper::body::Body::from(request_value_reader.get_ref().clone()));
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    ///
+    /// Sets the *request* property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn request(mut self, new_value: AddOnAttachment) -> CoursePostAddOnAttachmentPatchCall<'a, S> {
+        self._request = new_value;
+        self
+    }
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentPatchCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the post under which the attachment is attached.
+    ///
+    /// Sets the *post id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn post_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentPatchCall<'a, S> {
+        self._post_id = new_value.to_string();
+        self
+    }
+    /// Required. Identifier of the attachment.
+    ///
+    /// Sets the *attachment id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn attachment_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentPatchCall<'a, S> {
+        self._attachment_id = new_value.to_string();
+        self
+    }
+    /// Required. Mask that identifies which fields on the attachment to update. The update fails if invalid fields are specified. If a field supports empty values, it can be cleared by specifying it in the update mask and not in the `AddOnAttachment` object. If a field that does not support empty values is included in the update mask and not set in the `AddOnAttachment` object, an `INVALID_ARGUMENT` error is returned. The following fields may be specified by teachers: * `title` * `teacher_view_uri` * `student_view_uri` * `student_work_review_uri` * `due_date` * `due_time` * `max_points`
+    ///
+    /// Sets the *update mask* query property to the given value.
+    pub fn update_mask(mut self, new_value: client::FieldMask) -> CoursePostAddOnAttachmentPatchCall<'a, S> {
+        self._update_mask = Some(new_value);
+        self
+    }
+    /// Identifier of the post under which the attachment is attached.
+    ///
+    /// Sets the *item id* query property to the given value.
+    pub fn item_id(mut self, new_value: &str) -> CoursePostAddOnAttachmentPatchCall<'a, S> {
+        self._item_id = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CoursePostAddOnAttachmentPatchCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CoursePostAddOnAttachmentPatchCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
+/// Gets metadata for Classroom add-ons in the context of a specific post. To maintain the integrity of its own data and permissions model, an add-on should call this to validate query parameters and the requesting user's role whenever the add-on is opened in an [iframe](https://developers.google.com/classroom/add-ons/get-started/iframes/iframes-overview). This method returns the following error codes: * `PERMISSION_DENIED` for access errors. * `INVALID_ARGUMENT` if the request is malformed. * `NOT_FOUND` if one of the identified resources does not exist.
+///
+/// A builder for the *posts.getAddOnContext* method supported by a *course* resource.
+/// It is not used directly, but through a [`CourseMethods`] instance.
+///
+/// # Example
+///
+/// Instantiate a resource method builder
+///
+/// ```test_harness,no_run
+/// # extern crate hyper;
+/// # extern crate hyper_rustls;
+/// # extern crate google_classroom1 as classroom1;
+/// # async fn dox() {
+/// # use std::default::Default;
+/// # use classroom1::{Classroom, oauth2, hyper, hyper_rustls, chrono, FieldMask};
+/// 
+/// # let secret: oauth2::ApplicationSecret = Default::default();
+/// # let auth = oauth2::InstalledFlowAuthenticator::builder(
+/// #         secret,
+/// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
+/// #     ).build().await.unwrap();
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+/// // You can configure optional parameters by calling the respective setters at will, and
+/// // execute the final call using `doit()`.
+/// // Values shown here are possibly random and not representative !
+/// let result = hub.courses().posts_get_add_on_context("courseId", "postId")
+///              .item_id("nonumy")
+///              .attachment_id("sed")
+///              .add_on_token("kasd")
+///              .doit().await;
+/// # }
+/// ```
+pub struct CoursePostGetAddOnContextCall<'a, S>
+    where S: 'a {
+
+    hub: &'a Classroom<S>,
+    _course_id: String,
+    _post_id: String,
+    _item_id: Option<String>,
+    _attachment_id: Option<String>,
+    _add_on_token: Option<String>,
+    _delegate: Option<&'a mut dyn client::Delegate>,
+    _additional_params: HashMap<String, String>,
+}
+
+impl<'a, S> client::CallBuilder for CoursePostGetAddOnContextCall<'a, S> {}
+
+impl<'a, S> CoursePostGetAddOnContextCall<'a, S>
+where
+    S: tower_service::Service<http::Uri> + Clone + Send + Sync + 'static,
+    S::Response: hyper::client::connect::Connection + AsyncRead + AsyncWrite + Send + Unpin + 'static,
+    S::Future: Send + Unpin + 'static,
+    S::Error: Into<Box<dyn StdError + Send + Sync>>,
+{
+
+
+    /// Perform the operation you have build so far.
+    pub async fn doit(mut self) -> client::Result<(hyper::Response<hyper::body::Body>, AddOnContext)> {
+        use std::io::{Read, Seek};
+        use hyper::header::{CONTENT_TYPE, CONTENT_LENGTH, AUTHORIZATION, USER_AGENT, LOCATION};
+        use client::{ToParts, url::Params};
+        use std::borrow::Cow;
+
+        let mut dd = client::DefaultDelegate;
+        let mut dlg: &mut dyn client::Delegate = self._delegate.unwrap_or(&mut dd);
+        dlg.begin(client::MethodInfo { id: "classroom.courses.posts.getAddOnContext",
+                               http_method: hyper::Method::GET });
+
+        for &field in ["alt", "courseId", "postId", "itemId", "attachmentId", "addOnToken"].iter() {
+            if self._additional_params.contains_key(field) {
+                dlg.finished(false);
+                return Err(client::Error::FieldClash(field));
+            }
+        }
+
+        let mut params = Params::with_capacity(7 + self._additional_params.len());
+        params.push("courseId", self._course_id);
+        params.push("postId", self._post_id);
+        if let Some(value) = self._item_id.as_ref() {
+            params.push("itemId", value);
+        }
+        if let Some(value) = self._attachment_id.as_ref() {
+            params.push("attachmentId", value);
+        }
+        if let Some(value) = self._add_on_token.as_ref() {
+            params.push("addOnToken", value);
+        }
+
+        params.extend(self._additional_params.iter());
+
+        params.push("alt", "json");
+        let mut url = self.hub._base_url.clone() + "v1/courses/{courseId}/posts/{postId}/addOnContext";
+        
+        match dlg.api_key() {
+            Some(value) => params.push("key", value),
+            None => {
+                dlg.finished(false);
+                return Err(client::Error::MissingAPIKey)
+            }
+        }
+
+        for &(find_this, param_name) in [("{courseId}", "courseId"), ("{postId}", "postId")].iter() {
+            url = params.uri_replacement(url, param_name, find_this, false);
+        }
+        {
+            let to_remove = ["postId", "courseId"];
+            params.remove_params(&to_remove);
+        }
+
+        let url = params.parse_with_url(&url);
+
+
+
+        loop {
+            let mut req_result = {
+                let client = &self.hub.client;
+                dlg.pre_request();
+                let mut req_builder = hyper::Request::builder()
+                    .method(hyper::Method::GET)
+                    .uri(url.as_str())
+                    .header(USER_AGENT, self.hub._user_agent.clone());
+
+
+
+                        let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
+                        .body(hyper::body::Body::empty());
+
+                client.request(request.unwrap()).await
+
+            };
+
+            match req_result {
+                Err(err) => {
+                    if let client::Retry::After(d) = dlg.http_error(&err) {
+                        sleep(d).await;
+                        continue;
+                    }
+                    dlg.finished(false);
+                    return Err(client::Error::HttpError(err))
+                }
+                Ok(mut res) => {
+                    if !res.status().is_success() {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+                        let (parts, _) = res.into_parts();
+                        let body = hyper::Body::from(res_body_string.clone());
+                        let restored_response = hyper::Response::from_parts(parts, body);
+
+                        let server_response = json::from_str::<serde_json::Value>(&res_body_string).ok();
+
+                        if let client::Retry::After(d) = dlg.http_failure(&restored_response, server_response.clone()) {
+                            sleep(d).await;
+                            continue;
+                        }
+
+                        dlg.finished(false);
+
+                        return match server_response {
+                            Some(error_value) => Err(client::Error::BadRequest(error_value)),
+                            None => Err(client::Error::Failure(restored_response)),
+                        }
+                    }
+                    let result_value = {
+                        let res_body_string = client::get_body_as_string(res.body_mut()).await;
+
+                        match json::from_str(&res_body_string) {
+                            Ok(decoded) => (res, decoded),
+                            Err(err) => {
+                                dlg.response_json_decode_error(&res_body_string, &err);
+                                return Err(client::Error::JsonDecodeError(res_body_string, err));
+                            }
+                        }
+                    };
+
+                    dlg.finished(true);
+                    return Ok(result_value)
+                }
+            }
+        }
+    }
+
+
+    /// Required. Identifier of the course.
+    ///
+    /// Sets the *course id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn course_id(mut self, new_value: &str) -> CoursePostGetAddOnContextCall<'a, S> {
+        self._course_id = new_value.to_string();
+        self
+    }
+    /// Optional. Deprecated, use item_id instead.
+    ///
+    /// Sets the *post id* path property to the given value.
+    ///
+    /// Even though the property as already been set when instantiating this call,
+    /// we provide this method for API completeness.
+    pub fn post_id(mut self, new_value: &str) -> CoursePostGetAddOnContextCall<'a, S> {
+        self._post_id = new_value.to_string();
+        self
+    }
+    /// Identifier of the announcement, courseWork, or courseWorkMaterial under which the attachment is attached. This field is required, but is not marked as such while we are migrating from post_id.
+    ///
+    /// Sets the *item id* query property to the given value.
+    pub fn item_id(mut self, new_value: &str) -> CoursePostGetAddOnContextCall<'a, S> {
+        self._item_id = Some(new_value.to_string());
+        self
+    }
+    /// Optional. The identifier of the attachment. This field is required for student users and optional for teacher users. If not provided in the student case, an error is returned.
+    ///
+    /// Sets the *attachment id* query property to the given value.
+    pub fn attachment_id(mut self, new_value: &str) -> CoursePostGetAddOnContextCall<'a, S> {
+        self._attachment_id = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Token that authorizes the request. The token is passed as a query parameter when the user is redirected from Classroom to the add-on's URL. The authorization token is required when neither of the following is true: * The add-on has attachments on the post. * The developer project issuing the request is the same project that created the post.
+    ///
+    /// Sets the *add on token* query property to the given value.
+    pub fn add_on_token(mut self, new_value: &str) -> CoursePostGetAddOnContextCall<'a, S> {
+        self._add_on_token = Some(new_value.to_string());
+        self
+    }
+    /// The delegate implementation is consulted whenever there is an intermediate result, or if something goes wrong
+    /// while executing the actual API request.
+    /// 
+    /// ````text
+    ///                   It should be used to handle progress information, and to implement a certain level of resilience.
+    /// ````
+    ///
+    /// Sets the *delegate* property to the given value.
+    pub fn delegate(mut self, new_value: &'a mut dyn client::Delegate) -> CoursePostGetAddOnContextCall<'a, S> {
+        self._delegate = Some(new_value);
+        self
+    }
+
+    /// Set any additional parameter of the query string used in the request.
+    /// It should be used to set parameters which are not yet available through their own
+    /// setters.
+    ///
+    /// Please note that this method must not be used to set any of the known parameters
+    /// which have their own setter method. If done anyway, the request will fail.
+    ///
+    /// # Additional Parameters
+    ///
+    /// * *$.xgafv* (query-string) - V1 error format.
+    /// * *access_token* (query-string) - OAuth access token.
+    /// * *alt* (query-string) - Data format for response.
+    /// * *callback* (query-string) - JSONP
+    /// * *fields* (query-string) - Selector specifying which fields to include in a partial response.
+    /// * *key* (query-string) - API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.
+    /// * *oauth_token* (query-string) - OAuth 2.0 token for the current user.
+    /// * *prettyPrint* (query-boolean) - Returns response with indentations and line breaks.
+    /// * *quotaUser* (query-string) - Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.
+    /// * *uploadType* (query-string) - Legacy upload protocol for media (e.g. "media", "multipart").
+    /// * *upload_protocol* (query-string) - Upload protocol for media (e.g. "raw", "multipart").
+    pub fn param<T>(mut self, name: T, value: T) -> CoursePostGetAddOnContextCall<'a, S>
+                                                        where T: AsRef<str> {
+        self._additional_params.insert(name.as_ref().to_string(), value.as_ref().to_string());
+        self
+    }
+
+}
+
+
 /// Adds a user as a student of a course. Domain administrators are permitted to [directly add](https://developers.google.com/classroom/guides/manage-users) users within their domain as students to courses within their domain. Students are permitted to add themselves to a course using an enrollment code. This method returns the following error codes: * `PERMISSION_DENIED` if the requesting user is not permitted to create students in this course or for access errors. * `NOT_FOUND` if the requested course ID does not exist. * `FAILED_PRECONDITION` if the requested user's account is disabled, for the following request errors: * CourseMemberLimitReached * CourseNotModifiable * UserGroupsMembershipLimitReached * InactiveCourseOwner * `ALREADY_EXISTS` if the user is already a student or teacher in the course.
 ///
 /// A builder for the *students.create* method supported by a *course* resource.
@@ -11566,7 +20255,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -11576,7 +20265,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().students_create(req, "courseId")
-///              .enrollment_code("ea")
+///              .enrollment_code("sanctus")
 ///              .doit().await;
 /// # }
 /// ```
@@ -11869,7 +20558,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -11969,6 +20658,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12143,7 +20833,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -12243,6 +20933,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12417,13 +21108,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().students_list("courseId")
-///              .page_token("At")
-///              .page_size(-43)
+///              .page_token("amet.")
+///              .page_size(-84)
 ///              .doit().await;
 /// # }
 /// ```
@@ -12525,6 +21216,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -12704,7 +21396,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -12995,7 +21687,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13095,6 +21787,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -13269,7 +21962,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -13369,6 +22062,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -13543,13 +22237,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().teachers_list("courseId")
-///              .page_token("sanctus")
-///              .page_size(-56)
+///              .page_token("sadipscing")
+///              .page_size(-87)
 ///              .doit().await;
 /// # }
 /// ```
@@ -13651,6 +22345,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -13830,7 +22525,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14121,7 +22816,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14221,6 +22916,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14395,7 +23091,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -14495,6 +23191,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14669,13 +23366,13 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().topics_list("courseId")
-///              .page_token("sed")
-///              .page_size(-11)
+///              .page_token("et")
+///              .page_size(-56)
 ///              .doit().await;
 /// # }
 /// ```
@@ -14777,6 +23474,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -14956,7 +23654,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -14966,7 +23664,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().topics_patch(req, "courseId", "id")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -15272,7 +23970,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -15544,7 +24242,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15642,6 +24340,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -15806,7 +24505,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -15904,6 +24603,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16068,16 +24768,16 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().list()
-///              .teacher_id("nonumy")
-///              .student_id("At")
-///              .page_token("sadipscing")
-///              .page_size(-32)
-///              .add_course_states("dolores")
+///              .teacher_id("invidunt")
+///              .student_id("clita")
+///              .page_token("Stet")
+///              .page_size(-82)
+///              .add_course_states("ut")
 ///              .doit().await;
 /// # }
 /// ```
@@ -16184,6 +24884,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -16375,7 +25076,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16385,7 +25086,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.courses().patch(req, "id")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -16679,7 +25380,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -16970,7 +25671,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17068,6 +25769,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17233,7 +25935,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -17505,7 +26207,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17603,6 +26305,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -17767,7 +26470,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -17865,6 +26568,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -18029,15 +26733,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.invitations().list()
-///              .user_id("et")
-///              .page_token("sea")
-///              .page_size(-96)
-///              .course_id("consetetur")
+///              .user_id("dolores")
+///              .page_token("sed")
+///              .page_size(-38)
+///              .course_id("clita")
 ///              .doit().await;
 /// # }
 /// ```
@@ -18138,6 +26842,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -18321,7 +27026,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -18593,7 +27298,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -18691,6 +27396,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -18856,7 +27562,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19147,7 +27853,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -19247,6 +27953,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19421,15 +28128,15 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.user_profiles().guardian_invitations_list("studentId")
-///              .add_states("diam")
-///              .page_token("est")
-///              .page_size(-53)
-///              .invited_email_address("sed")
+///              .add_states("et")
+///              .page_token("sanctus")
+///              .page_size(-23)
+///              .invited_email_address("tempor")
 ///              .doit().await;
 /// # }
 /// ```
@@ -19541,6 +28248,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -19735,7 +28443,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // As the method needs a request, you would usually fill it with the desired information
 /// // into the respective structure. Some of the parts shown here might not be applicable !
 /// // Values shown here are possibly random and not representative !
@@ -19745,7 +28453,7 @@ where
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.user_profiles().guardian_invitations_patch(req, "studentId", "invitationId")
-///              .update_mask(&Default::default())
+///              .update_mask(FieldMask::new::<&str>(&[]))
 ///              .doit().await;
 /// # }
 /// ```
@@ -20050,7 +28758,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20150,6 +28858,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -20324,7 +29033,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20424,6 +29133,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -20598,14 +29308,14 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.user_profiles().guardians_list("studentId")
-///              .page_token("sea")
-///              .page_size(-74)
-///              .invited_email_address("At")
+///              .page_token("justo")
+///              .page_size(-5)
+///              .invited_email_address("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -20711,6 +29421,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -20896,7 +29607,7 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -20994,6 +29705,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await

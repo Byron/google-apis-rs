@@ -2,7 +2,7 @@
 // This file was generated automatically from 'src/generator/templates/api/lib.rs.mako'
 // DO NOT EDIT !
 
-//! This documentation was generated from *classroom* crate version *5.0.4+20240227*, where *20240227* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.4*.
+//! This documentation was generated from *classroom* crate version *5.0.5+20240617*, where *20240617* is the exact revision of the *classroom:v1* schema built by the [mako](http://www.makotemplates.org/) code generator *v5.0.5*.
 //! 
 //! Everything else about the *classroom* *v1* API can be found at the
 //! [official documentation site](https://developers.google.com/classroom/).
@@ -12,7 +12,7 @@
 //! Handle the following *Resources* with ease from the central [hub](Classroom) ... 
 //! 
 //! * [courses](api::Course)
-//!  * [*aliases create*](api::CourseAliasCreateCall), [*aliases delete*](api::CourseAliasDeleteCall), [*aliases list*](api::CourseAliasListCall), [*announcements create*](api::CourseAnnouncementCreateCall), [*announcements delete*](api::CourseAnnouncementDeleteCall), [*announcements get*](api::CourseAnnouncementGetCall), [*announcements list*](api::CourseAnnouncementListCall), [*announcements modify assignees*](api::CourseAnnouncementModifyAssigneeCall), [*announcements patch*](api::CourseAnnouncementPatchCall), [*course work create*](api::CourseCourseWorkCreateCall), [*course work delete*](api::CourseCourseWorkDeleteCall), [*course work get*](api::CourseCourseWorkGetCall), [*course work list*](api::CourseCourseWorkListCall), [*course work modify assignees*](api::CourseCourseWorkModifyAssigneeCall), [*course work patch*](api::CourseCourseWorkPatchCall), [*course work student submissions get*](api::CourseCourseWorkStudentSubmissionGetCall), [*course work student submissions list*](api::CourseCourseWorkStudentSubmissionListCall), [*course work student submissions modify attachments*](api::CourseCourseWorkStudentSubmissionModifyAttachmentCall), [*course work student submissions patch*](api::CourseCourseWorkStudentSubmissionPatchCall), [*course work student submissions reclaim*](api::CourseCourseWorkStudentSubmissionReclaimCall), [*course work student submissions return*](api::CourseCourseWorkStudentSubmissionReturnCall), [*course work student submissions turn in*](api::CourseCourseWorkStudentSubmissionTurnInCall), [*course work materials create*](api::CourseCourseWorkMaterialCreateCall), [*course work materials delete*](api::CourseCourseWorkMaterialDeleteCall), [*course work materials get*](api::CourseCourseWorkMaterialGetCall), [*course work materials list*](api::CourseCourseWorkMaterialListCall), [*course work materials patch*](api::CourseCourseWorkMaterialPatchCall), [*create*](api::CourseCreateCall), [*delete*](api::CourseDeleteCall), [*get*](api::CourseGetCall), [*list*](api::CourseListCall), [*patch*](api::CoursePatchCall), [*students create*](api::CourseStudentCreateCall), [*students delete*](api::CourseStudentDeleteCall), [*students get*](api::CourseStudentGetCall), [*students list*](api::CourseStudentListCall), [*teachers create*](api::CourseTeacherCreateCall), [*teachers delete*](api::CourseTeacherDeleteCall), [*teachers get*](api::CourseTeacherGetCall), [*teachers list*](api::CourseTeacherListCall), [*topics create*](api::CourseTopicCreateCall), [*topics delete*](api::CourseTopicDeleteCall), [*topics get*](api::CourseTopicGetCall), [*topics list*](api::CourseTopicListCall), [*topics patch*](api::CourseTopicPatchCall) and [*update*](api::CourseUpdateCall)
+//!  * [*aliases create*](api::CourseAliasCreateCall), [*aliases delete*](api::CourseAliasDeleteCall), [*aliases list*](api::CourseAliasListCall), [*announcements add on attachments create*](api::CourseAnnouncementAddOnAttachmentCreateCall), [*announcements add on attachments delete*](api::CourseAnnouncementAddOnAttachmentDeleteCall), [*announcements add on attachments get*](api::CourseAnnouncementAddOnAttachmentGetCall), [*announcements add on attachments list*](api::CourseAnnouncementAddOnAttachmentListCall), [*announcements add on attachments patch*](api::CourseAnnouncementAddOnAttachmentPatchCall), [*announcements create*](api::CourseAnnouncementCreateCall), [*announcements delete*](api::CourseAnnouncementDeleteCall), [*announcements get*](api::CourseAnnouncementGetCall), [*announcements get add on context*](api::CourseAnnouncementGetAddOnContextCall), [*announcements list*](api::CourseAnnouncementListCall), [*announcements modify assignees*](api::CourseAnnouncementModifyAssigneeCall), [*announcements patch*](api::CourseAnnouncementPatchCall), [*course work add on attachments create*](api::CourseCourseWorkAddOnAttachmentCreateCall), [*course work add on attachments delete*](api::CourseCourseWorkAddOnAttachmentDeleteCall), [*course work add on attachments get*](api::CourseCourseWorkAddOnAttachmentGetCall), [*course work add on attachments list*](api::CourseCourseWorkAddOnAttachmentListCall), [*course work add on attachments patch*](api::CourseCourseWorkAddOnAttachmentPatchCall), [*course work add on attachments student submissions get*](api::CourseCourseWorkAddOnAttachmentStudentSubmissionGetCall), [*course work add on attachments student submissions patch*](api::CourseCourseWorkAddOnAttachmentStudentSubmissionPatchCall), [*course work create*](api::CourseCourseWorkCreateCall), [*course work delete*](api::CourseCourseWorkDeleteCall), [*course work get*](api::CourseCourseWorkGetCall), [*course work get add on context*](api::CourseCourseWorkGetAddOnContextCall), [*course work list*](api::CourseCourseWorkListCall), [*course work modify assignees*](api::CourseCourseWorkModifyAssigneeCall), [*course work patch*](api::CourseCourseWorkPatchCall), [*course work student submissions get*](api::CourseCourseWorkStudentSubmissionGetCall), [*course work student submissions list*](api::CourseCourseWorkStudentSubmissionListCall), [*course work student submissions modify attachments*](api::CourseCourseWorkStudentSubmissionModifyAttachmentCall), [*course work student submissions patch*](api::CourseCourseWorkStudentSubmissionPatchCall), [*course work student submissions reclaim*](api::CourseCourseWorkStudentSubmissionReclaimCall), [*course work student submissions return*](api::CourseCourseWorkStudentSubmissionReturnCall), [*course work student submissions turn in*](api::CourseCourseWorkStudentSubmissionTurnInCall), [*course work materials add on attachments create*](api::CourseCourseWorkMaterialAddOnAttachmentCreateCall), [*course work materials add on attachments delete*](api::CourseCourseWorkMaterialAddOnAttachmentDeleteCall), [*course work materials add on attachments get*](api::CourseCourseWorkMaterialAddOnAttachmentGetCall), [*course work materials add on attachments list*](api::CourseCourseWorkMaterialAddOnAttachmentListCall), [*course work materials add on attachments patch*](api::CourseCourseWorkMaterialAddOnAttachmentPatchCall), [*course work materials create*](api::CourseCourseWorkMaterialCreateCall), [*course work materials delete*](api::CourseCourseWorkMaterialDeleteCall), [*course work materials get*](api::CourseCourseWorkMaterialGetCall), [*course work materials get add on context*](api::CourseCourseWorkMaterialGetAddOnContextCall), [*course work materials list*](api::CourseCourseWorkMaterialListCall), [*course work materials patch*](api::CourseCourseWorkMaterialPatchCall), [*create*](api::CourseCreateCall), [*delete*](api::CourseDeleteCall), [*get*](api::CourseGetCall), [*list*](api::CourseListCall), [*patch*](api::CoursePatchCall), [*posts add on attachments create*](api::CoursePostAddOnAttachmentCreateCall), [*posts add on attachments delete*](api::CoursePostAddOnAttachmentDeleteCall), [*posts add on attachments get*](api::CoursePostAddOnAttachmentGetCall), [*posts add on attachments list*](api::CoursePostAddOnAttachmentListCall), [*posts add on attachments patch*](api::CoursePostAddOnAttachmentPatchCall), [*posts add on attachments student submissions get*](api::CoursePostAddOnAttachmentStudentSubmissionGetCall), [*posts add on attachments student submissions patch*](api::CoursePostAddOnAttachmentStudentSubmissionPatchCall), [*posts get add on context*](api::CoursePostGetAddOnContextCall), [*students create*](api::CourseStudentCreateCall), [*students delete*](api::CourseStudentDeleteCall), [*students get*](api::CourseStudentGetCall), [*students list*](api::CourseStudentListCall), [*teachers create*](api::CourseTeacherCreateCall), [*teachers delete*](api::CourseTeacherDeleteCall), [*teachers get*](api::CourseTeacherGetCall), [*teachers list*](api::CourseTeacherListCall), [*topics create*](api::CourseTopicCreateCall), [*topics delete*](api::CourseTopicDeleteCall), [*topics get*](api::CourseTopicGetCall), [*topics list*](api::CourseTopicListCall), [*topics patch*](api::CourseTopicPatchCall) and [*update*](api::CourseUpdateCall)
 //! * [invitations](api::Invitation)
 //!  * [*accept*](api::InvitationAcceptCall), [*create*](api::InvitationCreateCall), [*delete*](api::InvitationDeleteCall), [*get*](api::InvitationGetCall) and [*list*](api::InvitationListCall)
 //! * [registrations](api::Registration)
@@ -56,12 +56,25 @@
 //! let r = hub.courses().aliases_create(...).doit().await
 //! let r = hub.courses().aliases_delete(...).doit().await
 //! let r = hub.courses().aliases_list(...).doit().await
+//! let r = hub.courses().announcements_add_on_attachments_create(...).doit().await
+//! let r = hub.courses().announcements_add_on_attachments_delete(...).doit().await
+//! let r = hub.courses().announcements_add_on_attachments_get(...).doit().await
+//! let r = hub.courses().announcements_add_on_attachments_list(...).doit().await
+//! let r = hub.courses().announcements_add_on_attachments_patch(...).doit().await
 //! let r = hub.courses().announcements_create(...).doit().await
 //! let r = hub.courses().announcements_delete(...).doit().await
 //! let r = hub.courses().announcements_get(...).doit().await
+//! let r = hub.courses().announcements_get_add_on_context(...).doit().await
 //! let r = hub.courses().announcements_list(...).doit().await
 //! let r = hub.courses().announcements_modify_assignees(...).doit().await
 //! let r = hub.courses().announcements_patch(...).doit().await
+//! let r = hub.courses().course_work_add_on_attachments_student_submissions_get(...).doit().await
+//! let r = hub.courses().course_work_add_on_attachments_student_submissions_patch(...).doit().await
+//! let r = hub.courses().course_work_add_on_attachments_create(...).doit().await
+//! let r = hub.courses().course_work_add_on_attachments_delete(...).doit().await
+//! let r = hub.courses().course_work_add_on_attachments_get(...).doit().await
+//! let r = hub.courses().course_work_add_on_attachments_list(...).doit().await
+//! let r = hub.courses().course_work_add_on_attachments_patch(...).doit().await
 //! let r = hub.courses().course_work_student_submissions_get(...).doit().await
 //! let r = hub.courses().course_work_student_submissions_list(...).doit().await
 //! let r = hub.courses().course_work_student_submissions_modify_attachments(...).doit().await
@@ -72,14 +85,29 @@
 //! let r = hub.courses().course_work_create(...).doit().await
 //! let r = hub.courses().course_work_delete(...).doit().await
 //! let r = hub.courses().course_work_get(...).doit().await
+//! let r = hub.courses().course_work_get_add_on_context(...).doit().await
 //! let r = hub.courses().course_work_list(...).doit().await
 //! let r = hub.courses().course_work_modify_assignees(...).doit().await
 //! let r = hub.courses().course_work_patch(...).doit().await
+//! let r = hub.courses().course_work_materials_add_on_attachments_create(...).doit().await
+//! let r = hub.courses().course_work_materials_add_on_attachments_delete(...).doit().await
+//! let r = hub.courses().course_work_materials_add_on_attachments_get(...).doit().await
+//! let r = hub.courses().course_work_materials_add_on_attachments_list(...).doit().await
+//! let r = hub.courses().course_work_materials_add_on_attachments_patch(...).doit().await
 //! let r = hub.courses().course_work_materials_create(...).doit().await
 //! let r = hub.courses().course_work_materials_delete(...).doit().await
 //! let r = hub.courses().course_work_materials_get(...).doit().await
+//! let r = hub.courses().course_work_materials_get_add_on_context(...).doit().await
 //! let r = hub.courses().course_work_materials_list(...).doit().await
 //! let r = hub.courses().course_work_materials_patch(...).doit().await
+//! let r = hub.courses().posts_add_on_attachments_student_submissions_get(...).doit().await
+//! let r = hub.courses().posts_add_on_attachments_student_submissions_patch(...).doit().await
+//! let r = hub.courses().posts_add_on_attachments_create(...).doit().await
+//! let r = hub.courses().posts_add_on_attachments_delete(...).doit().await
+//! let r = hub.courses().posts_add_on_attachments_get(...).doit().await
+//! let r = hub.courses().posts_add_on_attachments_list(...).doit().await
+//! let r = hub.courses().posts_add_on_attachments_patch(...).doit().await
+//! let r = hub.courses().posts_get_add_on_context(...).doit().await
 //! let r = hub.courses().students_create(...).doit().await
 //! let r = hub.courses().students_delete(...).doit().await
 //! let r = hub.courses().students_get(...).doit().await
@@ -125,6 +153,7 @@
 //! extern crate hyper;
 //! extern crate hyper_rustls;
 //! extern crate google_classroom1 as classroom1;
+//! use classroom1::api::AddOnAttachmentStudentSubmission;
 //! use classroom1::{Result, Error};
 //! # async fn dox() {
 //! use std::default::Default;
@@ -142,16 +171,18 @@
 //!         secret,
 //!         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 //!     ).build().await.unwrap();
-//! let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+//! let mut hub = Classroom::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
+//! // As the method needs a request, you would usually fill it with the desired information
+//! // into the respective structure. Some of the parts shown here might not be applicable !
+//! // Values shown here are possibly random and not representative !
+//! let mut req = AddOnAttachmentStudentSubmission::default();
+//! 
 //! // You can configure optional parameters by calling the respective setters at will, and
 //! // execute the final call using `doit()`.
 //! // Values shown here are possibly random and not representative !
-//! let result = hub.courses().course_work_student_submissions_list("courseId", "courseWorkId")
-//!              .user_id("takimata")
-//!              .add_states("amet.")
-//!              .page_token("duo")
-//!              .page_size(-55)
-//!              .late("gubergren")
+//! let result = hub.courses().course_work_add_on_attachments_student_submissions_patch(req, "courseId", "itemId", "attachmentId", "submissionId")
+//!              .update_mask(FieldMask::new::<&str>(&[]))
+//!              .post_id("takimata")
 //!              .doit().await;
 //! 
 //! match result {
@@ -224,6 +255,13 @@
 //! [wiki-pod]: http://en.wikipedia.org/wiki/Plain_old_data_structure
 //! [builder-pattern]: http://en.wikipedia.org/wiki/Builder_pattern
 //! [google-go-api]: https://github.com/google/google-api-go-client
+//! 
+//! ## Cargo Features
+//! 
+//! * `utoipa` - Add support for [utoipa](https://crates.io/crates/utoipa) and derive `utoipa::ToSchema` on all
+//! the types. You'll have to import and register the required types in `#[openapi(schemas(...))]`, otherwise the
+//! generated `openapi` spec would be invalid.
+//! 
 //! 
 //! 
 

@@ -54,42 +54,43 @@ use crate::{client, client::GetToken, client::serde_with};
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CustomSearchAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = CustomSearchAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cse().siterestrict_list()
-///              .start(86)
-///              .sort("dolor")
-///              .site_search_filter("duo")
-///              .site_search("vero")
+///              .start(81)
+///              .sort("vero")
+///              .snippet_length(-76)
+///              .site_search_filter("invidunt")
+///              .site_search("Stet")
 ///              .search_type("vero")
-///              .safe("invidunt")
-///              .rights("Stet")
-///              .related_site("vero")
-///              .q("elitr")
-///              .or_terms("Lorem")
-///              .num(-29)
-///              .lr("no")
-///              .low_range("ipsum")
-///              .link_site("accusam")
-///              .img_type("takimata")
-///              .img_size("consetetur")
-///              .img_dominant_color("voluptua.")
-///              .img_color_type("et")
-///              .hq("erat")
-///              .hl("consetetur")
-///              .high_range("amet.")
-///              .googlehost("sed")
-///              .gl("takimata")
-///              .filter("dolores")
-///              .file_type("gubergren")
-///              .exclude_terms("et")
-///              .exact_terms("accusam")
-///              .date_restrict("voluptua.")
-///              .cx("dolore")
-///              .cr("dolore")
-///              .c2coff("dolore")
+///              .safe("elitr")
+///              .rights("Lorem")
+///              .related_site("diam")
+///              .q("no")
+///              .or_terms("ipsum")
+///              .num(-23)
+///              .lr("takimata")
+///              .low_range("consetetur")
+///              .link_site("voluptua.")
+///              .img_type("et")
+///              .img_size("erat")
+///              .img_dominant_color("consetetur")
+///              .img_color_type("amet.")
+///              .hq("sed")
+///              .hl("takimata")
+///              .high_range("dolores")
+///              .googlehost("gubergren")
+///              .gl("et")
+///              .filter("accusam")
+///              .file_type("voluptua.")
+///              .exclude_terms("dolore")
+///              .exact_terms("dolore")
+///              .date_restrict("dolore")
+///              .cx("voluptua.")
+///              .cr("amet.")
+///              .c2coff("ea")
 ///              .doit().await;
 /// 
 /// match result {
@@ -128,7 +129,7 @@ impl<'a, S> CustomSearchAPI<S> {
         CustomSearchAPI {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://customsearch.googleapis.com/".to_string(),
             _root_url: "https://customsearch.googleapis.com/".to_string(),
         }
@@ -139,7 +140,7 @@ impl<'a, S> CustomSearchAPI<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -171,6 +172,7 @@ impl<'a, S> CustomSearchAPI<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Promotion {
@@ -204,6 +206,7 @@ impl client::Part for Promotion {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Result {
@@ -273,6 +276,7 @@ impl client::Part for Result {}
 /// 
 /// * [siterestrict list cse](CseSiterestrictListCall) (response)
 /// * [list cse](CseListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct Search {
@@ -310,6 +314,7 @@ impl client::ResponseResult for Search {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PromotionBodyLines {
@@ -336,6 +341,7 @@ impl client::Part for PromotionBodyLines {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct PromotionImage {
@@ -358,6 +364,7 @@ impl client::Part for PromotionImage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultImage {
@@ -397,6 +404,7 @@ impl client::Part for ResultImage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct ResultLabels {
@@ -420,6 +428,7 @@ impl client::Part for ResultLabels {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchQueries {
@@ -444,6 +453,7 @@ impl client::Part for SearchQueries {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchQueriesNextPage {
@@ -590,6 +600,7 @@ impl client::Part for SearchQueriesNextPage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchQueriesPreviousPage {
@@ -736,6 +747,7 @@ impl client::Part for SearchQueriesPreviousPage {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchQueriesRequest {
@@ -882,6 +894,7 @@ impl client::Part for SearchQueriesRequest {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchSearchInformation {
@@ -911,6 +924,7 @@ impl client::Part for SearchSearchInformation {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchSpelling {
@@ -932,6 +946,7 @@ impl client::Part for SearchSpelling {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct SearchUrl {
@@ -974,7 +989,7 @@ impl client::Part for SearchUrl {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = CustomSearchAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = CustomSearchAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `list(...)` and `siterestrict_list(...)`
 /// // to build up your call.
@@ -999,6 +1014,7 @@ impl<'a, S> CseMethods<'a, S> {
             hub: self.hub,
             _start: Default::default(),
             _sort: Default::default(),
+            _snippet_length: Default::default(),
             _site_search_filter: Default::default(),
             _site_search: Default::default(),
             _search_type: Default::default(),
@@ -1041,6 +1057,7 @@ impl<'a, S> CseMethods<'a, S> {
             hub: self.hub,
             _start: Default::default(),
             _sort: Default::default(),
+            _snippet_length: Default::default(),
             _site_search_filter: Default::default(),
             _site_search: Default::default(),
             _search_type: Default::default(),
@@ -1106,42 +1123,43 @@ impl<'a, S> CseMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CustomSearchAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CustomSearchAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cse().siterestrict_list()
-///              .start(23)
-///              .sort("amet.")
-///              .site_search_filter("ea")
-///              .site_search("sadipscing")
-///              .search_type("Lorem")
-///              .safe("invidunt")
-///              .rights("no")
-///              .related_site("est")
-///              .q("At")
-///              .or_terms("sed")
-///              .num(-98)
+///              .start(6)
+///              .sort("Lorem")
+///              .snippet_length(-38)
+///              .site_search_filter("no")
+///              .site_search("est")
+///              .search_type("At")
+///              .safe("sed")
+///              .rights("sit")
+///              .related_site("et")
+///              .q("tempor")
+///              .or_terms("aliquyam")
+///              .num(-5)
 ///              .lr("et")
-///              .low_range("tempor")
-///              .link_site("aliquyam")
-///              .img_type("ipsum")
-///              .img_size("et")
-///              .img_dominant_color("sanctus")
-///              .img_color_type("Lorem")
-///              .hq("est")
-///              .hl("sed")
-///              .high_range("diam")
-///              .googlehost("dolores")
-///              .gl("dolores")
-///              .filter("et")
+///              .low_range("sanctus")
+///              .link_site("Lorem")
+///              .img_type("est")
+///              .img_size("sed")
+///              .img_dominant_color("diam")
+///              .img_color_type("dolores")
+///              .hq("dolores")
+///              .hl("et")
+///              .high_range("sed")
+///              .googlehost("no")
+///              .gl("et")
+///              .filter("elitr")
 ///              .file_type("sed")
 ///              .exclude_terms("no")
-///              .exact_terms("et")
-///              .date_restrict("elitr")
-///              .cx("sed")
-///              .cr("no")
-///              .c2coff("nonumy")
+///              .exact_terms("nonumy")
+///              .date_restrict("At")
+///              .cx("sadipscing")
+///              .cr("aliquyam")
+///              .c2coff("dolores")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1151,6 +1169,7 @@ pub struct CseSiterestrictListCall<'a, S>
     hub: &'a CustomSearchAPI<S>,
     _start: Option<u32>,
     _sort: Option<String>,
+    _snippet_length: Option<i32>,
     _site_search_filter: Option<String>,
     _site_search: Option<String>,
     _search_type: Option<String>,
@@ -1207,19 +1226,22 @@ where
         dlg.begin(client::MethodInfo { id: "search.cse.siterestrict.list",
                                http_method: hyper::Method::GET });
 
-        for &field in ["alt", "start", "sort", "siteSearchFilter", "siteSearch", "searchType", "safe", "rights", "relatedSite", "q", "orTerms", "num", "lr", "lowRange", "linkSite", "imgType", "imgSize", "imgDominantColor", "imgColorType", "hq", "hl", "highRange", "googlehost", "gl", "filter", "fileType", "excludeTerms", "exactTerms", "dateRestrict", "cx", "cr", "c2coff"].iter() {
+        for &field in ["alt", "start", "sort", "snippetLength", "siteSearchFilter", "siteSearch", "searchType", "safe", "rights", "relatedSite", "q", "orTerms", "num", "lr", "lowRange", "linkSite", "imgType", "imgSize", "imgDominantColor", "imgColorType", "hq", "hl", "highRange", "googlehost", "gl", "filter", "fileType", "excludeTerms", "exactTerms", "dateRestrict", "cx", "cr", "c2coff"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(33 + self._additional_params.len());
+        let mut params = Params::with_capacity(34 + self._additional_params.len());
         if let Some(value) = self._start.as_ref() {
             params.push("start", value.to_string());
         }
         if let Some(value) = self._sort.as_ref() {
             params.push("sort", value);
+        }
+        if let Some(value) = self._snippet_length.as_ref() {
+            params.push("snippetLength", value.to_string());
         }
         if let Some(value) = self._site_search_filter.as_ref() {
             params.push("siteSearchFilter", value);
@@ -1339,6 +1361,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -1407,6 +1430,13 @@ where
     /// Sets the *sort* query property to the given value.
     pub fn sort(mut self, new_value: &str) -> CseSiterestrictListCall<'a, S> {
         self._sort = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum length of snippet text, in characters, to be returned with results. Note: this feature is limited to specific engines. * Valid values are integers between 161 and 1000, inclusive.
+    ///
+    /// Sets the *snippet length* query property to the given value.
+    pub fn snippet_length(mut self, new_value: i32) -> CseSiterestrictListCall<'a, S> {
+        self._snippet_length = Some(new_value);
         self
     }
     /// Controls whether to include or exclude results from the site named in the `siteSearch` parameter. Acceptable values are: * `"e"`: exclude * `"i"`: include
@@ -1676,42 +1706,43 @@ where
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = CustomSearchAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = CustomSearchAPI::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
 /// let result = hub.cse().list()
-///              .start(24)
-///              .sort("sadipscing")
-///              .site_search_filter("aliquyam")
-///              .site_search("dolores")
-///              .search_type("sadipscing")
-///              .safe("erat")
-///              .rights("aliquyam")
-///              .related_site("amet")
-///              .q("est")
-///              .or_terms("et")
-///              .num(-10)
-///              .lr("consetetur")
-///              .low_range("consetetur")
-///              .link_site("Stet")
+///              .start(6)
+///              .sort("erat")
+///              .snippet_length(-82)
+///              .site_search_filter("amet")
+///              .site_search("est")
+///              .search_type("et")
+///              .safe("sea")
+///              .rights("consetetur")
+///              .related_site("consetetur")
+///              .q("Stet")
+///              .or_terms("est")
+///              .num(-82)
+///              .lr("elitr")
+///              .low_range("duo")
+///              .link_site("diam")
 ///              .img_type("est")
-///              .img_size("aliquyam")
-///              .img_dominant_color("elitr")
-///              .img_color_type("duo")
-///              .hq("diam")
-///              .hl("est")
-///              .high_range("sit")
-///              .googlehost("sed")
+///              .img_size("sit")
+///              .img_dominant_color("sed")
+///              .img_color_type("eos")
+///              .hq("Lorem")
+///              .hl("ea")
+///              .high_range("Stet")
+///              .googlehost("dolores")
 ///              .gl("eos")
-///              .filter("Lorem")
-///              .file_type("ea")
-///              .exclude_terms("Stet")
-///              .exact_terms("dolores")
-///              .date_restrict("eos")
-///              .cx("et")
-///              .cr("sea")
-///              .c2coff("et")
+///              .filter("et")
+///              .file_type("sea")
+///              .exclude_terms("et")
+///              .exact_terms("At")
+///              .date_restrict("dolore")
+///              .cx("eirmod")
+///              .cr("Lorem")
+///              .c2coff("accusam")
 ///              .doit().await;
 /// # }
 /// ```
@@ -1721,6 +1752,7 @@ pub struct CseListCall<'a, S>
     hub: &'a CustomSearchAPI<S>,
     _start: Option<u32>,
     _sort: Option<String>,
+    _snippet_length: Option<i32>,
     _site_search_filter: Option<String>,
     _site_search: Option<String>,
     _search_type: Option<String>,
@@ -1777,19 +1809,22 @@ where
         dlg.begin(client::MethodInfo { id: "search.cse.list",
                                http_method: hyper::Method::GET });
 
-        for &field in ["alt", "start", "sort", "siteSearchFilter", "siteSearch", "searchType", "safe", "rights", "relatedSite", "q", "orTerms", "num", "lr", "lowRange", "linkSite", "imgType", "imgSize", "imgDominantColor", "imgColorType", "hq", "hl", "highRange", "googlehost", "gl", "filter", "fileType", "excludeTerms", "exactTerms", "dateRestrict", "cx", "cr", "c2coff"].iter() {
+        for &field in ["alt", "start", "sort", "snippetLength", "siteSearchFilter", "siteSearch", "searchType", "safe", "rights", "relatedSite", "q", "orTerms", "num", "lr", "lowRange", "linkSite", "imgType", "imgSize", "imgDominantColor", "imgColorType", "hq", "hl", "highRange", "googlehost", "gl", "filter", "fileType", "excludeTerms", "exactTerms", "dateRestrict", "cx", "cr", "c2coff"].iter() {
             if self._additional_params.contains_key(field) {
                 dlg.finished(false);
                 return Err(client::Error::FieldClash(field));
             }
         }
 
-        let mut params = Params::with_capacity(33 + self._additional_params.len());
+        let mut params = Params::with_capacity(34 + self._additional_params.len());
         if let Some(value) = self._start.as_ref() {
             params.push("start", value.to_string());
         }
         if let Some(value) = self._sort.as_ref() {
             params.push("sort", value);
+        }
+        if let Some(value) = self._snippet_length.as_ref() {
+            params.push("snippetLength", value.to_string());
         }
         if let Some(value) = self._site_search_filter.as_ref() {
             params.push("siteSearchFilter", value);
@@ -1909,6 +1944,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
@@ -1977,6 +2013,13 @@ where
     /// Sets the *sort* query property to the given value.
     pub fn sort(mut self, new_value: &str) -> CseListCall<'a, S> {
         self._sort = Some(new_value.to_string());
+        self
+    }
+    /// Optional. Maximum length of snippet text, in characters, to be returned with results. Note: this feature is limited to specific engines. * Valid values are integers between 161 and 1000, inclusive.
+    ///
+    /// Sets the *snippet length* query property to the given value.
+    pub fn snippet_length(mut self, new_value: i32) -> CseListCall<'a, S> {
+        self._snippet_length = Some(new_value);
         self
     }
     /// Controls whether to include or exclude results from the site named in the `siteSearch` parameter. Acceptable values are: * `"e"`: exclude * `"i"`: include

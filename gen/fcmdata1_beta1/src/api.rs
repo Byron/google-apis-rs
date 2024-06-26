@@ -76,7 +76,7 @@ impl Default for Scope {
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Fcmdata::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Fcmdata::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -121,7 +121,7 @@ impl<'a, S> Fcmdata<S> {
         Fcmdata {
             client,
             auth: Box::new(auth),
-            _user_agent: "google-api-rust-client/5.0.4".to_string(),
+            _user_agent: "google-api-rust-client/5.0.5".to_string(),
             _base_url: "https://fcmdata.googleapis.com/".to_string(),
             _root_url: "https://fcmdata.googleapis.com/".to_string(),
         }
@@ -132,7 +132,7 @@ impl<'a, S> Fcmdata<S> {
     }
 
     /// Set the user-agent header field to use in all requests to the server.
-    /// It defaults to `google-api-rust-client/5.0.4`.
+    /// It defaults to `google-api-rust-client/5.0.5`.
     ///
     /// Returns the previously set user-agent.
     pub fn user_agent(&mut self, agent_name: String) -> String {
@@ -164,6 +164,7 @@ impl<'a, S> Fcmdata<S> {
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseFcmDataV1beta1AndroidDeliveryData {
@@ -190,14 +191,20 @@ impl client::Part for GoogleFirebaseFcmDataV1beta1AndroidDeliveryData {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseFcmDataV1beta1Data {
-    /// Count of messages accepted by FCM intended to Android devices. The targeted device must have opted in to the collection of usage and diagnostic information.
+    /// Count of messages accepted by FCM intended for Android devices. The targeted device must have opted in to the collection of usage and diagnostic information.
     #[serde(rename="countMessagesAccepted")]
     
     #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
     pub count_messages_accepted: Option<i64>,
+    /// Count of notifications accepted by FCM intended for Android devices. The targeted device must have opted in to the collection of usage and diagnostic information.
+    #[serde(rename="countNotificationsAccepted")]
+    
+    #[serde_as(as = "Option<::client::serde_with::DisplayFromStr>")]
+    pub count_notifications_accepted: Option<i64>,
     /// Additional information about delivery performance for messages that were successfully delivered.
     #[serde(rename="deliveryPerformancePercents")]
     
@@ -210,6 +217,10 @@ pub struct GoogleFirebaseFcmDataV1beta1Data {
     #[serde(rename="messageOutcomePercents")]
     
     pub message_outcome_percents: Option<GoogleFirebaseFcmDataV1beta1MessageOutcomePercents>,
+    /// Additional insights about proxy notification delivery.
+    #[serde(rename="proxyNotificationInsightPercents")]
+    
+    pub proxy_notification_insight_percents: Option<GoogleFirebaseFcmDataV1beta1ProxyNotificationInsightPercents>,
 }
 
 impl client::Part for GoogleFirebaseFcmDataV1beta1Data {}
@@ -219,6 +230,7 @@ impl client::Part for GoogleFirebaseFcmDataV1beta1Data {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseFcmDataV1beta1DeliveryPerformancePercents {
@@ -255,6 +267,7 @@ impl client::Part for GoogleFirebaseFcmDataV1beta1DeliveryPerformancePercents {}
 /// The list links the activity name, along with information about where it is used (one of *request* and *response*).
 /// 
 /// * [android apps delivery data list projects](ProjectAndroidAppDeliveryDataListCall) (response)
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseFcmDataV1beta1ListAndroidDeliveryDataResponse {
@@ -275,6 +288,7 @@ impl client::ResponseResult for GoogleFirebaseFcmDataV1beta1ListAndroidDeliveryD
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseFcmDataV1beta1MessageInsightPercents {
@@ -291,9 +305,13 @@ impl client::Part for GoogleFirebaseFcmDataV1beta1MessageInsightPercents {}
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleFirebaseFcmDataV1beta1MessageOutcomePercents {
+    /// The percentage of accepted messages that were [collapsed](https://firebase.google.com/docs/cloud-messaging/concept-options#collapsible_and_non-collapsible_messages) by another message.
+    
+    pub collapsed: Option<f32>,
     /// The percentage of all accepted messages that were successfully delivered to the device.
     
     pub delivered: Option<f32>,
@@ -309,6 +327,10 @@ pub struct GoogleFirebaseFcmDataV1beta1MessageOutcomePercents {
     #[serde(rename="droppedTooManyPendingMessages")]
     
     pub dropped_too_many_pending_messages: Option<f32>,
+    /// The percentage of accepted messages that expired because [Time To Live (TTL)](https://firebase.google.com/docs/cloud-messaging/concept-options#ttl) elapsed before the target device reconnected.
+    #[serde(rename="droppedTtlExpired")]
+    
+    pub dropped_ttl_expired: Option<f32>,
     /// The percentage of messages accepted on this day that were not dropped and not delivered, due to the device being disconnected (as of the end of the America/Los_Angeles day when the message was sent to FCM). A portion of these messages will be delivered the next day when the device connects but others may be destined to devices that ultimately never reconnect.
     
     pub pending: Option<f32>,
@@ -317,10 +339,46 @@ pub struct GoogleFirebaseFcmDataV1beta1MessageOutcomePercents {
 impl client::Part for GoogleFirebaseFcmDataV1beta1MessageOutcomePercents {}
 
 
+/// Additional information about [proxy notification](https://firebase.google.com/docs/cloud-messaging/android/message-priority#proxy) delivery. All percentages are calculated with countNotificationsAccepted as the denominator.
+/// 
+/// This type is not used in any activity, and only used as *part* of another schema.
+/// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
+#[serde_with::serde_as(crate = "::client::serde_with")]
+#[derive(Default, Clone, Debug, Serialize, Deserialize)]
+pub struct GoogleFirebaseFcmDataV1beta1ProxyNotificationInsightPercents {
+    /// The percentage of accepted notifications that failed to be proxied. This is usually caused by exceptions that occurred while calling [notifyAsPackage](https://developer.android.com/reference/android/app/NotificationManager#notifyAsPackage%28java.lang.String,%20java.lang.String,%20int,%20android.app.Notification%29).
+    
+    pub failed: Option<f32>,
+    /// The percentage of accepted notifications that were successfully proxied by [Google Play services](https://developers.google.com/android/guides/overview).
+    
+    pub proxied: Option<f32>,
+    /// The percentage of accepted notifications that were skipped because the messages were not throttled.
+    #[serde(rename="skippedNotThrottled")]
+    
+    pub skipped_not_throttled: Option<f32>,
+    /// The percentage of accepted notifications that were skipped because the app disallowed these messages to be proxied.
+    #[serde(rename="skippedOptedOut")]
+    
+    pub skipped_opted_out: Option<f32>,
+    /// The percentage of accepted notifications that were skipped because configurations required for notifications to be proxied were missing.
+    #[serde(rename="skippedUnconfigured")]
+    
+    pub skipped_unconfigured: Option<f32>,
+    /// The percentage of accepted notifications that were skipped because proxy notification is unsupported for the recipient.
+    #[serde(rename="skippedUnsupported")]
+    
+    pub skipped_unsupported: Option<f32>,
+}
+
+impl client::Part for GoogleFirebaseFcmDataV1beta1ProxyNotificationInsightPercents {}
+
+
 /// Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values. * A month and day, with a zero year (for example, an anniversary). * A year on its own, with a zero month and a zero day. * A year and month, with a zero day (for example, a credit card expiration date). Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp
 /// 
 /// This type is not used in any activity, and only used as *part* of another schema.
 /// 
+#[cfg_attr(feature = "utoipa", derive(utoipa::ToSchema))]
 #[serde_with::serde_as(crate = "::client::serde_with")]
 #[derive(Default, Clone, Debug, Serialize, Deserialize)]
 pub struct GoogleTypeDate {
@@ -364,7 +422,7 @@ impl client::Part for GoogleTypeDate {}
 ///         secret,
 ///         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 ///     ).build().await.unwrap();
-/// let mut hub = Fcmdata::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// let mut hub = Fcmdata::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // Usually you wouldn't bind this to a variable, but keep calling *CallBuilders*
 /// // like `android_apps_delivery_data_list(...)`
 /// // to build up your call.
@@ -431,7 +489,7 @@ impl<'a, S> ProjectMethods<'a, S> {
 /// #         secret,
 /// #         oauth2::InstalledFlowReturnMethod::HTTPRedirect,
 /// #     ).build().await.unwrap();
-/// # let mut hub = Fcmdata::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().https_or_http().enable_http1().build()), auth);
+/// # let mut hub = Fcmdata::new(hyper::Client::builder().build(hyper_rustls::HttpsConnectorBuilder::new().with_native_roots().unwrap().https_or_http().enable_http1().build()), auth);
 /// // You can configure optional parameters by calling the respective setters at will, and
 /// // execute the final call using `doit()`.
 /// // Values shown here are possibly random and not representative !
@@ -539,6 +597,7 @@ where
 
 
                         let request = req_builder
+                        .header(CONTENT_LENGTH, 0_u64)
                         .body(hyper::body::Body::empty());
 
                 client.request(request.unwrap()).await
