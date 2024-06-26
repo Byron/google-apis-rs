@@ -281,7 +281,7 @@
             }
         }
     },
-    "revision": "20240417",
+    "revision": "20240624",
     "rootUrl": "https://mybusinessplaceactions.googleapis.com/",
     "schemas": {
         "Empty": {

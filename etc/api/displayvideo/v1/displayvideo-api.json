@@ -4452,7 +4452,7 @@
                                             "type": "string"
                                         },
                                         "targetingType": {
-                                            "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL`",
+                                            "description": "Required. Identifies the type of this assigned targeting option. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD`",
                                             "enum": [
                                                 "TARGETING_TYPE_UNSPECIFIED",
                                                 "TARGETING_TYPE_CHANNEL",
@@ -4603,7 +4603,7 @@
                                             "type": "string"
                                         },
                                         "targetingType": {
-                                            "description": "Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL`",
+                                            "description": "Required. Identifies the type of assigned targeting options to list. Supported targeting types: * `TARGETING_TYPE_CHANNEL` * `TARGETING_TYPE_DIGITAL_CONTENT_LABEL_EXCLUSION` * `TARGETING_TYPE_OMID` * `TARGETING_TYPE_SENSITIVE_CATEGORY_EXCLUSION` * `TARGETING_TYPE_YOUTUBE_VIDEO` * `TARGETING_TYPE_YOUTUBE_CHANNEL` * `TARGETING_TYPE_KEYWORD`",
                                             "enum": [
                                                 "TARGETING_TYPE_UNSPECIFIED",
                                                 "TARGETING_TYPE_CHANNEL",
@@ -8146,7 +8146,7 @@
             }
         }
     },
-    "revision": "20240418",
+    "revision": "20240620",
     "rootUrl": "https://displayvideo.googleapis.com/",
     "schemas": {
         "ActivateManualTriggerRequest": {
@@ -10938,7 +10938,8 @@
                         "SDF_VERSION_5_4",
                         "SDF_VERSION_5_5",
                         "SDF_VERSION_6",
-                        "SDF_VERSION_7"
+                        "SDF_VERSION_7",
+                        "SDF_VERSION_7_1"
                     ],
                     "enumDeprecated": [
                         false,
@@ -10951,6 +10952,7 @@
                         true,
                         true,
                         true,
+                        false,
                         false,
                         false,
                         false
@@ -10968,7 +10970,8 @@
                         "SDF version 5.4",
                         "SDF version 5.5",
                         "SDF version 6",
-                        "SDF version 7. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version."
+                        "SDF version 7. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version.",
+                        "SDF version 7.1. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version."
                     ],
                     "type": "string"
                 }
@@ -17811,7 +17814,8 @@
                         "SDF_VERSION_5_4",
                         "SDF_VERSION_5_5",
                         "SDF_VERSION_6",
-                        "SDF_VERSION_7"
+                        "SDF_VERSION_7",
+                        "SDF_VERSION_7_1"
                     ],
                     "enumDeprecated": [
                         false,
@@ -17824,6 +17828,7 @@
                         true,
                         true,
                         true,
+                        false,
                         false,
                         false,
                         false
@@ -17841,7 +17846,8 @@
                         "SDF version 5.4",
                         "SDF version 5.5",
                         "SDF version 6",
-                        "SDF version 7. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version."
+                        "SDF version 7. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version.",
+                        "SDF version 7.1. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version."
                     ],
                     "type": "string"
                 }
@@ -17888,7 +17894,8 @@
                         "SDF_VERSION_5_4",
                         "SDF_VERSION_5_5",
                         "SDF_VERSION_6",
-                        "SDF_VERSION_7"
+                        "SDF_VERSION_7",
+                        "SDF_VERSION_7_1"
                     ],
                     "enumDeprecated": [
                         false,
@@ -17901,6 +17908,7 @@
                         true,
                         true,
                         true,
+                        false,
                         false,
                         false,
                         false
@@ -17918,7 +17926,8 @@
                         "SDF version 5.4",
                         "SDF version 5.5",
                         "SDF version 6",
-                        "SDF version 7. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version."
+                        "SDF version 7. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version.",
+                        "SDF version 7.1. Read the [v7 migration guide](/display-video/api/structured-data-file/v7-migration-guide) before migrating to this version."
                     ],
                     "type": "string"
                 }
